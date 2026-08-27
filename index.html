@@ -2785,11 +2785,39 @@ function buildClubAiContext(){
     .slice().sort((a,b)=>parseLtv(b.ltv)-parseLtv(a.ltv)).slice(0,10);
   const top10Text = top10Rows.map((r,i)=>`${i+1}. ${r.name} (${r.cidade}, ${r.nivel}, ${r.ltv})`).join(' ');
 
-  return `ATENÇÃO: Nesta conversa o clube selecionado é ${c.name}, NÃO o Estrela FC — ignore TODOS os números fictícios do Estrela FC abaixo (visão geral, receita, base de torcedores, exemplos de torcedores no CRM, Top 10 por LTV, funil da CDP) e use estes dados reais do ${c.name} em vez deles:
+  const squad = SQUAD_BY_CLUB[currentClubId];
+  const topMasc = squad.masc.slice().sort((a,b)=>b.score-a.score).slice(0,4)
+    .map(p=>`${p.name} (${p.pos}, ${p.age} anos, score ${p.score}, valor de mercado ${p.market})`).join('; ');
+  const topFem = squad.fem.slice().sort((a,b)=>b.score-a.score).slice(0,3)
+    .map(p=>`${p.name} (${p.pos}, ${p.age} anos, score ${p.score}, valor de mercado ${p.market})`).join('; ');
+  const staff = STAFF_BY_CLUB[currentClubId];
+  const tecnico = staff.find(s=>s.role==='Técnico')?.name;
+  const medico = staff.find(s=>s.role==='Médico Chefe')?.name;
+  const teamStats = TEAM_STATS_BY_CLUB[currentClubId];
+  const assets = CLUB_ASSETS_BY_CLUB[currentClubId].map(a=>`${a.name} (${a.type}, ${a.location})`).join('; ');
+  const sponsors = SPONSORS_BY_CLUB[currentClubId];
+  const sponsorsText = sponsors.map(s=>`${s[0]} (${s[1]}, ${s[2]}, ROI ${s[3]})`).join('; ');
+  const brandInfo = BRAND_BY_CLUB[currentClubId];
+  const travel = TRAVEL_BY_CLUB[currentClubId][0];
+  const stadium = STADIUM_BY_CLUB[currentClubId];
+  const products = PRODUCTS_BY_CLUB[currentClubId].slice().sort((a,b)=>(b.price*b.vendido)-(a.price*a.vendido)).slice(0,3)
+    .map(p=>`${p.name} (${p.cat}, R$ ${p.price.toFixed(2).replace('.',',')}, ${p.vendido} vendidos)`).join('; ');
+
+  return `ATENÇÃO: Nesta conversa o clube selecionado é ${c.name}, NÃO o Estrela FC — ignore TODOS os números fictícios do Estrela FC abaixo (visão geral, receita, base de torcedores, exemplos de torcedores no CRM, Top 10 por LTV, funil da CDP, elenco, patrocinadores, ativos) e use estes dados reais do ${c.name} em vez deles:
 ${c.ai}
 Torcedores com perfil 360° completo na Ontologia (base do Torcedor 360): ${totalPerfis.toLocaleString('pt-BR')}, sendo ${totalSocios.toLocaleString('pt-BR')} sócios-torcedores pagantes. Distribuição por nível: ${tierText}.
 Torcedores exemplo no CRM: ${fanExamples}.
 Top 10 torcedores por LTV (se perguntarem "top 10", "quem gasta mais" ou similar, use ESTA lista exata, na ordem): ${top10Text}.
+Desempenho do time no Brasileirão 2026: ${teamStats.posicao}, retrospecto ${teamStats.vitorias}, artilheiro ${teamStats.artilheiro}, defesa: ${teamStats.defesa}.
+Principais jogadores do elenco masculino profissional (nomes reais, dados fictícios de score/valor para fins de demo): ${topMasc}.
+Principais jogadoras do elenco feminino profissional: ${topFem}.
+Comissão técnica e médica: técnico ${tecnico}, médico chefe ${medico} (nomes fictícios).
+Ativos do clube: ${assets}.
+Próxima viagem do elenco: ${travel[2]} em ${travel[0]}, dia ${travel[1]}, status ${travel[5]}.
+Estádio: ${stadium.name}, capacidade ${stadium.capacity.toLocaleString('pt-BR')}. Próximo jogo em casa: ${stadium.nextMatch.label}, ${stadium.nextMatch.date} às ${stadium.nextMatch.time}.
+Patrocinadores ativos (marcas fictícias): ${sponsorsText}.
+Marca do clube: valor estimado ${brandInfo.value}, ${brandInfo.social} seguidores combinados nas redes, licenciamento em ${brandInfo.licensees}.
+Top produtos da loja oficial (produtos reais, vendas fictícias): ${products}.
 
 `;
 }
