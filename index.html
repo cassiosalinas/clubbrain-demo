@@ -714,7 +714,7 @@ canvas{ max-width:100%; }
       <div class="card" style="margin-bottom:16px;">
         <div class="card-title">
           <h3>Tipos de objeto recentemente modificados</h3>
-          <span class="tag" id="ontology-count-tag" style="margin-left:auto;">10</span>
+          <span class="tag" id="ontology-count-tag" style="margin-left:auto;">9</span>
         </div>
         <div class="hero-note" style="margin:-6px 0 14px;">Cada card é um tipo de objeto na Ontologia do Clube — clique para ver como ele se conecta aos demais.</div>
         <div class="grid g-3" id="ontology-grid"></div>
@@ -2241,10 +2241,8 @@ function buildOntologyTypes(){
   const jogos = (EVENTS_BY_CLUB[currentClubId] || EVENTS_BY_CLUB.flamengo).length;
   const totalSold = st.sectors.reduce((s,x)=>s+Math.round(x.cap*x.sold),0);
   return [
-    { key:'torcedor', name:'Torcedor', icon:ONTOLOGY_ICONS.torcedor, color:brand, count:`${club.kpi.ativos} torcedores`, dependents:12, prominent:true,
-      desc:'Todo torcedor identificado pela Ontologia — da base ampla ao sócio-torcedor pagante.', linked:['Ingresso','Sócio-Torcedor','Produto'] },
-    { key:'socio', name:'Sócio-Torcedor', icon:ONTOLOGY_ICONS.socio, color:gold, count:`${club.kpi.cdpSocios} sócios ativos`, dependents:6,
-      desc:'Torcedor pagante com plano ativo — nível, ticket médio, LTV e risco de churn.', linked:['Torcedor','Assinatura'] },
+    { key:'socio', name:'Sócio-Torcedor', icon:ONTOLOGY_ICONS.socio, color:gold, count:`${club.kpi.cdpSocios} sócios ativos`, dependents:6, prominent:true,
+      desc:'Torcedor pagante com plano ativo — nível, ticket médio, LTV e risco de churn.', linked:['Ingresso','Assinatura','Produto'] },
     { key:'ingresso', name:'Ingresso', icon:ONTOLOGY_ICONS.ingresso, color:teal, count:`${totalSold.toLocaleString('pt-BR')} vendidos`, dependents:5,
       desc:'Cada ingresso vendido, ligado a um setor do estádio e a um torcedor.', linked:['Setor do Estádio','Jogo'] },
     { key:'jogo', name:'Jogo / Evento', icon:ONTOLOGY_ICONS.jogo, color:brand2, count:`${jogos} no calendário`, dependents:9,
@@ -2280,7 +2278,7 @@ function ontologyCardHtml(o){
 }
 function buildOntology(){
   const stats = [
-    ['Tipos de objeto','10'], ['Propriedades','186'], ['Propriedades compartilhadas','24'],
+    ['Tipos de objeto','9'], ['Propriedades','186'], ['Propriedades compartilhadas','24'],
     ['Tipos de link','34'], ['Tipos de ação','58'], ['Grupos','9'],
     ['Interfaces','4'], ['Tipos de valor','12'], ['Funções','146'], ['Problemas de saúde','0'],
   ];
@@ -2312,7 +2310,7 @@ function buildOntology(){
   const twins = [
     { name:`Gêmeo Digital do ${st2.name}`, icon:ONTOLOGY_ICONS.setor, color:teal, based:'Setor do Estádio',
       desc:`Modelo vivo dos ${st2.sectors.length} setores do estádio — simula fluxo de torcedores, filas nas catracas e ocupação em tempo real para o próximo jogo, alimentando o mapa de setores em Eventos & Ingressos.` },
-    { name:'Gêmeo Digital do Torcedor', icon:ONTOLOGY_ICONS.torcedor, color:brand, based:'Torcedor',
+    { name:'Gêmeo Digital do Sócio-Torcedor', icon:ONTOLOGY_ICONS.socio, color:gold, based:'Sócio-Torcedor',
       desc:'Modelo comportamental individual (Fan Score, propensão de compra, risco de churn) usado pelos Agentes de IA para prever a próxima ação antes de ativar uma campanha.' },
     { name:'Gêmeo Digital do Jogo', icon:ONTOLOGY_ICONS.jogo, color:brand2, based:'Jogo / Evento',
       desc:'Simula cenários de precificação dinâmica por setor — velocidade de vendas, ocupação esperada e receita projetada — antes do Agente de Precificação Dinâmica sugerir um preço.' },
@@ -2331,24 +2329,24 @@ function buildOntology(){
       <div style="font-size:12px; color:var(--text-dim); line-height:1.5;">${t.desc}</div>
     </div>`).join('');
 }
-const TORCEDOR_SCHEMA = [
-  ['fanId','string','Identificador único do torcedor na Ontologia (ex: FAN-FLA-00104)'],
+const SOCIO_SCHEMA = [
+  ['fanId','string','Identificador único do sócio-torcedor na Ontologia (ex: FAN-FLA-00104)'],
   ['nome','string','Nome completo'],
   ['idade','integer','12 a 85 anos'],
   ['sexo','enum','Masculino · Feminino'],
   ['cidade / região / país','string','Localização — a grande maioria no Brasil, pequena fatia no exterior'],
-  ['nivel','enum','Básico · Bronze · Prata · Ouro · Platina'],
+  ['nivel','enum','Bronze · Prata · Ouro · Platina'],
   ['fanScore','integer (0–100)','Composto por Engagement, Comercial, Conteúdo, Matchday, Gamificação, Fidelidade'],
-  ['ltv / gastoTotal','currency','Valor gerado desde que virou torcedor identificado'],
+  ['ltv / gastoTotal','currency','Valor gerado desde que virou sócio-torcedor pagante'],
   ['churnRisco','enum','Baixo · Médio · Alto'],
   ['propensaoDeCompra','percent','Calculada pelo Agente de CRM'],
   ['timeCoracao / tambemTorce','string','Time principal e clubes secundários'],
   ['tags / segments','array','Interesses e segmentos ativos vindos das Audiences'],
 ];
-function showTorcedorObjectModal(o){
-  const pool = getFanPool();
+function showSocioObjectModal(o){
+  const pool = getFanPool().filter(f=>f.socio);
   const total = pool.length;
-  const tierDb = getTierDb();
+  const tierDb = getTierDb().filter(t=>t.key!=='basico');
   const tierDist = tierDb.map(t=>({ name:t.name, color:t.color, count: pool.filter(f=>f.nivel===t.key).length }));
   const regioes = ['Sudeste','Nordeste','Sul','Centro-Oeste','Norte','Exterior'];
   const regiaoCores = { Sudeste:brand, Nordeste:teal, Sul:brand2, 'Centro-Oeste':gold, Norte:amber, Exterior:red };
@@ -2376,7 +2374,7 @@ function showTorcedorObjectModal(o){
      <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Propriedades (schema)</div>
      <div style="max-height:150px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;">
        <table style="margin:0;"><tbody>
-         ${TORCEDOR_SCHEMA.map(([field,type,desc])=>`
+         ${SOCIO_SCHEMA.map(([field,type,desc])=>`
            <tr><td class="strong mono" style="font-size:11.5px; white-space:nowrap;">${field}</td><td><span class="tag" style="font-size:10px;">${type}</span></td><td style="font-size:11.5px; color:var(--text-dim);">${desc}</td></tr>
          `).join('')}
        </tbody></table>
@@ -2409,7 +2407,7 @@ function showTorcedorObjectModal(o){
 function showOntologyModal(key){
   const o = ontologyTypesCache.find(x=>x.key===key);
   if(!o) return;
-  if(key === 'torcedor') return showTorcedorObjectModal(o);
+  if(key === 'socio') return showSocioObjectModal(o);
   showModal(
     `<h3 style="color:${o.color};">${o.name}</h3>`,
     `<div class="hero-note" style="margin:8px 0 16px;">${o.desc}</div>
