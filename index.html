@@ -1515,10 +1515,13 @@ Chart.defaults.borderColor = 'rgba(35,42,68,0.6)';
 const gridOpt = { color: 'rgba(35,42,68,0.6)', drawTicks:false };
 const brand = '#6c6bff', brand2 = '#b06bff', teal='#1fd6b8', amber='#ffb454', red='#ff5c72', gold='#f2c94c';
 
-// URL absoluta do backend no Netlify — permite hospedar este mesmo index.html
-// em outro domínio (ex: clubbrain.ai/algo) e o chat continuar funcionando,
-// chamando a function do Netlify via CORS em vez de um caminho relativo.
-const CHAT_BACKEND_URL = 'https://vfans.netlify.app/.netlify/functions/chat';
+// Escolhe o backend do chat automaticamente conforme onde este index.html
+// está rodando: dentro de clubbrain.ai usa o chat.php local (mesma pasta,
+// veja godaddy/chat.php); em qualquer outro lugar (Netlify, preview local
+// etc.) usa a function do Netlify via URL absoluta.
+const CHAT_BACKEND_URL = location.hostname.endsWith('clubbrain.ai')
+  ? 'chat.php'
+  : 'https://vfans.netlify.app/.netlify/functions/chat';
 
 function grad(ctx, color){
   const g = ctx.createLinearGradient(0,0,0,220);
