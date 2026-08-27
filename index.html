@@ -602,9 +602,9 @@ canvas{ max-width:100%; }
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>NPS / Sentimento</div>
-          <div class="value" id="kpi-cockpit-nps">88%</div>
+          <div class="value" id="kpi-cockpit-nps">68</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cockpit-nps"></canvas></div>
-          <div class="delta up" id="kpi-cockpit-nps-delta">↑ 4pp</div>
+          <div class="delta up" id="kpi-cockpit-nps-delta">↑ 4 pts</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg></span>Torcedores em risco de churn</div>
@@ -708,9 +708,15 @@ canvas{ max-width:100%; }
         <div class="grid g-3" id="ontology-grid"></div>
       </div>
 
-      <div class="card">
+      <div class="card" style="margin-bottom:16px;">
         <div class="card-title"><h3>Tipos de objeto em destaque</h3></div>
         <div class="grid g-2" id="ontology-prominent"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><h3>Gêmeos digitais em uso</h3></div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Um gêmeo digital é um modelo vivo de um objeto real, atualizado continuamente pela Ontologia — usado pelos Agentes de IA para simular cenários antes de agir no mundo real.</div>
+        <div class="grid g-2" id="ontology-twins"></div>
       </div>
     </section>
 
@@ -736,7 +742,8 @@ canvas{ max-width:100%; }
               <div class="subtab" data-gender="fem">Feminino</div>
             </div>
           </div>
-          <div class="hero-note" style="margin:-6px 0 14px;">Jogadores fictícios, criados para fins de demonstração — posição, idade, score de performance, valor de marca do jogador e valor de mercado.</div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Elenco oficial real, pesquisado publicamente (nomes, posições e idades). Valor de mercado em € reflete Transfermarkt quando disponível; score de performance e valor de marca são estimativas para fins de demonstração.</div>
+          <div class="grid g-4" id="team-stats-grid" style="margin-bottom:16px;"></div>
           <table>
             <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Score de performance</th><th>Valor de marca</th><th>Valor de mercado</th></tr></thead>
             <tbody id="elenco-table"></tbody>
@@ -1095,6 +1102,7 @@ canvas{ max-width:100%; }
           <span class="item"><span class="sw" style="background:#ffb454;"></span>Bom ritmo (75–89%)</span>
           <span class="item"><span class="sw" style="background:#1fd6b8;"></span>Baixa procura (&lt;75%)</span>
         </div>
+        <div id="stadium-illustration" style="margin-bottom:14px; border-radius:14px; overflow:hidden; background:#0c1020;"></div>
         <div id="stadium-map"></div>
       </div>
       <div class="two-col">
@@ -1799,7 +1807,7 @@ const CLUB_PROFILES = {
     kpi:{
       receita:'R$ 26,5M', receitaDelta:'↑ 14,8% vs. período anterior',
       ativos:'10,7M', ativosDelta:'↑ 11,6%',
-      nps:'86%', npsDelta:'↑ 3pp',
+      nps:'68', npsDelta:'↑ 3 pts',
       churn:'5,9%', churnBase:'≈ 631 mil torcedores da base reconhecida',
       cdpTotal:'45M', cdpIdentificados:'10,7M', cdpPerfis:'4.500', cdpSocios:'120',
       engajamento:'8,4%', engajamentoDelta:'↑ 0,8pp vs. mês anterior',
@@ -1813,7 +1821,7 @@ const CLUB_PROFILES = {
     kpi:{
       receita:'R$ 17,8M', receitaDelta:'↑ 9,7% vs. período anterior',
       ativos:'7,1M', ativosDelta:'↑ 10,3%',
-      nps:'82%', npsDelta:'↑ 2pp',
+      nps:'54', npsDelta:'↑ 2 pts',
       churn:'7,4%', churnBase:'≈ 525 mil torcedores da base reconhecida',
       cdpTotal:'30M', cdpIdentificados:'7,1M', cdpPerfis:'3.000', cdpSocios:'100',
       engajamento:'7,1%', engajamentoDelta:'↑ 0,4pp vs. mês anterior',
@@ -1905,6 +1913,7 @@ function selectClub(id, silent){
   refreshEventsForClub();
   if(document.getElementById('ontology-grid')) buildOntology();
   refreshClubManagementForClub();
+  renderCommerceProducts();
   if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
 }
 
@@ -2231,6 +2240,29 @@ function buildOntology(){
       </div>
       <div style="font-size:12.5px; color:var(--text-dim); line-height:1.5;">${o.desc}</div>
     </div>`).join('');
+
+  const st2 = getStadium();
+  const twins = [
+    { name:`Gêmeo Digital do ${st2.name}`, icon:ONTOLOGY_ICONS.setor, color:teal, based:'Setor do Estádio',
+      desc:`Modelo vivo dos ${st2.sectors.length} setores do estádio — simula fluxo de torcedores, filas nas catracas e ocupação em tempo real para o próximo jogo, alimentando o mapa de setores em Eventos & Ingressos.` },
+    { name:'Gêmeo Digital do Torcedor', icon:ONTOLOGY_ICONS.torcedor, color:brand, based:'Torcedor',
+      desc:'Modelo comportamental individual (Fan Score, propensão de compra, risco de churn) usado pelos Agentes de IA para prever a próxima ação antes de ativar uma campanha.' },
+    { name:'Gêmeo Digital do Jogo', icon:ONTOLOGY_ICONS.jogo, color:brand2, based:'Jogo / Evento',
+      desc:'Simula cenários de precificação dinâmica por setor — velocidade de vendas, ocupação esperada e receita projetada — antes do Agente de Precificação Dinâmica sugerir um preço.' },
+    { name:'Gêmeo Digital do Ativo do Clube', icon:ONTOLOGY_ICONS.ativo, color:gold, based:'Ativo do Clube',
+      desc:'Monitoramento preditivo de manutenção do estádio, CT e sede — antecipa desgaste de gramado e estrutura antes de virar problema operacional.' },
+  ];
+  document.getElementById('ontology-twins').innerHTML = twins.map(t=>`
+    <div class="card" style="background:linear-gradient(135deg, ${t.color}14, var(--surface)); border-color:${t.color}44;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <span class="icon-badge" style="background:${t.color}22; color:${t.color}; width:36px; height:36px; flex:none;">${t.icon}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-weight:700; font-size:14px;">${t.name}</div>
+          <div class="hero-note" style="margin-top:1px;">Baseado no objeto: ${t.based}</div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--text-dim); line-height:1.5;">${t.desc}</div>
+    </div>`).join('');
 }
 function showOntologyModal(key){
   const o = ontologyTypesCache.find(x=>x.key===key);
@@ -2248,53 +2280,56 @@ function showOntologyModal(key){
 }
 
 /* ============ GESTAO DO CLUBE ============ */
+/* Jogadores e jogadoras reais (elenco oficial 2026), pesquisados publicamente.
+   Score de performance é uma estimativa própria (0-100) baseada no desempenho reportado;
+   valor de mercado usa € (Transfermarkt) quando a fonte trazia o número exato — os demais são estimativas para fins de demonstração. */
 const SQUAD_BY_CLUB = {
   flamengo: {
     masc:[
-      { name:'Thiago Almeida', pos:'Goleiro', age:27, score:82, brand:'R$ 8,0M', market:'R$ 45,0M' },
-      { name:'Rafael Monteiro', pos:'Zagueiro', age:24, score:78, brand:'R$ 5,0M', market:'R$ 32,0M' },
-      { name:'Bruno Castilho', pos:'Zagueiro', age:29, score:85, brand:'R$ 12,0M', market:'R$ 58,0M' },
-      { name:'Gabriel Ferraz', pos:'Lateral Direito', age:22, score:74, brand:'R$ 4,0M', market:'R$ 22,0M' },
-      { name:'Diego Salgado', pos:'Lateral Esquerdo', age:26, score:80, brand:'R$ 6,0M', market:'R$ 38,0M' },
-      { name:'Matheus Rocha', pos:'Volante', age:25, score:88, brand:'R$ 15,0M', market:'R$ 65,0M' },
-      { name:'Lucas Vieira', pos:'Meia', age:23, score:91, brand:'R$ 22,0M', market:'R$ 85,0M' },
-      { name:'Pedro Aguiar', pos:'Meia', age:30, score:79, brand:'R$ 7,0M', market:'R$ 28,0M' },
-      { name:'Vitor Barbosa', pos:'Atacante', age:21, score:89, brand:'R$ 28,0M', market:'R$ 92,0M' },
-      { name:'Everton Dias', pos:'Atacante', age:28, score:93, brand:'R$ 35,0M', market:'R$ 110,0M' },
+      { name:'Agustín Rossi', pos:'Goleiro', age:30, score:85, brand:'R$ 9,0M', market:'€ 6,0M' },
+      { name:'Vitão', pos:'Zagueiro', age:25, score:80, brand:'R$ 6,0M', market:'€ 10,2M' },
+      { name:'Léo Pereira', pos:'Zagueiro', age:29, score:84, brand:'R$ 8,0M', market:'€ 12,0M' },
+      { name:'Wesley', pos:'Lateral Direito', age:20, score:81, brand:'R$ 7,0M', market:'€ 15,0M' },
+      { name:'Ayrton Lucas', pos:'Lateral Esquerdo', age:27, score:79, brand:'R$ 5,0M', market:'€ 9,0M' },
+      { name:'Erick Pulgar', pos:'Volante', age:32, score:83, brand:'R$ 6,0M', market:'€ 5,0M' },
+      { name:'Lucas Paquetá', pos:'Meia', age:28, score:92, brand:'R$ 25,0M', market:'€ 40,6M' },
+      { name:'Samuel Lino', pos:'Meia', age:25, score:86, brand:'R$ 10,0M', market:'€ 18,0M' },
+      { name:'Everton (Cebolinha)', pos:'Atacante', age:29, score:84, brand:'R$ 9,0M', market:'€ 8,0M' },
+      { name:'Pedro', pos:'Atacante', age:28, score:94, brand:'R$ 20,0M', market:'€ 18,0M' },
     ],
     fem:[
-      { name:'Ana Beatriz Correia', pos:'Goleira', age:26, score:84, brand:'R$ 1,2M', market:'R$ 3,5M' },
-      { name:'Camila Rezende', pos:'Zagueira', age:24, score:80, brand:'R$ 0,9M', market:'R$ 2,8M' },
-      { name:'Juliana Matos', pos:'Lateral', age:22, score:76, brand:'R$ 0,6M', market:'R$ 1,9M' },
-      { name:'Bianca Ferreira', pos:'Volante', age:27, score:87, brand:'R$ 1,5M', market:'R$ 4,2M' },
-      { name:'Larissa Gouveia', pos:'Meia', age:23, score:90, brand:'R$ 2,1M', market:'R$ 5,8M' },
-      { name:'Fernanda Costa', pos:'Meia', age:29, score:82, brand:'R$ 1,1M', market:'R$ 3,1M' },
-      { name:'Rayssa Lima', pos:'Atacante', age:20, score:88, brand:'R$ 2,4M', market:'R$ 6,5M' },
-      { name:'Marina Duarte', pos:'Atacante', age:25, score:92, brand:'R$ 3,2M', market:'R$ 8,4M' },
+      { name:'Bibi', pos:'Goleira', age:21, score:78, brand:'R$ 0,4M', market:'€ 0,15M' },
+      { name:'Viviane Holzel', pos:'Goleira', age:36, score:76, brand:'R$ 0,3M', market:'€ 0,08M' },
+      { name:'Agustina Barroso', pos:'Zagueira', age:32, score:85, brand:'R$ 0,9M', market:'€ 0,30M' },
+      { name:'Jucinara', pos:'Lateral', age:32, score:80, brand:'R$ 0,6M', market:'€ 0,20M' },
+      { name:'Fabiana', pos:'Zagueira', age:36, score:79, brand:'R$ 0,5M', market:'€ 0,15M' },
+      { name:'Djeni', pos:'Volante', age:30, score:82, brand:'R$ 0,7M', market:'€ 0,25M' },
+      { name:'Duda Rodrigues', pos:'Meia', age:22, score:84, brand:'R$ 0,8M', market:'€ 0,30M' },
+      { name:'Cristiane', pos:'Atacante', age:40, score:88, brand:'R$ 1,5M', market:'€ 0,20M' },
     ],
   },
   corinthians: {
     masc:[
-      { name:'Diego Fagundes', pos:'Goleiro', age:28, score:80, brand:'R$ 6,0M', market:'R$ 38,0M' },
-      { name:'Wesley Antunes', pos:'Zagueiro', age:25, score:79, brand:'R$ 4,5M', market:'R$ 29,0M' },
-      { name:'Caio Bragança', pos:'Zagueiro', age:31, score:83, brand:'R$ 9,0M', market:'R$ 40,0M' },
-      { name:'Renan Osório', pos:'Lateral Direito', age:23, score:75, brand:'R$ 3,8M', market:'R$ 20,0M' },
-      { name:'Yuri Cabral', pos:'Lateral Esquerdo', age:27, score:78, brand:'R$ 5,0M', market:'R$ 31,0M' },
-      { name:'Igor Pacheco', pos:'Volante', age:26, score:85, brand:'R$ 11,0M', market:'R$ 52,0M' },
-      { name:'Matheus Godói', pos:'Meia', age:22, score:87, brand:'R$ 18,0M', market:'R$ 70,0M' },
-      { name:'Rodrigo Tavares', pos:'Meia', age:29, score:81, brand:'R$ 8,0M', market:'R$ 34,0M' },
-      { name:'Kaique Rezende', pos:'Atacante', age:20, score:86, brand:'R$ 20,0M', market:'R$ 78,0M' },
-      { name:'Gustavo Mendonça', pos:'Atacante', age:27, score:90, brand:'R$ 26,0M', market:'R$ 95,0M' },
+      { name:'Hugo Souza', pos:'Goleiro', age:27, score:83, brand:'R$ 7,0M', market:'€ 7,0M' },
+      { name:'Félix Torres', pos:'Zagueiro', age:28, score:80, brand:'R$ 5,0M', market:'€ 6,0M' },
+      { name:'Gustavo Henrique', pos:'Zagueiro', age:33, score:78, brand:'R$ 4,0M', market:'€ 2,5M' },
+      { name:'Matheuzinho', pos:'Lateral Direito', age:25, score:76, brand:'R$ 3,5M', market:'€ 4,0M' },
+      { name:'Hugo', pos:'Lateral Esquerdo', age:28, score:75, brand:'R$ 3,0M', market:'€ 3,0M' },
+      { name:'Raniele', pos:'Volante', age:28, score:81, brand:'R$ 5,0M', market:'€ 6,0M' },
+      { name:'Rodrigo Garro', pos:'Meia', age:27, score:89, brand:'R$ 14,0M', market:'€ 12,0M' },
+      { name:'André Carrillo', pos:'Meia', age:34, score:79, brand:'R$ 4,0M', market:'€ 2,0M' },
+      { name:'Memphis Depay', pos:'Atacante', age:32, score:90, brand:'R$ 18,0M', market:'€ 8,1M' },
+      { name:'Yuri Alberto', pos:'Atacante', age:25, score:93, brand:'R$ 22,0M', market:'€ 23,8M' },
     ],
     fem:[
-      { name:'Patrícia Nogueira', pos:'Goleira', age:25, score:82, brand:'R$ 1,0M', market:'R$ 3,0M' },
-      { name:'Débora Sales', pos:'Zagueira', age:23, score:78, brand:'R$ 0,7M', market:'R$ 2,2M' },
-      { name:'Aline Bezerra', pos:'Lateral', age:26, score:77, brand:'R$ 0,8M', market:'R$ 2,4M' },
-      { name:'Tainá Rocha', pos:'Volante', age:24, score:85, brand:'R$ 1,4M', market:'R$ 3,9M' },
-      { name:'Vitória Campos', pos:'Meia', age:22, score:89, brand:'R$ 2,0M', market:'R$ 5,5M' },
-      { name:'Letícia Amaral', pos:'Meia', age:28, score:80, brand:'R$ 1,0M', market:'R$ 2,9M' },
-      { name:'Sabrina Teles', pos:'Atacante', age:21, score:87, brand:'R$ 2,3M', market:'R$ 6,2M' },
-      { name:'Giovanna Prado', pos:'Atacante', age:26, score:91, brand:'R$ 3,0M', market:'R$ 8,0M' },
+      { name:'Lelê', pos:'Goleira', age:35, score:83, brand:'R$ 0,5M', market:'€ 0,15M' },
+      { name:'Nicole Ramos', pos:'Goleira', age:24, score:77, brand:'R$ 0,3M', market:'€ 0,08M' },
+      { name:'Tamires', pos:'Lateral', age:33, score:86, brand:'R$ 1,0M', market:'€ 0,35M' },
+      { name:'Erika', pos:'Zagueira', age:34, score:84, brand:'R$ 0,8M', market:'€ 0,25M' },
+      { name:'Gi Fernandes', pos:'Lateral', age:24, score:79, brand:'R$ 0,5M', market:'€ 0,18M' },
+      { name:'Gabi Zanotti', pos:'Meia', age:26, score:87, brand:'R$ 1,1M', market:'€ 0,35M' },
+      { name:'Andressa Alves', pos:'Meia', age:32, score:82, brand:'R$ 0,7M', market:'€ 0,20M' },
+      { name:'Jaqueline', pos:'Atacante', age:32, score:88, brand:'R$ 1,3M', market:'€ 0,25M' },
     ],
   },
 };
@@ -2388,6 +2423,19 @@ const BRAND_BY_CLUB = {
     categorias:['Vestuário','Brinquedos','Games','Papelaria','Alimentos & bebidas','Eletrônicos','Decoração','Calçados','Editorial'] },
 };
 
+const TEAM_STATS_BY_CLUB = {
+  flamengo:{ posicao:'2º lugar · 45 pts', vitorias:'8V–3E–2D', artilheiro:'Pedro · 14 gols', defesa:'19 gols sofridos (melhor defesa)' },
+  corinthians:{ posicao:'10º lugar · 18 pts (16 jogos)', vitorias:'4V–6E–6D · 37% aproveitamento', artilheiro:'Yuri Alberto · 6 gols (geral) · André · 3 (Brasileirão)', defesa:'—' },
+};
+function renderTeamStats(){
+  const t = TEAM_STATS_BY_CLUB[currentClubId] || TEAM_STATS_BY_CLUB.flamengo;
+  document.getElementById('team-stats-grid').innerHTML = `
+    <div class="kpi"><div class="label">Posição no Brasileirão 2026</div><div class="value" style="font-size:17px;">${t.posicao}</div></div>
+    <div class="kpi"><div class="label">Retrospecto</div><div class="value" style="font-size:17px;">${t.vitorias}</div></div>
+    <div class="kpi"><div class="label">Artilheiro</div><div class="value" style="font-size:15px;">${t.artilheiro}</div></div>
+    <div class="kpi"><div class="label">Defesa</div><div class="value" style="font-size:15px;">${t.defesa}</div></div>
+  `;
+}
 function renderElencoTable(){
   const squad = SQUAD_BY_CLUB[currentClubId] || SQUAD_BY_CLUB.flamengo;
   const rows = squad[elencoGender] || squad.masc;
@@ -2449,7 +2497,7 @@ function renderMarca(){
 }
 function refreshClubManagementForClub(){
   if(!document.getElementById('elenco-table')) return;
-  renderElencoTable(); renderBaseGrid(); renderAtivosGrid(); renderComissaoGrid(); renderViagensTable(); renderPatrocinioTable(); renderMarca();
+  renderTeamStats(); renderElencoTable(); renderBaseGrid(); renderAtivosGrid(); renderComissaoGrid(); renderViagensTable(); renderPatrocinioTable(); renderMarca();
 }
 function buildClubManagement(){
   document.getElementById('clubmgmt-subtabs').addEventListener('click', (e)=>{
@@ -3068,8 +3116,42 @@ function stadiumSectorHtml(s, extraStyle){
     <div class="sect-sub">${s.cap.toLocaleString('pt-BR')} lug. · ${s.price}</div>
   </div>`;
 }
+function stadiumIllustrationSvg(clubId, st){
+  if(clubId === 'corinthians'){
+    // Neo Química Arena: bowl retangular/geometrico preto e branco, com as 4 torres de iluminacao dos cantos.
+    return `<svg viewBox="0 0 300 150" width="100%" style="display:block;">
+      <rect width="300" height="150" fill="#0c1020"/>
+      <rect x="18" y="18" width="264" height="114" rx="26" fill="#1c1f2b" stroke="#3a3f52" stroke-width="2"/>
+      <rect x="34" y="32" width="232" height="86" rx="18" fill="#26293a"/>
+      <rect x="52" y="46" width="196" height="58" rx="10" fill="#173d24"/>
+      <rect x="70" y="56" width="160" height="38" rx="4" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+      <line x1="150" y1="56" x2="150" y2="94" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+      <circle cx="150" cy="75" r="10" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+      <rect x="70" y="66" width="14" height="18" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+      <rect x="216" y="66" width="14" height="18" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+      ${[[24,24],[276,24],[24,126],[276,126]].map(([x,y])=>`
+        <rect x="${x-3}" y="${y-34}" width="6" height="34" fill="#e9ebf2"/>
+        <rect x="${x-9}" y="${y-40}" width="18" height="8" rx="2" fill="#e9ebf2"/>
+      `).join('')}
+      <text x="150" y="141" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(255,255,255,.4)" font-family="inherit">NEO QUÍMICA ARENA · ITAQUERA</text>
+    </svg>`;
+  }
+  // Maracana: bowl circular/oval, telhado em anel, characteristic silhouette.
+  return `<svg viewBox="0 0 300 150" width="100%" style="display:block;">
+    <rect width="300" height="150" fill="#0c1020"/>
+    <ellipse cx="150" cy="72" rx="140" ry="62" fill="none" stroke="#3a3f52" stroke-width="10"/>
+    <ellipse cx="150" cy="72" rx="128" ry="55" fill="#1c1f2b" stroke="#454b63" stroke-width="2"/>
+    <ellipse cx="150" cy="72" rx="98" ry="40" fill="#26293a"/>
+    <ellipse cx="150" cy="72" rx="70" ry="27" fill="#173d24"/>
+    <ellipse cx="150" cy="72" rx="46" ry="17" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+    <line x1="150" y1="55" x2="150" y2="89" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+    <circle cx="150" cy="72" r="8" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+    <text x="150" y="141" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(255,255,255,.4)" font-family="inherit">MARACANÃ · RIO DE JANEIRO</text>
+  </svg>`;
+}
 function buildStadiumMap(){
   const st = getStadium();
+  document.getElementById('stadium-illustration').innerHTML = stadiumIllustrationSvg(currentClubId, st);
   const byKey = k => st.sectors.find(s=>s.key===k);
   const html = `
     <div class="stadium-grid">
@@ -3385,38 +3467,57 @@ function buildCommerce(){
     options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>'R$'+(v/1000)+'K'}} } }
   });
 
-  const productIconSvg = (type, color) => {
-    const icons = {
-      camisa: `<path d="M16 2l6 4-3 4-3-2v13H8V8L5 10 2 6l6-4 2 2h4l2-2z" stroke="${color}" stroke-width="1.6" fill="none" stroke-linejoin="round"/>`,
-      bone: `<path d="M3 15a9 9 0 0118 0" stroke="${color}" stroke-width="1.6" fill="none"/><path d="M2 15c0 1.6 2.5 2.5 6 2.5h8c3 0 6-.6 6-2.5" stroke="${color}" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="12" cy="7.5" r="0.9" fill="${color}"/>`,
-      caneca: `<path d="M3 8h13v7a4 4 0 01-4 4H7a4 4 0 01-4-4V8z" stroke="${color}" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M16 9h2a2 2 0 010 4h-2" stroke="${color}" stroke-width="1.6" fill="none"/>`,
-      moletom: `<path d="M16 2l6 4-3 4-3-2v13H8V8L5 10 2 6l6-4 2 2h4l2-2z" stroke="${color}" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M9 2a3 3 0 006 0" stroke="${color}" stroke-width="1.6" fill="none"/>`,
-      colecionavel: `<ellipse cx="12" cy="13" rx="9" ry="6" stroke="${color}" stroke-width="1.6" fill="none"/><ellipse cx="12" cy="13" rx="5" ry="3" stroke="${color}" stroke-width="1.6" fill="none"/><path d="M12 3v4" stroke="${color}" stroke-width="1.6"/>`,
-    };
-    return `<svg viewBox="0 0 24 24" style="width:46%; height:46%;">${icons[type]}</svg>`;
+  renderCommerceProducts();
+}
+function commerceProductIconSvg(type, color){
+  const icons = {
+    camisa: `<path d="M16 2l6 4-3 4-3-2v13H8V8L5 10 2 6l6-4 2 2h4l2-2z" stroke="${color}" stroke-width="1.6" fill="none" stroke-linejoin="round"/>`,
+    bone: `<path d="M3 15a9 9 0 0118 0" stroke="${color}" stroke-width="1.6" fill="none"/><path d="M2 15c0 1.6 2.5 2.5 6 2.5h8c3 0 6-.6 6-2.5" stroke="${color}" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="12" cy="7.5" r="0.9" fill="${color}"/>`,
+    caneca: `<path d="M3 8h13v7a4 4 0 01-4 4H7a4 4 0 01-4-4V8z" stroke="${color}" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M16 9h2a2 2 0 010 4h-2" stroke="${color}" stroke-width="1.6" fill="none"/>`,
+    moletom: `<path d="M16 2l6 4-3 4-3-2v13H8V8L5 10 2 6l6-4 2 2h4l2-2z" stroke="${color}" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M9 2a3 3 0 006 0" stroke="${color}" stroke-width="1.6" fill="none"/>`,
+    colecionavel: `<ellipse cx="12" cy="13" rx="9" ry="6" stroke="${color}" stroke-width="1.6" fill="none"/><ellipse cx="12" cy="13" rx="5" ry="3" stroke="${color}" stroke-width="1.6" fill="none"/><path d="M12 3v4" stroke="${color}" stroke-width="1.6"/>`,
   };
-
-  const products = [
-    { name:'Camisa I 2026 (titular)', cat:'Camisas', icon:'camisa', color:brand, price:'R$ 349,90', vendido:118, receita:'R$ 41.288' },
-    { name:'Camisa II 2026 (visitante)', cat:'Camisas', icon:'camisa', color:brand, price:'R$ 349,90', vendido:84, receita:'R$ 29.392' },
-    { name:'Camisa III 2026 (retrô)', cat:'Camisas', icon:'camisa', color:brand, price:'R$ 379,90', vendido:62, receita:'R$ 23.554' },
-    { name:'Boné oficial', cat:'Acessórios', icon:'bone', color:teal, price:'R$ 89,90', vendido:210, receita:'R$ 18.879' },
-    { name:'Camisa infantil', cat:'Infantil', icon:'camisa', color:gold, price:'R$ 229,90', vendido:68, receita:'R$ 15.633' },
-    { name:'Moletom oficial', cat:'Vestuário', icon:'moletom', color:brand2, price:'R$ 259,90', vendido:51, receita:'R$ 13.255' },
-    { name:'Caneca oficial', cat:'Colecionáveis', icon:'caneca', color:amber, price:'R$ 49,90', vendido:175, receita:'R$ 8.733' },
-    { name:'Miniatura do estádio', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:'R$ 129,90', vendido:40, receita:'R$ 5.196' },
-  ];
-  document.getElementById('commerce-products').innerHTML = products.map(p=>`
-    <div class="card clickable" style="background:var(--surface-2);" onclick="showToast('Produto sincronizado via VTEX · SKU consultado na Ontologia')">
+  return `<svg viewBox="0 0 24 24" style="width:46%; height:46%;">${icons[type]}</svg>`;
+}
+const PRODUCTS_BY_CLUB = {
+  flamengo:[
+    { name:'Manto I 2026 (titular) Adidas', cat:'Camisas', icon:'camisa', color:brand, price:449.99, vendido:118 },
+    { name:'Manto I Authentic Adidas', cat:'Camisas', icon:'camisa', color:brand, price:799.99, vendido:34 },
+    { name:'Camisa Pré-Jogo Adidas 2026', cat:'Camisas', icon:'camisa', color:brand, price:299.99, vendido:92 },
+    { name:'Camisa Treino Comissão Adidas', cat:'Vestuário', icon:'moletom', color:brand2, price:249.99, vendido:51 },
+    { name:'Boné oficial Adidas', cat:'Acessórios', icon:'bone', color:teal, price:89.90, vendido:210 },
+    { name:'Moletom oficial Adidas', cat:'Vestuário', icon:'moletom', color:brand2, price:259.90, vendido:45 },
+    { name:'Caneca oficial', cat:'Colecionáveis', icon:'caneca', color:amber, price:49.90, vendido:175 },
+    { name:'Miniatura do Maracanã', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:129.90, vendido:40 },
+  ],
+  corinthians:[
+    { name:'Camisa I 2026/27 Torcedor Pro Nike', cat:'Camisas', icon:'camisa', color:brand, price:349.99, vendido:105 },
+    { name:'Camisa Goleiro Nike 2026/27', cat:'Camisas', icon:'camisa', color:brand, price:399.99, vendido:28 },
+    { name:'Camisa II Infantil Nike 2026/27', cat:'Infantil', icon:'camisa', color:gold, price:349.99, vendido:63 },
+    { name:'Camisa III (retrô) Nike 2026', cat:'Camisas', icon:'camisa', color:brand, price:379.99, vendido:58 },
+    { name:'Boné oficial Nike', cat:'Acessórios', icon:'bone', color:teal, price:79.90, vendido:180 },
+    { name:'Moletom oficial Nike', cat:'Vestuário', icon:'moletom', color:brand2, price:249.90, vendido:38 },
+    { name:'Caneca oficial', cat:'Colecionáveis', icon:'caneca', color:amber, price:44.90, vendido:150 },
+    { name:'Miniatura da Neo Química Arena', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:119.90, vendido:35 },
+  ],
+};
+function renderCommerceProducts(){
+  const el = document.getElementById('commerce-products');
+  if(!el) return;
+  const products = PRODUCTS_BY_CLUB[currentClubId] || PRODUCTS_BY_CLUB.flamengo;
+  el.innerHTML = products.map(p=>{
+    const receita = p.price * p.vendido;
+    return `<div class="card clickable" style="background:var(--surface-2);" onclick="showToast('Produto oficial sincronizado via VTEX · SKU consultado na Ontologia')">
       <div style="width:100%; aspect-ratio:1; border-radius:12px; background:linear-gradient(135deg, ${p.color}26, ${p.color}0d); display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
-        ${productIconSvg(p.icon, p.color)}
+        ${commerceProductIconSvg(p.icon, p.color)}
       </div>
       <div style="font-weight:700; font-size:13px; margin-bottom:2px;">${p.name}</div>
-      <div class="hero-note" style="margin-bottom:10px;">${p.cat} · ${p.price}</div>
+      <div class="hero-note" style="margin-bottom:10px;">${p.cat} · R$ ${p.price.toFixed(2).replace('.',',')}</div>
       <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); padding-top:10px; border-top:1px solid var(--border);">
-        <span>${p.vendido} vendidos</span><span style="font-weight:700; color:${p.color};">${p.receita}</span>
+        <span>${p.vendido} vendidos</span><span style="font-weight:700; color:${p.color};">R$ ${receita.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2})}</span>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 /* ============ CRM ============ */
