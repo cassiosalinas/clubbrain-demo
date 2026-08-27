@@ -240,17 +240,31 @@ canvas{ max-width:100%; }
 .heat-legend .sq{ width:12px; height:12px; border-radius:3px; }
 
 /* ---------- Seating chart ---------- */
-.seat-block{ display:inline-grid; gap:2px; margin:3px; vertical-align:top; }
-.seat-dot{ width:5px; height:5px; border-radius:50%; }
 .seat-legend{ display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color:var(--text-dim); margin-bottom:14px; }
 .seat-legend .item{ display:flex; align-items:center; gap:6px; }
 .seat-legend .sw{ width:9px; height:9px; border-radius:50%; }
-.field-label{
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  background:#0d1120; border:1px solid var(--border); border-radius:8px;
-  padding:14px 22px; font-weight:700; font-size:13px; letter-spacing:.06em; color:var(--text-dim);
+.stadium-grid{
+  display:grid; grid-template-columns: 1fr 2.2fr 1fr; grid-template-rows: auto 1fr auto;
+  grid-template-areas: "cornerA norte cornerB" "oeste pitch leste" "cornerC sul cornerD";
+  gap:6px; padding:6px 2px;
 }
-.seat-stage-wrap{ position:relative; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:6px; padding:30px 10px; }
+.stadium-sector{
+  border-radius:12px; padding:14px 8px; cursor:pointer; text-align:center;
+  transition: transform .15s ease, box-shadow .15s ease; position:relative;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:64px;
+}
+.stadium-sector:hover{ transform: translateY(-2px); box-shadow:0 10px 20px -10px rgba(0,0,0,.5); }
+.stadium-sector .sect-name{ font-weight:700; font-size:11.5px; line-height:1.2; }
+.stadium-sector .sect-pct{ font-size:19px; font-weight:800; line-height:1; }
+.stadium-sector .sect-sub{ font-size:10px; opacity:.8; color:var(--text-dim); }
+.stadium-pitch{
+  grid-area:pitch; background:linear-gradient(160deg,#1f6b3c,#0e3d22);
+  border-radius:16px; display:flex; align-items:center; justify-content:center;
+  min-height:170px; position:relative; border:2px solid rgba(255,255,255,.15); overflow:hidden;
+}
+.stadium-pitch::before{ content:''; position:absolute; width:52%; height:52%; border:2px solid rgba(255,255,255,.22); border-radius:50%; }
+.stadium-pitch::after{ content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; background:rgba(255,255,255,.22); }
+.stadium-corner{ border-radius:12px; display:flex; align-items:center; justify-content:center; min-height:60px; }
 
 /* ---------- Flow diagram ---------- */
 .flow-canvas{ position:relative; min-height:580px; width:760px; overflow-x:auto; }
@@ -923,11 +937,11 @@ canvas{ max-width:100%; }
       <div class="grid g-4" style="margin-bottom:16px;">
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7a2 2 0 012-2h14a2 2 0 012 2M3 7l9 6 9-6"/></svg></span>Ingressos vendidos</div>
-          <div class="value">92%</div><div class="progress" style="margin-top:6px;"><div style="width:92%; background:#1fd6b8;"></div></div>
+          <div class="value" id="events-kpi-vendidos">92%</div><div class="progress" style="margin-top:6px;"><div id="events-kpi-vendidos-bar" style="width:92%; background:#1fd6b8;"></div></div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Receita do evento</div>
-          <div class="value">R$ 980K</div><div class="delta up">↑ 22% vs. último jogo</div>
+          <div class="value" id="events-kpi-receita">R$ 980K</div><div class="delta up">↑ 22% vs. último jogo</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>Status de check-in</div>
@@ -937,19 +951,17 @@ canvas{ max-width:100%; }
             <div><div class="mono strong" style="font-size:15px; color:#7f88a8;">8%</div><div class="hero-note">Não chegou</div></div>
           </div>
         </div>
-        <div class="card kpi"><div class="label">Presença esperada</div><div class="value">29,7K</div><div class="hero-note">Estádio Municipal · 19h30</div></div>
+        <div class="card kpi"><div class="label">Presença esperada</div><div class="value" id="events-kpi-presenca">29,7K</div><div class="hero-note" id="events-kpi-presenca-sub">Estádio Municipal · 19h30</div></div>
       </div>
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Mapa de assentos — Estádio Municipal</h3></div>
+        <div class="card-title"><h3 id="events-map-title">Mapa de setores — Maracanã</h3></div>
+        <div class="hero-note" id="events-map-subtitle" style="margin:-6px 0 14px;">Próximo jogo: carregando…</div>
         <div class="seat-legend">
-          <span class="item"><span class="sw" style="background:#1fd6b8;"></span>Ocupado</span>
-          <span class="item"><span class="sw" style="background:#3d4568;"></span>Disponível</span>
-          <span class="item"><span class="sw" style="background:#b06bff;"></span>Selecionado</span>
-          <span class="item"><span class="sw" style="background:#2a3155;"></span>Bloqueado</span>
+          <span class="item"><span class="sw" style="background:#f24957;"></span>Quase esgotado (≥90%)</span>
+          <span class="item"><span class="sw" style="background:#ffb454;"></span>Bom ritmo (75–89%)</span>
+          <span class="item"><span class="sw" style="background:#1fd6b8;"></span>Baixa procura (&lt;75%)</span>
         </div>
-        <div class="seat-stage-wrap" id="seating-chart">
-          <div class="field-label">CAMPO</div>
-        </div>
+        <div id="stadium-map"></div>
       </div>
       <div class="two-col">
         <div class="card">
@@ -1758,6 +1770,7 @@ function selectClub(id, silent){
 
   renderClubDropdown();
   refreshCdpForClub();
+  refreshEventsForClub();
   if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
 }
 
@@ -2553,33 +2566,132 @@ function buildContent(){
 }
 
 /* ============ EVENTS ============ */
-function buildEvents(){
-  new Chart(document.getElementById('chart-tickets'), {
-    type:'line',
-    data:{ labels:['9 jun','10 jun','11 jun','12 jun','13 jun','14 jun','15 jun'],
-      datasets:[{ data:[300,620,980,1450,1980,2600,3100].map(v=>v*300), borderColor:amber, backgroundColor:'transparent', tension:.4, pointRadius:3, pointBackgroundColor:amber, borderWidth:2.4 }]},
-    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>'R$'+(v/1000)+'K'}} } }
-  });
-  const types = [
-    ['Camarote','1.240','R$ 620.000'],
-    ['Cadeira numerada','9.800','R$ 441.000'],
-    ['Arquibancada','15.200','R$ 380.000'],
-    ['Sócio-torcedor','2.260','free'],
-  ];
-  document.getElementById('ticket-types').innerHTML = types.map(t=>`<tr class="clickable" onclick="showToast('Mapa de assentos filtrado por: ${t[0]}')"><td class="strong">${t[0]}</td><td>${t[1]}</td><td>${t[2]==='free'?'Incluso no plano':t[2]}</td></tr>`).join('');
+/* ---------- Mapa de setores do estádio (real, por clube) ---------- */
+const STADIUM_BY_CLUB = {
+  flamengo: {
+    name:'Maracanã', capacity:78000,
+    nextMatch:{ date:'19 ago, 2026', label:'Flamengo x Cruzeiro — Libertadores (oitavas, volta)', time:'21h30' },
+    sectors:[
+      { key:'norte', name:'Norte', cap:18000, sold:0.97, price:'R$ 70', desc:'Setor mais animado — coração da torcida organizada.' },
+      { key:'sul', name:'Sul', cap:17000, sold:0.94, price:'R$ 70', desc:'Setor popular, forte presença da torcida.' },
+      { key:'leste-inf', name:'Leste Inferior', cap:10000, sold:0.91, price:'R$ 150', desc:'Visão lateral privilegiada, perfil mais familiar.' },
+      { key:'leste-sup', name:'Leste Superior', cap:9000, sold:0.78, price:'R$ 85', desc:'Lateral superior, ótimo custo-benefício.' },
+      { key:'oeste-inf', name:'Oeste Inferior', cap:9500, sold:0.95, price:'R$ 180', desc:'Setor mais valorizado — cadeiras cativas e melhor visão.' },
+      { key:'oeste-sup', name:'Oeste Superior', cap:9500, sold:0.82, price:'R$ 95', desc:'Lateral oeste superior, visão ampla do gramado.' },
+      { key:'premium', name:'Maracanã Mais', cap:3000, sold:0.99, price:'R$ 350', desc:'Espaço premium no oeste inferior, com buffet e bebidas não alcoólicas inclusos.' },
+      { key:'camarotes', name:'Camarotes', cap:2000, sold:0.88, price:'R$ 480', desc:'Camarotes corporativos, normalmente adquiridos por empresas parceiras.' },
+    ],
+  },
+  corinthians: {
+    name:'Neo Química Arena', capacity:48905,
+    nextMatch:{ date:'30 ago, 2026', label:'Corinthians x Santos — Brasileirão (25ª rodada)', time:'16h00' },
+    sectors:[
+      { key:'norte', name:'Norte', cap:6000, sold:0.90, price:'R$ 60', desc:'Setor popular, atrás do gol — perfil mais aquecido da torcida.' },
+      { key:'sul', name:'Sul', cap:6000, sold:0.86, price:'R$ 60', desc:'Setor popular, atrás do gol.' },
+      { key:'leste-inf', name:'Leste Inferior', cap:10000, sold:0.84, price:'R$ 120', desc:'Lateral inferior, público misto entre familiar e fiel torcedor.' },
+      { key:'leste-sup', name:'Leste Superior', cap:10000, sold:0.61, price:'R$ 75', desc:'Lateral superior, bom custo-benefício.' },
+      { key:'oeste-inf', name:'Oeste Inferior', cap:10000, sold:0.92, price:'R$ 170', desc:'Setor mais valorizado da arena — melhor visibilidade e áreas exclusivas.' },
+      { key:'oeste-sup', name:'Oeste Superior', cap:5005, sold:0.70, price:'R$ 95', desc:'Lateral oeste superior, acesso a áreas premium.' },
+      { key:'camarotes', name:'Camarotes', cap:1900, sold:0.79, price:'R$ 420', desc:'Camarotes corporativos com hospitalidade completa.' },
+    ],
+  },
+};
+function getStadium(){ return STADIUM_BY_CLUB[currentClubId] || STADIUM_BY_CLUB.flamengo; }
+function occupancyColor(sold){ return sold >= 0.90 ? red : (sold >= 0.75 ? amber : teal); }
+function occupancyLabel(sold){ return sold >= 0.90 ? 'quase esgotado' : (sold >= 0.75 ? 'bom ritmo de vendas' : 'baixa procura — oportunidade de precificação dinâmica'); }
+function stadiumSectorHtml(s, extraStyle){
+  if(!s) return `<div class="stadium-sector" style="opacity:.35;"></div>`;
+  const color = occupancyColor(s.sold);
+  return `<div class="stadium-sector" style="background:${color}22; border:1px solid ${color}55; ${extraStyle||''}" onclick="showStadiumSectorModal('${s.key}')">
+    <div class="sect-name" style="color:${color};">${s.name}</div>
+    <div class="sect-pct" style="color:${color};">${Math.round(s.sold*100)}%</div>
+    <div class="sect-sub">${s.cap.toLocaleString('pt-BR')} lug. · ${s.price}</div>
+  </div>`;
+}
+function buildStadiumMap(){
+  const st = getStadium();
+  const byKey = k => st.sectors.find(s=>s.key===k);
+  const html = `
+    <div class="stadium-grid">
+      <div style="grid-area:cornerA;">${stadiumSectorHtml(byKey('camarotes'))}</div>
+      <div style="grid-area:norte;">${stadiumSectorHtml(byKey('norte'))}</div>
+      <div style="grid-area:cornerB;">${stadiumSectorHtml(byKey('premium'))}</div>
+      <div style="grid-area:oeste; display:flex; gap:6px;">${stadiumSectorHtml(byKey('oeste-sup'),'flex:1;')}${stadiumSectorHtml(byKey('oeste-inf'),'flex:1;')}</div>
+      <div class="stadium-pitch">
+        <div style="text-align:center; position:relative; z-index:1;">
+          <div style="font-size:13.5px; font-weight:700; color:rgba(255,255,255,.9); margin-bottom:3px;">${st.name}</div>
+          <div style="font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.45);">Campo</div>
+        </div>
+      </div>
+      <div style="grid-area:leste; display:flex; gap:6px;">${stadiumSectorHtml(byKey('leste-inf'),'flex:1;')}${stadiumSectorHtml(byKey('leste-sup'),'flex:1;')}</div>
+      <div style="grid-area:cornerC;"><div class="stadium-corner"></div></div>
+      <div style="grid-area:sul;">${stadiumSectorHtml(byKey('sul'))}</div>
+      <div style="grid-area:cornerD;"><div class="stadium-corner"></div></div>
+    </div>`;
+  document.getElementById('stadium-map').innerHTML = html;
 
-  buildSeatingChart();
+  const totalCap = st.sectors.reduce((s,x)=>s+x.cap,0);
+  const totalSold = st.sectors.reduce((s,x)=>s+Math.round(x.cap*x.sold),0);
+  const totalRevenue = st.sectors.reduce((s,x)=>s+Math.round(x.cap*x.sold*parseInt(String(x.price).replace(/\D/g,''),10)),0);
+  const pct = Math.round(totalSold/totalCap*100);
+  const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setText('events-map-title', `Mapa de setores — ${st.name}`);
+  setText('events-map-subtitle', `Próximo jogo: ${st.nextMatch.label} · ${st.nextMatch.date}, ${st.nextMatch.time} · ${st.name}`);
+  setText('events-kpi-vendidos', pct + '%');
+  const bar = document.getElementById('events-kpi-vendidos-bar'); if(bar) bar.style.width = pct + '%';
+  setText('events-kpi-receita', totalRevenue >= 1000000 ? ('R$ ' + (totalRevenue/1000000).toFixed(1).replace('.',',') + 'M') : ('R$ ' + (totalRevenue/1000).toFixed(0) + 'K'));
+  setText('events-kpi-presenca', (totalSold/1000).toFixed(1).replace('.',',') + 'K');
+  setText('events-kpi-presenca-sub', `${st.name} · ${st.nextMatch.time}`);
 
-  // Próximos jogos e eventos
+  document.getElementById('ticket-types').innerHTML = st.sectors.map(s=>`
+    <tr class="clickable" onclick="showStadiumSectorModal('${s.key}')">
+      <td class="strong">${s.name}</td>
+      <td>${Math.round(s.cap*s.sold).toLocaleString('pt-BR')} / ${s.cap.toLocaleString('pt-BR')}</td>
+      <td>R$ ${(s.cap*s.sold*parseInt(String(s.price).replace(/\D/g,''),10)).toLocaleString('pt-BR', {maximumFractionDigits:0})}</td>
+    </tr>`).join('');
+}
+function showStadiumSectorModal(key){
+  const st = getStadium();
+  const s = st.sectors.find(x=>x.key===key);
+  if(!s) return;
+  const color = occupancyColor(s.sold);
+  const sold = Math.round(s.cap*s.sold);
+  const revenue = sold * parseInt(String(s.price).replace(/\D/g,''),10);
+  showModal(
+    `<h3 style="color:${color};">${s.name} — ${st.name}</h3>`,
+    `<div class="hero-note" style="margin:8px 0 16px;">${s.desc}</div>
+     <div class="grid g-2">
+       <div><div class="hero-note">Capacidade</div><div class="value" style="font-size:17px; font-weight:700;">${s.cap.toLocaleString('pt-BR')}</div></div>
+       <div><div class="hero-note">Vendido</div><div class="value" style="font-size:17px; font-weight:700; color:${color};">${Math.round(s.sold*100)}% (${sold.toLocaleString('pt-BR')})</div></div>
+       <div><div class="hero-note">Preço</div><div class="value" style="font-size:17px; font-weight:700;">${s.price}</div></div>
+       <div><div class="hero-note">Receita estimada</div><div class="value" style="font-size:17px; font-weight:700;">R$ ${revenue.toLocaleString('pt-BR')}</div></div>
+     </div>
+     <div class="hero-note" style="margin-top:14px;">${occupancyLabel(s.sold)}${s.sold<0.75 ? ' — peça ao Agente de Precificação Dinâmica uma sugestão de desconto para este setor.' : '.'}</div>`
+  );
+}
+
+/* ---------- Próximos jogos reais (por clube) ---------- */
+const EVENTS_BY_CLUB = {
+  flamengo: [
+    ['12 ago, 2026', 'Futebol masculino', 'Cruzeiro x Flamengo — Libertadores (oitavas, ida)', 'Mineirão (fora de casa)', 'Fora de casa'],
+    ['19 ago, 2026', 'Futebol masculino', 'Flamengo x Cruzeiro — Libertadores (oitavas, volta)', 'Maracanã', '95% vendido'],
+    ['13 set, 2026', 'Futebol masculino', 'Flamengo x Corinthians — Brasileirão (27ª rodada)', 'Maracanã', 'Clássico — pré-venda'],
+    ['21 jun, 2026', 'Futebol feminino', 'Flamengo Feminino x Atlética SC', 'Maracanã', '58% vendido'],
+    ['27 jun, 2026', 'Show', 'Turnê Nacional — Banda Ravena', 'Maracanã', '74% vendido'],
+    ['10 jul, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Sede social — Gávea', 'Confirmado'],
+  ],
+  corinthians: [
+    ['30 ago, 2026', 'Futebol masculino', 'Corinthians x Santos — Brasileirão (25ª rodada)', 'Neo Química Arena', '87% vendido'],
+    ['06 set, 2026', 'Futebol masculino', 'Corinthians x Chapecoense — Brasileirão (26ª rodada)', 'Neo Química Arena', '64% vendido'],
+    ['09 set, 2026', 'Futebol masculino', 'Estudiantes x Corinthians — Libertadores (quartas, ida)', 'La Plata (fora de casa)', 'Fora de casa'],
+    ['13 set, 2026', 'Futebol masculino', 'Flamengo x Corinthians — Brasileirão (27ª rodada)', 'Maracanã (fora de casa)', 'Fora de casa'],
+    ['16 set, 2026', 'Futebol masculino', 'Corinthians x Estudiantes — Libertadores (quartas, volta)', 'Neo Química Arena', 'Pré-venda Fiel Torcedor'],
+    ['20 set, 2026', 'Futebol masculino', 'Corinthians x Fluminense — Brasileirão (28ª rodada)', 'Neo Química Arena', '52% vendido'],
+  ],
+};
+function renderUpcomingEvents(){
   const catColors = { 'Futebol masculino':brand, 'Futebol feminino':brand2, 'Show':gold, 'Evento':teal };
-  const upcoming = [
-    ['18 jun, 2026', 'Futebol masculino', 'Estrela FC x Rival FC — Brasileirão', 'Estádio Municipal', '92% vendido'],
-    ['21 jun, 2026', 'Futebol feminino', 'Estrela FC Feminino x Atlética SC', 'Estádio Municipal', '58% vendido'],
-    ['27 jun, 2026', 'Show', 'Turnê Nacional — Banda Ravena', 'Estádio Municipal', '74% vendido'],
-    ['3 jul, 2026', 'Futebol masculino', 'Estrela FC x Náutico — Copa Regional', 'Estádio Municipal', '41% vendido'],
-    ['10 jul, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Centro de Eventos do Clube', 'Confirmado'],
-    ['15 jul, 2026', 'Futebol feminino', 'Estrela FC Feminino x Porto Vitória', 'Estádio Municipal', '33% vendido'],
-  ];
+  const upcoming = EVENTS_BY_CLUB[currentClubId] || EVENTS_BY_CLUB.flamengo;
   document.getElementById('upcoming-events').innerHTML = upcoming.map(e=>`
     <tr class="clickable" onclick="showToast('Filtrando por: ${e[2].replace(/'/g,"\\'")}')">
       <td>${e[0]}</td>
@@ -2588,6 +2700,23 @@ function buildEvents(){
       <td>${e[3]}</td>
       <td>${e[4]}</td>
     </tr>`).join('');
+}
+function refreshEventsForClub(){
+  if(!document.getElementById('stadium-map')) return;
+  buildStadiumMap();
+  renderUpcomingEvents();
+}
+
+function buildEvents(){
+  new Chart(document.getElementById('chart-tickets'), {
+    type:'line',
+    data:{ labels:['9 jun','10 jun','11 jun','12 jun','13 jun','14 jun','15 jun'],
+      datasets:[{ data:[300,620,980,1450,1980,2600,3100].map(v=>v*300), borderColor:amber, backgroundColor:'transparent', tension:.4, pointRadius:3, pointBackgroundColor:amber, borderWidth:2.4 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>'R$'+(v/1000)+'K'}} } }
+  });
+
+  buildStadiumMap();
+  renderUpcomingEvents();
 
   // Museu do Clube — visitas
   document.getElementById('museum-stats').innerHTML = `
@@ -2615,34 +2744,6 @@ function buildEvents(){
   })));
 
   renderPricingChatLog();
-}
-
-function buildSeatingChart(){
-  const colors = { occ:'#1fd6b8', avail:'#3d4568', sel:'#b06bff', blocked:'#2a3155' };
-  function block(rows, cols, weights){
-    // weights: [occ, avail, sel, blocked] probabilities
-    let cells = '';
-    for(let r=0;r<rows;r++){
-      cells += `<div style="display:flex; gap:2px;">`;
-      for(let c=0;c<cols;c++){
-        const rnd = Math.random();
-        let color = colors.occ;
-        if(rnd > weights[0]) color = colors.avail;
-        if(rnd > weights[0]+weights[1]) color = colors.sel;
-        if(rnd > weights[0]+weights[1]+weights[2]) color = colors.blocked;
-        cells += `<span class="seat-dot" style="background:${color};"></span>`;
-      }
-      cells += `</div>`;
-    }
-    return `<div class="seat-block">${cells}</div>`;
-  }
-  let html = '';
-  // main lower bowl sections - mostly occupied
-  for(let i=0;i<6;i++) html += block(9, 8, [0.82,0.10,0.05,0.03]);
-  document.getElementById('seating-chart').innerHTML =
-    `<div class="field-label">CAMPO</div>` + html +
-    `<div style="flex-basis:100%; height:0;"></div>` +
-    Array.from({length:6}).map(()=>block(6,10,[0.55,0.30,0.08,0.07])).join('');
 }
 
 /* ============ REWARDS ============ */
