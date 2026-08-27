@@ -486,13 +486,9 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
         Conteúdo
       </div>
-      <div class="nav-item" data-view="crm">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
-        CRM do torcedor
-      </div>
       <div class="nav-item" data-view="cdp">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
-        CDP — Fan Data Platform
+        CDP / CRM — Fan Data Platform
       </div>
 
       <div class="nav-group-label">Monetização</div>
@@ -1194,66 +1190,6 @@ canvas{ max-width:100%; }
       </div>
     </section>
 
-    <!-- ================= CRM ================= -->
-    <section class="view" id="view-crm">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Base de torcedores por nível</h3></div>
-        <div class="hero-note" style="margin:-6px 0 14px;">30 mil torcedores reconhecidos na Ontologia do Clube — 1 mil são sócios-torcedores pagantes, divididos em 4 níveis. Clique num nível para filtrar a lista abaixo.</div>
-        <div class="grid g-4" id="crm-tiers"></div>
-      </div>
-
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-          <h3>Torcedores por nível <span class="hero-note" id="crm-tier-filter-label" style="font-weight:400;"></span></h3>
-          <span id="crm-top10-btn" class="tag clickable" style="font-weight:600;" onclick="toggleCrmTopTen()">🏆 Top 10 por LTV</span>
-        </div>
-        <table>
-          <thead><tr><th>Torcedor</th><th>Nível</th><th>Cidade</th><th>LTV</th></tr></thead>
-          <tbody id="crm-tier-table"></tbody>
-        </table>
-      </div>
-
-      <div style="display:grid; grid-template-columns: 280px 1fr; gap:16px; align-items:start;">
-        <div class="card" style="padding:12px;">
-          <div class="card-title" style="padding:0 6px;"><h3>Torcedores</h3></div>
-          <div id="fan-list"></div>
-        </div>
-
-        <div>
-          <div class="card" style="margin-bottom:16px;">
-            <div style="display:flex; gap:18px; align-items:flex-start; margin-bottom:18px; flex-wrap:wrap;">
-              <div id="fan-avatar" style="width:72px;height:72px;border-radius:50%; font-size:24px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; flex:none; position:relative;"></div>
-              <div style="flex:1; min-width:220px;">
-                <h3 style="font-size:19px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;" id="fan-name"></h3>
-                <div class="hero-note" id="fan-subtitle" style="margin-top:3px;"></div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;" id="fan-demo-chips"></div>
-              </div>
-              <div style="display:flex; gap:10px;" id="fan-ai-scores"></div>
-            </div>
-
-            <div class="grid g-4" style="margin-bottom:18px;" id="fan-financials"></div>
-
-            <div class="card-title" style="margin-bottom:10px;"><h3 style="font-size:13px;">Torcida</h3></div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;" id="fan-clubs"></div>
-
-            <div class="card-title" style="margin-bottom:10px;"><h3 style="font-size:13px;">Interesses e tags</h3></div>
-            <div id="fan-tags"></div>
-          </div>
-
-          <div class="two-col">
-            <div class="card">
-              <div class="card-title"><h3>Histórico de interações</h3></div>
-              <div id="fan-history"></div>
-            </div>
-            <div class="card">
-              <div class="card-title"><h3>Segmentos ativos</h3></div>
-              <div id="segments"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ================= CDP (Camada 2 — Fan Data Platform) ================= -->
     <section class="view" id="view-cdp">
       <div class="subtabs" id="cdp-subtabs">
@@ -1352,9 +1288,26 @@ canvas{ max-width:100%; }
 
       <!-- Sub: Fans -->
       <div class="subview" id="cdp-sub-fans">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Base de torcedores por nível</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">30 mil torcedores reconhecidos na Ontologia do Clube — 1 mil são sócios-torcedores pagantes, divididos em 4 níveis. Clique num nível para filtrar a lista abaixo.</div>
+          <div class="grid g-4" id="crm-tiers"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <h3>Torcedores por nível <span class="hero-note" id="crm-tier-filter-label" style="font-weight:400;"></span></h3>
+            <span id="crm-top10-btn" class="tag clickable" style="font-weight:600;" onclick="toggleCrmTopTen()">🏆 Top 10 por LTV</span>
+          </div>
+          <table>
+            <thead><tr><th>Torcedor</th><th>Nível</th><th>Cidade</th><th>LTV</th></tr></thead>
+            <tbody id="crm-tier-table"></tbody>
+          </table>
+        </div>
+
         <div class="card">
           <div class="card-title" style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <h3>Fans <span class="hero-note" style="font-weight:400;">— amostra representativa da base identificada</span></h3>
+            <h3>Busca rápida <span class="hero-note" style="font-weight:400;">— por nome</span></h3>
             <input id="cdp-fan-search" type="text" placeholder="Buscar por nome…" style="background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:9px 13px; color:var(--text); font-size:12.5px; font-family:inherit; width:220px;" oninput="renderCdpFansList()">
           </div>
           <table>
@@ -1396,6 +1349,17 @@ canvas{ max-width:100%; }
             <div id="cdp360-insight" class="hero-note" style="font-size:12.5px; color:var(--text-dim); line-height:1.6; margin-bottom:14px;"></div>
             <div class="card-title" style="margin-bottom:8px;"><h3 style="font-size:13px;">Next Best Action</h3></div>
             <div id="cdp360-nba"></div>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-title"><h3>Interesses e tags</h3></div>
+            <div id="cdp360-tags"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><h3>Segmentos ativos</h3></div>
+            <div id="cdp360-segments"></div>
           </div>
         </div>
 
@@ -1581,7 +1545,7 @@ const titles = {
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
-  cdp: ["CDP — Fan Data Platform", "Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
+  cdp: ["CDP / CRM — Fan Data Platform", "Base de torcedores por nível, Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
   overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
   audience: ["Audiência", "Quem são os torcedores do Estrela FC"],
   engagement: ["Comunidades", "Saúde da comunidade, torcidas organizadas e membros mais ativos"],
@@ -1591,7 +1555,6 @@ const titles = {
   rewards: ["Gamificação", "Pontos, missões e recompensas da torcida"],
   monetization: ["Receita & patrocínio", "Assinaturas, conversão e ROI de patrocinadores"],
   commerce: ["Gestão de commerce", "Integração com a loja oficial (Camada 1) — catálogo, preços e vendas em tempo real, alimentando a Ontologia do Clube"],
-  crm: ["CRM do torcedor", "Perfil 360º e histórico individual de interação"],
   marketing: ["Automação de marketing", "Jornadas e campanhas ativas por canal"],
   ops: ["Saúde do sistema", "Monitoramento de infraestrutura e APIs em tempo real"],
 };
@@ -1692,17 +1655,6 @@ const FLAMENGO_CREST_HTML = '<img src="data:image/svg+xml;base64,' + FLAMENGO_CR
 const CORINTHIANS_CREST_HTML = '<img src="data:image/png;base64,' + CORINTHIANS_CREST_B64 + '" alt="Corinthians">';
 
 const CLUB_PROFILES = {
-  estrela: {
-    name:'Estrela FC', sub:'Temporada 2026', crest:ESTRELA_CREST_SVG, badgeBg:'linear-gradient(135deg,#ffb454,#ff5c72)',
-    kpi:{
-      receita:'R$ 3,06M', receitaDelta:'↑ 16,4% vs. período anterior',
-      ativos:'1,24M', ativosDelta:'↑ 15,2%',
-      nps:'88%', npsDelta:'↑ 4pp',
-      churn:'6,8%', churnBase:'≈ 84 mil torcedores da base reconhecida',
-      cdpTotal:'5,2M', cdpIdentificados:'1,24M', cdpPerfis:'30.000', cdpSocios:'1.000',
-    },
-    ai:'Estrela FC, clube fictício. Estádio Municipal (29,7 mil lugares). Torcedores ativos: 1,24 milhão. Torcedores reconhecidos na Ontologia: 30 mil. Sócios-torcedores pagantes: 1.000. Receita consolidada do período: R$ 3,06M.',
-  },
   flamengo: {
     name:'Flamengo', sub:'Temporada 2026', crest:FLAMENGO_CREST_HTML, badgeBg:'transparent',
     kpi:{
@@ -1726,7 +1678,7 @@ const CLUB_PROFILES = {
     ai:'Corinthians, Neo Química Arena (49 mil lugares). Torcedores ativos: 7,1 milhões. Torcedores conhecidos pelo clube (programa Fiel Torcedor): 150 mil (de ~30 milhões de apaixonados estimados). Receita consolidada do período: R$ 17,8M. Números estimados/ilustrativos para fins de demonstração.',
   },
 };
-let currentClubId = 'estrela';
+let currentClubId = 'flamengo';
 
 function renderClubDropdown(){
   document.getElementById('club-dropdown').innerHTML = Object.keys(CLUB_PROFILES).map(id=>{
@@ -1747,7 +1699,7 @@ document.addEventListener('click', (e)=>{
   if(dd && !e.target.closest('#club-select-toggle')) dd.classList.remove('open');
 });
 
-function selectClub(id){
+function selectClub(id, silent){
   const c = CLUB_PROFILES[id];
   if(!c) return;
   currentClubId = id;
@@ -1777,7 +1729,7 @@ function selectClub(id){
   setText('kpi-cdp-socios', c.kpi.cdpSocios);
 
   renderClubDropdown();
-  showToast(`Clube ativo: ${c.name}`, '#22e07a');
+  if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
 }
 function grad(ctx, color){
   const g = ctx.createLinearGradient(0,0,0,220);
@@ -1818,7 +1770,6 @@ function initChartsFor(key){
   if(key==='rewards') buildRewards();
   if(key==='monetization') buildMonetization();
   if(key==='commerce') buildCommerce();
-  if(key==='crm') buildCrm();
   if(key==='marketing') buildMarketing();
   if(key==='ops') buildOps();
 }
@@ -2396,7 +2347,7 @@ function buildEngagement(){
     {name:'ArquibancadaSul', pts:'1.320', badge:teal},
   ];
   document.getElementById('top-contributors').innerHTML = contributors.map((c,i)=>`
-    <div class="list-row clickable" onclick="goToView('crm'); showToast('Abrindo perfil de ${c.name} no CRM')">
+    <div class="list-row clickable" onclick="goToView('cdp'); showToast('Abrindo perfil de ${c.name} na CDP')">
       <span class="mono" style="width:16px; color:var(--text-faint);">${i+1}</span>
       <span class="chip-avatar" style="background:${c.badge};">${c.name.slice(0,2).toUpperCase()}</span>
       <span style="flex:1; font-size:13px; font-weight:600;">${c.name}</span>
@@ -2946,7 +2897,6 @@ const FANS_DB = [
   },
 ];
 
-let currentFanId = 'rafael';
 
 /* ============ NÍVEIS DE SÓCIO-TORCEDOR ============ */
 const TIER_DB = [
@@ -3037,8 +2987,7 @@ function renderCrmTierTable(){
 }
 
 function openFanFromTier(id){
-  selectFan(id);
-  document.getElementById('fan-name')?.scrollIntoView({behavior:'smooth', block:'center'});
+  openCdpFan360(id);
 }
 
 function showTierSampleModal(name, cidade, nivelName, color, ltv){
@@ -3051,75 +3000,6 @@ function showTierSampleModal(name, cidade, nivelName, color, ltv){
      </div>
      <div class="hero-note" style="margin-top:14px;">Amostra da base completa de 30 mil torcedores da Ontologia. Um perfil 360º completo — como os exemplos detalhados na lista de Torcedores abaixo — pode ser aberto para qualquer um sob demanda.</div>`
   );
-}
-
-function buildCrm(){
-  renderCrmTiers();
-  renderCrmTierTable();
-  renderFanList();
-  renderFanProfile(currentFanId);
-}
-
-function renderFanList(){
-  document.getElementById('fan-list').innerHTML = FANS_DB.map(f=>`
-    <div class="fan-list-item ${f.id===currentFanId?'active':''}" onclick="selectFan('${f.id}')">
-      <span class="mini-avatar" style="background:linear-gradient(135deg,${f.color1},${f.color2});">${f.initials}</span>
-      <div><div class="nm">${f.name}</div><div class="sg" style="color:${f.segmentoCor};">${f.segmentoTitulo}</div></div>
-    </div>`).join('');
-}
-
-function selectFan(id){
-  currentFanId = id;
-  renderFanList();
-  renderFanProfile(id);
-}
-
-function renderFanProfile(id){
-  const f = FANS_DB.find(x=>x.id===id);
-
-  document.getElementById('fan-avatar').style.background = `linear-gradient(135deg,${f.color1},${f.color2})`;
-  document.getElementById('fan-avatar').textContent = f.initials;
-
-  document.getElementById('fan-name').innerHTML = `${f.name} <span class="tag" style="border:none; background:${f.segmentoCor}22; color:${f.segmentoCor};">${f.segmentoTitulo}</span>`;
-  document.getElementById('fan-subtitle').textContent = `Sócio desde ${f.socioDesde} · ${f.cidade}`;
-
-  document.getElementById('fan-demo-chips').innerHTML = `
-    <span class="demo-chip">🎂 ${f.idade} anos</span>
-    <span class="demo-chip">${f.sexo === 'Masculino' ? '♂' : '♀'} ${f.sexo}</span>
-    <span class="demo-chip">📍 ${f.cidade} · ${f.regiao}</span>
-  `;
-
-  document.getElementById('fan-ai-scores').innerHTML = `
-    <div class="ai-score-box" style="background:${f.churnCor}18;"><div class="num" style="color:${f.churnCor};">${f.churnRisco}</div><div class="lbl">Risco de churn</div></div>
-    <div class="ai-score-box" style="background:${f.propensaoCor}18;"><div class="num" style="color:${f.propensaoCor};">${f.propensao}</div><div class="lbl">Propensão de compra</div></div>
-  `;
-
-  document.getElementById('fan-financials').innerHTML = `
-    <div><div class="hero-note">LTV</div><div class="value" style="font-size:19px; font-weight:700;">${f.ltv}</div></div>
-    <div><div class="hero-note">Gasto total</div><div class="value" style="font-size:19px; font-weight:700;">${f.gastoTotal}</div></div>
-    <div><div class="hero-note">Nº de compras</div><div class="value" style="font-size:19px; font-weight:700;">${f.transacoes}</div></div>
-    <div><div class="hero-note">Ticket médio</div><div class="value" style="font-size:19px; font-weight:700;">${f.ticketMedio}</div></div>
-    <div style="grid-column: span 2;"><div class="hero-note">Categoria de compra favorita</div><div class="value" style="font-size:15px; font-weight:600;">${f.produtoFavorito}</div></div>
-  `;
-
-  document.getElementById('fan-clubs').innerHTML = `
-    <span class="club-chip" style="background:${brand}22; color:#b3b2ff;">🏆 Time do coração: ${f.timeCoracao}</span>
-    ${f.tambemTorce !== '—' ? `<span class="club-chip" style="background:var(--surface-2); color:var(--text-dim);">também torce: ${f.tambemTorce}</span>` : ''}
-  `;
-
-  document.getElementById('fan-tags').innerHTML = f.tags.map(t=>`<span class="tag">${t}</span>`).join(' ');
-
-  document.getElementById('fan-history').innerHTML = f.history.map(h=>`
-    <div class="list-row">
-      <span class="chip-avatar" style="background:${h[2]}; font-size:13px;">${h[3]}</span>
-      <div style="flex:1;"><div style="font-size:13px;">${h[0]}</div><div class="hero-note">${h[1]}</div></div>
-    </div>`).join('');
-
-  document.getElementById('segments').innerHTML = f.segments.map(s=>`
-    <div class="card" style="background:var(--surface-2); margin-bottom:10px;">
-      <div style="font-weight:700; font-size:14px; margin-bottom:4px; color:${s[2]};">${s[0]}</div>
-      <div class="hero-note">${s[1]}</div>
-    </div>`).join('');
 }
 
 /* ============ CDP (Camada 2 — Fan Data Platform) ============ */
@@ -3231,7 +3111,9 @@ function buildCdp(){
       <span class="hero-note" style="white-space:nowrap;">${e[4]}</span>
     </div>`).join('');
 
-  // --- Fans ---
+  // --- Fans (níveis + amostra + busca) ---
+  renderCrmTiers();
+  renderCrmTierTable();
   renderCdpFansList();
   // --- Fan 360 ---
   renderCdpFan360(cdpFan360Id);
@@ -3339,6 +3221,14 @@ function renderCdpFan360(id){
     <div class="list-row">
       <span class="chip-avatar" style="background:${h[2]}; font-size:13px;">${h[3]}</span>
       <div style="flex:1;"><div style="font-size:13px;">${h[0]}</div><div class="hero-note">${h[1]}</div></div>
+    </div>`).join('');
+
+  document.getElementById('cdp360-tags').innerHTML = f.tags.map(t=>`<span class="tag">${t}</span>`).join(' ');
+
+  document.getElementById('cdp360-segments').innerHTML = f.segments.map(s=>`
+    <div class="card" style="background:var(--surface-2); margin-bottom:10px;">
+      <div style="font-weight:700; font-size:14px; margin-bottom:4px; color:${s[2]};">${s[0]}</div>
+      <div class="hero-note">${s[1]}</div>
     </div>`).join('');
 }
 
@@ -3542,6 +3432,7 @@ buildCockpit();
 initialized.cockpit = true;
 buildAgents();
 initialized.agents = true;
+selectClub(currentClubId, true);
 </script>
 
 
