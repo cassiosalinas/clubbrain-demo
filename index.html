@@ -723,25 +723,25 @@ canvas{ max-width:100%; }
       <div class="grid g-4" style="margin-bottom:16px;">
         <div class="card kpi">
           <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores ativos</div>
-          <div class="value">1,24M</div>
+          <div class="value" id="kpi-overview-ativos">1,24M</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-fans"></canvas></div>
-          <div class="delta up">↑ 15,2% vs. período anterior</div>
+          <div class="delta up" id="kpi-overview-ativos-delta">↑ 15,2% vs. período anterior</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8h.01M13 8h.01M9 8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Taxa de engajamento</div>
-          <div class="value">7,8%</div>
+          <div class="value" id="kpi-overview-engajamento">7,8%</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-engagement"></canvas></div>
-          <div class="delta up">↑ 0,6pp vs. mês anterior</div>
+          <div class="delta up" id="kpi-overview-engajamento-delta">↑ 0,6pp vs. mês anterior</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge badge-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Receita recorrente</div>
-          <div class="value">R$ 450K</div>
+          <div class="value" id="kpi-overview-mrr">R$ 450K</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-revenue"></canvas></div>
-          <div class="delta up">↑ 18,6% vs. mês anterior</div>
+          <div class="delta up" id="kpi-overview-mrr-delta">↑ 18,6% vs. mês anterior</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>Sentimento da torcida</div>
-          <div class="value">88%</div>
+          <div class="value" id="kpi-overview-nps">88%</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-sentiment"></canvas></div>
           <div class="delta up">↑ 4pp nas últimas 24h</div>
         </div>
@@ -765,7 +765,7 @@ canvas{ max-width:100%; }
           <div style="display:flex; align-items:center; gap:20px;">
             <div class="donut-wrap" style="width:150px; height:150px; flex:none;">
               <canvas id="chart-demo-donut"></canvas>
-              <div class="donut-center"><span class="big">1,24M</span><span class="small">Torcedores</span></div>
+              <div class="donut-center"><span class="big" id="kpi-overview-demo-total">1,24M</span><span class="small">Torcedores</span></div>
             </div>
             <div style="flex:1;" id="demo-legend"></div>
           </div>
@@ -792,10 +792,10 @@ canvas{ max-width:100%; }
       </div>
 
       <div class="grid g-4">
-        <div class="card kpi"><div class="label">Novos torcedores</div><div class="value" style="font-size:22px;">82K</div><div class="delta up">↑ 12%</div></div>
-        <div class="card kpi"><div class="label">Interações totais</div><div class="value" style="font-size:22px;">9,4M</div><div class="delta up">↑ 18%</div></div>
-        <div class="card kpi"><div class="label">Torcedores recorrentes</div><div class="value" style="font-size:22px;">68%</div><div class="delta up">↑ 10%</div></div>
-        <div class="card kpi"><div class="label">Torcedores reconhecidos</div><div class="value" style="font-size:22px;">30,4K</div><div class="delta up" style="color:var(--text-faint); background:transparent;">de 1,24M apaixonados</div></div>
+        <div class="card kpi"><div class="label">Novos torcedores</div><div class="value" style="font-size:22px;" id="kpi-overview-novos">82K</div><div class="delta up" id="kpi-overview-novos-delta">↑ 12%</div></div>
+        <div class="card kpi"><div class="label">Interações totais</div><div class="value" style="font-size:22px;" id="kpi-overview-interacoes">9,4M</div><div class="delta up" id="kpi-overview-interacoes-delta">↑ 18%</div></div>
+        <div class="card kpi"><div class="label">Torcedores recorrentes</div><div class="value" style="font-size:22px;" id="kpi-overview-recorrentes">68%</div><div class="delta up" id="kpi-overview-recorrentes-delta">↑ 10%</div></div>
+        <div class="card kpi"><div class="label">Torcedores reconhecidos</div><div class="value" style="font-size:22px;" id="kpi-overview-reconhecidos">30,4K</div><div class="delta up" style="color:var(--text-faint); background:transparent;" id="kpi-overview-reconhecidos-base">de 1,24M apaixonados</div></div>
       </div>
     </section>
 
@@ -1065,19 +1065,19 @@ canvas{ max-width:100%; }
       <div class="grid g-4" style="margin-bottom:16px;">
         <div class="card kpi" style="background:linear-gradient(135deg, rgba(31,214,184,.10), var(--surface)); border-color:rgba(31,214,184,.3);">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.18); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>MRR total</div>
-          <div class="value" style="color:#1fd6b8;">R$ 450K</div><div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-mrr"></canvas></div><div class="delta up">↑ 18,6%</div>
+          <div class="value" style="color:#1fd6b8;" id="kpi-mon-mrr">R$ 450K</div><div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-mrr"></canvas></div><div class="delta up" id="kpi-mon-mrr-delta">↑ 18,6%</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z"/></svg></span>Sócios-torcedores</div>
-          <div class="value">1.000</div><div class="delta up">↑ 14,2%</div>
+          <div class="value" id="kpi-mon-socios">1.000</div><div class="delta up">↑ 14,2%</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Receita média por sócio</div>
-          <div class="value">R$ 450</div><div class="delta up">↑ 8,7%</div>
+          <div class="value" id="kpi-mon-arpu">R$ 450</div><div class="delta up" id="kpi-mon-arpu-delta">↑ 8,7%</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg></span>Churn</div>
-          <div class="value">2,4%</div><div class="delta up">↓ 0,6pp</div>
+          <div class="value" id="kpi-mon-churn">2,4%</div><div class="delta up" id="kpi-mon-churn-delta">↓ 0,6pp</div>
         </div>
       </div>
 
@@ -1663,6 +1663,9 @@ const CLUB_PROFILES = {
       nps:'86%', npsDelta:'↑ 3pp',
       churn:'5,9%', churnBase:'≈ 631 mil torcedores da base reconhecida',
       cdpTotal:'45M', cdpIdentificados:'10,7M', cdpPerfis:'120.000', cdpSocios:'120.000',
+      engajamento:'8,4%', engajamentoDelta:'↑ 0,8pp vs. mês anterior',
+      novos:'707K', novosDelta:'↑ 12%', interacoes:'81M', interacoesDelta:'↑ 18%', recorrentes:'72%', recorrentesDelta:'↑ 9%',
+      mrr:'R$ 3,9M', mrrDelta:'↑ 14,8%', arpu:'R$ 32,50', arpuDelta:'↑ 8,7%', subChurn:'2,1%', subChurnDelta:'↓ 0,5pp',
     },
     ai:'Flamengo, Maracanã (78 mil lugares). Torcedores ativos: 10,7 milhões. Torcedores conhecidos pelo clube: 120 mil (de 45 milhões de apaixonados no total — mais de 99% da torcida está além do estádio). Receita consolidada do período: R$ 26,5M. Números baseados no case real usado no material comercial da Virtual Fans, com o restante do funil estimado proporcionalmente para fins de demonstração.',
   },
@@ -1674,6 +1677,9 @@ const CLUB_PROFILES = {
       nps:'82%', npsDelta:'↑ 2pp',
       churn:'7,4%', churnBase:'≈ 525 mil torcedores da base reconhecida',
       cdpTotal:'30M', cdpIdentificados:'7,1M', cdpPerfis:'150.000', cdpSocios:'150.000',
+      engajamento:'7,1%', engajamentoDelta:'↑ 0,4pp vs. mês anterior',
+      novos:'470K', novosDelta:'↑ 9%', interacoes:'54M', interacoesDelta:'↑ 14%', recorrentes:'65%', recorrentesDelta:'↑ 6%',
+      mrr:'R$ 2,6M', mrrDelta:'↑ 9,7%', arpu:'R$ 17,30', arpuDelta:'↑ 5,4%', subChurn:'2,6%', subChurnDelta:'↓ 0,3pp',
     },
     ai:'Corinthians, Neo Química Arena (49 mil lugares). Torcedores ativos: 7,1 milhões. Torcedores conhecidos pelo clube (programa Fiel Torcedor): 150 mil (de ~30 milhões de apaixonados estimados). Receita consolidada do período: R$ 17,8M. Números estimados/ilustrativos para fins de demonstração.',
   },
@@ -1727,6 +1733,32 @@ function selectClub(id, silent){
   setText('kpi-cdp-identificados', c.kpi.cdpIdentificados);
   setText('kpi-cdp-perfis', c.kpi.cdpPerfis);
   setText('kpi-cdp-socios', c.kpi.cdpSocios);
+
+  setText('kpi-overview-ativos', c.kpi.ativos);
+  setText('kpi-overview-ativos-delta', c.kpi.ativosDelta);
+  setText('kpi-overview-engajamento', c.kpi.engajamento);
+  setText('kpi-overview-engajamento-delta', c.kpi.engajamentoDelta);
+  setText('kpi-overview-mrr', c.kpi.mrr);
+  setText('kpi-overview-mrr-delta', c.kpi.mrrDelta);
+  setText('kpi-overview-nps', c.kpi.nps);
+  setText('kpi-overview-demo-total', c.kpi.ativos);
+  setText('kpi-overview-novos', c.kpi.novos);
+  setText('kpi-overview-novos-delta', c.kpi.novosDelta);
+  setText('kpi-overview-interacoes', c.kpi.interacoes);
+  setText('kpi-overview-interacoes-delta', c.kpi.interacoesDelta);
+  setText('kpi-overview-recorrentes', c.kpi.recorrentes);
+  setText('kpi-overview-recorrentes-delta', c.kpi.recorrentesDelta);
+  setText('kpi-overview-reconhecidos', c.kpi.cdpPerfis);
+  const reconhecidosBase = document.getElementById('kpi-overview-reconhecidos-base');
+  if(reconhecidosBase) reconhecidosBase.textContent = `de ${c.kpi.ativos} apaixonados`;
+
+  setText('kpi-mon-mrr', c.kpi.mrr);
+  setText('kpi-mon-mrr-delta', c.kpi.mrrDelta);
+  setText('kpi-mon-socios', c.kpi.cdpSocios);
+  setText('kpi-mon-arpu', c.kpi.arpu);
+  setText('kpi-mon-arpu-delta', c.kpi.arpuDelta);
+  setText('kpi-mon-churn', c.kpi.subChurn);
+  setText('kpi-mon-churn-delta', c.kpi.subChurnDelta);
 
   renderClubDropdown();
   if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
