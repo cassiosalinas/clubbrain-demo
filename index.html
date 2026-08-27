@@ -1343,6 +1343,7 @@ canvas{ max-width:100%; }
       <div class="subtabs" id="cdp-subtabs">
         <div class="subtab active" data-sub="overview">Overview</div>
         <div class="subtab" data-sub="fans">Fans</div>
+        <div class="subtab" data-sub="crmbase">Base CRM</div>
         <div class="subtab" data-sub="fan360">Fan 360°</div>
         <div class="subtab" data-sub="journeys">Journeys</div>
         <div class="subtab" data-sub="insights">AI Insights</div>
@@ -1461,6 +1462,67 @@ canvas{ max-width:100%; }
             <thead><tr><th>Fan ID</th><th>Nome</th><th>Status</th><th>Nível</th><th>Fan Score</th><th>LTV</th></tr></thead>
             <tbody id="cdp-fans-table"></tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Sub: Base CRM -->
+      <div class="subview" id="cdp-sub-crmbase">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Base CRM completa</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Todos os torcedores da base gerada — busque, filtre e ordene em tempo real. Clique numa linha para ver o registro completo.</div>
+          <div class="grid g-4" style="margin-bottom:14px;">
+            <div>
+              <label class="seg-label">Buscar (nome ou cidade)</label>
+              <input type="text" id="crmbase-search" class="seg-input" placeholder="Ex: Ana, São Paulo…" oninput="crmBasePage=1; renderCrmBaseTable();">
+            </div>
+            <div>
+              <label class="seg-label">Nível</label>
+              <select id="crmbase-nivel" class="seg-input" onchange="crmBasePage=1; renderCrmBaseTable();">
+                <option value="">Todos os níveis</option>
+                <option value="basico">Básico</option>
+                <option value="bronze">Bronze</option>
+                <option value="prata">Prata</option>
+                <option value="ouro">Ouro</option>
+                <option value="platina">Platina</option>
+              </select>
+            </div>
+            <div>
+              <label class="seg-label">Região</label>
+              <select id="crmbase-regiao" class="seg-input" onchange="crmBasePage=1; renderCrmBaseTable();">
+                <option value="">Todas as regiões</option>
+                <option value="Sudeste">Sudeste</option>
+                <option value="Nordeste">Nordeste</option>
+                <option value="Sul">Sul</option>
+                <option value="Centro-Oeste">Centro-Oeste</option>
+                <option value="Norte">Norte</option>
+                <option value="Exterior">Exterior</option>
+              </select>
+            </div>
+            <div>
+              <label class="seg-label">Ordenar por</label>
+              <select id="crmbase-sort" class="seg-input" onchange="crmBasePage=1; renderCrmBaseTable();">
+                <option value="ltv-desc">LTV (maior primeiro)</option>
+                <option value="ltv-asc">LTV (menor primeiro)</option>
+                <option value="idade-asc">Idade (menor primeiro)</option>
+                <option value="idade-desc">Idade (maior primeiro)</option>
+                <option value="acesso-asc">Último acesso (mais recente)</option>
+                <option value="acesso-desc">Último acesso (mais antigo)</option>
+                <option value="name-asc">Nome (A–Z)</option>
+              </select>
+            </div>
+          </div>
+          <div class="hero-note" id="crmbase-count-label" style="margin-bottom:10px;"></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>ID</th><th>Nome</th><th>Idade</th><th>Cidade</th><th>Região</th><th>Nível</th><th>Canal</th><th>Últ. acesso</th><th>Churn</th><th>LTV</th></tr></thead>
+              <tbody id="crmbase-table"></tbody>
+            </table>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-top:16px;">
+            <button class="pill" onclick="crmBasePrevPage()">← Anterior</button>
+            <span class="hero-note" id="crmbase-page-label" style="white-space:nowrap;"></span>
+            <button class="pill" onclick="crmBaseNextPage()">Próxima →</button>
+          </div>
         </div>
       </div>
 
@@ -1982,6 +2044,8 @@ function refreshCdpForClub(){
   renderCrmTiers();
   renderCrmTierTable();
   renderCdpFansList();
+  crmBasePage = 1;
+  renderCrmBaseTable();
   renderCdpFan360('rafael');
   renderCdpInsightsFeed();
   renderCdpJourney();
@@ -3927,13 +3991,23 @@ const POOL_REGIOES = [
 ];
 const POOL_TIER_WEIGHTS = [ { key:'bronze', pct:55 }, { key:'prata', pct:30 }, { key:'ouro', pct:11.7 }, { key:'platina', pct:3.3 } ];
 const POOL_LTV_RANGES = { bronze:[80,400], prata:[400,1200], ouro:[1200,3800], platina:[3800,9500] };
+const POOL_CANAIS = [ { nome:'App', pct:48 }, { nome:'Web', pct:22 }, { nome:'Loja física', pct:14 }, { nome:'Redes sociais', pct:16 } ];
+const POOL_ORIGENS = [ { nome:'Orgânico', pct:40 }, { nome:'Indicação', pct:22 }, { nome:'Campanha paga', pct:18 }, { nome:'Loja física', pct:10 }, { nome:'Redes sociais', pct:10 } ];
+const POOL_PRODUTOS_FAV = [ { nome:'Camisas', pct:46 }, { nome:'Acessórios', pct:20 }, { nome:'Colecionáveis', pct:14 }, { nome:'Vestuário', pct:12 }, { nome:'Infantil', pct:8 } ];
+const EMAIL_ACCENT_MAP = {'á':'a','à':'a','ã':'a','â':'a','ä':'a','é':'e','è':'e','ê':'e','ë':'e','í':'i','ì':'i','î':'i','ï':'i','ó':'o','ò':'o','õ':'o','ô':'o','ö':'o','ú':'u','ù':'u','û':'u','ü':'u','ç':'c','ñ':'n'};
+function emailSlug(str){
+  const lower = str.toLowerCase().split('').map(ch => EMAIL_ACCENT_MAP[ch] || ch).join('');
+  return lower.replace(/[^a-z]/g,'');
+}
 function generateFanPool(clubId, total, sociosCount){
   const rnd = mulberry32(hashSeed(clubId + ':fanpool'));
   const pool = [];
   for(let i=0;i<total;i++){
     const isSocio = i < sociosCount;
     const sexo = rnd() < 0.5 ? 'M' : 'F';
-    const nome = poolPick(sexo==='M'?POOL_FIRST_M:POOL_FIRST_F, rnd) + ' ' + poolPick(POOL_LAST, rnd);
+    const first = poolPick(sexo==='M'?POOL_FIRST_M:POOL_FIRST_F, rnd);
+    const last = poolPick(POOL_LAST, rnd);
+    const nome = first + ' ' + last;
     const idade = 12 + Math.floor(rnd()*74);
     const regiaoObj = poolWeightedPick(POOL_REGIOES, rnd);
     const cidade = poolPick(regiaoObj.cidades, rnd);
@@ -3945,7 +4019,21 @@ function generateFanPool(clubId, total, sociosCount){
     } else if(rnd() < 0.15){
       ltvNum = Math.round(rnd()*120);
     }
-    pool.push({ name:nome, idade, regiao:regiaoObj.nome, cidade, sexo, socio:isSocio, nivel, ltv:'R$ ' + ltvNum.toLocaleString('pt-BR') });
+    const ultimoAcesso = Math.floor(rnd()*rnd()*180);
+    const churnRisco = (!isSocio && ultimoAcesso>90) ? 'Alto' : (ultimoAcesso>45 ? 'Médio' : 'Baixo');
+    pool.push({
+      id: `${clubId.slice(0,3).toUpperCase()}-${(i+1).toString().padStart(6,'0')}`,
+      name:nome, idade, regiao:regiaoObj.nome, cidade, sexo, socio:isSocio, nivel,
+      ltv:'R$ ' + ltvNum.toLocaleString('pt-BR'),
+      email: `${emailSlug(first)}.${emailSlug(last)}${i}@email.com`,
+      telefone: `(${11+Math.floor(rnd()*79)}) 9${Math.floor(1000+rnd()*8999)}-${Math.floor(1000+rnd()*8999)}`,
+      canal: poolWeightedPick(POOL_CANAIS, rnd).nome,
+      origem: poolWeightedPick(POOL_ORIGENS, rnd).nome,
+      produtoFavorito: poolWeightedPick(POOL_PRODUTOS_FAV, rnd).nome,
+      ultimoAcesso,
+      churnRisco,
+      optInMarketing: rnd() < 0.82,
+    });
   }
   return pool;
 }
@@ -4026,6 +4114,93 @@ function renderCrmTierTable(){
       <td>${r.ltv}</td>
     </tr>`;
   }).join('');
+}
+
+/* ---------- Base CRM completa (busca + filtro + ordenacao + paginacao sobre os 15.000/12.000) ---------- */
+let crmBasePage = 1;
+const CRMBASE_PAGE_SIZE = 50;
+function getCrmBaseFiltered(){
+  const search = (document.getElementById('crmbase-search')?.value || '').trim().toLowerCase();
+  const nivel = document.getElementById('crmbase-nivel')?.value || '';
+  const regiao = document.getElementById('crmbase-regiao')?.value || '';
+  const sortVal = document.getElementById('crmbase-sort')?.value || 'ltv-desc';
+  let rows = getFanPool();
+  if(search) rows = rows.filter(f => f.name.toLowerCase().includes(search) || f.cidade.toLowerCase().includes(search));
+  if(nivel) rows = rows.filter(f => f.nivel === nivel);
+  if(regiao) rows = rows.filter(f => f.regiao === regiao);
+  const [field, dir] = sortVal.split('-');
+  const mult = dir === 'asc' ? 1 : -1;
+  rows = rows.slice().sort((a,b)=>{
+    if(field==='ltv') return mult*(parseLtv(a.ltv)-parseLtv(b.ltv));
+    if(field==='idade') return mult*(a.idade-b.idade);
+    if(field==='acesso') return mult*(a.ultimoAcesso-b.ultimoAcesso);
+    if(field==='name') return mult*a.name.localeCompare(b.name);
+    return 0;
+  });
+  return rows;
+}
+function renderCrmBaseTable(){
+  const tableEl = document.getElementById('crmbase-table');
+  if(!tableEl) return;
+  const filtered = getCrmBaseFiltered();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / CRMBASE_PAGE_SIZE));
+  if(crmBasePage > totalPages) crmBasePage = totalPages;
+  if(crmBasePage < 1) crmBasePage = 1;
+  const start = (crmBasePage-1)*CRMBASE_PAGE_SIZE;
+  const pageRows = filtered.slice(start, start+CRMBASE_PAGE_SIZE);
+  const tierMeta = k => getTierDb().find(t=>t.key===k);
+  const churnColor = c => c==='Alto' ? red : (c==='Médio' ? amber : '#22e07a');
+
+  tableEl.innerHTML = pageRows.map(f=>{
+    const t = tierMeta(f.nivel);
+    return `<tr class="clickable" onclick="showCrmRecordModal('${f.id}')">
+      <td class="mono" style="font-size:11px; color:var(--text-faint);">${f.id}</td>
+      <td class="strong">${f.name}</td>
+      <td>${f.idade}</td>
+      <td>${f.cidade}</td>
+      <td>${f.regiao}</td>
+      <td><span class="tag" style="background:${t.color}1f; border-color:${t.color}44; color:${t.color};">${t.name}</span></td>
+      <td>${f.canal}</td>
+      <td>${f.ultimoAcesso}d atrás</td>
+      <td><span class="tag" style="background:${churnColor(f.churnRisco)}1f; border-color:${churnColor(f.churnRisco)}44; color:${churnColor(f.churnRisco)};">${f.churnRisco}</span></td>
+      <td>${f.ltv}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="10" class="hero-note" style="text-align:center; padding:24px;">Nenhum torcedor encontrado com esses filtros.</td></tr>`;
+
+  document.getElementById('crmbase-count-label').textContent = `${filtered.length.toLocaleString('pt-BR')} torcedores encontrados`;
+  document.getElementById('crmbase-page-label').textContent = `Página ${crmBasePage} de ${totalPages}`;
+}
+function crmBasePrevPage(){ if(crmBasePage>1){ crmBasePage--; renderCrmBaseTable(); } }
+function crmBaseNextPage(){ crmBasePage++; renderCrmBaseTable(); }
+function showCrmRecordModal(id){
+  const f = getFanPool().find(x=>x.id===id);
+  if(!f) return;
+  const t = getTierDb().find(x=>x.key===f.nivel);
+  showModal(
+    `<h3 style="color:${t.color};">${f.name}</h3>`,
+    `<div class="hero-note" style="margin:8px 0 16px;">${f.id} · ${t.name} · ${f.socio ? 'Sócio-torcedor pagante' : 'Torcedor identificado (não pagante)'}</div>
+     <div class="grid g-2" style="margin-bottom:16px;">
+       <div><div class="hero-note">Idade</div><div class="value" style="font-size:15px; font-weight:700;">${f.idade} anos</div></div>
+       <div><div class="hero-note">Sexo</div><div class="value" style="font-size:15px; font-weight:700;">${f.sexo==='M'?'Masculino':'Feminino'}</div></div>
+       <div><div class="hero-note">Cidade</div><div class="value" style="font-size:15px; font-weight:700;">${f.cidade}</div></div>
+       <div><div class="hero-note">Região</div><div class="value" style="font-size:15px; font-weight:700;">${f.regiao}</div></div>
+       <div><div class="hero-note">LTV</div><div class="value" style="font-size:15px; font-weight:700;">${f.ltv}</div></div>
+       <div><div class="hero-note">Risco de churn</div><div class="value" style="font-size:15px; font-weight:700;">${f.churnRisco}</div></div>
+     </div>
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Contato (fictício)</div>
+     <div style="font-size:12.5px; color:var(--text-dim); line-height:1.8; margin-bottom:16px;">
+       E-mail: <b style="color:var(--text);">${f.email}</b><br>
+       Telefone: <b style="color:var(--text);">${f.telefone}</b><br>
+       Opt-in de marketing: <b style="color:${f.optInMarketing?'#22e07a':red};">${f.optInMarketing ? 'Sim' : 'Não'}</b>
+     </div>
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Comportamento</div>
+     <div style="font-size:12.5px; color:var(--text-dim); line-height:1.8;">
+       Canal preferido: <b style="color:var(--text);">${f.canal}</b><br>
+       Origem de aquisição: <b style="color:var(--text);">${f.origem}</b><br>
+       Produto favorito: <b style="color:var(--text);">${f.produtoFavorito}</b><br>
+       Último acesso: <b style="color:var(--text);">${f.ultimoAcesso} dias atrás</b>
+     </div>`
+  );
 }
 
 function openFanFromTier(id){
@@ -4157,6 +4332,7 @@ function buildCdp(){
   renderCrmTiers();
   renderCrmTierTable();
   renderCdpFansList();
+  renderCrmBaseTable();
   // --- Fan 360 ---
   renderCdpFan360(cdpFan360Id);
   // --- Journeys ---
