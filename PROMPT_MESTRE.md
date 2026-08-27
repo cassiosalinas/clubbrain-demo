@@ -153,24 +153,25 @@ Critérios: **Importância estratégica** (Crítica/Alta/Média/Baixa) · **Impa
 Já existe um **protótipo funcional em HTML único** (`ClubBrain_Demo_Virtual_Fans.html`), auto-contido (sem backend, sem dependência de internet — Chart.js embutido no arquivo), pensado para ser levado a reuniões com clubes. Ele materializa visualmente as camadas 1, 3 e 5 da arquitetura (experiência, ontologia, aplicação) com dados fictícios de um clube fictício, o **Estrela FC**.
 
 ### 7.1 Estrutura da demo
-Uma marca única, **Virtual Fans — by Clubbrain.ai**, com sidebar fixa e módulos navegáveis agrupados por Executivo, Inteligência, Visão do torcedor, Monetização e Operação:
+A marca do produto foi removida da UI — sidebar e login mostram o escudo e o nome do clube ativo (seletor Flamengo/Corinthians), com sidebar fixa e módulos navegáveis agrupados por Executivo, Inteligência, Visão do torcedor, Monetização e Operação:
 
 | # | Módulo | Camada da arquitetura | Inspirado em |
 |---|---|---|---|
 | 1 | Visão geral | Camada 3 (Ontologia) + KPIs gerais | Dashboard "FanSphere" (Audience Overview) |
 | 2 | Audiência | Camada 2/3 (CDP) | Demografia do dashboard 1 |
-| 3 | Engajamento | Camada 1 (Fan Experience) | "FanForge" (Community Engagement) |
+| 3 | Comunidades | Camada 1 (Fan Experience) | "FanForge" (Community Engagement) |
 | 4 | Sentimento & Buzz | Camada 2 (Ingestão social) | "FANHUB" (Sentiment & Buzz) |
 | 5 | Conteúdo | Camada 1 (CMS) | "FANVERSE" (Content Analytics) |
-| 6 | Eventos & Ingressos | Camada 1 (Ticketing) | "FanConnect" (Event Ticketing) |
-| 7 | Gamificação | Camada 1 (Gamificação & Missões) | "FanSphere" (Loyalty & Rewards) |
-| 8 | Receita & Patrocínio | Camada 5 (Monetização) | "FANFORGE" (Monetization & Sponsorship) |
-| 9 | CRM do torcedor | Camada 3 (Ontologia — nó Fã) | "Fan Intelligence" (Fan CRM Profiles) |
-| 10 | CDP — Fan Data Platform | Camada 2 (Ingestão & Streaming) | módulo próprio, com 7 sub-abas: Overview, Fans, Fan 360°, Audiences, Journeys, AI Insights, Activations |
-| 11 | Automação de marketing | Camada 4 (Agente de Aquisição) | "FanEdge" (Marketing Automation) |
-| 12 | Saúde do sistema | Fundação Transversal (Observabilidade) | "FanHub" (System Health & API) |
+| 6 | Torcedor 360 | Camada 2/3 (CDP + CRM unificados) | módulo próprio, com sub-abas: Overview, Fans (níveis + Top 10 LTV), Fan 360°, Audiences, Journeys, AI Insights, Activations — dados de base de torcedores e financeiros distintos por clube |
+| 7 | Ontologia do Clube | Camada 3 (grafo de conhecimento) | inspirado no Ontology Manager da Palantir Foundry — tipos de objeto (Torcedor, Sócio-Torcedor, Ingresso, Jogo, Jogador, Patrocinador, Produto, Setor do Estádio, Funcionário, Ativo do Clube) conectados aos dados reais da plataforma |
+| 8 | Eventos & Ingressos | Camada 1 (Ticketing) | "FanConnect" (Event Ticketing) — inclui mapa de setores real e clicável do estádio do clube ativo (Maracanã / Neo Química Arena), com próximos jogos reais pesquisados |
+| 9 | Gamificação | Camada 1 (Gamificação & Missões) | "FanSphere" (Loyalty & Rewards) |
+| 10 | Receita & Patrocínio | Camada 5 (Monetização) | "FANFORGE" (Monetization & Sponsorship) |
+| 11 | Gestão de commerce | Camada 1 (E-commerce via VTEX) | catálogo, vendas e top produtos da loja oficial |
+| 12 | Automação de marketing | Camada 4 (Agente de Aquisição) | "FanEdge" (Marketing Automation) |
+| 13 | Saúde do sistema | Fundação Transversal (Observabilidade) | "FanHub" (System Health & API) |
 
-> Módulos "Cockpit executivo" (Executivo) e "Agentes de IA" (Inteligência, camada 4) completam a navegação mas não vieram dos dashboards de referência originais.
+> Módulos "Cockpit executivo" (Executivo) e "Agentes de IA" (Inteligência, camada 4) completam a navegação mas não vieram dos dashboards de referência originais. O antigo módulo "CRM do torcedor" foi fundido dentro de "Torcedor 360" (níveis de sócio-torcedor, Top 10 e Fan 360° vivem todos ali).
 
 ### 7.2 Elemento de diferenciação: o grafo da Ontologia
 Na Visão Geral, um diagrama SVG mostra o nó central "TORCEDOR" conectado a 8 nós ao redor (Jogador, Patrocinador, Produto, Evento, Ingresso, Campanha, Estádio, Conteúdo) — é a materialização visual da Camada 3 (item 2.3 acima). Esse é o elemento que diferencia a demo de "só mais um dashboard SaaS" e ancora a conversa comercial na tese real da empresa.
