@@ -2326,9 +2326,85 @@ function buildOntology(){
       <div style="font-size:12px; color:var(--text-dim); line-height:1.5;">${t.desc}</div>
     </div>`).join('');
 }
+const TORCEDOR_SCHEMA = [
+  ['fanId','string','Identificador único do torcedor na Ontologia (ex: FAN-FLA-00104)'],
+  ['nome','string','Nome completo'],
+  ['idade','integer','12 a 85 anos'],
+  ['sexo','enum','Masculino · Feminino'],
+  ['cidade / região / país','string','Localização — a grande maioria no Brasil, pequena fatia no exterior'],
+  ['nivel','enum','Básico · Bronze · Prata · Ouro · Platina'],
+  ['fanScore','integer (0–100)','Composto por Engagement, Comercial, Conteúdo, Matchday, Gamificação, Fidelidade'],
+  ['ltv / gastoTotal','currency','Valor gerado desde que virou torcedor identificado'],
+  ['churnRisco','enum','Baixo · Médio · Alto'],
+  ['propensaoDeCompra','percent','Calculada pelo Agente de CRM'],
+  ['timeCoracao / tambemTorce','string','Time principal e clubes secundários'],
+  ['tags / segments','array','Interesses e segmentos ativos vindos das Audiences'],
+];
+function showTorcedorObjectModal(o){
+  const pool = getFanPool();
+  const total = pool.length;
+  const tierDb = getTierDb();
+  const tierDist = tierDb.map(t=>({ name:t.name, color:t.color, count: pool.filter(f=>f.nivel===t.key).length }));
+  const regioes = ['Sudeste','Nordeste','Sul','Centro-Oeste','Norte','Exterior'];
+  const regiaoCores = { Sudeste:brand, Nordeste:teal, Sul:brand2, 'Centro-Oeste':gold, Norte:amber, Exterior:red };
+  const regiaoDist = regioes.map(r=>({ name:r, color:regiaoCores[r], count: pool.filter(f=>f.regiao===r).length }));
+  const ageBuckets = [[12,17],[18,24],[25,34],[35,44],[45,54],[55,85]];
+  const ageDist = ageBuckets.map(([lo,hi])=>({ name:`${lo}–${hi}`, count: pool.filter(f=>f.idade>=lo && f.idade<=hi).length }));
+  const sample = getFansDb()[0];
+
+  const barRow = (label, count, color) => `
+    <div class="list-row">
+      <span class="dot-legend" style="background:${color}"></span>
+      <span style="flex:1; font-size:12.5px;">${label}</span>
+      <div class="progress" style="width:100px;"><div style="width:${Math.max(2,Math.round(count/total*100))}%; background:${color}"></div></div>
+      <span class="mono" style="width:56px; text-align:right; font-size:11.5px; color:var(--text-dim);">${count.toLocaleString('pt-BR')}</span>
+    </div>`;
+
+  showModal(
+    `<h3 style="color:${o.color};">${o.name}</h3>`,
+    `<div class="hero-note" style="margin:8px 0 16px;">${o.desc}</div>
+     <div class="grid g-2" style="margin-bottom:16px;">
+       <div><div class="hero-note">Objetos</div><div class="value" style="font-size:16px; font-weight:700;">${o.count}</div></div>
+       <div><div class="hero-note">Dependentes</div><div class="value" style="font-size:16px; font-weight:700;">${o.dependents}</div></div>
+     </div>
+
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Propriedades (schema)</div>
+     <div style="max-height:150px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;">
+       <table style="margin:0;"><tbody>
+         ${TORCEDOR_SCHEMA.map(([field,type,desc])=>`
+           <tr><td class="strong mono" style="font-size:11.5px; white-space:nowrap;">${field}</td><td><span class="tag" style="font-size:10px;">${type}</span></td><td style="font-size:11.5px; color:var(--text-dim);">${desc}</td></tr>
+         `).join('')}
+       </tbody></table>
+     </div>
+
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Distribuição por nível — base real de ${total.toLocaleString('pt-BR')}</div>
+     <div style="margin-bottom:16px;">${tierDist.map(t=>barRow(t.name, t.count, t.color)).join('')}</div>
+
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Distribuição por região</div>
+     <div style="margin-bottom:16px;">${regiaoDist.map(r=>barRow(r.name, r.count, r.color)).join('')}</div>
+
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Distribuição por faixa etária (12–85 anos)</div>
+     <div style="margin-bottom:16px;">${ageDist.map(a=>barRow(a.name+' anos', a.count, brand)).join('')}</div>
+
+     <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Amostra de instância</div>
+     <div class="card" style="background:var(--surface-2); margin-bottom:16px;">
+       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+         <span class="chip-avatar" style="background:${sample.color1};">${sample.initials}</span>
+         <div><div style="font-weight:700; font-size:13px;">${sample.name}</div><div class="hero-note">${sample.fanId} · ${sample.nivel}</div></div>
+       </div>
+       <div style="font-size:11.5px; color:var(--text-dim); line-height:1.7;">
+         idade: <b style="color:var(--text);">${sample.idade}</b> · cidade: <b style="color:var(--text);">${sample.cidade}</b> · fanScore: <b style="color:var(--text);">${sample.fanScore}</b> · ltv: <b style="color:var(--text);">${sample.ltv}</b> · churnRisco: <b style="color:var(--text);">${sample.churnRisco}</b>
+       </div>
+     </div>
+
+     <div class="hero-note" style="margin-bottom:6px;">Tipos ligados</div>
+     <div style="display:flex; gap:6px; flex-wrap:wrap;">${o.linked.map(l=>`<span class="tag">${l}</span>`).join('')}</div>`
+  );
+}
 function showOntologyModal(key){
   const o = ontologyTypesCache.find(x=>x.key===key);
   if(!o) return;
+  if(key === 'torcedor') return showTorcedorObjectModal(o);
   showModal(
     `<h3 style="color:${o.color};">${o.name}</h3>`,
     `<div class="hero-note" style="margin:8px 0 16px;">${o.desc}</div>
