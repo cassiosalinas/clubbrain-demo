@@ -153,7 +153,7 @@ Critérios: **Importância estratégica** (Crítica/Alta/Média/Baixa) · **Impa
 Já existe um **protótipo funcional em HTML único** (`ClubBrain_Demo_Virtual_Fans.html`), auto-contido (sem backend, sem dependência de internet — Chart.js embutido no arquivo), pensado para ser levado a reuniões com clubes. Ele materializa visualmente as camadas 1, 3 e 5 da arquitetura (experiência, ontologia, aplicação) com dados fictícios de um clube fictício, o **Estrela FC**.
 
 ### 7.1 Estrutura da demo
-Uma marca única, **Virtual Fans — by Clubbrain.ai**, com sidebar fixa e 11 módulos navegáveis:
+Uma marca única, **Virtual Fans — by Clubbrain.ai**, com sidebar fixa e módulos navegáveis agrupados por Executivo, Inteligência, Visão do torcedor, Monetização e Operação:
 
 | # | Módulo | Camada da arquitetura | Inspirado em |
 |---|---|---|---|
@@ -166,8 +166,11 @@ Uma marca única, **Virtual Fans — by Clubbrain.ai**, com sidebar fixa e 11 m�
 | 7 | Gamificação | Camada 1 (Gamificação & Missões) | "FanSphere" (Loyalty & Rewards) |
 | 8 | Receita & Patrocínio | Camada 5 (Monetização) | "FANFORGE" (Monetization & Sponsorship) |
 | 9 | CRM do torcedor | Camada 3 (Ontologia — nó Fã) | "Fan Intelligence" (Fan CRM Profiles) |
-| 10 | Automação de marketing | Camada 4 (Agente de Aquisição) | "FanEdge" (Marketing Automation) |
-| 11 | Saúde do sistema | Fundação Transversal (Observabilidade) | "FanHub" (System Health & API) |
+| 10 | CDP (Fan Data Platform) | Camada 2 (Ingestão & Streaming) | — módulo próprio, sem equivalente nos protótipos originais |
+| 11 | Automação de marketing | Camada 4 (Agente de Aquisição) | "FanEdge" (Marketing Automation) |
+| 12 | Saúde do sistema | Fundação Transversal (Observabilidade) | "FanHub" (System Health & API) |
+
+> Módulos "Cockpit executivo" (Executivo) e "Agentes de IA" (Inteligência, camada 4) completam a navegação mas não vieram dos dashboards de referência originais.
 
 ### 7.2 Elemento de diferenciação: o grafo da Ontologia
 Na Visão Geral, um diagrama SVG mostra o nó central "TORCEDOR" conectado a 8 nós ao redor (Jogador, Patrocinador, Produto, Evento, Ingresso, Campanha, Estádio, Conteúdo) — é a materialização visual da Camada 3 (item 2.3 acima). Esse é o elemento que diferencia a demo de "só mais um dashboard SaaS" e ancora a conversa comercial na tese real da empresa.
