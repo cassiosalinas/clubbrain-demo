@@ -529,6 +529,10 @@ canvas{ max-width:100%; }
       </div>
 
       <div class="nav-group-label">Inteligência</div>
+      <div class="nav-item" data-view="ontology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v6M12 13.5L6.8 17.2M12 13.5l5.2 3.7"/></svg>
+        Ontologia do Clube
+      </div>
       <div class="nav-item" data-view="agents">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
         Agentes de IA
@@ -671,6 +675,38 @@ canvas{ max-width:100%; }
       </div>
 
       <div class="grid g-2" id="agents-grid"></div>
+    </section>
+
+    <!-- ================= ONTOLOGIA DO CLUBE ================= -->
+    <section class="view" id="view-ontology">
+      <div class="card" style="margin-bottom:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:220px; position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); width:15px; height:15px; color:var(--text-faint); pointer-events:none;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="ontology-search" type="text" placeholder="Buscar por nome, tipo, RID, aliases…" oninput="buildOntology()" style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 14px 11px 36px; color:var(--text); font-size:13px; font-family:inherit;">
+        </div>
+        <div class="tag" style="padding:8px 14px;">🌿 Main</div>
+        <button class="btn-primary" style="padding:9px 16px;" onclick="showToast('Criação de novo tipo de objeto — disponível na versão completa da plataforma')">+ Novo</button>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Recursos da Ontologia do Clube</h3></div>
+        <div class="hero-note" style="margin:-6px 0 14px;">O grafo de conhecimento que conecta cada dado do clube — torcedor, ingresso, jogador, patrocínio, produto e ativo — num modelo único, consultado pelos Agentes de IA (Camada 4).</div>
+        <div class="grid" id="ontology-resources" style="grid-template-columns:repeat(5,1fr); gap:10px;"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">
+          <h3>Tipos de objeto recentemente modificados</h3>
+          <span class="tag" id="ontology-count-tag" style="margin-left:auto;">10</span>
+        </div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Cada card é um tipo de objeto na Ontologia do Clube — clique para ver como ele se conecta aos demais.</div>
+        <div class="grid g-3" id="ontology-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><h3>Tipos de objeto em destaque</h3></div>
+        <div class="grid g-2" id="ontology-prominent"></div>
+      </div>
     </section>
 
     <!-- ================= OPS CENTER ================= -->
@@ -1547,6 +1583,7 @@ function logoutDemo(){
 const titles = {
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
+  ontology: ["Ontologia do Clube", "Camada 3 — o grafo de conhecimento que conecta torcedor, jogo, jogador, patrocínio e ativos num modelo único"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
   cdp: ["Torcedor 360", "CDP + CRM — base de torcedores por nível, Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
   overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
@@ -1771,6 +1808,7 @@ function selectClub(id, silent){
   renderClubDropdown();
   refreshCdpForClub();
   refreshEventsForClub();
+  if(document.getElementById('ontology-grid')) buildOntology();
   if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
 }
 
@@ -1814,6 +1852,7 @@ function initChartsFor(key){
   initialized[key] = true;
   if(key==='cockpit') buildCockpit();
   if(key==='agents') buildAgents();
+  if(key==='ontology') buildOntology();
   if(key==='opscenter') buildOpsCenter();
   if(key==='cdp') buildCdp();
   if(key==='overview') buildOverview();
@@ -2009,6 +2048,108 @@ function buildCockpit(){
 }
 
 /* ============ AGENTS (Camada 4) ============ */
+/* ============ ONTOLOGIA DO CLUBE (Camada 3) ============ */
+const ONTOLOGY_ICONS = {
+  torcedor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  socio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg>',
+  ingresso:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.17L3 3v6.59a2 2 0 00.59 1.41l9.59 9.59a2 2 0 002.82 0l4.59-4.59a2 2 0 000-2.82z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>',
+  jogo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  jogador:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3l4 2 4-2 4 4-3 3v11H7V10L4 7z"/></svg>',
+  patrocinador:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
+  produto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg>',
+  setor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>',
+  funcionario:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c0-1.5 1.5-2.5 3-2.5s3 1 3 2.5M15 9h4M15 13h4"/></svg>',
+  ativo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h.01M15 16h.01"/></svg>',
+};
+let ontologyTypesCache = [];
+function buildOntologyTypes(){
+  const club = CLUB_PROFILES[currentClubId];
+  const st = getStadium();
+  const jogos = (EVENTS_BY_CLUB[currentClubId] || EVENTS_BY_CLUB.flamengo).length;
+  const totalSold = st.sectors.reduce((s,x)=>s+Math.round(x.cap*x.sold),0);
+  return [
+    { key:'torcedor', name:'Torcedor', icon:ONTOLOGY_ICONS.torcedor, color:brand, count:`${club.kpi.ativos} torcedores`, dependents:12, prominent:true,
+      desc:'Todo torcedor identificado pela Ontologia — da base ampla ao sócio-torcedor pagante.', linked:['Ingresso','Sócio-Torcedor','Produto'] },
+    { key:'socio', name:'Sócio-Torcedor', icon:ONTOLOGY_ICONS.socio, color:gold, count:`${club.kpi.cdpSocios} sócios ativos`, dependents:6,
+      desc:'Torcedor pagante com plano ativo — nível, ticket médio, LTV e risco de churn.', linked:['Torcedor','Assinatura'] },
+    { key:'ingresso', name:'Ingresso', icon:ONTOLOGY_ICONS.ingresso, color:teal, count:`${totalSold.toLocaleString('pt-BR')} vendidos`, dependents:5,
+      desc:'Cada ingresso vendido, ligado a um setor do estádio e a um torcedor.', linked:['Setor do Estádio','Jogo'] },
+    { key:'jogo', name:'Jogo / Evento', icon:ONTOLOGY_ICONS.jogo, color:brand2, count:`${jogos} no calendário`, dependents:9,
+      desc:'Partidas e eventos sob gestão do clube — calendário, ocupação e receita.', linked:['Ingresso','Jogador','Patrocinador'] },
+    { key:'jogador', name:'Jogador', icon:ONTOLOGY_ICONS.jogador, color:red, count:'58 atletas', dependents:7, prominent:true,
+      desc:'Elenco profissional masculino e feminino — posição, idade, score de performance e valor de mercado.', linked:['Jogo','Comissão Técnica'] },
+    { key:'patrocinador', name:'Patrocinador', icon:ONTOLOGY_ICONS.patrocinador, color:amber, count:'8 marcas parceiras', dependents:4,
+      desc:'Marcas parceiras do clube — contrato, contrapartidas e ROI de patrocínio.', linked:['Jogo','Contrato'] },
+    { key:'produto', name:'Produto (Loja oficial)', icon:ONTOLOGY_ICONS.produto, color:brand2, count:'128 itens no catálogo', dependents:3,
+      desc:'Catálogo da loja oficial (VTEX) — camisas, acessórios e colecionáveis.', linked:['Torcedor','Pedido'] },
+    { key:'setor', name:'Setor do Estádio', icon:ONTOLOGY_ICONS.setor, color:teal, count:`${st.sectors.length} setores`, dependents:2,
+      desc:`Cada setor do ${st.name} — capacidade, preço e ocupação em tempo real.`, linked:['Ingresso','Ativo do Clube'] },
+    { key:'funcionario', name:'Funcionário', icon:ONTOLOGY_ICONS.funcionario, color:brand, count:'340 colaboradores', dependents:5,
+      desc:'Comissão técnica, médica, administrativa e operacional do clube.', linked:['Departamento','Jogador'] },
+    { key:'ativo', name:'Ativo do Clube', icon:ONTOLOGY_ICONS.ativo, color:gold, count:'3 instalações', dependents:6,
+      desc:'Estádio, centro de treinamento e sede social — o patrimônio físico do clube.', linked:['Setor do Estádio','Funcionário'] },
+  ];
+}
+function ontologyCardHtml(o){
+  return `<div class="card clickable" onclick="showOntologyModal('${o.key}')">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+      <span class="icon-badge" style="background:${o.color}22; color:${o.color}; width:34px; height:34px; flex:none;">${o.icon}</span>
+      <div style="flex:1; min-width:0;">
+        <div style="font-weight:700; font-size:14px;">${o.name}</div>
+        <div class="hero-note" style="margin-top:1px;">${o.count} · ${o.dependents} dependentes</div>
+      </div>
+    </div>
+    <div style="font-size:12px; color:var(--text-dim); line-height:1.5; margin-bottom:10px; min-height:36px;">${o.desc}</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      ${o.linked.map(l=>`<span class="tag" style="font-size:10.5px; padding:3px 8px;">${l}</span>`).join('')}
+    </div>
+  </div>`;
+}
+function buildOntology(){
+  const stats = [
+    ['Tipos de objeto','10'], ['Propriedades','186'], ['Propriedades compartilhadas','24'],
+    ['Tipos de link','34'], ['Tipos de ação','58'], ['Grupos','9'],
+    ['Interfaces','4'], ['Tipos de valor','12'], ['Funções','146'], ['Problemas de saúde','0'],
+  ];
+  document.getElementById('ontology-resources').innerHTML = stats.map(s=>`
+    <div style="text-align:center; padding:10px 4px; border-radius:10px; background:var(--surface-2);">
+      <div style="font-size:19px; font-weight:800;">${s[1]}</div>
+      <div class="hero-note" style="margin-top:2px;">${s[0]}</div>
+    </div>`).join('');
+
+  ontologyTypesCache = buildOntologyTypes();
+  const q = (document.getElementById('ontology-search')?.value || '').trim().toLowerCase();
+  const filtered = q ? ontologyTypesCache.filter(o => o.name.toLowerCase().includes(q) || o.desc.toLowerCase().includes(q)) : ontologyTypesCache;
+  document.getElementById('ontology-grid').innerHTML = filtered.map(ontologyCardHtml).join('') || `<div class="hero-note">Nenhum tipo de objeto encontrado para "${q}".</div>`;
+  document.getElementById('ontology-count-tag').textContent = filtered.length;
+
+  document.getElementById('ontology-prominent').innerHTML = ontologyTypesCache.filter(o=>o.prominent).map(o=>`
+    <div class="card clickable" onclick="showOntologyModal('${o.key}')" style="background:linear-gradient(135deg, ${o.color}14, var(--surface)); border-color:${o.color}44;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <span class="icon-badge" style="background:${o.color}22; color:${o.color}; width:38px; height:38px; flex:none;">${o.icon}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-weight:700; font-size:15px;">${o.name} <span class="tag" style="font-size:10px; margin-left:4px; color:${o.color}; border-color:${o.color}55;">Prominente</span></div>
+          <div class="hero-note" style="margin-top:1px;">${o.count} · ${o.dependents} dependentes</div>
+        </div>
+      </div>
+      <div style="font-size:12.5px; color:var(--text-dim); line-height:1.5;">${o.desc}</div>
+    </div>`).join('');
+}
+function showOntologyModal(key){
+  const o = ontologyTypesCache.find(x=>x.key===key);
+  if(!o) return;
+  showModal(
+    `<h3 style="color:${o.color};">${o.name}</h3>`,
+    `<div class="hero-note" style="margin:8px 0 16px;">${o.desc}</div>
+     <div class="grid g-2">
+       <div><div class="hero-note">Objetos</div><div class="value" style="font-size:16px; font-weight:700;">${o.count}</div></div>
+       <div><div class="hero-note">Dependentes</div><div class="value" style="font-size:16px; font-weight:700;">${o.dependents}</div></div>
+     </div>
+     <div class="hero-note" style="margin-top:14px; margin-bottom:6px;">Tipos ligados</div>
+     <div style="display:flex; gap:6px; flex-wrap:wrap;">${o.linked.map(l=>`<span class="tag">${l}</span>`).join('')}</div>`
+  );
+}
+
 function buildAgents(){
   const flowSteps = [
     ['Gatilho', 'Evento do torcedor ou pergunta de um executivo'],
