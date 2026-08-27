@@ -488,7 +488,7 @@ canvas{ max-width:100%; }
       </div>
       <div class="nav-item" data-view="cdp">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
-        CDP / CRM — Fan Data Platform
+        Torcedor 360
       </div>
 
       <div class="nav-group-label">Monetização</div>
@@ -1545,7 +1545,7 @@ const titles = {
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
-  cdp: ["CDP / CRM — Fan Data Platform", "Base de torcedores por nível, Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
+  cdp: ["Torcedor 360", "CDP + CRM — base de torcedores por nível, Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
   overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
   audience: ["Audiência", "Quem são os torcedores do Estrela FC"],
   engagement: ["Comunidades", "Saúde da comunidade, torcidas organizadas e membros mais ativos"],
@@ -1662,12 +1662,12 @@ const CLUB_PROFILES = {
       ativos:'10,7M', ativosDelta:'↑ 11,6%',
       nps:'86%', npsDelta:'↑ 3pp',
       churn:'5,9%', churnBase:'≈ 631 mil torcedores da base reconhecida',
-      cdpTotal:'45M', cdpIdentificados:'10,7M', cdpPerfis:'120.000', cdpSocios:'120.000',
+      cdpTotal:'45M', cdpIdentificados:'10,7M', cdpPerfis:'4.500', cdpSocios:'120',
       engajamento:'8,4%', engajamentoDelta:'↑ 0,8pp vs. mês anterior',
       novos:'707K', novosDelta:'↑ 12%', interacoes:'81M', interacoesDelta:'↑ 18%', recorrentes:'72%', recorrentesDelta:'↑ 9%',
-      mrr:'R$ 3,9M', mrrDelta:'↑ 14,8%', arpu:'R$ 32,50', arpuDelta:'↑ 8,7%', subChurn:'2,1%', subChurnDelta:'↓ 0,5pp',
+      mrr:'R$ 21,6K', mrrDelta:'↑ 14,8%', arpu:'R$ 180,00', arpuDelta:'↑ 8,7%', subChurn:'2,1%', subChurnDelta:'↓ 0,5pp',
     },
-    ai:'Flamengo, Maracanã (78 mil lugares). Torcedores ativos: 10,7 milhões. Torcedores conhecidos pelo clube: 120 mil (de 45 milhões de apaixonados no total — mais de 99% da torcida está além do estádio). Receita consolidada do período: R$ 26,5M. Números baseados no case real usado no material comercial da Virtual Fans, com o restante do funil estimado proporcionalmente para fins de demonstração.',
+    ai:'Flamengo, Maracanã (78 mil lugares). Torcedores ativos: 10,7 milhões (de 45 milhões de apaixonados no total). Torcedores com perfil 360° completo na plataforma Torcedor 360: 4.500, sendo 120 sócios-torcedores pagantes. Receita consolidada do período: R$ 26,5M. Números baseados no case real usado no material comercial da Virtual Fans, com o restante do funil estimado proporcionalmente para fins de demonstração.',
   },
   corinthians: {
     name:'Corinthians', sub:'Temporada 2026', crest:CORINTHIANS_CREST_HTML, badgeBg:'transparent',
@@ -1676,12 +1676,12 @@ const CLUB_PROFILES = {
       ativos:'7,1M', ativosDelta:'↑ 10,3%',
       nps:'82%', npsDelta:'↑ 2pp',
       churn:'7,4%', churnBase:'≈ 525 mil torcedores da base reconhecida',
-      cdpTotal:'30M', cdpIdentificados:'7,1M', cdpPerfis:'150.000', cdpSocios:'150.000',
+      cdpTotal:'30M', cdpIdentificados:'7,1M', cdpPerfis:'3.000', cdpSocios:'100',
       engajamento:'7,1%', engajamentoDelta:'↑ 0,4pp vs. mês anterior',
       novos:'470K', novosDelta:'↑ 9%', interacoes:'54M', interacoesDelta:'↑ 14%', recorrentes:'65%', recorrentesDelta:'↑ 6%',
-      mrr:'R$ 2,6M', mrrDelta:'↑ 9,7%', arpu:'R$ 17,30', arpuDelta:'↑ 5,4%', subChurn:'2,6%', subChurnDelta:'↓ 0,3pp',
+      mrr:'R$ 15,0K', mrrDelta:'↑ 9,7%', arpu:'R$ 150,00', arpuDelta:'↑ 5,4%', subChurn:'2,6%', subChurnDelta:'↓ 0,3pp',
     },
-    ai:'Corinthians, Neo Química Arena (49 mil lugares). Torcedores ativos: 7,1 milhões. Torcedores conhecidos pelo clube (programa Fiel Torcedor): 150 mil (de ~30 milhões de apaixonados estimados). Receita consolidada do período: R$ 17,8M. Números estimados/ilustrativos para fins de demonstração.',
+    ai:'Corinthians, Neo Química Arena (49 mil lugares). Torcedores ativos: 7,1 milhões (de ~30 milhões de apaixonados estimados). Torcedores com perfil 360° completo na plataforma Torcedor 360: 3.000, sendo 100 sócios-torcedores pagantes (programa Fiel Torcedor). Receita consolidada do período: R$ 17,8M. Números estimados/ilustrativos para fins de demonstração.',
   },
 };
 let currentClubId = 'flamengo';
@@ -1761,8 +1761,22 @@ function selectClub(id, silent){
   setText('kpi-mon-churn-delta', c.kpi.subChurnDelta);
 
   renderClubDropdown();
+  refreshCdpForClub();
   if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
 }
+
+function refreshCdpForClub(){
+  cdpFan360Id = 'rafael';
+  crmTierFilter = null;
+  crmTopTenMode = false;
+  renderCrmTiers();
+  renderCrmTierTable();
+  renderCdpFansList();
+  renderCdpFan360('rafael');
+  renderCdpInsightsFeed();
+  renderCdpJourney();
+}
+
 function grad(ctx, color){
   const g = ctx.createLinearGradient(0,0,0,220);
   g.addColorStop(0, color + '55');
@@ -2104,6 +2118,33 @@ Seu papel específico agora é: {AGENT_NAME} — {AGENT_DESC}
 Responda como esse agente, com base nesses dados. Se a pergunta tocar mais de uma área do clube, responda mesmo assim de forma consolidada — você tem visão completa da Ontologia.
 `.trim();
 
+function buildClubAiContext(){
+  if(currentClubId === 'estrela') return '';
+  const c = CLUB_PROFILES[currentClubId];
+  const tierDb = getTierDb();
+  const fansDb = getFansDb();
+  const tierExtra = getTierExtra();
+
+  const tierText = tierDb.map(t=>`${t.name} ${t.count.toLocaleString('pt-BR')}`).join(', ');
+  const totalPerfis = tierDb.reduce((s,t)=>s+t.count,0);
+  const totalSocios = tierDb.filter(t=>t.key!=='basico').reduce((s,t)=>s+t.count,0);
+
+  const fanExamples = fansDb.map(f=>`${f.name} (${f.cidade}, nível ${f.segmentoTitulo || f.nivel}, risco de churn ${f.churnRisco}, LTV ${f.ltv})`).join('; ');
+
+  const top10Rows = fansDb.map(f=>({name:f.name, cidade:f.cidade, nivel:f.nivel, ltv:f.ltv}))
+    .concat(tierExtra)
+    .slice().sort((a,b)=>parseLtv(b.ltv)-parseLtv(a.ltv)).slice(0,10);
+  const top10Text = top10Rows.map((r,i)=>`${i+1}. ${r.name} (${r.cidade}, ${r.nivel}, ${r.ltv})`).join(' ');
+
+  return `ATENÇÃO: Nesta conversa o clube selecionado é ${c.name}, NÃO o Estrela FC — ignore TODOS os números fictícios do Estrela FC abaixo (visão geral, receita, base de torcedores, exemplos de torcedores no CRM, Top 10 por LTV, funil da CDP) e use estes dados reais do ${c.name} em vez deles:
+${c.ai}
+Torcedores com perfil 360° completo na Ontologia (base do Torcedor 360): ${totalPerfis.toLocaleString('pt-BR')}, sendo ${totalSocios.toLocaleString('pt-BR')} sócios-torcedores pagantes. Distribuição por nível: ${tierText}.
+Torcedores exemplo no CRM: ${fanExamples}.
+Top 10 torcedores por LTV (se perguntarem "top 10", "quem gasta mais" ou similar, use ESTA lista exata, na ordem): ${top10Text}.
+
+`;
+}
+
 async function sendAgentChat(){
   const input = document.getElementById('agent-chat-input');
   const question = input.value.trim();
@@ -2126,9 +2167,7 @@ async function sendAgentChat(){
   log.scrollTop = log.scrollHeight;
 
   try{
-    const clubOverride = currentClubId !== 'estrela'
-      ? `ATENÇÃO: Nesta conversa o clube selecionado NÃO é o Estrela FC — ignore os números do Estrela FC abaixo quando forem sobre visão geral/receita/base de torcedores, e use estes dados reais do clube selecionado em vez deles: ${CLUB_PROFILES[currentClubId].ai}\n\n`
-      : '';
+    const clubOverride = buildClubAiContext();
     const systemPrompt = clubOverride + CLUBBRAIN_CONTEXT
       .replace('{AGENT_NAME}', agentInfo.name)
       .replace('{AGENT_DESC}', agentInfo.desc);
@@ -2199,9 +2238,7 @@ async function sendPricingChat(){
   log.scrollTop = log.scrollHeight;
 
   try{
-    const clubOverride = currentClubId !== 'estrela'
-      ? `ATENÇÃO: Nesta conversa o clube selecionado NÃO é o Estrela FC — ignore os números do Estrela FC abaixo quando forem sobre visão geral/receita/base de torcedores, e use estes dados reais do clube selecionado em vez deles: ${CLUB_PROFILES[currentClubId].ai}\n\n`
-      : '';
+    const clubOverride = buildClubAiContext();
     const systemPrompt = clubOverride + CLUBBRAIN_CONTEXT
       .replace('{AGENT_NAME}', PRICING_AGENT.name)
       .replace('{AGENT_DESC}', PRICING_AGENT.desc);
@@ -2826,145 +2863,283 @@ function buildCommerce(){
 }
 
 /* ============ CRM ============ */
-const FANS_DB = [
-  {
-    id:'rafael', name:'Rafael Souza', initials:'RS', color1:'#6c6bff', color2:'#b06bff', nivel:'platina',
-    fanId:'FAN-000104', fanScore:87, jogadorFavorito:'Léo Martins (camisa 10)', competicaoFavorita:'Brasileirão',
-    scoreDims:[['Engagement',92],['Comercial',71],['Conteúdo',88],['Matchday',64],['Gamificação',95],['Fidelidade',84]],
-    aiInsight:'Rafael colecionou 3 camisas nos últimos 12 meses e abre 90% dos e-mails de lançamento de produto — alta probabilidade de comprar a próxima camisa retrô da campanha de aniversário.',
-    nextBestActions:[['Oferecer camisa retrô da campanha de aniversário','84%'],['Convidar para experiência VIP no próximo jogo','67%'],['Upgrade para Platina','41%']],
-    idade:'25–34', sexo:'Masculino', cidade:'São Paulo, SP', regiao:'Sudeste',
-    timeCoracao:'Estrela FC', tambemTorce:'Seleção Brasileira',
-    socioDesde:'fev/2021', segmentoTitulo:'Top 1% de torcedores', segmentoCor:gold,
-    ltv:'R$ 1.200', gastoTotal:'R$ 1.200', transacoes:'12', ticketMedio:'R$ 100', produtoFavorito:'Camisas oficiais',
-    churnRisco:'Baixo', churnCor:'#22e07a', propensao:'82%', propensaoCor:teal,
-    tags:['Arquibancada Sul','Colecionador de camisas','Torcida organizada','Sócio vitalício','Early adopter','Newsletter'],
-    segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
-    history:[
-      ['Curtiu post no Instagram','12 mai, 2026', teal, '♥'],
-      ['Foi ao jogo: Estrela FC 2x1 Rival', '22 abr, 2026', brand, '🎟'],
-      ['Comprou camisa oficial · R$ 85','21 abr, 2026', amber, '🛒'],
-      ['Abriu e-mail: acesso antecipado','15 abr, 2026', brand2, '✉'],
-      ['Virou sócio-torcedor','10 fev, 2021', gold, '★'],
-    ],
-  },
-  {
-    id:'camila', name:'Camila Alves', initials:'CA', color1:'#1fd6b8', color2:'#6c6bff', nivel:'ouro',
-    fanId:'FAN-000212', fanScore:85, jogadorFavorito:'Diego Ramos', competicaoFavorita:'Libertadores',
-    scoreDims:[['Engagement',80],['Comercial',90],['Conteúdo',75],['Matchday',88],['Gamificação',60],['Fidelidade',92]],
-    aiInsight:'Camila compra camarote em 80% dos jogos em casa e respondeu positivamente à última pesquisa de satisfação — candidata forte para upgrade de plano.',
-    nextBestActions:[['Oferecer upgrade para Platina','58%'],['Convidar para pré-venda de ingressos fora','52%']],
-    idade:'35–44', sexo:'Feminino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
-    timeCoracao:'Estrela FC', tambemTorce:'—',
-    socioDesde:'ago/2019', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
-    ltv:'R$ 2.640', gastoTotal:'R$ 2.640', transacoes:'21', ticketMedio:'R$ 126', produtoFavorito:'Ingressos VIP',
-    churnRisco:'Baixo', churnCor:'#22e07a', propensao:'74%', propensaoCor:teal,
-    tags:['Camarote','Sócio há 5+ anos','Leva a família aos jogos','App power user'],
-    segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
-    history:[
-      ['Comprou pacote camarote · R$ 450','18 mai, 2026', amber, '🛒'],
-      ['Respondeu pesquisa de satisfação','10 mai, 2026', brand2, '📝'],
-      ['Foi ao jogo: Estrela FC 3x0 Rival', '2 mai, 2026', brand, '🎟'],
-      ['Renovou plano de sócio','5 ago, 2025', gold, '★'],
-    ],
-  },
-  {
-    id:'bruno', name:'Bruno Lima', initials:'BL', color1:'#ffb454', color2:'#ff8a3d', nivel:'bronze',
-    fanId:'FAN-000587', fanScore:44, jogadorFavorito:'Léo Martins (camisa 10)', competicaoFavorita:'Copa Regional',
-    scoreDims:[['Engagement',55],['Comercial',30],['Conteúdo',48],['Matchday',20],['Gamificação',65],['Fidelidade',40]],
-    aiInsight:'Bruno é sócio há poucos meses e ainda não foi ao estádio — forte candidato a uma oferta de ingresso de boas-vindas antes que o interesse esfrie.',
-    nextBestActions:[['Enviar oferta de ingresso de estreia com desconto','76%'],['Convidar para tour no Museu Virtual','61%']],
-    idade:'18–24', sexo:'Masculino', cidade:'Recife, PE', regiao:'Nordeste',
-    timeCoracao:'Estrela FC', tambemTorce:'Náutico',
-    socioDesde:'jan/2026', segmentoTitulo:'Novo sócio', segmentoCor:brand,
-    ltv:'R$ 180', gastoTotal:'R$ 180', transacoes:'3', ticketMedio:'R$ 60', produtoFavorito:'Ingressos arquibancada',
-    churnRisco:'Médio', churnCor:'#ffb454', propensao:'55%', propensaoCor:amber,
-    tags:['Torcedor à distância','Nunca foi ao estádio','Ativo em redes sociais'],
-    segments:[['Novos sócios','Entraram nos últimos 30 dias', brand]],
-    history:[
-      ['Abriu e-mail: boas-vindas','20 jan, 2026', brand2, '✉'],
-      ['Comprou camisa third · R$ 60','22 jan, 2026', amber, '🛒'],
-      ['Virou sócio-torcedor','15 jan, 2026', gold, '★'],
-    ],
-  },
-  {
-    id:'larissa', name:'Larissa Melo', initials:'LM', color1:'#b06bff', color2:'#6c6bff', nivel:'platina',
-    fanId:'FAN-000031', fanScore:96, jogadorFavorito:'Léo Martins (camisa 10)', competicaoFavorita:'Brasileirão',
-    scoreDims:[['Engagement',95],['Comercial',88],['Conteúdo',82],['Matchday',91],['Gamificação',70],['Fidelidade',99]],
-    aiInsight:'Larissa é torcedora vitalícia com engajamento consistentemente alto há 10 anos — perfil ideal para o programa de embaixadores do clube.',
-    nextBestActions:[['Convidar para o programa de embaixadores','88%'],['Oferecer experiência exclusiva na final','79%']],
-    idade:'45–54', sexo:'Feminino', cidade:'Porto Alegre, RS', regiao:'Sul',
-    timeCoracao:'Estrela FC', tambemTorce:'—',
-    socioDesde:'mar/2016', segmentoTitulo:'Torcedora vitalícia', segmentoCor:gold,
-    ltv:'R$ 5.180', gastoTotal:'R$ 5.180', transacoes:'34', ticketMedio:'R$ 152', produtoFavorito:'Viagens com o time',
-    churnRisco:'Baixo', churnCor:'#22e07a', propensao:'88%', propensaoCor:teal,
-    tags:['Sócia vitalícia','Viaja para jogos fora','Madrinha de torcida organizada','Doadora recorrente'],
-    segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
-    history:[
-      ['Comprou pacote de viagem para jogo fora · R$ 890','8 mai, 2026', amber, '🛒'],
-      ['Doou para o fundo social do clube','1 mai, 2026', brand2, '💜'],
-      ['Foi ao jogo: Estrela FC 2x1 Rival', '22 abr, 2026', brand, '🎟'],
-      ['Completou 10 anos como sócia','mar/2026', gold, '★'],
-    ],
-  },
-  {
-    id:'diego', name:'Diego Farias', initials:'DF', color1:'#ff5c72', color2:'#ff8a3d', nivel:'prata',
-    fanId:'FAN-000398', fanScore:38, jogadorFavorito:'—', competicaoFavorita:'Brasileirão',
-    scoreDims:[['Engagement',25],['Comercial',35],['Conteúdo',40],['Matchday',15],['Gamificação',50],['Fidelidade',45]],
-    aiInsight:'Diego não compra há 70 dias e desativou notificações — sinais claros de risco de churn. Uma ação de reengajamento personalizada tem boa chance de reverter.',
-    nextBestActions:[['Enviar oferta de retenção personalizada','72%'],['Ligar do time de relacionamento','55%']],
-    idade:'25–34', sexo:'Masculino', cidade:'Salvador, BA', regiao:'Nordeste',
-    timeCoracao:'Estrela FC', tambemTorce:'Bahia',
-    socioDesde:'jun/2022', segmentoTitulo:'Risco de churn', segmentoCor:red,
-    ltv:'R$ 640', gastoTotal:'R$ 640', transacoes:'7', ticketMedio:'R$ 91', produtoFavorito:'Assinatura de streaming do clube',
-    churnRisco:'Alto', churnCor:'#ff5c72', propensao:'21%', propensaoCor:red,
-    tags:['Sem compra há 70 dias','Cancelou push notifications','Baixa abertura de e-mail'],
-    segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
-    history:[
-      ['Abriu chamado de suporte (login)','2 mai, 2026', red, '🎧'],
-      ['Deixou de abrir e-mails da campanha','abr, 2026', brand2, '✉'],
-      ['Última compra: ingresso avulso · R$ 70','12 fev, 2026', amber, '🛒'],
-      ['Virou sócio-torcedor','jun/2022', gold, '★'],
-    ],
-  },
-];
+const FANS_DB_BY_CLUB = {
+  flamengo: [
+    {
+      id:'rafael', name:'Rafael Nascimento', initials:'RN', color1:'#e0272c', color2:'#1a1a1a', nivel:'platina',
+      fanId:'FAN-FLA-00104', fanScore:87, jogadorFavorito:'Matheus Rocha (camisa 9)', competicaoFavorita:'Libertadores',
+      scoreDims:[['Engagement',92],['Comercial',71],['Conteúdo',88],['Matchday',64],['Gamificação',95],['Fidelidade',84]],
+      aiInsight:'Rafael colecionou 3 camisas nos últimos 12 meses e abre 90% dos e-mails de lançamento de produto — alta probabilidade de comprar a próxima camisa retrô da campanha de aniversário.',
+      nextBestActions:[['Oferecer camisa retrô da campanha de aniversário','84%'],['Convidar para experiência VIP no Maracanã','67%'],['Upgrade para Platina','41%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
+      timeCoracao:'Flamengo', tambemTorce:'Seleção Brasileira',
+      socioDesde:'fev/2021', segmentoTitulo:'Top 1% de torcedores', segmentoCor:gold,
+      ltv:'R$ 1.350', gastoTotal:'R$ 1.350', transacoes:'13', ticketMedio:'R$ 104', produtoFavorito:'Camisas oficiais',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'82%', propensaoCor:teal,
+      tags:['Maracanã · setor Norte','Colecionador de camisas','Nação Rubro-Negra','Sócio vitalício','Early adopter','Newsletter'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Curtiu post no Instagram','12 mai, 2026', teal, '♥'],
+        ['Foi ao jogo: Flamengo 2x1 Rival', '22 abr, 2026', brand, '🎟'],
+        ['Comprou camisa oficial · R$ 89','21 abr, 2026', amber, '🛒'],
+        ['Abriu e-mail: acesso antecipado','15 abr, 2026', brand2, '✉'],
+        ['Virou sócio-torcedor','10 fev, 2021', gold, '★'],
+      ],
+    },
+    {
+      id:'camila', name:'Camila Duarte', initials:'CD', color1:'#1a1a1a', color2:'#e0272c', nivel:'ouro',
+      fanId:'FAN-FLA-00212', fanScore:85, jogadorFavorito:'Bruno Farias', competicaoFavorita:'Brasileirão',
+      scoreDims:[['Engagement',80],['Comercial',90],['Conteúdo',75],['Matchday',88],['Gamificação',60],['Fidelidade',92]],
+      aiInsight:'Camila compra camarote em 80% dos jogos em casa e respondeu positivamente à última pesquisa de satisfação — candidata forte para upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para Platina','58%'],['Convidar para pré-venda de ingressos fora do Rio','52%']],
+      idade:'35–44', sexo:'Feminino', cidade:'Niterói, RJ', regiao:'Sudeste',
+      timeCoracao:'Flamengo', tambemTorce:'—',
+      socioDesde:'ago/2019', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
+      ltv:'R$ 2.780', gastoTotal:'R$ 2.780', transacoes:'22', ticketMedio:'R$ 126', produtoFavorito:'Ingressos VIP',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'74%', propensaoCor:teal,
+      tags:['Camarote Maracanã','Sócio há 5+ anos','Leva a família aos jogos','App power user'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 470','18 mai, 2026', amber, '🛒'],
+        ['Respondeu pesquisa de satisfação','10 mai, 2026', brand2, '📝'],
+        ['Foi ao jogo: Flamengo 3x0 Rival', '2 mai, 2026', brand, '🎟'],
+        ['Renovou plano de sócio','5 ago, 2025', gold, '★'],
+      ],
+    },
+    {
+      id:'bruno', name:'Bruno Carvalho', initials:'BC', color1:'#ffb454', color2:'#ff8a3d', nivel:'bronze',
+      fanId:'FAN-FLA-00587', fanScore:44, jogadorFavorito:'Matheus Rocha (camisa 9)', competicaoFavorita:'Copa do Brasil',
+      scoreDims:[['Engagement',55],['Comercial',30],['Conteúdo',48],['Matchday',20],['Gamificação',65],['Fidelidade',40]],
+      aiInsight:'Bruno é sócio há poucos meses e ainda não foi ao Maracanã — forte candidato a uma oferta de ingresso de boas-vindas antes que o interesse esfrie.',
+      nextBestActions:[['Enviar oferta de ingresso de estreia com desconto','76%'],['Convidar para tour no Museu Virtual da Nação','61%']],
+      idade:'18–24', sexo:'Masculino', cidade:'Duque de Caxias, RJ', regiao:'Sudeste',
+      timeCoracao:'Flamengo', tambemTorce:'—',
+      socioDesde:'jan/2026', segmentoTitulo:'Novo sócio', segmentoCor:brand,
+      ltv:'R$ 195', gastoTotal:'R$ 195', transacoes:'3', ticketMedio:'R$ 65', produtoFavorito:'Ingressos arquibancada',
+      churnRisco:'Médio', churnCor:'#ffb454', propensao:'55%', propensaoCor:amber,
+      tags:['Torcedor à distância','Nunca foi ao Maracanã','Ativo em redes sociais'],
+      segments:[['Novos sócios','Entraram nos últimos 30 dias', brand]],
+      history:[
+        ['Abriu e-mail: boas-vindas','20 jan, 2026', brand2, '✉'],
+        ['Comprou camisa third · R$ 65','22 jan, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','15 jan, 2026', gold, '★'],
+      ],
+    },
+    {
+      id:'larissa', name:'Larissa Andrade', initials:'LA', color1:'#e0272c', color2:'#1a1a1a', nivel:'platina',
+      fanId:'FAN-FLA-00031', fanScore:96, jogadorFavorito:'Matheus Rocha (camisa 9)', competicaoFavorita:'Libertadores',
+      scoreDims:[['Engagement',95],['Comercial',88],['Conteúdo',82],['Matchday',91],['Gamificação',70],['Fidelidade',99]],
+      aiInsight:'Larissa é torcedora vitalícia com engajamento consistentemente alto há 10 anos — perfil ideal para o programa de embaixadores da Nação.',
+      nextBestActions:[['Convidar para o programa de embaixadores da Nação','88%'],['Oferecer experiência exclusiva na final','79%']],
+      idade:'45–54', sexo:'Feminino', cidade:'Belo Horizonte, MG', regiao:'Sudeste',
+      timeCoracao:'Flamengo', tambemTorce:'—',
+      socioDesde:'mar/2016', segmentoTitulo:'Torcedora vitalícia', segmentoCor:gold,
+      ltv:'R$ 5.320', gastoTotal:'R$ 5.320', transacoes:'35', ticketMedio:'R$ 152', produtoFavorito:'Viagens com o time',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'88%', propensaoCor:teal,
+      tags:['Sócia vitalícia','Viaja para jogos fora','Madrinha de torcida organizada','Doadora recorrente'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote de viagem para jogo fora · R$ 920','8 mai, 2026', amber, '🛒'],
+        ['Doou para o fundo social do clube','1 mai, 2026', brand2, '💜'],
+        ['Foi ao jogo: Flamengo 2x1 Rival', '22 abr, 2026', brand, '🎟'],
+        ['Completou 10 anos como sócia','mar/2026', gold, '★'],
+      ],
+    },
+    {
+      id:'diego', name:'Diego Barros', initials:'DB', color1:'#ff5c72', color2:'#ff8a3d', nivel:'prata',
+      fanId:'FAN-FLA-00398', fanScore:38, jogadorFavorito:'—', competicaoFavorita:'Brasileirão',
+      scoreDims:[['Engagement',25],['Comercial',35],['Conteúdo',40],['Matchday',15],['Gamificação',50],['Fidelidade',45]],
+      aiInsight:'Diego não compra há 70 dias e desativou notificações — sinais claros de risco de churn. Uma ação de reengajamento personalizada tem boa chance de reverter.',
+      nextBestActions:[['Enviar oferta de retenção personalizada','72%'],['Ligar do time de relacionamento','55%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Nova Iguaçu, RJ', regiao:'Sudeste',
+      timeCoracao:'Flamengo', tambemTorce:'—',
+      socioDesde:'jun/2022', segmentoTitulo:'Risco de churn', segmentoCor:red,
+      ltv:'R$ 660', gastoTotal:'R$ 660', transacoes:'7', ticketMedio:'R$ 94', produtoFavorito:'Assinatura de streaming do clube',
+      churnRisco:'Alto', churnCor:'#ff5c72', propensao:'21%', propensaoCor:red,
+      tags:['Sem compra há 70 dias','Cancelou push notifications','Baixa abertura de e-mail'],
+      segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
+      history:[
+        ['Abriu chamado de suporte (login)','2 mai, 2026', red, '🎧'],
+        ['Deixou de abrir e-mails da campanha','abr, 2026', brand2, '✉'],
+        ['Última compra: ingresso avulso · R$ 72','12 fev, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','jun/2022', gold, '★'],
+      ],
+    },
+  ],
+  corinthians: [
+    {
+      id:'rafael', name:'Rafael Bittencourt', initials:'RB', color1:'#1a1a1a', color2:'#333333', nivel:'platina',
+      fanId:'FAN-COR-00104', fanScore:87, jogadorFavorito:'Cauê Ribeiro (camisa 9)', competicaoFavorita:'Libertadores',
+      scoreDims:[['Engagement',92],['Comercial',71],['Conteúdo',88],['Matchday',64],['Gamificação',95],['Fidelidade',84]],
+      aiInsight:'Rafael colecionou 3 camisas nos últimos 12 meses e abre 90% dos e-mails de lançamento de produto — alta probabilidade de comprar a próxima camisa retrô da campanha de aniversário.',
+      nextBestActions:[['Oferecer camisa retrô da campanha de aniversário','84%'],['Convidar para experiência VIP na Neo Química Arena','67%'],['Upgrade para Platina','41%']],
+      idade:'25–34', sexo:'Masculino', cidade:'São Paulo, SP', regiao:'Sudeste',
+      timeCoracao:'Corinthians', tambemTorce:'Seleção Brasileira',
+      socioDesde:'fev/2021', segmentoTitulo:'Top 1% de torcedores', segmentoCor:gold,
+      ltv:'R$ 1.180', gastoTotal:'R$ 1.180', transacoes:'12', ticketMedio:'R$ 98', produtoFavorito:'Camisas oficiais',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'82%', propensaoCor:teal,
+      tags:['Neo Química Arena · setor Leste','Colecionador de camisas','Fiel Torcedor','Sócio vitalício','Early adopter','Newsletter'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Curtiu post no Instagram','12 mai, 2026', teal, '♥'],
+        ['Foi ao jogo: Corinthians 2x1 Rival', '22 abr, 2026', brand, '🎟'],
+        ['Comprou camisa oficial · R$ 84','21 abr, 2026', amber, '🛒'],
+        ['Abriu e-mail: acesso antecipado','15 abr, 2026', brand2, '✉'],
+        ['Virou sócio-torcedor','10 fev, 2021', gold, '★'],
+      ],
+    },
+    {
+      id:'camila', name:'Camila Ferraz', initials:'CF', color1:'#333333', color2:'#1a1a1a', nivel:'ouro',
+      fanId:'FAN-COR-00212', fanScore:85, jogadorFavorito:'Wesley Aguiar', competicaoFavorita:'Brasileirão',
+      scoreDims:[['Engagement',80],['Comercial',90],['Conteúdo',75],['Matchday',88],['Gamificação',60],['Fidelidade',92]],
+      aiInsight:'Camila compra camarote em 80% dos jogos em casa e respondeu positivamente à última pesquisa de satisfação — candidata forte para upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para Platina','58%'],['Convidar para pré-venda de ingressos fora de SP','52%']],
+      idade:'35–44', sexo:'Feminino', cidade:'Santo André, SP', regiao:'Sudeste',
+      timeCoracao:'Corinthians', tambemTorce:'—',
+      socioDesde:'ago/2019', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
+      ltv:'R$ 2.590', gastoTotal:'R$ 2.590', transacoes:'20', ticketMedio:'R$ 122', produtoFavorito:'Ingressos VIP',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'74%', propensaoCor:teal,
+      tags:['Camarote Neo Química Arena','Sócio há 5+ anos','Leva a família aos jogos','App power user'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 440','18 mai, 2026', amber, '🛒'],
+        ['Respondeu pesquisa de satisfação','10 mai, 2026', brand2, '📝'],
+        ['Foi ao jogo: Corinthians 3x0 Rival', '2 mai, 2026', brand, '🎟'],
+        ['Renovou plano de sócio','5 ago, 2025', gold, '★'],
+      ],
+    },
+    {
+      id:'bruno', name:'Bruno Siqueira', initials:'BS', color1:'#ffb454', color2:'#ff8a3d', nivel:'bronze',
+      fanId:'FAN-COR-00587', fanScore:44, jogadorFavorito:'Cauê Ribeiro (camisa 9)', competicaoFavorita:'Copa do Brasil',
+      scoreDims:[['Engagement',55],['Comercial',30],['Conteúdo',48],['Matchday',20],['Gamificação',65],['Fidelidade',40]],
+      aiInsight:'Bruno é sócio há poucos meses e ainda não foi na Neo Química Arena — forte candidato a uma oferta de ingresso de boas-vindas antes que o interesse esfrie.',
+      nextBestActions:[['Enviar oferta de ingresso de estreia com desconto','76%'],['Convidar para tour no Museu Virtual da Fiel','61%']],
+      idade:'18–24', sexo:'Masculino', cidade:'Guarulhos, SP', regiao:'Sudeste',
+      timeCoracao:'Corinthians', tambemTorce:'—',
+      socioDesde:'jan/2026', segmentoTitulo:'Novo sócio', segmentoCor:brand,
+      ltv:'R$ 175', gastoTotal:'R$ 175', transacoes:'3', ticketMedio:'R$ 58', produtoFavorito:'Ingressos arquibancada',
+      churnRisco:'Médio', churnCor:'#ffb454', propensao:'55%', propensaoCor:amber,
+      tags:['Torcedor à distância','Nunca foi na Neo Química Arena','Ativo em redes sociais'],
+      segments:[['Novos sócios','Entraram nos últimos 30 dias', brand]],
+      history:[
+        ['Abriu e-mail: boas-vindas','20 jan, 2026', brand2, '✉'],
+        ['Comprou camisa third · R$ 58','22 jan, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','15 jan, 2026', gold, '★'],
+      ],
+    },
+    {
+      id:'larissa', name:'Larissa Prado', initials:'LP', color1:'#1a1a1a', color2:'#333333', nivel:'platina',
+      fanId:'FAN-COR-00031', fanScore:96, jogadorFavorito:'Cauê Ribeiro (camisa 9)', competicaoFavorita:'Libertadores',
+      scoreDims:[['Engagement',95],['Comercial',88],['Conteúdo',82],['Matchday',91],['Gamificação',70],['Fidelidade',99]],
+      aiInsight:'Larissa é torcedora vitalícia com engajamento consistentemente alto há 10 anos — perfil ideal para o programa de embaixadores da Fiel.',
+      nextBestActions:[['Convidar para o programa de embaixadores da Fiel','88%'],['Oferecer experiência exclusiva na final','79%']],
+      idade:'45–54', sexo:'Feminino', cidade:'Campinas, SP', regiao:'Sudeste',
+      timeCoracao:'Corinthians', tambemTorce:'—',
+      socioDesde:'mar/2016', segmentoTitulo:'Torcedora vitalícia', segmentoCor:gold,
+      ltv:'R$ 5.040', gastoTotal:'R$ 5.040', transacoes:'33', ticketMedio:'R$ 148', produtoFavorito:'Viagens com o time',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'88%', propensaoCor:teal,
+      tags:['Sócia vitalícia','Viaja para jogos fora','Madrinha de torcida organizada','Doadora recorrente'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote de viagem para jogo fora · R$ 860','8 mai, 2026', amber, '🛒'],
+        ['Doou para o fundo social do clube','1 mai, 2026', brand2, '💜'],
+        ['Foi ao jogo: Corinthians 2x1 Rival', '22 abr, 2026', brand, '🎟'],
+        ['Completou 10 anos como sócia','mar/2026', gold, '★'],
+      ],
+    },
+    {
+      id:'diego', name:'Diego Matos', initials:'DM', color1:'#ff5c72', color2:'#ff8a3d', nivel:'prata',
+      fanId:'FAN-COR-00398', fanScore:38, jogadorFavorito:'—', competicaoFavorita:'Brasileirão',
+      scoreDims:[['Engagement',25],['Comercial',35],['Conteúdo',40],['Matchday',15],['Gamificação',50],['Fidelidade',45]],
+      aiInsight:'Diego não compra há 70 dias e desativou notificações — sinais claros de risco de churn. Uma ação de reengajamento personalizada tem boa chance de reverter.',
+      nextBestActions:[['Enviar oferta de retenção personalizada','72%'],['Ligar do time de relacionamento','55%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Osasco, SP', regiao:'Sudeste',
+      timeCoracao:'Corinthians', tambemTorce:'—',
+      socioDesde:'jun/2022', segmentoTitulo:'Risco de churn', segmentoCor:red,
+      ltv:'R$ 610', gastoTotal:'R$ 610', transacoes:'6', ticketMedio:'R$ 88', produtoFavorito:'Assinatura de streaming do clube',
+      churnRisco:'Alto', churnCor:'#ff5c72', propensao:'21%', propensaoCor:red,
+      tags:['Sem compra há 70 dias','Cancelou push notifications','Baixa abertura de e-mail'],
+      segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
+      history:[
+        ['Abriu chamado de suporte (login)','2 mai, 2026', red, '🎧'],
+        ['Deixou de abrir e-mails da campanha','abr, 2026', brand2, '✉'],
+        ['Última compra: ingresso avulso · R$ 68','12 fev, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','jun/2022', gold, '★'],
+      ],
+    },
+  ],
+};
 
-
-/* ============ NÍVEIS DE SÓCIO-TORCEDOR ============ */
-const TIER_DB = [
-  { key:'basico', name:'Básico', color:'#7f88a8', count:29000, desc:'Identificado na Ontologia, sem assinatura paga' },
-  { key:'bronze', name:'Bronze', color:'#c98a4b', count:550, desc:'Sócio-torcedor · plano de entrada' },
-  { key:'prata', name:'Prata', color:'#b7c0d8', count:300, desc:'Sócio-torcedor · benefícios intermediários' },
-  { key:'ouro', name:'Ouro', color:'#f2c94c', count:120, desc:'Sócio-torcedor · benefícios avançados' },
-  { key:'platina', name:'Platina', color:'#b06bff', count:30, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
-];
-const TIER_SAMPLE_EXTRA = [
-  { name:'Marcos Vieira', cidade:'Belo Horizonte, MG', nivel:'basico', ltv:'R$ 0' },
-  { name:'Juliana Prado', cidade:'Curitiba, PR', nivel:'basico', ltv:'R$ 45' },
-  { name:'Eduardo Nascimento', cidade:'Manaus, AM', nivel:'basico', ltv:'R$ 0' },
-  { name:'Sofia Barbosa', cidade:'Salvador, BA', nivel:'basico', ltv:'R$ 90' },
-  { name:'Patrícia Gomes', cidade:'Fortaleza, CE', nivel:'bronze', ltv:'R$ 210' },
-  { name:'Thiago Rocha', cidade:'Brasília, DF', nivel:'bronze', ltv:'R$ 165' },
-  { name:'Caio Monteiro', cidade:'Recife, PE', nivel:'bronze', ltv:'R$ 320' },
-  { name:'Vanessa Lopes', cidade:'Curitiba, PR', nivel:'prata', ltv:'R$ 780' },
-  { name:'André Castro', cidade:'Belém, PA', nivel:'prata', ltv:'R$ 690' },
-  { name:'Bianca Ferreira', cidade:'Vitória, ES', nivel:'prata', ltv:'R$ 950' },
-  { name:'Renata Costa', cidade:'Florianópolis, SC', nivel:'ouro', ltv:'R$ 1.950' },
-  { name:'Felipe Andrade', cidade:'Goiânia, GO', nivel:'ouro', ltv:'R$ 2.100' },
-  { name:'Rafaela Nogueira', cidade:'Campinas, SP', nivel:'ouro', ltv:'R$ 3.200' },
-  { name:'Henrique Salles', cidade:'Natal, RN', nivel:'ouro', ltv:'R$ 2.850' },
-  { name:'Marcelo Duarte', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 6.400' },
-  { name:'Isabela Ramos', cidade:'Rio de Janeiro, RJ', nivel:'platina', ltv:'R$ 8.200' },
-  { name:'Rodrigo Teixeira', cidade:'Curitiba, PR', nivel:'platina', ltv:'R$ 7.650' },
-  { name:'Beatriz Nunes', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 5.900' },
-  { name:'Gustavo Pereira', cidade:'Belo Horizonte, MG', nivel:'platina', ltv:'R$ 4.750' },
-];
+/* ============ NÍVEIS DE SÓCIO-TORCEDOR (por clube) ============ */
+const TIER_DB_BY_CLUB = {
+  flamengo: [
+    { key:'basico', name:'Básico', color:'#7f88a8', count:4380, desc:'Identificado na Ontologia, sem assinatura paga' },
+    { key:'bronze', name:'Bronze', color:'#c98a4b', count:66, desc:'Sócio-torcedor · plano de entrada' },
+    { key:'prata', name:'Prata', color:'#b7c0d8', count:36, desc:'Sócio-torcedor · benefícios intermediários' },
+    { key:'ouro', name:'Ouro', color:'#f2c94c', count:14, desc:'Sócio-torcedor · benefícios avançados' },
+    { key:'platina', name:'Platina', color:'#b06bff', count:4, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+  ],
+  corinthians: [
+    { key:'basico', name:'Básico', color:'#7f88a8', count:2900, desc:'Identificado na Ontologia, sem assinatura paga' },
+    { key:'bronze', name:'Bronze', color:'#c98a4b', count:55, desc:'Sócio-torcedor · plano de entrada' },
+    { key:'prata', name:'Prata', color:'#b7c0d8', count:30, desc:'Sócio-torcedor · benefícios intermediários' },
+    { key:'ouro', name:'Ouro', color:'#f2c94c', count:12, desc:'Sócio-torcedor · benefícios avançados' },
+    { key:'platina', name:'Platina', color:'#b06bff', count:3, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+  ],
+};
+const TIER_SAMPLE_EXTRA_BY_CLUB = {
+  flamengo: [
+    { name:'Marcos Vieira', cidade:'Belo Horizonte, MG', nivel:'basico', ltv:'R$ 0' },
+    { name:'Juliana Prado', cidade:'Vitória, ES', nivel:'basico', ltv:'R$ 45' },
+    { name:'Eduardo Nascimento', cidade:'Manaus, AM', nivel:'basico', ltv:'R$ 0' },
+    { name:'Sofia Barbosa', cidade:'Salvador, BA', nivel:'basico', ltv:'R$ 90' },
+    { name:'Patrícia Gomes', cidade:'Niterói, RJ', nivel:'bronze', ltv:'R$ 210' },
+    { name:'Thiago Rocha', cidade:'Brasília, DF', nivel:'bronze', ltv:'R$ 165' },
+    { name:'Caio Monteiro', cidade:'Nova Friburgo, RJ', nivel:'bronze', ltv:'R$ 320' },
+    { name:'Vanessa Lopes', cidade:'Petrópolis, RJ', nivel:'prata', ltv:'R$ 780' },
+    { name:'André Castro', cidade:'Belém, PA', nivel:'prata', ltv:'R$ 690' },
+    { name:'Bianca Ferreira', cidade:'Volta Redonda, RJ', nivel:'prata', ltv:'R$ 950' },
+    { name:'Renata Costa', cidade:'Campos dos Goytacazes, RJ', nivel:'ouro', ltv:'R$ 1.950' },
+    { name:'Felipe Andrade', cidade:'Goiânia, GO', nivel:'ouro', ltv:'R$ 2.100' },
+    { name:'Rafaela Nogueira', cidade:'Nilópolis, RJ', nivel:'ouro', ltv:'R$ 3.200' },
+    { name:'Henrique Salles', cidade:'Natal, RN', nivel:'ouro', ltv:'R$ 2.850' },
+    { name:'Marcelo Duarte', cidade:'Rio de Janeiro, RJ', nivel:'platina', ltv:'R$ 6.400' },
+    { name:'Isabela Ramos', cidade:'Rio de Janeiro, RJ', nivel:'platina', ltv:'R$ 8.200' },
+    { name:'Rodrigo Teixeira', cidade:'São Gonçalo, RJ', nivel:'platina', ltv:'R$ 7.650' },
+    { name:'Beatriz Nunes', cidade:'Rio de Janeiro, RJ', nivel:'platina', ltv:'R$ 5.900' },
+    { name:'Gustavo Pereira', cidade:'Belo Horizonte, MG', nivel:'platina', ltv:'R$ 4.750' },
+  ],
+  corinthians: [
+    { name:'Marcos Aguilar', cidade:'Ribeirão Preto, SP', nivel:'basico', ltv:'R$ 0' },
+    { name:'Juliana Torres', cidade:'Sorocaba, SP', nivel:'basico', ltv:'R$ 45' },
+    { name:'Eduardo Lacerda', cidade:'Manaus, AM', nivel:'basico', ltv:'R$ 0' },
+    { name:'Sofia Ramalho', cidade:'Salvador, BA', nivel:'basico', ltv:'R$ 90' },
+    { name:'Patrícia Nogueira', cidade:'Santo André, SP', nivel:'bronze', ltv:'R$ 205' },
+    { name:'Thiago Almada', cidade:'Brasília, DF', nivel:'bronze', ltv:'R$ 160' },
+    { name:'Caio Ferreira', cidade:'São Bernardo do Campo, SP', nivel:'bronze', ltv:'R$ 310' },
+    { name:'Vanessa Martins', cidade:'Diadema, SP', nivel:'prata', ltv:'R$ 760' },
+    { name:'André Bezerra', cidade:'Belém, PA', nivel:'prata', ltv:'R$ 680' },
+    { name:'Bianca Sales', cidade:'Sorocaba, SP', nivel:'prata', ltv:'R$ 930' },
+    { name:'Renata Aguiar', cidade:'Piracicaba, SP', nivel:'ouro', ltv:'R$ 1.900' },
+    { name:'Felipe Cardoso', cidade:'Goiânia, GO', nivel:'ouro', ltv:'R$ 2.050' },
+    { name:'Rafaela Siqueira', cidade:'Jundiaí, SP', nivel:'ouro', ltv:'R$ 3.100' },
+    { name:'Henrique Barros', cidade:'Natal, RN', nivel:'ouro', ltv:'R$ 2.780' },
+    { name:'Marcelo Fontes', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 6.150' },
+    { name:'Isabela Machado', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 7.900' },
+    { name:'Rodrigo Peixoto', cidade:'São Caetano do Sul, SP', nivel:'platina', ltv:'R$ 7.300' },
+    { name:'Beatriz Salgado', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 5.650' },
+    { name:'Gustavo Nery', cidade:'Osasco, SP', nivel:'platina', ltv:'R$ 4.500' },
+  ],
+};
+function getFansDb(){ return FANS_DB_BY_CLUB[currentClubId] || FANS_DB_BY_CLUB.flamengo; }
+function getTierDb(){ return TIER_DB_BY_CLUB[currentClubId] || TIER_DB_BY_CLUB.flamengo; }
+function getTierExtra(){ return TIER_SAMPLE_EXTRA_BY_CLUB[currentClubId] || TIER_SAMPLE_EXTRA_BY_CLUB.flamengo; }
 let crmTierFilter = null;
 let crmTopTenMode = false;
 function parseLtv(str){ return parseInt(String(str).replace(/\D/g,''), 10) || 0; }
 
 function renderCrmTiers(){
-  document.getElementById('crm-tiers').innerHTML = TIER_DB.map(t=>{
+  document.getElementById('crm-tiers').innerHTML = getTierDb().map(t=>{
     const active = crmTierFilter===t.key;
     return `<div class="card kpi clickable" style="border-color:${active?t.color:'var(--border)'}; background:${active?t.color+'14':'var(--surface)'};" onclick="filterCrmTier('${t.key}')">
       <div class="label"><span class="icon-badge" style="background:${t.color}26; color:${t.color};">●</span>${t.name}</div>
@@ -2989,9 +3164,9 @@ function toggleCrmTopTen(){
 }
 
 function renderCrmTierTable(){
-  const tierMeta = k => TIER_DB.find(t=>t.key===k);
-  let rows = FANS_DB.map(f=>({ id:f.id, name:f.name, cidade:f.cidade, nivel:f.nivel, ltv:f.ltv, full:true }))
-    .concat(TIER_SAMPLE_EXTRA.map(e=>({ id:null, name:e.name, cidade:e.cidade, nivel:e.nivel, ltv:e.ltv, full:false })));
+  const tierMeta = k => getTierDb().find(t=>t.key===k);
+  let rows = getFansDb().map(f=>({ id:f.id, name:f.name, cidade:f.cidade, nivel:f.nivel, ltv:f.ltv, full:true }))
+    .concat(getTierExtra().map(e=>({ id:null, name:e.name, cidade:e.cidade, nivel:e.nivel, ltv:e.ltv, full:false })));
 
   const btn = document.getElementById('crm-top10-btn');
   if(btn){ btn.style.background = crmTopTenMode ? gold+'22' : 'var(--surface-2)'; btn.style.borderColor = crmTopTenMode ? gold+'55' : 'var(--border)'; btn.style.color = crmTopTenMode ? gold : 'var(--text-dim)'; }
@@ -3161,9 +3336,9 @@ function buildCdp(){
 
 function renderCdpFansList(){
   const q = (document.getElementById('cdp-fan-search')?.value || '').toLowerCase();
-  const tierMeta = k => TIER_DB.find(t=>t.key===k);
-  let rows = FANS_DB.map(f=>({ id:f.id, name:f.name, nivel:f.nivel, ltv:f.ltv, fanScore:f.fanScore, fanId:f.fanId, full:true, cidade:f.cidade }))
-    .concat(TIER_SAMPLE_EXTRA.map((e,i)=>({ id:null, name:e.name, nivel:e.nivel, ltv:e.ltv, fanScore:null, fanId:'FAN-'+String(2001+i).padStart(6,'0'), full:false, cidade:e.cidade })));
+  const tierMeta = k => getTierDb().find(t=>t.key===k);
+  let rows = getFansDb().map(f=>({ id:f.id, name:f.name, nivel:f.nivel, ltv:f.ltv, fanScore:f.fanScore, fanId:f.fanId, full:true, cidade:f.cidade }))
+    .concat(getTierExtra().map((e,i)=>({ id:null, name:e.name, nivel:e.nivel, ltv:e.ltv, fanScore:null, fanId:'FAN-'+String(2001+i).padStart(6,'0'), full:false, cidade:e.cidade })));
   if(q) rows = rows.filter(r=>r.name.toLowerCase().includes(q));
 
   document.getElementById('cdp-fans-table').innerHTML = rows.map(r=>{
@@ -3190,9 +3365,9 @@ function openCdpFan360(id){
 }
 
 function renderCdpFan360(id){
-  const f = FANS_DB.find(x=>x.id===id) || FANS_DB.find(x=>x.id==='rafael');
+  const f = getFansDb().find(x=>x.id===id) || getFansDb().find(x=>x.id==='rafael');
   cdpFan360Id = f.id;
-  const t = TIER_DB.find(x=>x.key===f.nivel);
+  const t = getTierDb().find(x=>x.key===f.nivel);
 
   document.getElementById('cdp360-avatar').style.background = `linear-gradient(135deg,${f.color1},${f.color2})`;
   document.getElementById('cdp360-avatar').textContent = f.initials;
@@ -3284,7 +3459,7 @@ function renderCdpAudiences(){
 }
 
 function renderCdpJourney(){
-  const f = FANS_DB.find(x=>x.id==='rafael');
+  const f = getFansDb().find(x=>x.id==='rafael');
   document.getElementById('cdp-journey-fan-name').textContent = f.name;
   const steps = [
     ['Descoberta','Instagram — anúncio patrocinado','📱', brand],
@@ -3309,8 +3484,8 @@ function renderCdpJourney(){
 }
 
 function renderCdpInsightsFeed(){
-  document.getElementById('cdp-insights-feed').innerHTML = FANS_DB.map(f=>{
-    const t = TIER_DB.find(x=>x.key===f.nivel);
+  document.getElementById('cdp-insights-feed').innerHTML = getFansDb().map(f=>{
+    const t = getTierDb().find(x=>x.key===f.nivel);
     const nba = f.nextBestActions[0];
     return `<div class="card clickable" style="margin-bottom:14px;" onclick="openCdpFan360('${f.id}')">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
