@@ -1,19 +1,45 @@
 // netlify/functions/chat.js
 //
 // Backend mínimo que protege a chave da API da Anthropic.
-// O front-end (index.html) chama /.netlify/functions/chat em vez de
-// chamar api.anthropic.com diretamente — assim a chave nunca aparece
-// no navegador do usuário.
+// O front-end (index.html) chama esta function em vez de chamar
+// api.anthropic.com diretamente — assim a chave nunca aparece no
+// navegador do usuário. Também aceita chamadas de origens externas
+// (ex: a demo hospedada em clubbrain.ai/algo, fora do Netlify),
+// por isso os headers de CORS abaixo.
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → adicionar ANTHROPIC_API_KEY
 //   (pegue a chave em https://console.anthropic.com/settings/keys)
 
+const ALLOWED_ORIGINS = [
+  'https://clubbrain.ai',
+  'https://www.clubbrain.ai',
+  'https://vfans.netlify.app',
+];
+
+function corsHeaders(event) {
+  const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || '';
+  if (!ALLOWED_ORIGINS.includes(origin)) return {};
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+}
+
 exports.handler = async function (event) {
+  const cors = corsHeaders(event);
+
+  // Preflight do navegador
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers: cors, body: '' };
+  }
+
   // Só aceita POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: cors,
       body: JSON.stringify({ error: 'Método não permitido. Use POST.' }),
     };
   }
@@ -22,6 +48,7 @@ exports.handler = async function (event) {
   if (!apiKey) {
     return {
       statusCode: 500,
+      headers: cors,
       body: JSON.stringify({
         error: 'ANTHROPIC_API_KEY não configurada no Netlify (Site settings → Environment variables).',
       }),
@@ -33,12 +60,12 @@ exports.handler = async function (event) {
   try {
     payload = JSON.parse(event.body || '{}');
   } catch (e) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'JSON inválido no corpo da requisição.' }) };
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'JSON inválido no corpo da requisição.' }) };
   }
 
   const { system, messages } = payload;
   if (!Array.isArray(messages) || messages.length === 0) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Campo "messages" é obrigatório e não pode ser vazio.' }) };
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "messages" é obrigatório e não pode ser vazio.' }) };
   }
 
   try {
@@ -64,12 +91,13 @@ exports.handler = async function (event) {
 
     return {
       statusCode: anthropicResponse.status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...cors },
       body: JSON.stringify(data),
     };
   } catch (err) {
     return {
       statusCode: 502,
+      headers: cors,
       body: JSON.stringify({ error: 'Falha ao chamar a API da Anthropic: ' + err.message }),
     };
   }
