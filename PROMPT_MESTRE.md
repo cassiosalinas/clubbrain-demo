@@ -166,7 +166,7 @@ Uma marca única, **Virtual Fans — by Clubbrain.ai**, com sidebar fixa e módu
 | 7 | Gamificação | Camada 1 (Gamificação & Missões) | "FanSphere" (Loyalty & Rewards) |
 | 8 | Receita & Patrocínio | Camada 5 (Monetização) | "FANFORGE" (Monetization & Sponsorship) |
 | 9 | CRM do torcedor | Camada 3 (Ontologia — nó Fã) | "Fan Intelligence" (Fan CRM Profiles) |
-| 10 | CDP (Fan Data Platform) | Camada 2 (Ingestão & Streaming) | — módulo próprio, sem equivalente nos protótipos originais |
+| 10 | CDP — Fan Data Platform | Camada 2 (Ingestão & Streaming) | módulo próprio, com 7 sub-abas: Overview, Fans, Fan 360°, Audiences, Journeys, AI Insights, Activations |
 | 11 | Automação de marketing | Camada 4 (Agente de Aquisição) | "FanEdge" (Marketing Automation) |
 | 12 | Saúde do sistema | Fundação Transversal (Observabilidade) | "FanHub" (System Health & API) |
 
