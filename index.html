@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClubBrain · by Virtual Fans</title>
+<title>Virtual Fans · by Clubbrain.ai</title>
 <script>
 /*!
  * Chart.js v4.4.4
@@ -365,8 +365,8 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L14.5 9.5H22L16 14L18 21.5L12 17L6 21.5L8 14L2 9.5H9.5L12 2Z" fill="white" fill-opacity="0.95"/></svg>
       </div>
       <div>
-        <div class="brand-word">ClubBrain</div>
-        <div class="brand-sub">by Virtual Fans</div>
+        <div class="brand-word">Virtual Fans</div>
+        <div class="brand-sub">by Clubbrain.ai</div>
       </div>
     </div>
 
@@ -884,6 +884,43 @@ canvas{ max-width:100%; }
             <thead><tr><th>Tipo</th><th>Vendidos</th><th>Receita</th></tr></thead>
             <tbody id="ticket-types"></tbody>
           </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title"><h3>Próximos jogos e eventos sob gestão do clube</h3></div>
+        <table>
+          <thead><tr><th>Data</th><th>Categoria</th><th>Evento</th><th>Local</th><th>Status</th></tr></thead>
+          <tbody id="upcoming-events"></tbody>
+        </table>
+      </div>
+
+      <div class="two-col" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-title"><h3>Museu do Clube — visitas</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Museu físico (sede do estádio) comparado ao tour virtual dentro do app — a prova visual de que a base invisível de apaixonados (fora do estádio) também pode ser medida e ativada.</div>
+          <div class="grid g-2" id="museum-stats"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Gasto operacional do clube — no período</h3></div>
+          <div class="donut-wrap" style="width:150px; height:150px; margin:0 auto;">
+            <canvas id="chart-expenses-donut"></canvas>
+            <div class="donut-center"><span class="big" id="expenses-total">R$ 2,66M</span><span class="small">no período</span></div>
+          </div>
+          <div id="expenses-legend" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px; background:linear-gradient(135deg, rgba(242,201,76,.08), var(--surface)); border-color:rgba(242,201,76,.25);">
+        <div class="card-title">
+          <span class="icon-badge" style="background:rgba(242,201,76,.18); color:#f2c94c;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>
+          <h3>Agente de Precificação Dinâmica (IA real — Claude)</h3>
+        </div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Cruza o calendário de jogos e eventos acima, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.</div>
+        <div id="pricing-chat-log" style="max-height:260px; overflow-y:auto; margin-bottom:12px;"></div>
+        <div style="display:flex; gap:8px;">
+          <input id="pricing-chat-input" type="text" placeholder="Ex: qual preço sugerido pro show da banda Ravena?" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 14px; color:var(--text); font-size:13px; font-family:inherit;" onkeydown="if(event.key==='Enter') sendPricingChat();">
+          <button class="btn-primary" id="pricing-chat-send" onclick="sendPricingChat()">Perguntar</button>
         </div>
       </div>
     </section>
@@ -1440,6 +1477,7 @@ function buildAgents(){
       agents:[
         ['Agente Comercial','Consulta as contrapartidas contratuais de um patrocinador na Ontologia e gera o relatório de cumprimento e ROI automaticamente.'],
         ['Agente de Ingressos','Detecta ingressos parados perto da data do jogo e sugere um desconto dinâmico para torcedores de alta propensão de compra.'],
+        ['Agente de Precificação Dinâmica','Cruza o calendário de jogos e eventos, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.'],
       ]},
     { name:'Experiência', sub:'Experiência do fã, Operações', color:teal, icon:'🎟',
       agents:[
@@ -1516,7 +1554,7 @@ function renderAgentChatLog(){
 }
 
 const CLUBBRAIN_CONTEXT = `
-Você está simulando um agente de IA da plataforma ClubBrain (da empresa Virtual Fans), operando sobre a "Ontologia do Clube" — um grafo de conhecimento fictício de um clube de futebol chamado Estrela FC, usado numa demo comercial. Responda sempre em português do Brasil, em tom direto e executivo (poucas frases, sem enrolação), como se estivesse de fato consultando esse grafo. Baseie-se SEMPRE nos dados fictícios abaixo; se a pergunta pedir algo que não está neles, responda de forma plausível e deixe claro que é uma estimativa ou que consultaria mais dados da Ontologia.
+Você está simulando um agente de IA da plataforma Virtual Fans (da empresa Clubbrain.ai), operando sobre a "Ontologia do Clube" — um grafo de conhecimento fictício de um clube de futebol chamado Estrela FC, usado numa demo comercial. Responda sempre em português do Brasil, em tom direto e executivo (poucas frases, sem enrolação), como se estivesse de fato consultando esse grafo. Baseie-se SEMPRE nos dados fictícios abaixo; se a pergunta pedir algo que não está neles, responda de forma plausível e deixe claro que é uma estimativa ou que consultaria mais dados da Ontologia.
 
 DADOS DO ESTRELA FC (todos fictícios):
 - Torcedores ativos: 1,24 milhão | Sócios-torcedores pagantes: 6.250 | Receita consolidada do período: R$ 3,06M
@@ -1526,6 +1564,9 @@ DADOS DO ESTRELA FC (todos fictícios):
 - Patrocinadores ativos: TurboEnergy (ROI 650%, contrapartidas 92% cumpridas), Banco Atlas (ROI 410%), TechNova (ROI 380%)
 - Próximo jogo: Estádio Municipal, 92% dos ingressos vendidos, receita esperada R$980K
 - Sentimento da torcida nas redes: 88% positivo nas últimas 24h
+- Próximos jogos e eventos sob gestão do clube: 18/jun Futebol masculino x Rival FC (Brasileirão, 92% vendido); 21/jun Futebol feminino x Atlética SC (58% vendido); 27/jun Show — Turnê Banda Ravena (74% vendido); 3/jul Futebol masculino x Náutico — Copa Regional (41% vendido, ainda com boa janela para precificação dinâmica); 10/jul Evento — Feira de Sócios & Ativação de Patrocinadores (confirmado); 15/jul Futebol feminino x Porto Vitória (33% vendido)
+- Museu do Clube: 8.400 visitas/mês no museu físico (↑6%) vs. 41.200 visitas/mês no tour virtual dentro do app (↑34%); tempo médio no tour virtual 6m40s; conversão museu → loja oficial 14%
+- Gasto operacional do clube no período (total R$2,66M): Elenco/time R$1,8M (68%), Espaços — estádio/CT/sedes R$420K (16%), Manutenção R$260K (10%), Outros R$180K (6%)
 
 Seu papel específico agora é: {AGENT_NAME} — {AGENT_DESC}
 Responda como esse agente específico, focando no que é da alçada dele. Se perguntarem algo fora do seu escopo, diga que esse tipo de pergunta seria roteada pelo orquestrador para outro agente.
@@ -1584,6 +1625,69 @@ async function sendAgentChat(){
     typingEl.remove();
     hist.push({role:'assistant', content: '⚠️ Não consegui chamar o backend agora. Verifique: (1) se o site foi publicado com a pasta netlify/functions incluída, (2) se a variável de ambiente ANTHROPIC_API_KEY está configurada no Netlify (Site settings → Environment variables), (3) se você tem uma chave de API válida em console.anthropic.com — isso é diferente de uma conta Claude.ai comum. Detalhe técnico: ' + err.message, error:true});
     renderAgentChatLog();
+  }finally{
+    btn.disabled = false; btn.textContent = 'Perguntar';
+  }
+}
+
+/* ============ PRICING CHAT (Agente de Precificação Dinâmica — Eventos) ============ */
+const PRICING_AGENT = { name:'Agente de Precificação Dinâmica', desc:'Cruza o calendário de jogos e eventos, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.' };
+let pricingChatHistory = [];
+
+function renderPricingChatLog(){
+  const log = document.getElementById('pricing-chat-log');
+  if(!log) return;
+  if(pricingChatHistory.length === 0){
+    log.innerHTML = `<div class="hero-note">Nenhuma pergunta ainda. Tente "qual preço sugerido pro show da banda Ravena?" ou "qual o lucro projetado do jogo x Náutico?".</div>`;
+    return;
+  }
+  log.innerHTML = pricingChatHistory.map(m => `<div class="chat-bubble ${m.role==='user'?'user':(m.error?'error':'agent')}">${m.content}</div>`).join('');
+  log.scrollTop = log.scrollHeight;
+}
+
+async function sendPricingChat(){
+  const input = document.getElementById('pricing-chat-input');
+  const question = input.value.trim();
+  if(!question) return;
+
+  pricingChatHistory.push({role:'user', content: question});
+  renderPricingChatLog();
+  input.value = '';
+
+  const btn = document.getElementById('pricing-chat-send');
+  btn.disabled = true; btn.textContent = 'Pensando…';
+  const log = document.getElementById('pricing-chat-log');
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-typing';
+  typingEl.innerHTML = '<span></span><span></span><span></span>';
+  log.appendChild(typingEl);
+  log.scrollTop = log.scrollHeight;
+
+  try{
+    const systemPrompt = CLUBBRAIN_CONTEXT
+      .replace('{AGENT_NAME}', PRICING_AGENT.name)
+      .replace('{AGENT_DESC}', PRICING_AGENT.desc);
+
+    const apiMessages = pricingChatHistory.slice(-8).map(m => ({ role: m.role, content: m.content }));
+
+    const response = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: systemPrompt, messages: apiMessages })
+    });
+
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || ('status ' + response.status));
+    const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+    const answer = textBlocks.join('\n').trim() || '(sem resposta de texto)';
+
+    pricingChatHistory.push({role:'assistant', content: answer});
+    typingEl.remove();
+    renderPricingChatLog();
+  }catch(err){
+    typingEl.remove();
+    pricingChatHistory.push({role:'assistant', content: '⚠️ Não consegui chamar o backend agora. Verifique a variável ANTHROPIC_API_KEY no Netlify. Detalhe técnico: ' + err.message, error:true});
+    renderPricingChatLog();
   }finally{
     btn.disabled = false; btn.textContent = 'Perguntar';
   }
@@ -1877,6 +1981,52 @@ function buildEvents(){
   document.getElementById('ticket-types').innerHTML = types.map(t=>`<tr class="clickable" onclick="showToast('Mapa de assentos filtrado por: ${t[0]}')"><td class="strong">${t[0]}</td><td>${t[1]}</td><td>${t[2]==='free'?'Incluso no plano':t[2]}</td></tr>`).join('');
 
   buildSeatingChart();
+
+  // Próximos jogos e eventos
+  const catColors = { 'Futebol masculino':brand, 'Futebol feminino':brand2, 'Show':gold, 'Evento':teal };
+  const upcoming = [
+    ['18 jun, 2026', 'Futebol masculino', 'Estrela FC x Rival FC — Brasileirão', 'Estádio Municipal', '92% vendido'],
+    ['21 jun, 2026', 'Futebol feminino', 'Estrela FC Feminino x Atlética SC', 'Estádio Municipal', '58% vendido'],
+    ['27 jun, 2026', 'Show', 'Turnê Nacional — Banda Ravena', 'Estádio Municipal', '74% vendido'],
+    ['3 jul, 2026', 'Futebol masculino', 'Estrela FC x Náutico — Copa Regional', 'Estádio Municipal', '41% vendido'],
+    ['10 jul, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Centro de Eventos do Clube', 'Confirmado'],
+    ['15 jul, 2026', 'Futebol feminino', 'Estrela FC Feminino x Porto Vitória', 'Estádio Municipal', '33% vendido'],
+  ];
+  document.getElementById('upcoming-events').innerHTML = upcoming.map(e=>`
+    <tr class="clickable" onclick="showToast('Filtrando por: ${e[2].replace(/'/g,"\\'")}')">
+      <td>${e[0]}</td>
+      <td><span class="tag" style="background:${catColors[e[1]]}1f; border-color:${catColors[e[1]]}44; color:${catColors[e[1]]};">${e[1]}</span></td>
+      <td class="strong">${e[2]}</td>
+      <td>${e[3]}</td>
+      <td>${e[4]}</td>
+    </tr>`).join('');
+
+  // Museu do Clube — visitas
+  document.getElementById('museum-stats').innerHTML = `
+    <div class="kpi"><div class="label">Museu físico (mês)</div><div class="value" style="font-size:20px;">8.400</div><div class="delta up">↑ 6%</div></div>
+    <div class="kpi"><div class="label">Tour virtual (mês)</div><div class="value" style="font-size:20px;">41.200</div><div class="delta up">↑ 34%</div></div>
+    <div class="kpi"><div class="label">Tempo médio no tour virtual</div><div class="value" style="font-size:20px;">6m40s</div></div>
+    <div class="kpi"><div class="label">Conversão museu → loja oficial</div><div class="value" style="font-size:20px;">14%</div><div class="delta up">↑ 2pp</div></div>
+  `;
+
+  // Gasto operacional do clube
+  const expenses = [
+    { name:'Elenco (time)', color:brand, value:1800000 },
+    { name:'Espaços (estádio, CT, sedes)', color:teal, value:420000 },
+    { name:'Manutenção', color:amber, value:260000 },
+    { name:'Outros', color:red, value:180000 },
+  ];
+  const expTotal = expenses.reduce((s,e)=>s+e.value,0);
+  new Chart(document.getElementById('chart-expenses-donut'), {
+    type:'doughnut',
+    data:{ labels: expenses.map(e=>e.name), datasets:[{ data: expenses.map(e=>e.value), backgroundColor: expenses.map(e=>e.color), borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'74%', plugins:{legend:{display:false}} }
+  });
+  legendList(document.getElementById('expenses-legend'), expenses.map(e=>({
+    label:e.name, pct: Math.round(e.value/expTotal*100), color:e.color
+  })));
+
+  renderPricingChatLog();
 }
 
 function buildSeatingChart(){

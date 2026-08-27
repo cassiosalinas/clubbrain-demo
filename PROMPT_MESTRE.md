@@ -153,7 +153,7 @@ Critérios: **Importância estratégica** (Crítica/Alta/Média/Baixa) · **Impa
 Já existe um **protótipo funcional em HTML único** (`ClubBrain_Demo_Virtual_Fans.html`), auto-contido (sem backend, sem dependência de internet — Chart.js embutido no arquivo), pensado para ser levado a reuniões com clubes. Ele materializa visualmente as camadas 1, 3 e 5 da arquitetura (experiência, ontologia, aplicação) com dados fictícios de um clube fictício, o **Estrela FC**.
 
 ### 7.1 Estrutura da demo
-Uma marca única, **ClubBrain — by Virtual Fans**, com sidebar fixa e 11 módulos navegáveis:
+Uma marca única, **Virtual Fans — by Clubbrain.ai**, com sidebar fixa e 11 módulos navegáveis:
 
 | # | Módulo | Camada da arquitetura | Inspirado em |
 |---|---|---|---|
@@ -191,7 +191,7 @@ Na Visão Geral, um diagrama SVG mostra o nó central "TORCEDOR" conectado a 8 n
 
 ## 8. Diretrizes de marca para qualquer material novo
 
-- **Nunca misturar os 7 nomes fictícios das telas originais** (FanSphere, FanHub, FanForge, Fanverse, FanConnect, Fan Intelligence, FanEdge) num mesmo material — eles eram protótipos soltos, não a marca final. A marca única e definitiva para a demo/produto é **ClubBrain, by Virtual Fans**.
+- **Nunca misturar os 7 nomes fictícios das telas originais** (FanSphere, FanHub, FanForge, Fanverse, FanConnect, Fan Intelligence, FanEdge) num mesmo material — eles eram protótipos soltos, não a marca final. A marca única e definitiva para a demo/produto é **Virtual Fans, by Clubbrain.ai**.
 - Tom visual: dashboard SaaS dark-mode, denso em dado, mas com destaques de cor por módulo (não tudo na mesma cor).
 - Qualquer novo módulo deve ser localizado explicitamente na arquitetura de 5 camadas (seção 2) antes de ser desenhado — isso é o que torna a demo defensável numa reunião técnica, não só bonita.
 
