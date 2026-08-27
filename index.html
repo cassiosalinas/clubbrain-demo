@@ -429,6 +429,10 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
         CRM do torcedor
       </div>
+      <div class="nav-item" data-view="cdp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
+        CDP — Fan Data Platform
+      </div>
 
       <div class="nav-group-label">Monetização</div>
       <div class="nav-item" data-view="events">
@@ -448,10 +452,6 @@ canvas{ max-width:100%; }
       <div class="nav-item" data-view="opscenter">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
         Central operacional
-      </div>
-      <div class="nav-item" data-view="cdp">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
-        CDP
       </div>
       <div class="nav-item" data-view="marketing">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
@@ -1123,66 +1123,193 @@ canvas{ max-width:100%; }
 
     <!-- ================= CDP (Camada 2 — Fan Data Platform) ================= -->
     <section class="view" id="view-cdp">
-      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(31,214,184,.08), var(--surface)); border-color:rgba(31,214,184,.25);">
-        <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
-          A <b style="color:var(--text);">CDP (Fan Data Platform)</b> é a Camada 2 da arquitetura: unifica todo evento do torcedor — de qualquer canal — num perfil único, antes de virar a <b style="color:var(--text);">Ontologia do Clube</b>. É a ponte entre "todo clique vira dado" e o perfil 360º que já vimos no CRM.
-        </div>
+      <div class="subtabs" id="cdp-subtabs">
+        <div class="subtab active" data-sub="overview">Overview</div>
+        <div class="subtab" data-sub="fans">Fans</div>
+        <div class="subtab" data-sub="fan360">Fan 360°</div>
+        <div class="subtab" data-sub="audiences">Audiences</div>
+        <div class="subtab" data-sub="journeys">Journeys</div>
+        <div class="subtab" data-sub="insights">AI Insights</div>
+        <div class="subtab" data-sub="activations">Activations</div>
       </div>
 
-      <div class="grid g-4" style="margin-bottom:16px;">
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>Eventos capturados hoje</div>
-          <div class="value">1,75M</div>
-          <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cdp-events"></canvas></div>
-          <div class="delta up">↑ 11%</div>
-        </div>
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Perfis únicos resolvidos</div>
-          <div class="value">1,24M</div>
-          <div class="hero-note">de todas as fontes conectadas</div>
-        </div>
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>Taxa de resolução de identidade</div>
-          <div class="value">99,0%</div>
-          <div class="delta up">↑ 0,3pp</div>
-        </div>
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge" style="background:rgba(255,180,84,.16); color:#ffb454;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>Latência média de ingestão</div>
-          <div class="value">340ms</div>
-          <div class="hero-note">evento → perfil atualizado</div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Fontes de dados conectadas</h3></div>
-        <table>
-          <thead><tr><th>Fonte</th><th>Canal</th><th>Eventos/dia</th><th>Status</th></tr></thead>
-          <tbody id="cdp-sources"></tbody>
-        </table>
-      </div>
-
-      <div class="two-col" style="margin-bottom:16px;">
-        <div class="card">
-          <div class="card-title"><h3>Resolução de identidade</h3></div>
-          <div class="donut-wrap" style="width:150px; height:150px; margin:0 auto;">
-            <canvas id="chart-cdp-resolution-donut"></canvas>
-            <div class="donut-center"><span class="big">99,0%</span><span class="small">resolvido</span></div>
+      <!-- Sub: Overview -->
+      <div class="subview active" id="cdp-sub-overview">
+        <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(31,214,184,.08), var(--surface)); border-color:rgba(31,214,184,.25);">
+          <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+            A <b style="color:var(--text);">CDP (Fan Data Platform)</b> é a Camada 2 da arquitetura: unifica todo evento do torcedor — de qualquer canal — num perfil único (<b style="color:var(--text);">Identity Resolution</b>), antes de virar a Ontologia do Clube. Este módulo é a plataforma completa: da fonte de dados bruta até a ativação de campanha.
           </div>
-          <div id="cdp-resolution-legend" style="margin-top:14px;"></div>
         </div>
+
+        <div class="grid g-4" style="margin-bottom:16px;">
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores (universo total)</div>
+            <div class="value">5,2M</div>
+            <div class="hero-note">apaixonados fora do estádio, por região</div>
+          </div>
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>Identificados (Identity Graph)</div>
+            <div class="value">1,24M</div>
+            <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cdp-events"></canvas></div>
+            <div class="delta up">↑ 11%</div>
+          </div>
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg></span>Perfis 360° na Ontologia</div>
+            <div class="value">30.000</div>
+            <div class="hero-note">torcedores reconhecidos individualmente</div>
+          </div>
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge" style="background:rgba(255,180,84,.16); color:#ffb454;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Sócios-torcedores (membros)</div>
+            <div class="value">1.000</div>
+            <div class="hero-note">convertidos em receita recorrente</div>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-title"><h3>Fan Engagement</h3></div>
+            <div class="hero-note" style="margin-bottom:12px;">Classificação comportamental sobre os 5,2M torcedores do universo total</div>
+            <div id="cdp-engagement-breakdown"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><h3>Fan Score médio <span class="hero-note" style="font-weight:400;">e canais de origem</span></h3></div>
+            <div style="display:flex; align-items:center; gap:20px;">
+              <div class="donut-wrap" style="width:110px; height:110px; flex:none;">
+                <canvas id="chart-cdp-score-donut"></canvas>
+                <div class="donut-center"><span class="big" style="font-size:22px;">74</span><span class="small">/100</span></div>
+              </div>
+              <div style="flex:1;" id="cdp-channels-legend"></div>
+            </div>
+            <div class="hero-note" style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);">Receita influenciada por ativações da CDP no ano: <b style="color:var(--text);">R$ 8,4M</b> (≈24% da receita total do clube)</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Fontes de dados conectadas <span class="hero-note" style="font-weight:400;">— Ticketing, CRM, App, Web, Loja e Estádio Virtual, unificados via Identity Graph</span></h3></div>
+          <table>
+            <thead><tr><th>Fonte</th><th>Canal</th><th>Eventos/dia</th><th>Status</th></tr></thead>
+            <tbody id="cdp-sources"></tbody>
+          </table>
+        </div>
+
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-title"><h3>Resolução de identidade</h3></div>
+            <div class="donut-wrap" style="width:150px; height:150px; margin:0 auto;">
+              <canvas id="chart-cdp-resolution-donut"></canvas>
+              <div class="donut-center"><span class="big">99,0%</span><span class="small">resolvido</span></div>
+            </div>
+            <div id="cdp-resolution-legend" style="margin-top:14px;"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><h3>Volume de eventos — últimas 24h</h3></div>
+            <canvas id="chart-cdp-volume" height="130"></canvas>
+          </div>
+        </div>
+
         <div class="card">
-          <div class="card-title"><h3>Volume de eventos — últimas 24h</h3></div>
-          <canvas id="chart-cdp-volume" height="130"></canvas>
+          <div class="card-title">
+            <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>
+            <h3>Eventos chegando agora</h3>
+          </div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Torcedores identificados são resolvidos ao perfil na hora; eventos ainda sem match ficam anônimos até o próximo sinal (login, compra, etc.)</div>
+          <div id="cdp-live-feed"></div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">
-          <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>
-          <h3>Eventos chegando agora</h3>
+      <!-- Sub: Fans -->
+      <div class="subview" id="cdp-sub-fans">
+        <div class="card">
+          <div class="card-title" style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h3>Fans <span class="hero-note" style="font-weight:400;">— amostra representativa da base identificada</span></h3>
+            <input id="cdp-fan-search" type="text" placeholder="Buscar por nome…" style="background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:9px 13px; color:var(--text); font-size:12.5px; font-family:inherit; width:220px;" oninput="renderCdpFansList()">
+          </div>
+          <table>
+            <thead><tr><th>Fan ID</th><th>Nome</th><th>Status</th><th>Nível</th><th>Fan Score</th><th>LTV</th></tr></thead>
+            <tbody id="cdp-fans-table"></tbody>
+          </table>
         </div>
-        <div class="hero-note" style="margin:-6px 0 14px;">Torcedores identificados são resolvidos ao perfil na hora; eventos ainda sem match ficam anônimos até o próximo sinal (login, compra, etc.)</div>
-        <div id="cdp-live-feed"></div>
+      </div>
+
+      <!-- Sub: Fan 360 -->
+      <div class="subview" id="cdp-sub-fan360">
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; margin-bottom:18px;">
+            <div id="cdp360-avatar" style="width:72px; height:72px; border-radius:50%; font-size:24px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; flex:none;"></div>
+            <div style="flex:1; min-width:220px;">
+              <h3 id="cdp360-name" style="font-size:19px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></h3>
+              <div class="hero-note" id="cdp360-subtitle" style="margin-top:3px;"></div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;" id="cdp360-badges"></div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;" id="cdp360-scores"></div>
+          </div>
+          <div class="grid g-4" id="cdp360-kpis"></div>
+        </div>
+
+        <div class="grid g-2" style="margin-bottom:16px;">
+          <div class="card"><div class="card-title"><h3>Identidade</h3></div><div id="cdp360-identity"></div></div>
+          <div class="card"><div class="card-title"><h3>Relacionamento</h3></div><div id="cdp360-relationship"></div></div>
+          <div class="card"><div class="card-title"><h3>Preferências</h3></div><div id="cdp360-preferences"></div></div>
+          <div class="card"><div class="card-title"><h3>Comercial</h3></div><div id="cdp360-commercial"></div></div>
+        </div>
+
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-title"><h3>Fan Score — por dimensão</h3></div>
+            <div id="cdp360-scorebars"></div>
+          </div>
+          <div class="card" style="background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface)); border-color:rgba(108,107,255,.25);">
+            <div class="card-title"><h3>🧠 AI Insights</h3></div>
+            <div id="cdp360-insight" class="hero-note" style="font-size:12.5px; color:var(--text-dim); line-height:1.6; margin-bottom:14px;"></div>
+            <div class="card-title" style="margin-bottom:8px;"><h3 style="font-size:13px;">Next Best Action</h3></div>
+            <div id="cdp360-nba"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>Timeline de eventos</h3></div>
+          <div id="cdp360-timeline"></div>
+        </div>
+      </div>
+
+      <!-- Sub: Audiences -->
+      <div class="subview" id="cdp-sub-audiences">
+        <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface));">
+          <div class="hero-note" style="font-size:12.5px;">Segmentos construídos combinando qualquer atributo do Fan 360° — Fan Score, comportamento, comercial, sócio. Clique em "Ativar segmento" pra levar direto pra uma campanha.</div>
+        </div>
+        <div id="cdp-audiences-list"></div>
+      </div>
+
+      <!-- Sub: Journeys -->
+      <div class="subview" id="cdp-sub-journeys">
+        <div class="card">
+          <div class="card-title"><h3>Jornada de <span id="cdp-journey-fan-name" style="color:var(--brand2);"></span></h3></div>
+          <div class="hero-note" style="margin-bottom:20px;">Do primeiro clique num anúncio até virar Super Fã — cada etapa é um evento resolvido pela CDP e ligado ao mesmo Fan ID.</div>
+          <div id="cdp-journey-steps"></div>
+        </div>
+      </div>
+
+      <!-- Sub: AI Insights -->
+      <div class="subview" id="cdp-sub-insights">
+        <div class="hero-note" style="margin-bottom:14px;">Insights gerados pelo Agente Orquestrador consultando a Ontologia do Clube — priorizados por confiança.</div>
+        <div id="cdp-insights-feed"></div>
+      </div>
+
+      <!-- Sub: Activations -->
+      <div class="subview" id="cdp-sub-activations">
+        <div class="card" style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="margin-bottom:4px;">Campanhas ativadas</h3>
+            <div class="hero-note">Segmento → canais → resultado. É aqui que a CDP vira receita.</div>
+          </div>
+          <button class="btn-primary" onclick="openCdpActivationModal()">+ Nova ativação</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Campanha</th><th>Segmento</th><th>Canais</th><th>Impactados</th><th>Cliques</th><th>Compras</th><th>Receita</th></tr></thead>
+            <tbody id="cdp-activations-table"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -1295,7 +1422,7 @@ const titles = {
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
-  cdp: ["CDP — Fan Data Platform", "Camada 2 — cada evento do torcedor, de qualquer canal, unificado num perfil único antes de virar Ontologia"],
+  cdp: ["CDP — Fan Data Platform", "Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
   overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
   audience: ["Audiência", "Quem são os torcedores do Estrela FC"],
   engagement: ["Engajamento", "Atividade da comunidade e dos membros mais ativos"],
@@ -1721,7 +1848,7 @@ DADOS DO ESTRELA FC (todos fictícios):
 - Sentimento da torcida nas redes: 88% positivo nas últimas 24h
 - Próximos jogos e eventos sob gestão do clube: 18/jun Futebol masculino x Rival FC (Brasileirão, 92% vendido); 21/jun Futebol feminino x Atlética SC (58% vendido); 27/jun Show — Turnê Banda Ravena (74% vendido); 3/jul Futebol masculino x Náutico — Copa Regional (41% vendido, ainda com boa janela para precificação dinâmica); 10/jul Evento — Feira de Sócios & Ativação de Patrocinadores (confirmado); 15/jul Futebol feminino x Porto Vitória (33% vendido)
 - Museu do Clube: 8.400 visitas/mês no museu físico (↑6%) vs. 41.200 visitas/mês no tour virtual dentro do app (↑34%); tempo médio no tour virtual 6m40s; conversão museu → loja oficial 14%
-- CDP (Fan Data Platform, Camada 2): 1,75M eventos capturados/dia de 7 fontes conectadas (app do torcedor, redes sociais, e-commerce, ingressos/catraca, ponto de venda físico, museu virtual, CRM legado — este último ainda em sincronização); 1,24M perfis únicos resolvidos; taxa de resolução de identidade 99,0% (90,4% match determinístico, 8,6% probabilístico, 1,0% ainda não resolvido); latência média evento→perfil de 340ms
+- CDP (Fan Data Platform, Camada 2): funil 5,2M torcedores totais (universo apaixonado) → 1,24M identificados (Identity Graph, 99% de taxa de resolução) → 30 mil com perfil 360° completo na Ontologia → 1.000 sócios pagantes. Fan Score médio da base: 74/100. Segmentação comportamental: Super Fans 260K, Engaged 890K, Casual 1,4M, Dormant 2,65M. Cada torcedor no CRM tem um Fan Score individual (ex: Larissa Melo 96, Rafael Souza 87, Camila Alves 85, Bruno Lima 44, Diego Farias 38), calculado por dimensão (Engagement, Comercial, Conteúdo, Matchday, Gamificação, Fidelidade), com AI Insight e Next Best Action próprios. Audiences pré-construídas: "Torcedores altamente engajados" (158.240), "Sócios com risco de churn" (84), "Interessados em camisa, não compraram" (18.640) — cada uma ativável em campanha (WhatsApp/Push/E-mail/App/Ads). Receita influenciada por ativações da CDP no ano: R$8,4M.
 - Gasto operacional do clube no período (total R$2,66M): Elenco/time R$1,8M (68%), Espaços — estádio/CT/sedes R$420K (16%), Manutenção R$260K (10%), Outros R$180K (6%)
 
 Seu papel específico agora é: {AGENT_NAME} — {AGENT_DESC}
@@ -2371,6 +2498,10 @@ function buildMonetization(){
 const FANS_DB = [
   {
     id:'rafael', name:'Rafael Souza', initials:'RS', color1:'#6c6bff', color2:'#b06bff', nivel:'platina',
+    fanId:'FAN-000104', fanScore:87, jogadorFavorito:'Léo Martins (camisa 10)', competicaoFavorita:'Brasileirão',
+    scoreDims:[['Engagement',92],['Comercial',71],['Conteúdo',88],['Matchday',64],['Gamificação',95],['Fidelidade',84]],
+    aiInsight:'Rafael colecionou 3 camisas nos últimos 12 meses e abre 90% dos e-mails de lançamento de produto — alta probabilidade de comprar a próxima camisa retrô da campanha de aniversário.',
+    nextBestActions:[['Oferecer camisa retrô da campanha de aniversário','84%'],['Convidar para experiência VIP no próximo jogo','67%'],['Upgrade para Platina','41%']],
     idade:'25–34', sexo:'Masculino', cidade:'São Paulo, SP', regiao:'Sudeste',
     timeCoracao:'Estrela FC', tambemTorce:'Seleção Brasileira',
     socioDesde:'fev/2021', segmentoTitulo:'Top 1% de torcedores', segmentoCor:gold,
@@ -2388,6 +2519,10 @@ const FANS_DB = [
   },
   {
     id:'camila', name:'Camila Alves', initials:'CA', color1:'#1fd6b8', color2:'#6c6bff', nivel:'ouro',
+    fanId:'FAN-000212', fanScore:85, jogadorFavorito:'Diego Ramos', competicaoFavorita:'Libertadores',
+    scoreDims:[['Engagement',80],['Comercial',90],['Conteúdo',75],['Matchday',88],['Gamificação',60],['Fidelidade',92]],
+    aiInsight:'Camila compra camarote em 80% dos jogos em casa e respondeu positivamente à última pesquisa de satisfação — candidata forte para upgrade de plano.',
+    nextBestActions:[['Oferecer upgrade para Platina','58%'],['Convidar para pré-venda de ingressos fora','52%']],
     idade:'35–44', sexo:'Feminino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
     timeCoracao:'Estrela FC', tambemTorce:'—',
     socioDesde:'ago/2019', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
@@ -2404,6 +2539,10 @@ const FANS_DB = [
   },
   {
     id:'bruno', name:'Bruno Lima', initials:'BL', color1:'#ffb454', color2:'#ff8a3d', nivel:'bronze',
+    fanId:'FAN-000587', fanScore:44, jogadorFavorito:'Léo Martins (camisa 10)', competicaoFavorita:'Copa Regional',
+    scoreDims:[['Engagement',55],['Comercial',30],['Conteúdo',48],['Matchday',20],['Gamificação',65],['Fidelidade',40]],
+    aiInsight:'Bruno é sócio há poucos meses e ainda não foi ao estádio — forte candidato a uma oferta de ingresso de boas-vindas antes que o interesse esfrie.',
+    nextBestActions:[['Enviar oferta de ingresso de estreia com desconto','76%'],['Convidar para tour no Museu Virtual','61%']],
     idade:'18–24', sexo:'Masculino', cidade:'Recife, PE', regiao:'Nordeste',
     timeCoracao:'Estrela FC', tambemTorce:'Náutico',
     socioDesde:'jan/2026', segmentoTitulo:'Novo sócio', segmentoCor:brand,
@@ -2419,6 +2558,10 @@ const FANS_DB = [
   },
   {
     id:'larissa', name:'Larissa Melo', initials:'LM', color1:'#b06bff', color2:'#6c6bff', nivel:'platina',
+    fanId:'FAN-000031', fanScore:96, jogadorFavorito:'Léo Martins (camisa 10)', competicaoFavorita:'Brasileirão',
+    scoreDims:[['Engagement',95],['Comercial',88],['Conteúdo',82],['Matchday',91],['Gamificação',70],['Fidelidade',99]],
+    aiInsight:'Larissa é torcedora vitalícia com engajamento consistentemente alto há 10 anos — perfil ideal para o programa de embaixadores do clube.',
+    nextBestActions:[['Convidar para o programa de embaixadores','88%'],['Oferecer experiência exclusiva na final','79%']],
     idade:'45–54', sexo:'Feminino', cidade:'Porto Alegre, RS', regiao:'Sul',
     timeCoracao:'Estrela FC', tambemTorce:'—',
     socioDesde:'mar/2016', segmentoTitulo:'Torcedora vitalícia', segmentoCor:gold,
@@ -2435,6 +2578,10 @@ const FANS_DB = [
   },
   {
     id:'diego', name:'Diego Farias', initials:'DF', color1:'#ff5c72', color2:'#ff8a3d', nivel:'prata',
+    fanId:'FAN-000398', fanScore:38, jogadorFavorito:'—', competicaoFavorita:'Brasileirão',
+    scoreDims:[['Engagement',25],['Comercial',35],['Conteúdo',40],['Matchday',15],['Gamificação',50],['Fidelidade',45]],
+    aiInsight:'Diego não compra há 70 dias e desativou notificações — sinais claros de risco de churn. Uma ação de reengajamento personalizada tem boa chance de reverter.',
+    nextBestActions:[['Enviar oferta de retenção personalizada','72%'],['Ligar do time de relacionamento','55%']],
     idade:'25–34', sexo:'Masculino', cidade:'Salvador, BA', regiao:'Nordeste',
     timeCoracao:'Estrela FC', tambemTorce:'Bahia',
     socioDesde:'jun/2022', segmentoTitulo:'Risco de churn', segmentoCor:red,
@@ -2628,8 +2775,61 @@ function renderFanProfile(id){
 }
 
 /* ============ CDP (Camada 2 — Fan Data Platform) ============ */
+function fanScoreFromLtv(ltvNum, nivel){
+  const ranges = { basico:[8,32], bronze:[28,52], prata:[42,66], ouro:[58,82], platina:[74,97] };
+  const [lo,hi] = ranges[nivel] || [30,60];
+  const norm = Math.min(1, ltvNum / 8500);
+  return Math.round(lo + norm*(hi-lo));
+}
+
+const CDP_AUDIENCES = [
+  { name:'Torcedores altamente engajados', criteria:['Fan Score > 80','Último acesso < 30 dias','Interações > 10'], count:158240, color:teal },
+  { name:'Sócios com risco de churn', criteria:['Sócio = Sim','Churn Risk > 70%','Renovação < 90 dias'], count:84, color:red },
+  { name:'Interessados em camisa, não compraram', criteria:['Visualizou produto = Camisa','Não comprou','Últimos 7 dias'], count:18640, color:amber },
+];
+let cdpActivations = [
+  ['Camisa histórica — 15% OFF', 'Interessados em camisa, não compraram', 'WhatsApp + Push', 7821, 2847, 618, 247138],
+  ['Convite VIP — torcedores engajados', 'Torcedores altamente engajados', 'E-mail + App', 42300, 9680, 1240, 964000],
+  ['Retenção — risco de churn', 'Sócios com risco de churn', 'WhatsApp + CRM', 84, 31, 9, 4050],
+];
+let cdpFan360Id = 'rafael';
+
 function buildCdp(){
+  document.getElementById('cdp-subtabs').addEventListener('click', (e)=>{
+    const t = e.target.closest('.subtab'); if(!t) return;
+    document.querySelectorAll('#cdp-subtabs .subtab').forEach(s=>s.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('#view-cdp .subview').forEach(s=>s.classList.remove('active'));
+    document.getElementById('cdp-sub-'+t.dataset.sub).classList.add('active');
+  });
+
   sparkline('spark-cdp-events', [1.28,1.35,1.31,1.42,1.51,1.58,1.63,1.69,1.6,1.71,1.68,1.75], teal);
+
+  // --- Fan Engagement + Fan Score/Channels (Overview) ---
+  const engagement = [
+    { name:'Super Fans', color: gold, count:260000 },
+    { name:'Engaged', color: teal, count:890000 },
+    { name:'Casual', color: brand, count:1400000 },
+    { name:'Dormant', color:'#4b5378', count:2650000 },
+  ];
+  const engTotal = engagement.reduce((s,e)=>s+e.count,0);
+  document.getElementById('cdp-engagement-breakdown').innerHTML = engagement.map(e=>`
+    <div class="list-row">
+      <span class="dot-legend" style="background:${e.color}"></span>
+      <span style="flex:1; font-size:13px;">${e.name}</span>
+      <div class="progress" style="width:120px;"><div style="width:${Math.round(e.count/engTotal*100)}%; background:${e.color}"></div></div>
+      <span class="mono" style="width:64px; text-align:right; font-size:12.5px; color:var(--text-dim);">${(e.count/1000).toFixed(0)}K</span>
+    </div>`).join('');
+
+  new Chart(document.getElementById('chart-cdp-score-donut'), {
+    type:'doughnut',
+    data:{ datasets:[{ data:[74,26], backgroundColor:[brand,'#232a44'], borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'76%', plugins:{legend:{display:false}, tooltip:{enabled:false}} }
+  });
+  legendList(document.getElementById('cdp-channels-legend'), [
+    { name:'App', pct:42, color:brand }, { name:'Web', pct:31, color:teal },
+    { name:'Stadium', pct:18, color:gold }, { name:'Outros', pct:9, color:brand2 },
+  ].map(c=>({label:c.name, pct:c.pct, color:c.color})));
 
   const sources = [
     ['App do torcedor (Virtual Fans)', 'Mobile/App', '1.240.000', 'ok'],
@@ -2682,6 +2882,219 @@ function buildCdp(){
       </div>
       <span class="hero-note" style="white-space:nowrap;">${e[4]}</span>
     </div>`).join('');
+
+  // --- Fans ---
+  renderCdpFansList();
+  // --- Fan 360 ---
+  renderCdpFan360(cdpFan360Id);
+  // --- Audiences ---
+  renderCdpAudiences();
+  // --- Journeys ---
+  renderCdpJourney();
+  // --- AI Insights ---
+  renderCdpInsightsFeed();
+  // --- Activations ---
+  renderCdpActivations();
+}
+
+function renderCdpFansList(){
+  const q = (document.getElementById('cdp-fan-search')?.value || '').toLowerCase();
+  const tierMeta = k => TIER_DB.find(t=>t.key===k);
+  let rows = FANS_DB.map(f=>({ id:f.id, name:f.name, nivel:f.nivel, ltv:f.ltv, fanScore:f.fanScore, fanId:f.fanId, full:true, cidade:f.cidade }))
+    .concat(TIER_SAMPLE_EXTRA.map((e,i)=>({ id:null, name:e.name, nivel:e.nivel, ltv:e.ltv, fanScore:null, fanId:'FAN-'+String(2001+i).padStart(6,'0'), full:false, cidade:e.cidade })));
+  if(q) rows = rows.filter(r=>r.name.toLowerCase().includes(q));
+
+  document.getElementById('cdp-fans-table').innerHTML = rows.map(r=>{
+    const t = tierMeta(r.nivel);
+    const action = r.full
+      ? `openCdpFan360('${r.id}')`
+      : `showTierSampleModal('${r.name.replace(/'/g,"\\'")}','${r.cidade}','${t.name}','${t.color}','${r.ltv}')`;
+    const score = r.fanScore != null ? r.fanScore : fanScoreFromLtv(parseLtv(r.ltv), r.nivel);
+    return `<tr class="clickable" onclick="${action}">
+      <td class="mono" style="color:var(--text-faint); font-size:11.5px;">${r.fanId}</td>
+      <td class="strong">${r.name}</td>
+      <td><span class="status-dot status-active">🟢 Identificado</span></td>
+      <td><span class="tag" style="background:${t.color}1f; border-color:${t.color}44; color:${t.color};">${t.name}</span></td>
+      <td>${score}</td>
+      <td>${r.ltv}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openCdpFan360(id){
+  const t = document.querySelector('#cdp-subtabs .subtab[data-sub="fan360"]');
+  if(t) t.click();
+  renderCdpFan360(id);
+}
+
+function renderCdpFan360(id){
+  const f = FANS_DB.find(x=>x.id===id) || FANS_DB.find(x=>x.id==='rafael');
+  cdpFan360Id = f.id;
+  const t = TIER_DB.find(x=>x.key===f.nivel);
+
+  document.getElementById('cdp360-avatar').style.background = `linear-gradient(135deg,${f.color1},${f.color2})`;
+  document.getElementById('cdp360-avatar').textContent = f.initials;
+  document.getElementById('cdp360-name').innerHTML = `${f.name} <span class="tag" style="border:none; background:${t.color}22; color:${t.color};">${t.name}</span> <span class="status-dot status-active">🟢 Identificado</span>`;
+  document.getElementById('cdp360-subtitle').textContent = `${f.fanId} · Sócio desde ${f.socioDesde} · ${f.cidade}`;
+  document.getElementById('cdp360-badges').innerHTML = `
+    <span class="demo-chip">🎂 ${f.idade} anos</span>
+    <span class="demo-chip">${f.sexo === 'Masculino' ? '♂' : '♀'} ${f.sexo}</span>
+    <span class="demo-chip">📍 ${f.cidade}</span>`;
+  document.getElementById('cdp360-scores').innerHTML = `
+    <div class="ai-score-box" style="background:${brand}18;"><div class="num" style="color:${brand};">${f.fanScore}</div><div class="lbl">Fan Score</div></div>
+    <div class="ai-score-box" style="background:${f.churnCor}18;"><div class="num" style="color:${f.churnCor};">${f.churnRisco}</div><div class="lbl">Churn Risk</div></div>`;
+
+  const engagementLabel = f.fanScore>85?'Muito alto':f.fanScore>65?'Alto':f.fanScore>40?'Médio':'Baixo';
+  document.getElementById('cdp360-kpis').innerHTML = `
+    <div class="kpi"><div class="label">Fan Score</div><div class="value" style="font-size:20px;">${f.fanScore}/100</div></div>
+    <div class="kpi"><div class="label">Engagement</div><div class="value" style="font-size:20px;">${engagementLabel}</div></div>
+    <div class="kpi"><div class="label">Lifetime Value</div><div class="value" style="font-size:20px;">${f.ltv}</div></div>
+    <div class="kpi"><div class="label">Propensão de compra</div><div class="value" style="font-size:20px; color:${f.propensaoCor};">${f.propensao}</div></div>`;
+
+  document.getElementById('cdp360-identity').innerHTML = `
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Nome</span><span class="mono" style="font-size:12.5px;">${f.name}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Fan ID</span><span class="mono" style="font-size:12.5px;">${f.fanId}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Idade</span><span class="mono" style="font-size:12.5px;">${f.idade} anos</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Cidade</span><span class="mono" style="font-size:12.5px;">${f.cidade}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Região</span><span class="mono" style="font-size:12.5px;">${f.regiao}</span></div>`;
+
+  document.getElementById('cdp360-relationship').innerHTML = `
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Sócio desde</span><span class="mono" style="font-size:12.5px;">${f.socioDesde}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Nível</span><span class="tag" style="color:${t.color}; border-color:${t.color}44;">${t.name}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Status</span><span class="status-dot status-active">Ativo</span></div>`;
+
+  document.getElementById('cdp360-preferences').innerHTML = `
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Jogador favorito</span><span class="mono" style="font-size:12.5px;">${f.jogadorFavorito}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Competição favorita</span><span class="mono" style="font-size:12.5px;">${f.competicaoFavorita}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Produto favorito</span><span class="mono" style="font-size:12.5px;">${f.produtoFavorito}</span></div>`;
+
+  document.getElementById('cdp360-commercial').innerHTML = `
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Transações</span><span class="mono" style="font-size:12.5px;">${f.transacoes}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Ticket médio</span><span class="mono" style="font-size:12.5px;">${f.ticketMedio}</span></div>
+    <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Receita acumulada</span><span class="mono" style="font-size:12.5px;">${f.gastoTotal}</span></div>`;
+
+  document.getElementById('cdp360-scorebars').innerHTML = f.scoreDims.map(d=>`
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>${d[0]}</span><span class="mono strong">${d[1]}</span></div>
+      <div class="progress"><div style="width:${d[1]}%; background:${brand};"></div></div>
+    </div>`).join('');
+
+  document.getElementById('cdp360-insight').textContent = f.aiInsight;
+  document.getElementById('cdp360-nba').innerHTML = f.nextBestActions.map(a=>`
+    <div class="list-row">
+      <span style="flex:1; font-size:12.5px;">${a[0]}</span>
+      <span class="tag" style="color:${teal}; border-color:${teal}44;">${a[1]}</span>
+      <button class="pill" style="padding:6px 10px; font-size:11px;" onclick="showToast('Ação aplicada: ${a[0].replace(/'/g,"\\'")}', '#22e07a')">Aplicar</button>
+    </div>`).join('');
+
+  document.getElementById('cdp360-timeline').innerHTML = f.history.map(h=>`
+    <div class="list-row">
+      <span class="chip-avatar" style="background:${h[2]}; font-size:13px;">${h[3]}</span>
+      <div style="flex:1;"><div style="font-size:13px;">${h[0]}</div><div class="hero-note">${h[1]}</div></div>
+    </div>`).join('');
+}
+
+function renderCdpAudiences(){
+  document.getElementById('cdp-audiences-list').innerHTML = CDP_AUDIENCES.map(a=>`
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:220px;">
+          <div style="font-weight:700; font-size:14.5px; margin-bottom:8px;">${a.name}</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${a.criteria.map(c=>`<span class="tag" style="font-size:11px;">${c}</span>`).join('')}
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="value" style="font-size:24px; color:${a.color};">${a.count.toLocaleString('pt-BR')}</div>
+          <div class="hero-note">torcedores</div>
+        </div>
+        <button class="btn-primary" onclick="openCdpActivationModal('${a.name.replace(/'/g,"\\'")}', ${a.count})">Ativar segmento →</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderCdpJourney(){
+  const f = FANS_DB.find(x=>x.id==='rafael');
+  document.getElementById('cdp-journey-fan-name').textContent = f.name;
+  const steps = [
+    ['Descoberta','Instagram — anúncio patrocinado','📱', brand],
+    ['Engagement','Assistiu vídeo "Gols da temporada"','▶', brand2],
+    ['Identificação','Cadastro no app do torcedor','🆔', teal],
+    ['Experiência','Visitou o Estádio Virtual','🏟', amber],
+    ['Gamificação','Completou quiz "Você conhece o Estrela FC?"','🎮', gold],
+    ['Commerce','Comprou camisa oficial','🛒', brand],
+    ['Membership','Virou sócio-torcedor','⭐', gold],
+    ['Loyalty','Hoje: Top 1% de torcedores (Platina)','🏆', '#22e07a'],
+  ];
+  document.getElementById('cdp-journey-steps').innerHTML = `
+    <div style="position:relative; padding-left:26px;">
+      <div style="position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:var(--border);"></div>
+      ${steps.map(s=>`
+        <div style="position:relative; margin-bottom:22px;">
+          <span style="position:absolute; left:-26px; top:0; width:18px; height:18px; border-radius:50%; background:${s[3]}; border:3px solid var(--surface);"></span>
+          <div style="font-weight:700; font-size:13.5px; color:${s[3]};">${s[2]} ${s[0]}</div>
+          <div class="hero-note" style="margin-top:2px;">${s[1]}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderCdpInsightsFeed(){
+  document.getElementById('cdp-insights-feed').innerHTML = FANS_DB.map(f=>{
+    const t = TIER_DB.find(x=>x.key===f.nivel);
+    const nba = f.nextBestActions[0];
+    return `<div class="card clickable" style="margin-bottom:14px;" onclick="openCdpFan360('${f.id}')">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <span class="chip-avatar" style="background:linear-gradient(135deg,${f.color1},${f.color2});">🧠</span>
+        <div style="font-weight:700; font-size:13.5px;">${f.name}</div>
+        <span class="tag" style="margin-left:auto; color:${t.color}; border-color:${t.color}44;">${nba[1]} confiança</span>
+      </div>
+      <div class="hero-note" style="font-size:12.5px; color:var(--text-dim); line-height:1.6; margin-bottom:10px;">${f.aiInsight}</div>
+      <div style="font-size:12px;"><b>Próxima ação sugerida:</b> ${nba[0]}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCdpActivations(){
+  document.getElementById('cdp-activations-table').innerHTML = cdpActivations.map(a=>`
+    <tr><td class="strong">${a[0]}</td><td>${a[1]}</td><td>${a[2]}</td>
+    <td>${a[3].toLocaleString('pt-BR')}</td><td>${a[4].toLocaleString('pt-BR')}</td><td>${a[5].toLocaleString('pt-BR')}</td>
+    <td>R$ ${a[6].toLocaleString('pt-BR')}</td></tr>`).join('');
+}
+
+function openCdpActivationModal(segmentName, count){
+  segmentName = segmentName || CDP_AUDIENCES[0].name;
+  count = count || CDP_AUDIENCES[0].count;
+  showModal(
+    `<h3 style="margin-bottom:4px;">Nova ativação</h3>`,
+    `<div class="hero-note" style="margin-bottom:16px;">Segmento: <b style="color:var(--text);">${segmentName}</b> · ${count.toLocaleString('pt-BR')} torcedores</div>
+     <div style="margin-bottom:12px;">
+       <div class="hero-note" style="margin-bottom:6px;">Nome da campanha</div>
+       <input id="cdp-activation-name" type="text" value="Campanha — ${segmentName}" style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:10px 12px; color:var(--text); font-size:13px; font-family:inherit; box-sizing:border-box;">
+     </div>
+     <div style="margin-bottom:18px;">
+       <div class="hero-note" style="margin-bottom:8px;">Canais</div>
+       <div style="display:flex; gap:8px; flex-wrap:wrap;">
+         ${['WhatsApp','Push','E-mail','App','Website','Ads'].map((c,i)=>`<label class="tag" style="cursor:pointer;"><input type="checkbox" ${i<2?'checked':''} value="${c}" style="margin-right:5px;">${c}</label>`).join('')}
+       </div>
+     </div>
+     <button class="btn-primary" style="width:100%;" onclick="launchCdpActivation('${segmentName.replace(/'/g,"\\'")}', ${count})">Lançar campanha</button>`
+  );
+}
+
+function launchCdpActivation(segmentName, count){
+  const nameInput = document.getElementById('cdp-activation-name');
+  const name = (nameInput && nameInput.value.trim()) || ('Campanha — '+segmentName);
+  const channels = Array.from(document.querySelectorAll('.modal-box input[type=checkbox]:checked')).map(c=>c.value);
+  document.querySelector('.modal-overlay')?.remove();
+
+  const impacted = Math.round(count * (0.35 + Math.random()*0.2));
+  const clicks = Math.round(impacted * (0.25 + Math.random()*0.15));
+  const purchases = Math.round(clicks * (0.1 + Math.random()*0.1));
+  const revenue = purchases * (350 + Math.round(Math.random()*150));
+
+  cdpActivations.unshift([name, segmentName, channels.join(' + ') || '—', impacted, clicks, purchases, revenue]);
+  renderCdpActivations();
+  showToast(`Campanha lançada: ${impacted.toLocaleString('pt-BR')} torcedores impactados`, '#22e07a');
 }
 
 /* ============ MARKETING ============ */
