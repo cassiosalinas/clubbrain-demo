@@ -81,6 +81,9 @@ a{ color:inherit; }
   display:flex; align-items:center; gap:10px; cursor:pointer;
 }
 .club-badge{ width:26px; height:26px; border-radius:7px; background:linear-gradient(135deg,#ffb454,#ff5c72); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; }
+.club-badge svg{ width:16px; height:16px; }
+.topbar-club-badge{ width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,#ffb454,#ff5c72); flex:none; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px -6px rgba(255,92,114,.5); }
+.topbar-club-badge svg{ width:19px; height:19px; }
 .club-select .name{ font-size:13px; font-weight:600; }
 .club-select .sub{ font-size:10.5px; color:var(--text-faint); }
 .club-select svg{ margin-left:auto; width:14px; height:14px; color:var(--text-faint); }
@@ -368,7 +371,9 @@ canvas{ max-width:100%; }
     </div>
 
     <div class="club-select">
-      <div class="club-badge">EF</div>
+      <div class="club-badge">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><path d="M12 7.3 13.4 10.4 16.8 10.7 14.2 12.9 15 16.2 12 14.4 9 16.2 9.8 12.9 7.2 10.7 10.6 10.4Z" fill="white"/></svg>
+      </div>
       <div>
         <div class="name">Estrela FC</div>
         <div class="sub">Temporada 2026</div>
@@ -410,6 +415,10 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
         Conteúdo
       </div>
+      <div class="nav-item" data-view="crm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
+        CRM do torcedor
+      </div>
 
       <div class="nav-group-label">Monetização</div>
       <div class="nav-item" data-view="events">
@@ -429,10 +438,6 @@ canvas{ max-width:100%; }
       <div class="nav-item" data-view="opscenter">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
         Central operacional
-      </div>
-      <div class="nav-item" data-view="crm">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
-        CRM do torcedor
       </div>
       <div class="nav-item" data-view="marketing">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
@@ -456,6 +461,15 @@ canvas{ max-width:100%; }
   <!-- MAIN -->
   <main class="main">
     <header class="topbar">
+      <div style="display:flex; align-items:center; gap:11px; padding-right:16px; border-right:1px solid var(--border);">
+        <div class="topbar-club-badge">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><path d="M12 7.3 13.4 10.4 16.8 10.7 14.2 12.9 15 16.2 12 14.4 9 16.2 9.8 12.9 7.2 10.7 10.6 10.4Z" fill="white"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px; font-weight:700; line-height:1.1;">Estrela FC</div>
+          <div style="font-size:10.5px; color:var(--text-faint);">Temporada 2026</div>
+        </div>
+      </div>
       <div>
         <h1 id="view-title">Cockpit executivo</h1>
         <div class="subtitle" id="view-subtitle">Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO</div>
@@ -550,14 +564,7 @@ canvas{ max-width:100%; }
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Como o orquestrador decide</h3></div>
-        <div id="agents-flow"></div>
-      </div>
-
-      <div class="grid g-2" id="agents-grid"></div>
-
-      <div class="card" style="margin-top:16px; background:linear-gradient(135deg, rgba(34,224,122,.08), var(--surface)); border-color:rgba(34,224,122,.25);">
+      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(34,224,122,.08), var(--surface)); border-color:rgba(34,224,122,.25);">
         <div class="card-title">
           <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
           <h3>Fale com um agente agora (IA real — Claude)</h3>
@@ -570,6 +577,13 @@ canvas{ max-width:100%; }
           <button class="btn-primary" id="agent-chat-send" onclick="sendAgentChat()">Perguntar</button>
         </div>
       </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Como o orquestrador decide</h3></div>
+        <div id="agents-flow"></div>
+      </div>
+
+      <div class="grid g-2" id="agents-grid"></div>
     </section>
 
     <!-- ================= OPS CENTER ================= -->
