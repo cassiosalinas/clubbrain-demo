@@ -481,6 +481,10 @@ canvas{ max-width:100%; }
       </div>
 
       <div class="nav-group-label">Visão do torcedor</div>
+      <div class="nav-item" data-view="cdp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
+        Torcedor 360
+      </div>
       <div class="nav-item" data-view="overview">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         Visão geral
@@ -500,10 +504,6 @@ canvas{ max-width:100%; }
       <div class="nav-item" data-view="content">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
         Conteúdo
-      </div>
-      <div class="nav-item" data-view="cdp">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
-        Torcedor 360
       </div>
 
       <div class="nav-group-label">Monetização</div>
@@ -1353,7 +1353,6 @@ canvas{ max-width:100%; }
         <div class="subtab active" data-sub="overview">Overview</div>
         <div class="subtab" data-sub="fans">Fans</div>
         <div class="subtab" data-sub="fan360">Fan 360°</div>
-        <div class="subtab" data-sub="audiences">Audiences</div>
         <div class="subtab" data-sub="journeys">Journeys</div>
         <div class="subtab" data-sub="insights">AI Insights</div>
         <div class="subtab" data-sub="activations">Activations</div>
@@ -1526,8 +1525,86 @@ canvas{ max-width:100%; }
         </div>
       </div>
 
-      <!-- Sub: Audiences -->
-      <div class="subview" id="cdp-sub-audiences">
+      <!-- Sub: Journeys -->
+      <div class="subview" id="cdp-sub-journeys">
+        <div class="card">
+          <div class="card-title"><h3>Jornada de <span id="cdp-journey-fan-name" style="color:var(--brand2);"></span></h3></div>
+          <div class="hero-note" style="margin-bottom:20px;">Do primeiro clique num anúncio até virar Super Fã — cada etapa é um evento resolvido pela CDP e ligado ao mesmo Fan ID.</div>
+          <div id="cdp-journey-steps"></div>
+        </div>
+      </div>
+
+      <!-- Sub: AI Insights -->
+      <div class="subview" id="cdp-sub-insights">
+        <div class="hero-note" style="margin-bottom:14px;">Insights gerados pelo Agente Orquestrador consultando a Ontologia do Clube — priorizados por confiança.</div>
+        <div id="cdp-insights-feed"></div>
+      </div>
+
+      <!-- Sub: Activations -->
+      <div class="subview" id="cdp-sub-activations">
+        <div class="card" style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="margin-bottom:4px;">Campanhas ativadas</h3>
+            <div class="hero-note">Segmento → canais → resultado. É aqui que a CDP vira receita.</div>
+          </div>
+          <button class="btn-primary" onclick="openCdpActivationModal()">+ Nova ativação</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Campanha</th><th>Segmento</th><th>Canais</th><th>Impactados</th><th>Cliques</th><th>Compras</th><th>Receita</th></tr></thead>
+            <tbody id="cdp-activations-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MARKETING ================= -->
+    <section class="view" id="view-marketing">
+      <div class="subtabs" id="marketing-subtabs">
+        <div class="subtab active" data-sub="automacao">Automação</div>
+        <div class="subtab" data-sub="audiences">Audiences</div>
+      </div>
+
+      <div class="subview active" id="marketing-sub-automacao">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Fluxo automatizado — boas-vindas ao sócio</h3></div>
+          <div class="flow-canvas" id="flow-diagram"></div>
+        </div>
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="grid g-2" style="margin-bottom:14px;">
+              <div class="kpi">
+                <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></span>Taxa de abertura</div>
+                <div class="value" style="font-size:22px;">24%</div><div class="delta up">↑ 8%</div>
+              </div>
+              <div class="kpi">
+                <div class="label"><span class="icon-badge" style="background:rgba(176,107,255,.16); color:#b06bff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></span>Push enviados</div>
+                <div class="value" style="font-size:22px;">500K</div><div class="delta up">↑ 12%</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px; padding-top:6px; border-top:1px solid var(--border);">
+              <div class="donut-wrap" style="width:84px; height:84px; flex:none;">
+                <canvas id="chart-workflows-donut"></canvas>
+                <div class="donut-center"><span class="big" style="font-size:17px;">12</span></div>
+              </div>
+              <div><div style="font-weight:600; font-size:13px;">Workflows ativos</div><div class="hero-note">Em e-mail, push e in-app · todos operacionais</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><h3>Taxa de abertura por dia</h3></div>
+            <canvas id="chart-open-rate" height="110"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Campanhas ativas</h3></div>
+          <table>
+            <thead><tr><th>Campanha</th><th>Status</th><th>Enviados</th><th>Abertura</th><th>CTR</th></tr></thead>
+            <tbody id="campaigns-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subview" id="marketing-sub-audiences">
         <div class="card" style="margin-bottom:16px;">
           <div class="card-title"><h3>Construtor de segmentação</h3></div>
           <div class="hero-note" style="margin:-6px 0 14px;">Combine critérios sobre a base real de torcedores (idade, região, nível) e veja o tamanho do segmento em tempo real — depois, transforme numa audiência ativável.</div>
@@ -1574,81 +1651,9 @@ canvas{ max-width:100%; }
           </div>
         </div>
         <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface));">
-          <div class="hero-note" style="font-size:12.5px;">Segmentos construídos combinando qualquer atributo do Fan 360° — Fan Score, comportamento, comercial, sócio. Clique em "Ativar segmento" pra levar direto pra uma campanha.</div>
+          <div class="hero-note" style="font-size:12.5px;">Segmentos construídos combinando qualquer atributo do Fan 360° — Fan Score, comportamento, comercial, sócio. Clique em "Ativar segmento" pra levar direto pra uma campanha (o resultado aparece em Torcedor 360 → Activations).</div>
         </div>
         <div id="cdp-audiences-list"></div>
-      </div>
-
-      <!-- Sub: Journeys -->
-      <div class="subview" id="cdp-sub-journeys">
-        <div class="card">
-          <div class="card-title"><h3>Jornada de <span id="cdp-journey-fan-name" style="color:var(--brand2);"></span></h3></div>
-          <div class="hero-note" style="margin-bottom:20px;">Do primeiro clique num anúncio até virar Super Fã — cada etapa é um evento resolvido pela CDP e ligado ao mesmo Fan ID.</div>
-          <div id="cdp-journey-steps"></div>
-        </div>
-      </div>
-
-      <!-- Sub: AI Insights -->
-      <div class="subview" id="cdp-sub-insights">
-        <div class="hero-note" style="margin-bottom:14px;">Insights gerados pelo Agente Orquestrador consultando a Ontologia do Clube — priorizados por confiança.</div>
-        <div id="cdp-insights-feed"></div>
-      </div>
-
-      <!-- Sub: Activations -->
-      <div class="subview" id="cdp-sub-activations">
-        <div class="card" style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-          <div>
-            <h3 style="margin-bottom:4px;">Campanhas ativadas</h3>
-            <div class="hero-note">Segmento → canais → resultado. É aqui que a CDP vira receita.</div>
-          </div>
-          <button class="btn-primary" onclick="openCdpActivationModal()">+ Nova ativação</button>
-        </div>
-        <div class="card">
-          <table>
-            <thead><tr><th>Campanha</th><th>Segmento</th><th>Canais</th><th>Impactados</th><th>Cliques</th><th>Compras</th><th>Receita</th></tr></thead>
-            <tbody id="cdp-activations-table"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= MARKETING ================= -->
-    <section class="view" id="view-marketing">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Fluxo automatizado — boas-vindas ao sócio</h3></div>
-        <div class="flow-canvas" id="flow-diagram"></div>
-      </div>
-      <div class="two-col" style="margin-bottom:16px;">
-        <div class="card">
-          <div class="grid g-2" style="margin-bottom:14px;">
-            <div class="kpi">
-              <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></span>Taxa de abertura</div>
-              <div class="value" style="font-size:22px;">24%</div><div class="delta up">↑ 8%</div>
-            </div>
-            <div class="kpi">
-              <div class="label"><span class="icon-badge" style="background:rgba(176,107,255,.16); color:#b06bff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></span>Push enviados</div>
-              <div class="value" style="font-size:22px;">500K</div><div class="delta up">↑ 12%</div>
-            </div>
-          </div>
-          <div style="display:flex; align-items:center; gap:16px; padding-top:6px; border-top:1px solid var(--border);">
-            <div class="donut-wrap" style="width:84px; height:84px; flex:none;">
-              <canvas id="chart-workflows-donut"></canvas>
-              <div class="donut-center"><span class="big" style="font-size:17px;">12</span></div>
-            </div>
-            <div><div style="font-weight:600; font-size:13px;">Workflows ativos</div><div class="hero-note">Em e-mail, push e in-app · todos operacionais</div></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title"><h3>Taxa de abertura por dia</h3></div>
-          <canvas id="chart-open-rate" height="110"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><h3>Campanhas ativas</h3></div>
-        <table>
-          <thead><tr><th>Campanha</th><th>Status</th><th>Enviados</th><th>Abertura</th><th>CTR</th></tr></thead>
-          <tbody id="campaigns-table"></tbody>
-        </table>
       </div>
     </section>
 
@@ -1749,7 +1754,7 @@ const titles = {
   ontology: ["Ontologia do Clube", "Camada 3 — o grafo de conhecimento que conecta torcedor, jogo, jogador, patrocínio e ativos num modelo único"],
   clubmgmt: ["Gestão do clube", "Elenco, categorias de base, ativos, comissão técnica e médica, viagens, patrocínio e marca — a visão de quem administra o clube"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
-  cdp: ["Torcedor 360", "CDP + CRM — base de torcedores por nível, Identity Resolution, Fan 360°, Audiences, Jornada, AI Insights e Ativação — tudo num só lugar"],
+  cdp: ["Torcedor 360", "CDP + CRM — base de torcedores por nível, Identity Resolution, Fan 360°, Jornada, AI Insights e Ativação — tudo num só lugar"],
   overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
   audience: ["Audiência", "Quem são os torcedores do Estrela FC"],
   engagement: ["Comunidades", "Saúde da comunidade, torcidas organizadas e membros mais ativos"],
@@ -1759,7 +1764,7 @@ const titles = {
   rewards: ["Gamificação", "Pontos, missões e recompensas da torcida"],
   monetization: ["Receita & patrocínio", "Assinaturas, conversão e ROI de patrocinadores"],
   commerce: ["Gestão de commerce", "Integração com a loja oficial (Camada 1) — catálogo, preços e vendas em tempo real, alimentando a Ontologia do Clube"],
-  marketing: ["Automação de marketing", "Jornadas e campanhas ativas por canal"],
+  marketing: ["Automação de marketing", "Jornadas e campanhas ativas por canal, e o construtor de segmentação (Audiences) de torcedores"],
   ops: ["Saúde do sistema", "Monitoramento de infraestrutura e APIs em tempo real"],
 };
 /* ============ TOAST & MODAL (interatividade global) ============ */
@@ -1975,6 +1980,7 @@ function selectClub(id, silent){
   if(document.getElementById('ontology-grid')) buildOntology();
   refreshClubManagementForClub();
   renderCommerceProducts();
+  if(document.getElementById('seg-nivel')) updateSegmentBuilder();
   if(!silent) showToast(`Clube ativo: ${c.name}`, '#22e07a');
 }
 
@@ -1988,7 +1994,6 @@ function refreshCdpForClub(){
   renderCdpFan360('rafael');
   renderCdpInsightsFeed();
   renderCdpJourney();
-  updateSegmentBuilder();
 }
 
 function grad(ctx, color){
@@ -4146,9 +4151,6 @@ function buildCdp(){
   renderCdpFansList();
   // --- Fan 360 ---
   renderCdpFan360(cdpFan360Id);
-  // --- Audiences ---
-  renderCdpAudiences();
-  updateSegmentBuilder();
   // --- Journeys ---
   renderCdpJourney();
   // --- AI Insights ---
@@ -4404,6 +4406,15 @@ function launchCdpActivation(segmentName, count){
 
 /* ============ MARKETING ============ */
 function buildMarketing(){
+  document.getElementById('marketing-subtabs').addEventListener('click', (e)=>{
+    const t = e.target.closest('.subtab'); if(!t) return;
+    document.querySelectorAll('#marketing-subtabs .subtab').forEach(s=>s.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('#view-marketing .subview').forEach(s=>s.classList.remove('active'));
+    document.getElementById('marketing-sub-'+t.dataset.sub).classList.add('active');
+  });
+  renderCdpAudiences();
+  updateSegmentBuilder();
   buildFlowDiagram();
   new Chart(document.getElementById('chart-workflows-donut'), {
     type:'doughnut',
