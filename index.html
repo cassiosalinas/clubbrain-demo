@@ -982,17 +982,37 @@ canvas{ max-width:100%; }
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z"/></svg></span>Sócios-torcedores</div>
-          <div class="value">6.250</div><div class="delta up">↑ 14,2%</div>
+          <div class="value">1.000</div><div class="delta up">↑ 14,2%</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Receita média por sócio</div>
-          <div class="value">R$ 72</div><div class="delta up">↑ 8,7%</div>
+          <div class="value">R$ 450</div><div class="delta up">↑ 8,7%</div>
         </div>
         <div class="card kpi">
           <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg></span>Churn</div>
           <div class="value">2,4%</div><div class="delta up">↓ 0,6pp</div>
         </div>
       </div>
+
+      <div style="display:grid; grid-template-columns: 260px 1fr; gap:16px; margin-bottom:16px;">
+        <div class="card">
+          <div class="card-title"><h3>Fontes de receita do clube</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Receita anual consolidada, R$ 34,5M</div>
+          <div class="donut-wrap" style="width:150px; height:150px; margin:0 auto;">
+            <canvas id="chart-revenue-sources-donut"></canvas>
+            <div class="donut-center"><span class="big">R$34,5M</span><span class="small">no ano</span></div>
+          </div>
+          <div id="revenue-sources-legend" style="margin-top:14px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Detalhamento por fonte</h3></div>
+          <table>
+            <thead><tr><th>Fonte</th><th>Receita anual</th><th>% do total</th></tr></thead>
+            <tbody id="revenue-sources-table"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="two-col" style="margin-bottom:16px;">
         <div class="card">
           <div class="card-title"><h3>Receita recorrente mensal</h3></div>
@@ -1023,6 +1043,20 @@ canvas{ max-width:100%; }
 
     <!-- ================= CRM ================= -->
     <section class="view" id="view-crm">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Base de torcedores por nível</h3></div>
+        <div class="hero-note" style="margin:-6px 0 14px;">30 mil torcedores reconhecidos na Ontologia do Clube — 1 mil são sócios-torcedores pagantes, divididos em 4 níveis. Clique num nível para filtrar a lista abaixo.</div>
+        <div class="grid g-4" id="crm-tiers"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Torcedores por nível <span class="hero-note" id="crm-tier-filter-label" style="font-weight:400;"></span></h3></div>
+        <table>
+          <thead><tr><th>Torcedor</th><th>Nível</th><th>Cidade</th><th>LTV</th></tr></thead>
+          <tbody id="crm-tier-table"></tbody>
+        </table>
+      </div>
+
       <div style="display:grid; grid-template-columns: 280px 1fr; gap:16px; align-items:start;">
         <div class="card" style="padding:12px;">
           <div class="card-title" style="padding:0 6px;"><h3>Torcedores</h3></div>
@@ -1444,7 +1478,7 @@ function buildCockpit(){
     </div>`).join('');
 
   document.getElementById('cockpit-secondary').innerHTML = `
-    <div class="kpi"><div class="label">Novos sócios no mês</div><div class="value" style="font-size:20px;">3.240</div><div class="delta up">↑ 12%</div></div>
+    <div class="kpi"><div class="label">Novos sócios no mês</div><div class="value" style="font-size:20px;">42</div><div class="delta up">↑ 12%</div></div>
     <div class="kpi"><div class="label">Ticket médio geral</div><div class="value" style="font-size:20px;">R$ 96</div><div class="delta up">↑ 5%</div></div>
     <div class="kpi"><div class="label">Taxa de renovação</div><div class="value" style="font-size:20px;">91,4%</div><div class="delta up">↑ 1,2pp</div></div>
     <div class="kpi"><div class="label">ROI médio de patrocínio</div><div class="value" style="font-size:20px;">420%</div><div class="delta up">↑ 28,4%</div></div>
@@ -1557,10 +1591,12 @@ const CLUBBRAIN_CONTEXT = `
 Você está simulando um agente de IA da plataforma Virtual Fans (da empresa Clubbrain.ai), operando sobre a "Ontologia do Clube" — um grafo de conhecimento fictício de um clube de futebol chamado Estrela FC, usado numa demo comercial. Responda sempre em português do Brasil, em tom direto e executivo (poucas frases, sem enrolação), como se estivesse de fato consultando esse grafo. Baseie-se SEMPRE nos dados fictícios abaixo; se a pergunta pedir algo que não está neles, responda de forma plausível e deixe claro que é uma estimativa ou que consultaria mais dados da Ontologia.
 
 DADOS DO ESTRELA FC (todos fictícios):
-- Torcedores ativos: 1,24 milhão | Sócios-torcedores pagantes: 6.250 | Receita consolidada do período: R$ 3,06M
-- Composição da receita: Patrocínio 43%, Bilheteria 32%, Sócio-torcedor 15%, E-commerce 10%
+- Torcedores ativos: 1,24 milhão | Torcedores reconhecidos na Ontologia: 30 mil | Sócios-torcedores pagantes: 1.000 | Receita consolidada do período: R$ 3,06M
+- Níveis de sócio-torcedor (dos 30 mil reconhecidos): Básico 29.000 (identificado, sem assinatura), Bronze 550, Prata 300, Ouro 120, Platina 30 — receita média por sócio pagante R$450/mês
+- Composição da receita do período: Patrocínio 43%, Bilheteria 32%, Sócio-torcedor 15%, E-commerce 10%
+- Fontes de receita do clube no ano (R$34,5M): Direitos de transmissão/TV 28%, Patrocínio 24%, Bilheteria 16%, Sócio-torcedor 10%, E-commerce & licenciados 8%, Direitos de imagem 6%, Redes sociais & conteúdo digital 5%, Museu (físico+virtual) 2%, Outros 1%
 - Churn agregado: 6,8% da base reconhecida (~84 mil torcedores) com sinais de risco
-- Torcedores exemplo no CRM: Rafael Souza (SP, sócio Top 1%, baixo risco de churn, LTV R$1.200), Diego Farias (Salvador, ALTO risco de churn, sem compra há 70 dias, cancelou notificações), Larissa Melo (Porto Alegre, torcedora vitalícia há 10 anos, LTV R$5.180), Camila Alves (Rio de Janeiro, torcedora fiel, compra camarote), Bruno Lima (Recife, sócio novo, ainda não foi ao estádio)
+- Torcedores exemplo no CRM: Rafael Souza (SP, nível Platina, baixo risco de churn, LTV R$1.200), Diego Farias (Salvador, nível Prata, ALTO risco de churn, sem compra há 70 dias, cancelou notificações), Larissa Melo (Porto Alegre, nível Platina, torcedora vitalícia há 10 anos, LTV R$5.180), Camila Alves (Rio de Janeiro, nível Ouro, torcedora fiel, compra camarote), Bruno Lima (Recife, nível Bronze, sócio novo, ainda não foi ao estádio)
 - Patrocinadores ativos: TurboEnergy (ROI 650%, contrapartidas 92% cumpridas), Banco Atlas (ROI 410%), TechNova (ROI 380%)
 - Próximo jogo: Estádio Municipal, 92% dos ingressos vendidos, receita esperada R$980K
 - Sentimento da torcida nas redes: 88% positivo nas últimas 24h
@@ -2146,7 +2182,7 @@ function buildMonetization(){
     ['Torcedores alcançados','125.000','100%'],
     ['Visualizações de conteúdo','45.000','36%'],
     ['Assinaturas iniciadas','9.000','7,2%'],
-    ['Sócios pagantes','6.250','5,0%'],
+    ['Sócios pagantes','1.000','0,8%'],
   ];
   document.getElementById('funnel').innerHTML = funnel.map((f,i)=>`
     <div class="list-row">
@@ -2177,7 +2213,7 @@ function buildMonetization(){
     <td><span class="status-dot status-active">${s[5]}</span></td></tr>`).join('');
 
   // append trend column header + cells via DOM (keeps table def simple above)
-  const headRow = document.querySelector('#view-monetization table thead tr');
+  const headRow = document.getElementById('sponsor-table').closest('table').querySelector('thead tr');
   if(headRow && !headRow.dataset.trendAdded){
     headRow.insertAdjacentHTML('beforeend', '<th>Tendência</th>');
     headRow.dataset.trendAdded = '1';
@@ -2185,12 +2221,36 @@ function buildMonetization(){
   document.querySelectorAll('#sponsor-table tr').forEach((tr,i)=>{
     tr.insertAdjacentHTML('beforeend', `<td>${miniTrend(sponsors[i][6], green)}</td>`);
   });
+
+  // Fontes de receita específicas do clube
+  const revenueSources = [
+    { name:'Direitos de transmissão (TV/streaming)', color:brand, value:9660000 },
+    { name:'Patrocínio', color:gold, value:8280000 },
+    { name:'Bilheteria', color:amber, value:5520000 },
+    { name:'Sócio-torcedor', color:teal, value:3450000 },
+    { name:'E-commerce & licenciados', color:brand2, value:2760000 },
+    { name:'Direitos de imagem', color:red, value:2070000 },
+    { name:'Redes sociais & conteúdo digital', color:'#22e07a', value:1730000 },
+    { name:'Museu (físico + virtual)', color:'#7f88a8', value:690000 },
+    { name:'Outros', color:'#4b5378', value:350000 },
+  ];
+  const revTotal = revenueSources.reduce((s,r)=>s+r.value,0);
+  new Chart(document.getElementById('chart-revenue-sources-donut'), {
+    type:'doughnut',
+    data:{ labels: revenueSources.map(r=>r.name), datasets:[{ data: revenueSources.map(r=>r.value), backgroundColor: revenueSources.map(r=>r.color), borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'74%', plugins:{legend:{display:false}} }
+  });
+  legendList(document.getElementById('revenue-sources-legend'), revenueSources.map(r=>({
+    label:r.name, pct: Math.round(r.value/revTotal*100), color:r.color
+  })));
+  document.getElementById('revenue-sources-table').innerHTML = revenueSources.map(r=>`
+    <tr><td class="strong">${r.name}</td><td>R$ ${(r.value/1000000).toFixed(2).replace('.',',')}M</td><td>${Math.round(r.value/revTotal*100)}%</td></tr>`).join('');
 }
 
 /* ============ CRM ============ */
 const FANS_DB = [
   {
-    id:'rafael', name:'Rafael Souza', initials:'RS', color1:'#6c6bff', color2:'#b06bff',
+    id:'rafael', name:'Rafael Souza', initials:'RS', color1:'#6c6bff', color2:'#b06bff', nivel:'platina',
     idade:'25–34', sexo:'Masculino', cidade:'São Paulo, SP', regiao:'Sudeste',
     timeCoracao:'Estrela FC', tambemTorce:'Seleção Brasileira',
     socioDesde:'fev/2021', segmentoTitulo:'Top 1% de torcedores', segmentoCor:gold,
@@ -2207,7 +2267,7 @@ const FANS_DB = [
     ],
   },
   {
-    id:'camila', name:'Camila Alves', initials:'CA', color1:'#1fd6b8', color2:'#6c6bff',
+    id:'camila', name:'Camila Alves', initials:'CA', color1:'#1fd6b8', color2:'#6c6bff', nivel:'ouro',
     idade:'35–44', sexo:'Feminino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
     timeCoracao:'Estrela FC', tambemTorce:'—',
     socioDesde:'ago/2019', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
@@ -2223,7 +2283,7 @@ const FANS_DB = [
     ],
   },
   {
-    id:'bruno', name:'Bruno Lima', initials:'BL', color1:'#ffb454', color2:'#ff8a3d',
+    id:'bruno', name:'Bruno Lima', initials:'BL', color1:'#ffb454', color2:'#ff8a3d', nivel:'bronze',
     idade:'18–24', sexo:'Masculino', cidade:'Recife, PE', regiao:'Nordeste',
     timeCoracao:'Estrela FC', tambemTorce:'Náutico',
     socioDesde:'jan/2026', segmentoTitulo:'Novo sócio', segmentoCor:brand,
@@ -2238,7 +2298,7 @@ const FANS_DB = [
     ],
   },
   {
-    id:'larissa', name:'Larissa Melo', initials:'LM', color1:'#b06bff', color2:'#6c6bff',
+    id:'larissa', name:'Larissa Melo', initials:'LM', color1:'#b06bff', color2:'#6c6bff', nivel:'platina',
     idade:'45–54', sexo:'Feminino', cidade:'Porto Alegre, RS', regiao:'Sul',
     timeCoracao:'Estrela FC', tambemTorce:'—',
     socioDesde:'mar/2016', segmentoTitulo:'Torcedora vitalícia', segmentoCor:gold,
@@ -2254,7 +2314,7 @@ const FANS_DB = [
     ],
   },
   {
-    id:'diego', name:'Diego Farias', initials:'DF', color1:'#ff5c72', color2:'#ff8a3d',
+    id:'diego', name:'Diego Farias', initials:'DF', color1:'#ff5c72', color2:'#ff8a3d', nivel:'prata',
     idade:'25–34', sexo:'Masculino', cidade:'Salvador, BA', regiao:'Nordeste',
     timeCoracao:'Estrela FC', tambemTorce:'Bahia',
     socioDesde:'jun/2022', segmentoTitulo:'Risco de churn', segmentoCor:red,
@@ -2273,7 +2333,87 @@ const FANS_DB = [
 
 let currentFanId = 'rafael';
 
+/* ============ NÍVEIS DE SÓCIO-TORCEDOR ============ */
+const TIER_DB = [
+  { key:'basico', name:'Básico', color:'#7f88a8', count:29000, desc:'Identificado na Ontologia, sem assinatura paga' },
+  { key:'bronze', name:'Bronze', color:'#c98a4b', count:550, desc:'Sócio-torcedor · plano de entrada' },
+  { key:'prata', name:'Prata', color:'#b7c0d8', count:300, desc:'Sócio-torcedor · benefícios intermediários' },
+  { key:'ouro', name:'Ouro', color:'#f2c94c', count:120, desc:'Sócio-torcedor · benefícios avançados' },
+  { key:'platina', name:'Platina', color:'#b06bff', count:30, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+];
+const TIER_SAMPLE_EXTRA = [
+  { name:'Marcos Vieira', cidade:'Belo Horizonte, MG', nivel:'basico', ltv:'R$ 0' },
+  { name:'Juliana Prado', cidade:'Curitiba, PR', nivel:'basico', ltv:'R$ 45' },
+  { name:'Eduardo Nascimento', cidade:'Manaus, AM', nivel:'basico', ltv:'R$ 0' },
+  { name:'Patrícia Gomes', cidade:'Fortaleza, CE', nivel:'bronze', ltv:'R$ 210' },
+  { name:'Thiago Rocha', cidade:'Brasília, DF', nivel:'bronze', ltv:'R$ 165' },
+  { name:'Vanessa Lopes', cidade:'Curitiba, PR', nivel:'prata', ltv:'R$ 780' },
+  { name:'André Castro', cidade:'Belém, PA', nivel:'prata', ltv:'R$ 690' },
+  { name:'Renata Costa', cidade:'Florianópolis, SC', nivel:'ouro', ltv:'R$ 1.950' },
+  { name:'Felipe Andrade', cidade:'Goiânia, GO', nivel:'ouro', ltv:'R$ 2.100' },
+  { name:'Marcelo Duarte', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 6.400' },
+];
+let crmTierFilter = null;
+
+function renderCrmTiers(){
+  document.getElementById('crm-tiers').innerHTML = TIER_DB.map(t=>{
+    const active = crmTierFilter===t.key;
+    return `<div class="card kpi clickable" style="border-color:${active?t.color:'var(--border)'}; background:${active?t.color+'14':'var(--surface)'};" onclick="filterCrmTier('${t.key}')">
+      <div class="label"><span class="icon-badge" style="background:${t.color}26; color:${t.color};">●</span>${t.name}</div>
+      <div class="value" style="font-size:20px;">${t.count.toLocaleString('pt-BR')}</div>
+      <div class="hero-note">${t.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterCrmTier(key){
+  crmTierFilter = (crmTierFilter === key) ? null : key;
+  renderCrmTiers();
+  renderCrmTierTable();
+}
+
+function renderCrmTierTable(){
+  const tierMeta = k => TIER_DB.find(t=>t.key===k);
+  let rows = FANS_DB.map(f=>({ id:f.id, name:f.name, cidade:f.cidade, nivel:f.nivel, ltv:f.ltv, full:true }))
+    .concat(TIER_SAMPLE_EXTRA.map(e=>({ id:null, name:e.name, cidade:e.cidade, nivel:e.nivel, ltv:e.ltv, full:false })));
+  if(crmTierFilter) rows = rows.filter(r=>r.nivel===crmTierFilter);
+
+  document.getElementById('crm-tier-filter-label').textContent = crmTierFilter ? `— filtrado por ${tierMeta(crmTierFilter).name}` : '— amostra de todos os níveis';
+
+  document.getElementById('crm-tier-table').innerHTML = rows.map(r=>{
+    const t = tierMeta(r.nivel);
+    const action = r.full
+      ? `openFanFromTier('${r.id}')`
+      : `showTierSampleModal('${r.name.replace(/'/g,"\\'")}','${r.cidade}','${t.name}','${t.color}','${r.ltv}')`;
+    return `<tr class="clickable" onclick="${action}">
+      <td class="strong">${r.name}</td>
+      <td><span class="tag" style="background:${t.color}1f; border-color:${t.color}44; color:${t.color};">${t.name}</span></td>
+      <td>${r.cidade}</td>
+      <td>${r.ltv}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openFanFromTier(id){
+  selectFan(id);
+  document.getElementById('fan-name')?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function showTierSampleModal(name, cidade, nivelName, color, ltv){
+  showModal(
+    `<h3 style="color:${color};">${name}</h3>`,
+    `<div class="hero-note" style="margin:8px 0 16px;">Nível ${nivelName} · ${cidade}</div>
+     <div class="grid g-2">
+       <div><div class="hero-note">LTV</div><div class="value" style="font-size:17px; font-weight:700;">${ltv}</div></div>
+       <div><div class="hero-note">Nível</div><div class="value" style="font-size:17px; font-weight:700; color:${color};">${nivelName}</div></div>
+     </div>
+     <div class="hero-note" style="margin-top:14px;">Amostra da base completa de 30 mil torcedores da Ontologia. Um perfil 360º completo — como os exemplos detalhados na lista de Torcedores abaixo — pode ser aberto para qualquer um sob demanda.</div>`
+  );
+}
+
 function buildCrm(){
+  renderCrmTiers();
+  renderCrmTierTable();
   renderFanList();
   renderFanProfile(currentFanId);
 }
