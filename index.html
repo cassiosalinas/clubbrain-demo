@@ -1066,7 +1066,10 @@ canvas{ max-width:100%; }
       </div>
 
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Torcedores por nível <span class="hero-note" id="crm-tier-filter-label" style="font-weight:400;"></span></h3></div>
+        <div class="card-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <h3>Torcedores por nível <span class="hero-note" id="crm-tier-filter-label" style="font-weight:400;"></span></h3>
+          <span id="crm-top10-btn" class="tag clickable" style="font-weight:600;" onclick="toggleCrmTopTen()">🏆 Top 10 por LTV</span>
+        </div>
         <table>
           <thead><tr><th>Torcedor</th><th>Nível</th><th>Cidade</th><th>LTV</th></tr></thead>
           <tbody id="crm-tier-table"></tbody>
@@ -1641,6 +1644,7 @@ DADOS DO ESTRELA FC (todos fictícios):
 - Fontes de receita do clube no ano (R$34,5M): Direitos de transmissão/TV 28%, Patrocínio 24%, Bilheteria 16%, Sócio-torcedor 10%, E-commerce & licenciados 8%, Direitos de imagem 6%, Redes sociais & conteúdo digital 5%, Museu (físico+virtual) 2%, Outros 1%
 - Churn agregado: 6,8% da base reconhecida (~84 mil torcedores) com sinais de risco
 - Torcedores exemplo no CRM: Rafael Souza (SP, nível Platina, baixo risco de churn, LTV R$1.200), Diego Farias (Salvador, nível Prata, ALTO risco de churn, sem compra há 70 dias, cancelou notificações), Larissa Melo (Porto Alegre, nível Platina, torcedora vitalícia há 10 anos, LTV R$5.180), Camila Alves (Rio de Janeiro, nível Ouro, torcedora fiel, compra camarote), Bruno Lima (Recife, nível Bronze, sócio novo, ainda não foi ao estádio)
+- Top 10 torcedores por LTV (calculado sobre a amostra representativa do CRM — se perguntarem "top 10", "quem gasta mais" ou similar, use ESTA lista exata, na ordem): 1. Isabela Ramos (RJ, Platina, R$8.200) 2. Rodrigo Teixeira (Curitiba, Platina, R$7.650) 3. Marcelo Duarte (SP, Platina, R$6.400) 4. Beatriz Nunes (SP, Platina, R$5.900) 5. Larissa Melo (Porto Alegre, Platina, R$5.180) 6. Gustavo Pereira (BH, Platina, R$4.750) 7. Rafaela Nogueira (Campinas, Ouro, R$3.200) 8. Henrique Salles (Natal, Ouro, R$2.850) 9. Camila Alves (Rio de Janeiro, Ouro, R$2.640) 10. Felipe Andrade (Goiânia, Ouro, R$2.100)
 - Patrocinadores ativos: TurboEnergy (ROI 650%, contrapartidas 92% cumpridas), Banco Atlas (ROI 410%), TechNova (ROI 380%)
 - Próximo jogo: Estádio Municipal, 92% dos ingressos vendidos, receita esperada R$980K
 - Sentimento da torcida nas redes: 88% positivo nas últimas 24h
@@ -2389,15 +2393,26 @@ const TIER_SAMPLE_EXTRA = [
   { name:'Marcos Vieira', cidade:'Belo Horizonte, MG', nivel:'basico', ltv:'R$ 0' },
   { name:'Juliana Prado', cidade:'Curitiba, PR', nivel:'basico', ltv:'R$ 45' },
   { name:'Eduardo Nascimento', cidade:'Manaus, AM', nivel:'basico', ltv:'R$ 0' },
+  { name:'Sofia Barbosa', cidade:'Salvador, BA', nivel:'basico', ltv:'R$ 90' },
   { name:'Patrícia Gomes', cidade:'Fortaleza, CE', nivel:'bronze', ltv:'R$ 210' },
   { name:'Thiago Rocha', cidade:'Brasília, DF', nivel:'bronze', ltv:'R$ 165' },
+  { name:'Caio Monteiro', cidade:'Recife, PE', nivel:'bronze', ltv:'R$ 320' },
   { name:'Vanessa Lopes', cidade:'Curitiba, PR', nivel:'prata', ltv:'R$ 780' },
   { name:'André Castro', cidade:'Belém, PA', nivel:'prata', ltv:'R$ 690' },
+  { name:'Bianca Ferreira', cidade:'Vitória, ES', nivel:'prata', ltv:'R$ 950' },
   { name:'Renata Costa', cidade:'Florianópolis, SC', nivel:'ouro', ltv:'R$ 1.950' },
   { name:'Felipe Andrade', cidade:'Goiânia, GO', nivel:'ouro', ltv:'R$ 2.100' },
+  { name:'Rafaela Nogueira', cidade:'Campinas, SP', nivel:'ouro', ltv:'R$ 3.200' },
+  { name:'Henrique Salles', cidade:'Natal, RN', nivel:'ouro', ltv:'R$ 2.850' },
   { name:'Marcelo Duarte', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 6.400' },
+  { name:'Isabela Ramos', cidade:'Rio de Janeiro, RJ', nivel:'platina', ltv:'R$ 8.200' },
+  { name:'Rodrigo Teixeira', cidade:'Curitiba, PR', nivel:'platina', ltv:'R$ 7.650' },
+  { name:'Beatriz Nunes', cidade:'São Paulo, SP', nivel:'platina', ltv:'R$ 5.900' },
+  { name:'Gustavo Pereira', cidade:'Belo Horizonte, MG', nivel:'platina', ltv:'R$ 4.750' },
 ];
 let crmTierFilter = null;
+let crmTopTenMode = false;
+function parseLtv(str){ return parseInt(String(str).replace(/\D/g,''), 10) || 0; }
 
 function renderCrmTiers(){
   document.getElementById('crm-tiers').innerHTML = TIER_DB.map(t=>{
@@ -2412,6 +2427,14 @@ function renderCrmTiers(){
 
 function filterCrmTier(key){
   crmTierFilter = (crmTierFilter === key) ? null : key;
+  crmTopTenMode = false;
+  renderCrmTiers();
+  renderCrmTierTable();
+}
+
+function toggleCrmTopTen(){
+  crmTopTenMode = !crmTopTenMode;
+  if(crmTopTenMode) crmTierFilter = null;
   renderCrmTiers();
   renderCrmTierTable();
 }
@@ -2420,9 +2443,17 @@ function renderCrmTierTable(){
   const tierMeta = k => TIER_DB.find(t=>t.key===k);
   let rows = FANS_DB.map(f=>({ id:f.id, name:f.name, cidade:f.cidade, nivel:f.nivel, ltv:f.ltv, full:true }))
     .concat(TIER_SAMPLE_EXTRA.map(e=>({ id:null, name:e.name, cidade:e.cidade, nivel:e.nivel, ltv:e.ltv, full:false })));
-  if(crmTierFilter) rows = rows.filter(r=>r.nivel===crmTierFilter);
 
-  document.getElementById('crm-tier-filter-label').textContent = crmTierFilter ? `— filtrado por ${tierMeta(crmTierFilter).name}` : '— amostra de todos os níveis';
+  const btn = document.getElementById('crm-top10-btn');
+  if(btn){ btn.style.background = crmTopTenMode ? gold+'22' : 'var(--surface-2)'; btn.style.borderColor = crmTopTenMode ? gold+'55' : 'var(--border)'; btn.style.color = crmTopTenMode ? gold : 'var(--text-dim)'; }
+
+  if(crmTopTenMode){
+    rows = rows.slice().sort((a,b)=>parseLtv(b.ltv)-parseLtv(a.ltv)).slice(0,10);
+    document.getElementById('crm-tier-filter-label').textContent = '— Top 10 por LTV, calculado sobre a amostra completa';
+  } else {
+    if(crmTierFilter) rows = rows.filter(r=>r.nivel===crmTierFilter);
+    document.getElementById('crm-tier-filter-label').textContent = crmTierFilter ? `— filtrado por ${tierMeta(crmTierFilter).name}` : '— amostra de todos os níveis';
+  }
 
   document.getElementById('crm-tier-table').innerHTML = rows.map(r=>{
     const t = tierMeta(r.nivel);
