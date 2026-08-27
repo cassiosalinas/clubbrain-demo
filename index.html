@@ -304,6 +304,22 @@ canvas{ max-width:100%; }
 .clickable{ cursor:pointer; transition: background .12s; }
 .clickable:hover{ background: rgba(255,255,255,0.03); }
 
+#global-chat-panel{
+  position:fixed; top:0; right:-420px; width:400px; max-width:92vw; height:100vh;
+  background:var(--surface); border-left:1px solid var(--border);
+  z-index:200; transition:right .25s ease; display:flex; flex-direction:column;
+  box-shadow:-24px 0 50px -20px rgba(0,0,0,.6);
+}
+#global-chat-panel.open{ right:0; }
+.global-chat-header{ padding:16px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex:none; }
+.global-chat-body{ flex:1; overflow-y:auto; padding:16px 18px; }
+.global-chat-footer{ padding:14px 18px; border-top:1px solid var(--border); flex:none; }
+#global-chat-backdrop{
+  position:fixed; inset:0; background:rgba(4,6,12,.4); z-index:199;
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+#global-chat-backdrop.open{ opacity:1; pointer-events:auto; }
+
 /* ---------- Central Operacional ---------- */
 .subtabs{ display:flex; gap:6px; margin-bottom:16px; background:var(--surface-2); padding:4px; border-radius:10px; width:fit-content; }
 .subtab{ padding:8px 16px; border-radius:8px; font-size:12.5px; font-weight:600; color:var(--text-dim); cursor:pointer; }
@@ -476,6 +492,9 @@ canvas{ max-width:100%; }
       </div>
       <div class="topbar-actions">
         <div class="live-chip"><span class="live-dot"></span> Dados simulados · demo</div>
+        <div class="pill" id="global-chat-trigger" onclick="toggleGlobalChat()" style="background:linear-gradient(135deg, rgba(34,224,122,.16), rgba(31,214,184,.10)); border-color:rgba(34,224,122,.35); color:#4fe0c4; font-weight:600;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Falar com um agente
+        </div>
         <div class="pill" id="date-range-pill" onclick="toggleDateRange()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> <span id="date-range-text">12 mai – 12 jun, 2026</span></div>
         <div class="pill" style="position:relative; padding:9px 11px;" onclick="toggleNotifications(event)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -564,18 +583,15 @@ canvas{ max-width:100%; }
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(34,224,122,.08), var(--surface)); border-color:rgba(34,224,122,.25);">
-        <div class="card-title">
-          <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
-          <h3>Fale com um agente agora (IA real — Claude)</h3>
+      <div class="card clickable" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(34,224,122,.08), var(--surface)); border-color:rgba(34,224,122,.25); display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;" onclick="toggleGlobalChat(true)">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a; width:38px; height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+          <div>
+            <h3 style="margin-bottom:2px;">Fale com um agente agora (IA real — Claude)</h3>
+            <div class="hero-note">Chama de verdade a API da Anthropic via backend próprio no Netlify. Disponível em qualquer página pelo botão no topo.</div>
+          </div>
         </div>
-        <div class="hero-note" style="margin:-6px 0 14px;">Esta caixa chama de verdade a API da Anthropic (via backend próprio no Netlify), com o agente escolhido respondendo com base nos dados fictícios do Estrela FC.</div>
-        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;" id="agent-chat-selector"></div>
-        <div id="agent-chat-log" style="max-height:320px; overflow-y:auto; margin-bottom:12px;"></div>
-        <div style="display:flex; gap:8px;">
-          <input id="agent-chat-input" type="text" placeholder="Pergunte algo a este agente…" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 14px; color:var(--text); font-size:13px; font-family:inherit;" onkeydown="if(event.key==='Enter') sendAgentChat();">
-          <button class="btn-primary" id="agent-chat-send" onclick="sendAgentChat()">Perguntar</button>
-        </div>
+        <button class="btn-primary" onclick="event.stopPropagation(); toggleGlobalChat(true);">Abrir chat →</button>
       </div>
 
       <div class="card" style="margin-bottom:16px;">
@@ -1175,6 +1191,31 @@ canvas{ max-width:100%; }
 
   </main>
 </div>
+
+<div id="global-chat-backdrop" onclick="toggleGlobalChat(false)"></div>
+<aside id="global-chat-panel">
+  <div class="global-chat-header">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a; width:32px; height:32px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+      <div>
+        <div style="font-weight:700; font-size:14px;">Fale com um agente</div>
+        <div class="hero-note">IA real — Claude, via backend no Netlify</div>
+      </div>
+    </div>
+    <span onclick="toggleGlobalChat(false)" style="cursor:pointer; color:var(--text-faint); font-size:22px; line-height:1;">&times;</span>
+  </div>
+  <div class="global-chat-body">
+    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;" id="agent-chat-selector"></div>
+    <div id="agent-chat-log"></div>
+  </div>
+  <div class="global-chat-footer">
+    <div style="display:flex; gap:8px;">
+      <input id="agent-chat-input" type="text" placeholder="Pergunte algo a este agente…" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 14px; color:var(--text); font-size:13px; font-family:inherit;" onkeydown="if(event.key==='Enter') sendAgentChat();">
+      <button class="btn-primary" id="agent-chat-send" onclick="sendAgentChat()">Perguntar</button>
+    </div>
+  </div>
+</aside>
+
 <div id="toast-host"></div>
 <script>
 /* ============ NAV & VIEW SWITCH ============ */
@@ -1221,6 +1262,16 @@ function toggleDateRange(){
   dateRangeToggled = !dateRangeToggled;
   document.getElementById('date-range-text').textContent = dateRangeToggled ? '12 abr – 12 mai, 2026' : '12 mai – 12 jun, 2026';
   showToast(dateRangeToggled ? 'Mostrando período: mês anterior' : 'Mostrando período: mês atual');
+}
+function toggleGlobalChat(force){
+  const panel = document.getElementById('global-chat-panel');
+  const backdrop = document.getElementById('global-chat-backdrop');
+  const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  backdrop.classList.toggle('open', open);
+  if(open){
+    setTimeout(()=>document.getElementById('agent-chat-input')?.focus(), 260);
+  }
 }
 function toggleNotifications(e){
   e.stopPropagation();
@@ -2575,6 +2626,8 @@ function buildOps(){
 /* init first view */
 buildCockpit();
 initialized.cockpit = true;
+buildAgents();
+initialized.agents = true;
 </script>
 
 
