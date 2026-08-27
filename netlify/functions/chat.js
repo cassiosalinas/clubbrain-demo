@@ -1,0 +1,76 @@
+// netlify/functions/chat.js
+//
+// Backend mínimo que protege a chave da API da Anthropic.
+// O front-end (index.html) chama /.netlify/functions/chat em vez de
+// chamar api.anthropic.com diretamente — assim a chave nunca aparece
+// no navegador do usuário.
+//
+// Configuração necessária no painel do Netlify:
+//   Site settings → Environment variables → adicionar ANTHROPIC_API_KEY
+//   (pegue a chave em https://console.anthropic.com/settings/keys)
+
+exports.handler = async function (event) {
+  // Só aceita POST
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Método não permitido. Use POST.' }),
+    };
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: 'ANTHROPIC_API_KEY não configurada no Netlify (Site settings → Environment variables).',
+      }),
+    };
+  }
+
+  // Parse do corpo enviado pelo front-end
+  let payload;
+  try {
+    payload = JSON.parse(event.body || '{}');
+  } catch (e) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'JSON inválido no corpo da requisição.' }) };
+  }
+
+  const { system, messages } = payload;
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Campo "messages" é obrigatório e não pode ser vazio.' }) };
+  }
+
+  try {
+    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        // Modelo atual recomendado para este tipo de chat. Troque para
+        // 'claude-haiku-4-5-20251001' se quiser respostas mais rápidas/baratas,
+        // ou confira o modelo mais recente em https://docs.claude.com/en/docs/about-claude/models/overview
+        model: 'claude-sonnet-5',
+        max_tokens: 500,
+        system: system || undefined,
+        messages,
+      }),
+    });
+
+    const data = await anthropicResponse.json();
+
+    return {
+      statusCode: anthropicResponse.status,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    };
+  } catch (err) {
+    return {
+      statusCode: 502,
+      body: JSON.stringify({ error: 'Falha ao chamar a API da Anthropic: ' + err.message }),
+    };
+  }
+};
