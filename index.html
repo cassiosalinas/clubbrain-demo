@@ -940,15 +940,6 @@ canvas{ max-width:100%; }
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">
-          <span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
-          <h3>Ontologia do torcedor — como o dado se conecta</h3>
-        </div>
-        <div class="hero-note" style="margin:-6px 0 16px;">Cada interação do torcedor é capturada e ligada a este grafo central. É essa camada que permite aos agentes de IA decidir quem premiar, o que recomendar e onde investir o próximo real de marketing.</div>
-        <div id="ontology-graph"></div>
-      </div>
-
       <div class="grid g-4">
         <div class="card kpi"><div class="label">Novos torcedores</div><div class="value" style="font-size:22px;" id="kpi-overview-novos">82K</div><div class="delta up" id="kpi-overview-novos-delta">↑ 12%</div></div>
         <div class="card kpi"><div class="label">Interações totais</div><div class="value" style="font-size:22px;" id="kpi-overview-interacoes">9,4M</div><div class="delta up" id="kpi-overview-interacoes-delta">↑ 18%</div></div>
@@ -2990,38 +2981,6 @@ function buildOverview(){
   legendList(document.getElementById('gender-legend-ov'), [
     {label:'Masculino', pct:61, color:brand},{label:'Feminino', pct:36, color:brand2},{label:'Outro', pct:3, color:teal},
   ]);
-
-  buildOntologyGraph();
-}
-
-function buildOntologyGraph(){
-  const nodes = ['Jogador','Patrocinador','Produto','Evento','Ingresso','Campanha','Estádio','Conteúdo'];
-  const cx=300, cy=170, r=125;
-  let lines='', labels='';
-  nodes.forEach((n,i)=>{
-    const angle = (i/nodes.length)*Math.PI*2 - Math.PI/2;
-    const x = cx + r*Math.cos(angle), y = cy + r*Math.sin(angle);
-    lines += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2a3155" stroke-width="1.5"/>`;
-    labels += `
-      <circle cx="${x}" cy="${y}" r="30" fill="#1a2035" stroke="#2a3155" stroke-width="1.5"/>
-      <text x="${x}" y="${y+4}" text-anchor="middle" font-size="9.5" fill="#c7cbe0" font-family="Inter">${n}</text>`;
-  });
-  const svg = `
-  <svg viewBox="0 0 600 340" style="width:100%; height:auto;">
-    ${lines}
-    ${labels}
-    <circle cx="${cx}" cy="${cy}" r="48" fill="url(#gradCenter)" />
-    <circle cx="${cx}" cy="${cy}" r="48" fill="none" stroke="#8f8dff" stroke-width="1.5" />
-    <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#fff" font-family="Sora">TORCEDOR</text>
-    <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="#e4e2ff" font-family="Inter">nó central</text>
-    <defs>
-      <radialGradient id="gradCenter">
-        <stop offset="0%" stop-color="#6c6bff"/>
-        <stop offset="100%" stop-color="#4a3fc7"/>
-      </radialGradient>
-    </defs>
-  </svg>`;
-  document.getElementById('ontology-graph').innerHTML = svg;
 }
 
 /* ============ AUDIENCE ============ */
