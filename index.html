@@ -449,6 +449,10 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
         Central operacional
       </div>
+      <div class="nav-item" data-view="cdp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
+        CDP
+      </div>
       <div class="nav-item" data-view="marketing">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         Automação de marketing
@@ -1117,6 +1121,71 @@ canvas{ max-width:100%; }
       </div>
     </section>
 
+    <!-- ================= CDP (Camada 2 — Fan Data Platform) ================= -->
+    <section class="view" id="view-cdp">
+      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(31,214,184,.08), var(--surface)); border-color:rgba(31,214,184,.25);">
+        <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+          A <b style="color:var(--text);">CDP (Fan Data Platform)</b> é a Camada 2 da arquitetura: unifica todo evento do torcedor — de qualquer canal — num perfil único, antes de virar a <b style="color:var(--text);">Ontologia do Clube</b>. É a ponte entre "todo clique vira dado" e o perfil 360º que já vimos no CRM.
+        </div>
+      </div>
+
+      <div class="grid g-4" style="margin-bottom:16px;">
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>Eventos capturados hoje</div>
+          <div class="value">1,75M</div>
+          <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cdp-events"></canvas></div>
+          <div class="delta up">↑ 11%</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Perfis únicos resolvidos</div>
+          <div class="value">1,24M</div>
+          <div class="hero-note">de todas as fontes conectadas</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>Taxa de resolução de identidade</div>
+          <div class="value">99,0%</div>
+          <div class="delta up">↑ 0,3pp</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge" style="background:rgba(255,180,84,.16); color:#ffb454;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>Latência média de ingestão</div>
+          <div class="value">340ms</div>
+          <div class="hero-note">evento → perfil atualizado</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Fontes de dados conectadas</h3></div>
+        <table>
+          <thead><tr><th>Fonte</th><th>Canal</th><th>Eventos/dia</th><th>Status</th></tr></thead>
+          <tbody id="cdp-sources"></tbody>
+        </table>
+      </div>
+
+      <div class="two-col" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-title"><h3>Resolução de identidade</h3></div>
+          <div class="donut-wrap" style="width:150px; height:150px; margin:0 auto;">
+            <canvas id="chart-cdp-resolution-donut"></canvas>
+            <div class="donut-center"><span class="big">99,0%</span><span class="small">resolvido</span></div>
+          </div>
+          <div id="cdp-resolution-legend" style="margin-top:14px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Volume de eventos — últimas 24h</h3></div>
+          <canvas id="chart-cdp-volume" height="130"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>
+          <h3>Eventos chegando agora</h3>
+        </div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Torcedores identificados são resolvidos ao perfil na hora; eventos ainda sem match ficam anônimos até o próximo sinal (login, compra, etc.)</div>
+        <div id="cdp-live-feed"></div>
+      </div>
+    </section>
+
     <!-- ================= MARKETING ================= -->
     <section class="view" id="view-marketing">
       <div class="card" style="margin-bottom:16px;">
@@ -1226,6 +1295,7 @@ const titles = {
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
+  cdp: ["CDP — Fan Data Platform", "Camada 2 — cada evento do torcedor, de qualquer canal, unificado num perfil único antes de virar Ontologia"],
   overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
   audience: ["Audiência", "Quem são os torcedores do Estrela FC"],
   engagement: ["Engajamento", "Atividade da comunidade e dos membros mais ativos"],
@@ -1347,6 +1417,7 @@ function initChartsFor(key){
   if(key==='cockpit') buildCockpit();
   if(key==='agents') buildAgents();
   if(key==='opscenter') buildOpsCenter();
+  if(key==='cdp') buildCdp();
   if(key==='overview') buildOverview();
   if(key==='audience') buildAudience();
   if(key==='engagement') buildEngagement();
@@ -1650,6 +1721,7 @@ DADOS DO ESTRELA FC (todos fictícios):
 - Sentimento da torcida nas redes: 88% positivo nas últimas 24h
 - Próximos jogos e eventos sob gestão do clube: 18/jun Futebol masculino x Rival FC (Brasileirão, 92% vendido); 21/jun Futebol feminino x Atlética SC (58% vendido); 27/jun Show — Turnê Banda Ravena (74% vendido); 3/jul Futebol masculino x Náutico — Copa Regional (41% vendido, ainda com boa janela para precificação dinâmica); 10/jul Evento — Feira de Sócios & Ativação de Patrocinadores (confirmado); 15/jul Futebol feminino x Porto Vitória (33% vendido)
 - Museu do Clube: 8.400 visitas/mês no museu físico (↑6%) vs. 41.200 visitas/mês no tour virtual dentro do app (↑34%); tempo médio no tour virtual 6m40s; conversão museu → loja oficial 14%
+- CDP (Fan Data Platform, Camada 2): 1,75M eventos capturados/dia de 7 fontes conectadas (app do torcedor, redes sociais, e-commerce, ingressos/catraca, ponto de venda físico, museu virtual, CRM legado — este último ainda em sincronização); 1,24M perfis únicos resolvidos; taxa de resolução de identidade 99,0% (90,4% match determinístico, 8,6% probabilístico, 1,0% ainda não resolvido); latência média evento→perfil de 340ms
 - Gasto operacional do clube no período (total R$2,66M): Elenco/time R$1,8M (68%), Espaços — estádio/CT/sedes R$420K (16%), Manutenção R$260K (10%), Outros R$180K (6%)
 
 Seu papel específico agora é: {AGENT_NAME} — {AGENT_DESC}
@@ -2552,6 +2624,63 @@ function renderFanProfile(id){
     <div class="card" style="background:var(--surface-2); margin-bottom:10px;">
       <div style="font-weight:700; font-size:14px; margin-bottom:4px; color:${s[2]};">${s[0]}</div>
       <div class="hero-note">${s[1]}</div>
+    </div>`).join('');
+}
+
+/* ============ CDP (Camada 2 — Fan Data Platform) ============ */
+function buildCdp(){
+  sparkline('spark-cdp-events', [1.28,1.35,1.31,1.42,1.51,1.58,1.63,1.69,1.6,1.71,1.68,1.75], teal);
+
+  const sources = [
+    ['App do torcedor (Virtual Fans)', 'Mobile/App', '1.240.000', 'ok'],
+    ['Redes sociais (social listening)', 'Social', '340.000', 'ok'],
+    ['E-commerce / loja oficial', 'Web', '84.000', 'ok'],
+    ['Ingressos & catraca (estádio)', 'Ticketing', '62.000', 'ok'],
+    ['Ponto de venda físico (estádio, loja)', 'POS', '18.000', 'ok'],
+    ['Museu virtual (tour no app)', 'Mobile/App', '1.400', 'ok'],
+    ['CRM legado (pré-migração)', 'Batch/CSV', '4.200', 'warn'],
+  ];
+  document.getElementById('cdp-sources').innerHTML = sources.map(s=>`
+    <tr><td class="strong">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td>
+    <td><span class="status-dot ${s[3]==='ok' ? 'status-active' : 'status-warn'}">${s[3]==='ok' ? 'Conectado' : 'Sincronizando'}</span></td></tr>`).join('');
+
+  const resolution = [
+    { name:'Match determinístico (login, CPF, e-mail)', color:teal, pct:90.4 },
+    { name:'Match probabilístico (device, comportamento)', color:brand, pct:8.6 },
+    { name:'Não resolvido (aguarda próximo sinal)', color:'#4b5378', pct:1.0 },
+  ];
+  new Chart(document.getElementById('chart-cdp-resolution-donut'), {
+    type:'doughnut',
+    data:{ labels: resolution.map(r=>r.name), datasets:[{ data: resolution.map(r=>r.pct), backgroundColor: resolution.map(r=>r.color), borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'74%', plugins:{legend:{display:false}} }
+  });
+  legendList(document.getElementById('cdp-resolution-legend'), resolution.map(r=>({ label:r.name, pct:r.pct, color:r.color })));
+
+  new Chart(document.getElementById('chart-cdp-volume'), {
+    type:'bar',
+    data:{ labels:['0h','4h','8h','12h','16h','20h'],
+      datasets:[{ data:[42000,38000,95000,210000,340000,410000], backgroundColor: teal, borderRadius:6, maxBarThickness:38 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>(v/1000)+'K'}} } }
+  });
+
+  const liveEvents = [
+    ['Rafael Souza', 'App do torcedor', 'ticket_purchase', teal, 'agora'],
+    ['(anônimo)', 'Redes sociais', 'post_engagement', '#4b5378', '3s atrás'],
+    ['Camila Alves', 'E-commerce', 'cart_checkout', brand2, '6s atrás'],
+    ['(anônimo)', 'Museu virtual', 'tour_started', '#4b5378', '9s atrás'],
+    ['Diego Farias', 'App do torcedor', 'push_opened', red, '14s atrás'],
+    ['(anônimo)', 'Ponto de venda', 'pos_purchase', '#4b5378', '19s atrás'],
+    ['Bruno Lima', 'Ingressos & catraca', 'gate_checkin', amber, '24s atrás'],
+    ['(anônimo)', 'CRM legado', 'batch_import', '#4b5378', '31s atrás'],
+  ];
+  document.getElementById('cdp-live-feed').innerHTML = liveEvents.map(e=>`
+    <div class="status-row">
+      <span class="status-dotlive ok" style="background:${e[3]};"></span>
+      <div style="flex:1;">
+        <div style="font-size:12.5px;"><b>${e[0]}</b> <span class="tag" style="margin-left:6px; font-size:10px; padding:2px 8px;">${e[1]}</span></div>
+        <div class="mono" style="font-size:11.5px; color:var(--text-dim); margin-top:2px;">evento: ${e[2]}</div>
+      </div>
+      <span class="hero-note" style="white-space:nowrap;">${e[4]}</span>
     </div>`).join('');
 }
 
