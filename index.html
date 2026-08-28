@@ -459,7 +459,7 @@ canvas{ max-width:100%; }
   <aside class="sidebar">
     <div class="platform-mark">
       <span class="platform-mark-logo" id="platform-mark-logo"></span>
-      <span>ClubBrain.ai</span>
+      <span>Powered by ClubBrain.ai</span>
     </div>
     <div class="club-select" id="club-select-toggle" onclick="toggleClubDropdown(event)">
       <div class="club-badge" id="sidebar-club-badge">
@@ -736,7 +736,9 @@ canvas{ max-width:100%; }
     <section class="view" id="view-clubmgmt">
       <div class="subtabs" id="clubmgmt-subtabs">
         <div class="subtab active" data-sub="elenco">Elenco profissional</div>
-        <div class="subtab" data-sub="performance">Performance &amp; Saúde</div>
+        <div class="subtab" data-sub="performance">Performance</div>
+        <div class="subtab" data-sub="medico">Departamento Médico</div>
+        <div class="subtab" data-sub="scouting">Scouting</div>
         <div class="subtab" data-sub="base">Categorias de base</div>
         <div class="subtab" data-sub="ativos">Ativos do clube</div>
         <div class="subtab" data-sub="comissao">Equipe técnica &amp; médica</div>
@@ -781,27 +783,9 @@ canvas{ max-width:100%; }
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-title"><h3>Risco de lesão por jogador</h3></div>
-          <div class="hero-note" style="margin:-6px 0 14px;">Carga de treino acumulada e risco estimado pelo MedicalBrain — elenco masculino profissional.</div>
-          <table>
-            <thead><tr><th>Jogador</th><th>Posição</th><th>Carga de treino</th><th>Risco de lesão</th><th>Recomendação</th></tr></thead>
-            <tbody id="injury-risk-table"></tbody>
-          </table>
-        </div>
-
         <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(34,224,122,.06), var(--surface));">
           <div class="card-title"><h3>Insights da IA</h3></div>
           <div id="performance-ai-insights"></div>
-        </div>
-
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-title"><h3>Scouting — alvos recomendados</h3></div>
-          <div class="hero-note" style="margin:-6px 0 14px;">ScoutBrain cruza perfil técnico, idade e orçamento disponível para sugerir reforços — nomes e valores fictícios.</div>
-          <table>
-            <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Clube atual</th><th>Valor estimado</th><th>Compatibilidade</th></tr></thead>
-            <tbody id="scouting-table"></tbody>
-          </table>
         </div>
 
         <div class="card" style="background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface));">
@@ -822,6 +806,50 @@ canvas{ max-width:100%; }
           </div>
           <button class="btn-primary" onclick="runScenarioSimulation()">Simular →</button>
           <div id="scenario-result" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+      <!-- Sub: Departamento Medico -->
+      <div class="subview" id="clubmgmt-sub-medico">
+        <div class="grid g-4" style="margin-bottom:16px;">
+          <div class="card kpi"><div class="label">Elenco apto para jogo</div><div class="value" id="medical-apto-pct" style="font-size:22px;">—</div></div>
+          <div class="card kpi"><div class="label">Dias perdidos por lesão (ano)</div><div class="value" id="medical-dias-perdidos" style="font-size:22px;">—</div></div>
+          <div class="card kpi"><div class="label">Custo médico estimado</div><div class="value" id="medical-custo" style="font-size:22px;">—</div></div>
+          <div class="card kpi"><div class="label">Responsáveis</div><div class="value" id="medical-responsavel" style="font-size:14.5px;">—</div><div class="hero-note" id="medical-fisio">—</div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Status médico do elenco</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">MedicalBrain — carga de treino, histórico de lesões na temporada e recuperação estimada.</div>
+          <table>
+            <thead><tr><th>Jogador</th><th>Posição</th><th>Status</th><th>Carga de treino</th><th>Lesões (temporada)</th><th>Recuperação estimada</th><th>Recomendação</th></tr></thead>
+            <tbody id="medical-status-table"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Dias perdidos por lesão — últimos 6 meses</h3></div>
+          <canvas id="chart-injury-trend" height="120"></canvas>
+        </div>
+      </div>
+
+      <!-- Sub: Scouting -->
+      <div class="subview" id="clubmgmt-sub-scouting">
+        <div class="grid g-3" style="margin-bottom:16px;">
+          <div class="card kpi"><div class="label">Orçamento de scouting disponível</div><div class="value" id="scouting-budget" style="font-size:22px;">—</div></div>
+          <div class="card kpi"><div class="label">Alvos monitorados</div><div class="value" id="scouting-count" style="font-size:22px;">—</div></div>
+          <div class="card kpi"><div class="label">Posição prioritária</div><div class="value" id="scouting-priority-pos" style="font-size:18px;">—</div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Por que essas posições?</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">ScoutBrain cruza idade média e score de performance por posição no elenco atual para identificar prioridades de reforço.</div>
+          <div id="scouting-position-analysis"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Alvos recomendados</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Nomes, clubes e valores fictícios, para fins de demonstração.</div>
+          <table>
+            <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Clube atual</th><th>Liga</th><th>Valor estimado</th><th>Compatibilidade</th><th>Status</th></tr></thead>
+            <tbody id="scouting-table"></tbody>
+          </table>
         </div>
       </div>
 
@@ -2616,26 +2644,97 @@ const SQUAD_VALUE_TREND_BY_CLUB = {
 };
 const SCOUTING_TARGETS_BY_CLUB = {
   flamengo:[
-    { name:'Bento Azevedo', pos:'Lateral Esquerdo', age:21, clube:'Athletico-PR', valor:'€ 7,5M', compat:92 },
-    { name:'Kaká Ferreira', pos:'Volante', age:23, clube:'Bahia', valor:'€ 9,0M', compat:87 },
-    { name:'Iago Marreiros', pos:'Zagueiro', age:24, clube:'Bragantino', valor:'€ 6,2M', compat:81 },
+    { name:'Bento Azevedo', pos:'Lateral Esquerdo', age:21, clube:'Athletico-PR', liga:'Brasileirão Série A', valor:'€ 7,5M', compat:92, status:'Proposta enviada' },
+    { name:'Kaká Ferreira', pos:'Volante', age:23, clube:'Bahia', liga:'Brasileirão Série A', valor:'€ 9,0M', compat:87, status:'Negociação iniciada' },
+    { name:'Iago Marreiros', pos:'Zagueiro', age:24, clube:'Bragantino', liga:'Brasileirão Série A', valor:'€ 6,2M', compat:81, status:'Em observação' },
+    { name:'Rui Andrade', pos:'Volante', age:22, clube:'Estoril', liga:'Primeira Liga (POR)', valor:'€ 5,5M', compat:76, status:'Em observação' },
   ],
   corinthians:[
-    { name:'Denner Lucas', pos:'Atacante', age:22, clube:'Cuiabá', valor:'€ 8,0M', compat:90 },
-    { name:'Vitor Hugo Reis', pos:'Meia', age:20, clube:'Criciúma', valor:'€ 5,4M', compat:85 },
-    { name:'Samir Peixoto', pos:'Lateral Direito', age:23, clube:'Vitória', valor:'€ 4,8M', compat:79 },
+    { name:'Denner Lucas', pos:'Atacante', age:22, clube:'Cuiabá', liga:'Brasileirão Série A', valor:'€ 8,0M', compat:90, status:'Negociação iniciada' },
+    { name:'Vitor Hugo Reis', pos:'Meia', age:20, clube:'Criciúma', liga:'Brasileirão Série A', valor:'€ 5,4M', compat:85, status:'Proposta enviada' },
+    { name:'Samir Peixoto', pos:'Lateral Direito', age:23, clube:'Vitória', liga:'Brasileirão Série A', valor:'€ 4,8M', compat:79, status:'Em observação' },
+    { name:'Théo Barreto', pos:'Atacante', age:21, clube:'Farense', liga:'Primeira Liga (POR)', valor:'€ 6,0M', compat:74, status:'Em observação' },
   ],
 };
 function getInjuryRiskData(){
   const rnd = mulberry32(hashSeed(currentClubId + ':injury'));
   return SQUAD_BY_CLUB[currentClubId].masc.map(p=>{
     const carga = Math.round(70 + rnd()*45);
-    let risco, cor, recomendacao;
-    if(carga >= 110){ risco='Alto'; cor=red; recomendacao='Poupar do próximo treino de carga'; }
-    else if(carga >= 90){ risco='Médio'; cor=amber; recomendacao='Monitorar e ajustar volume de treino'; }
-    else { risco='Baixo'; cor='#22e07a'; recomendacao='Rotina normal'; }
-    return { name:p.name, pos:p.pos, carga, risco, cor, recomendacao };
+    const lesoesAnteriores = Math.floor(rnd()*4);
+    const diasPerdidosAno = Math.floor(rnd()*40);
+    let risco, cor, recomendacao, status, diasRecuperacao;
+    if(carga >= 110){ risco='Alto'; cor=red; recomendacao='Poupar do próximo treino de carga'; status='Em transição'; diasRecuperacao = 3 + Math.floor(rnd()*7); }
+    else if(carga >= 90){ risco='Médio'; cor=amber; recomendacao='Monitorar e ajustar volume de treino'; status='Apto (monitorado)'; diasRecuperacao = 0; }
+    else { risco='Baixo'; cor='#22e07a'; recomendacao='Rotina normal'; status='Apto'; diasRecuperacao = 0; }
+    return { name:p.name, pos:p.pos, carga, risco, cor, recomendacao, status, lesoesAnteriores, diasPerdidosAno, diasRecuperacao };
   });
+}
+function renderMedicalTab(){
+  if(!document.getElementById('medical-status-table')) return;
+  const data = getInjuryRiskData();
+  const aptoCount = data.filter(p=>p.status.startsWith('Apto')).length;
+  const aptoPct = Math.round(aptoCount/data.length*100);
+  const diasPerdidosTotal = data.reduce((s,p)=>s+p.diasPerdidosAno,0);
+  const custoMedico = diasPerdidosTotal * 12000;
+  const staff = STAFF_BY_CLUB[currentClubId];
+  const medico = staff.find(s=>s.role==='Médico Chefe')?.name;
+  const fisio = staff.find(s=>s.role==='Fisioterapeuta Chefe')?.name;
+
+  document.getElementById('medical-apto-pct').textContent = `${aptoPct}% (${aptoCount}/${data.length})`;
+  document.getElementById('medical-dias-perdidos').textContent = `${diasPerdidosTotal} dias`;
+  document.getElementById('medical-custo').textContent = `R$ ${(custoMedico/1000).toFixed(0)}K`;
+  document.getElementById('medical-responsavel').textContent = medico;
+  document.getElementById('medical-fisio').textContent = `Fisioterapeuta: ${fisio}`;
+
+  document.getElementById('medical-status-table').innerHTML = data.map(p=>`
+    <tr><td class="strong">${p.name}</td><td>${p.pos}</td>
+    <td><span class="tag" style="background:${p.cor}1f; border-color:${p.cor}44; color:${p.cor};">${p.status}</span></td>
+    <td>${p.carga}%</td><td>${p.lesoesAnteriores}</td>
+    <td>${p.diasRecuperacao > 0 ? p.diasRecuperacao + ' dias' : '—'}</td>
+    <td>${p.recomendacao}</td></tr>`).join('');
+
+  const rnd = mulberry32(hashSeed(currentClubId + ':injurytrend'));
+  const trend = Array.from({length:6}).map(()=>Math.round(rnd()*60));
+  if(window.__injuryTrendChart) window.__injuryTrendChart.destroy();
+  window.__injuryTrendChart = new Chart(document.getElementById('chart-injury-trend'), {
+    type:'bar',
+    data:{ labels:['-5m','-4m','-3m','-2m','-1m','Hoje'], datasets:[{ data:trend, backgroundColor: red, borderRadius:6, maxBarThickness:38 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>v+'d'}} } }
+  });
+}
+function renderScoutingTab(){
+  if(!document.getElementById('scouting-table')) return;
+  const scouting = SCOUTING_TARGETS_BY_CLUB[currentClubId] || SCOUTING_TARGETS_BY_CLUB.flamengo;
+  const rnd = mulberry32(hashSeed(currentClubId + ':scoutbudget'));
+  const budget = 20 + Math.floor(rnd()*40);
+  document.getElementById('scouting-budget').textContent = `€ ${budget}M`;
+  document.getElementById('scouting-count').textContent = scouting.length;
+
+  const posGroups = {};
+  SQUAD_BY_CLUB[currentClubId].masc.forEach(p=>{
+    const grupo = { 'Goleiro':'Defesa','Zagueiro':'Defesa','Lateral Direito':'Defesa','Lateral Esquerdo':'Defesa','Volante':'Meio-campo','Meia':'Meio-campo','Atacante':'Ataque' }[p.pos] || 'Outro';
+    if(!posGroups[grupo]) posGroups[grupo] = [];
+    posGroups[grupo].push(p);
+  });
+  const groupStats = Object.entries(posGroups).map(([grupo, players])=>({
+    grupo, idadeMedia: Math.round(players.reduce((s,p)=>s+p.age,0)/players.length),
+    scoreMedio: Math.round(players.reduce((s,p)=>s+p.score,0)/players.length), count: players.length,
+  }));
+  const prioritario = groupStats.slice().sort((a,b)=> (a.scoreMedio - a.idadeMedia) - (b.scoreMedio - b.idadeMedia))[0];
+  document.getElementById('scouting-priority-pos').textContent = prioritario.grupo;
+
+  document.getElementById('scouting-position-analysis').innerHTML = groupStats.map(g=>`
+    <div class="list-row">
+      <span class="dot-legend" style="background:${g.grupo===prioritario.grupo?red:teal}"></span>
+      <span style="flex:1; font-size:12.5px;">${g.grupo} <span class="hero-note">(${g.count} atletas)</span></span>
+      <span class="hero-note" style="width:110px; text-align:right;">idade média ${g.idadeMedia}</span>
+      <span class="mono" style="width:90px; text-align:right; font-size:11.5px; color:var(--text-dim);">score ${g.scoreMedio}</span>
+    </div>`).join('');
+
+  document.getElementById('scouting-table').innerHTML = scouting.map(s=>`
+    <tr><td class="strong">${s.name}</td><td>${s.pos}</td><td>${s.age}</td><td>${s.clube}</td><td>${s.liga}</td><td>${s.valor}</td>
+    <td><div class="progress" style="width:70px; display:inline-block; vertical-align:middle;"><div style="width:${s.compat}%; background:${teal};"></div></div> <span class="mono" style="font-size:11px;">${s.compat}%</span></td>
+    <td><span class="tag" style="font-size:10.5px;">${s.status}</span></td></tr>`).join('');
 }
 function renderPerformanceTab(){
   if(!document.getElementById('chart-tactical-radar')) return;
@@ -2661,11 +2760,6 @@ function renderPerformanceTab(){
   });
 
   const injuryData = getInjuryRiskData();
-  document.getElementById('injury-risk-table').innerHTML = injuryData.map(p=>`
-    <tr><td class="strong">${p.name}</td><td>${p.pos}</td><td>${p.carga}%</td>
-    <td><span class="tag" style="background:${p.cor}1f; border-color:${p.cor}44; color:${p.cor};">${p.risco}</span></td>
-    <td>${p.recomendacao}</td></tr>`).join('');
-
   const altoRisco = injuryData.filter(p=>p.risco==='Alto').sort((a,b)=>b.carga-a.carga)[0];
   const scoutTop = (SCOUTING_TARGETS_BY_CLUB[currentClubId]||SCOUTING_TARGETS_BY_CLUB.flamengo)[0];
   const staffFin = STAFF_BY_CLUB[currentClubId].find(s=>s.role==='Técnico')?.name;
@@ -2680,11 +2774,6 @@ function renderPerformanceTab(){
       <span class="chip-avatar" style="background:${i.color}; width:26px; height:26px; font-size:11px;">${i.badge}</span>
       <div style="flex:1; font-size:12.5px;"><b style="color:${i.color};">${i.name}:</b> ${i.text}</div>
     </div>`).join('');
-
-  const scouting = SCOUTING_TARGETS_BY_CLUB[currentClubId] || SCOUTING_TARGETS_BY_CLUB.flamengo;
-  document.getElementById('scouting-table').innerHTML = scouting.map(s=>`
-    <tr><td class="strong">${s.name}</td><td>${s.pos}</td><td>${s.age}</td><td>${s.clube}</td><td>${s.valor}</td>
-    <td><div class="progress" style="width:80px; display:inline-block; vertical-align:middle;"><div style="width:${s.compat}%; background:${teal};"></div></div> <span class="mono" style="font-size:11px;">${s.compat}%</span></td></tr>`).join('');
 
   updateScenarioOptions();
 }
@@ -2913,7 +3002,7 @@ function renderMarca(){
 function refreshClubManagementForClub(){
   if(!document.getElementById('elenco-table')) return;
   renderTeamStats(); renderElencoTable(); renderBaseGrid(); renderAtivosGrid(); renderComissaoGrid(); renderViagensTable(); renderPatrocinioTable(); renderMarca();
-  renderPerformanceTab();
+  renderPerformanceTab(); renderMedicalTab(); renderScoutingTab();
 }
 function buildClubManagement(){
   document.getElementById('clubmgmt-subtabs').addEventListener('click', (e)=>{
