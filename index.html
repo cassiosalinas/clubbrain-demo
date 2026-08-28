@@ -580,6 +580,10 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Saúde do sistema
       </div>
+      <div class="nav-item" data-view="integrations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg>
+        Integration Hub
+      </div>
 
       <div class="nav-group-label">Inteligência</div>
       <div class="nav-item" data-view="ontology">
@@ -1128,18 +1132,6 @@ canvas{ max-width:100%; }
         </div>
       </div>
       <div class="card">
-        <div class="card-title"><h3>Mapa de calor de interações</h3></div>
-        <div class="heatmap" id="heatmap-grid"></div>
-        <div class="heat-legend">
-          <span>Baixa atividade</span>
-          <span class="sq" style="background:#152238;"></span><span class="sq" style="background:#1c3a3a;"></span>
-          <span class="sq" style="background:#1fd6b8;"></span><span class="sq" style="background:#ffb454;"></span>
-          <span class="sq" style="background:#ff8a3d;"></span>
-          <span>Alta atividade</span>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
         <div class="card-title"><h3>Torcidas organizadas <span class="hero-note" style="font-weight:400;">— comunidades reconhecidas pelo clube</span></h3></div>
         <div class="grid g-2" id="fan-groups"></div>
       </div>
@@ -1869,6 +1861,49 @@ canvas{ max-width:100%; }
       </div>
     </section>
 
+    <!-- ================= INTEGRATION HUB ================= -->
+    <section class="view" id="view-integrations">
+      <div class="grid g-4" style="margin-bottom:16px;">
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg></span>Integrações ativas</div>
+          <div class="value">11</div><div class="hero-note">de 13 conectadas ao todo</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Taxa de sucesso (24h)</div>
+          <div class="value">99,6%</div><div class="delta up">↑ 0,2pp vs ontem</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Volume processado (mês)</div>
+          <div class="value">R$ 4,2M</div><div class="hero-note">via pagamentos + commerce</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>Precisam de atenção</div>
+          <div class="value">2</div><div class="hero-note">token expirando · latência alta</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Pagamentos &amp; financeiro</h3></div>
+        <div class="grid g-3" id="integrations-pagamentos"></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Comércio, ingressos &amp; CRM</h3></div>
+        <div class="grid g-3" id="integrations-commerce"></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Marketing, redes &amp; analytics</h3></div>
+        <div class="grid g-3" id="integrations-marketing"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><h3>Log de sincronizações</h3></div>
+        <table>
+          <thead><tr><th>Horário</th><th>Integração</th><th>Evento</th><th>Registros</th><th>Status</th></tr></thead>
+          <tbody id="integrations-log"></tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -1943,6 +1978,7 @@ const titles = {
   commerce: ["Gestão de commerce", "Integração com a loja oficial (Camada 1) — catálogo, preços e vendas em tempo real, alimentando a Ontologia do Clube"],
   marketing: ["Automação de marketing", "Jornadas e campanhas ativas por canal, e o construtor de segmentação (Audiences) de torcedores"],
   ops: ["Saúde do sistema", "Monitoramento de infraestrutura e APIs em tempo real"],
+  integrations: ["Integration Hub", "Métodos de pagamento, APIs e soluções de terceiros conectadas ao ClubBrain — status, volume e sincronização em tempo real"],
 };
 /* ============ TOAST & MODAL (interatividade global) ============ */
 function showToast(text, color){
@@ -2226,6 +2262,7 @@ function initChartsFor(key){
   if(key==='commerce') buildCommerce();
   if(key==='marketing') buildMarketing();
   if(key==='ops') buildOps();
+  if(key==='integrations') buildIntegrations();
 }
 
 /* ============ OPS CENTER (Atendimento + Alertas + Mapa de sistemas) ============ */
@@ -3508,8 +3545,6 @@ function buildEngagement(){
       <span class="mono" style="font-size:12.5px; color:${gold};">${c.pts} pts</span>
     </div>`).join('');
 
-  buildHeatmap();
-
   const fanGroups = [
     { name:'Arquibancada Sul', membros:42000, regiao:'Sudeste', fundacao:1998, atividade:'Alta', color:teal },
     { name:'Torcida Jovem EFC', membros:33100, regiao:'Nacional', fundacao:2015, atividade:'Muito alta', color:gold },
@@ -3526,31 +3561,6 @@ function buildEngagement(){
       </div>
       <span class="tag" style="color:${g.color}; border-color:${g.color}44;">${g.atividade}</span>
     </div>`).join('');
-}
-
-function buildHeatmap(){
-  const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-  const hours = ['0h','2h','4h','6h','8h','10h','12h','14h','16h','18h','20h','22h'];
-  const colorFor = (v)=>{
-    if(v<20) return '#152238';
-    if(v<40) return '#1c3a3a';
-    if(v<60) return '#1fd6b8';
-    if(v<80) return '#ffb454';
-    return '#ff8a3d';
-  };
-  let html = `<div></div>` + hours.map(h=>`<div class="col-label">${h}</div>`).join('');
-  days.forEach((d,ri)=>{
-    html += `<div class="row-label">${d}</div>`;
-    hours.forEach((h,ci)=>{
-      // simulate activity: weekends & evenings higher
-      const weekendBoost = (ri>=4)?25:0;
-      const eveningBoost = (ci>=7 && ci<=10)?30:0;
-      const base = 20 + Math.round(Math.sin(ri+ci)*10) + weekendBoost + eveningBoost;
-      const v = Math.max(5, Math.min(95, base));
-      html += `<div class="cell" style="background:${colorFor(v)}" title="${d} ${h}: ${v}%"></div>`;
-    });
-  });
-  document.getElementById('heatmap-grid').innerHTML = html;
 }
 
 /* ============ SENTIMENT ============ */
@@ -4049,24 +4059,68 @@ function commerceProductIconSvg(type, color){
 }
 const PRODUCTS_BY_CLUB = {
   flamengo:[
-    { name:'Manto I 2026 (titular) Adidas', cat:'Camisas', icon:'camisa', color:brand, price:449.99, vendido:118 },
-    { name:'Manto I Authentic Adidas', cat:'Camisas', icon:'camisa', color:brand, price:799.99, vendido:34 },
-    { name:'Camisa Pré-Jogo Adidas 2026', cat:'Camisas', icon:'camisa', color:brand, price:299.99, vendido:92 },
-    { name:'Camisa Treino Comissão Adidas', cat:'Vestuário', icon:'moletom', color:brand2, price:249.99, vendido:51 },
-    { name:'Boné oficial Adidas', cat:'Acessórios', icon:'bone', color:teal, price:89.90, vendido:210 },
-    { name:'Moletom oficial Adidas', cat:'Vestuário', icon:'moletom', color:brand2, price:259.90, vendido:45 },
-    { name:'Caneca oficial', cat:'Colecionáveis', icon:'caneca', color:amber, price:49.90, vendido:175 },
-    { name:'Miniatura do Maracanã', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:129.90, vendido:40 },
+    { name:'Manto Flamengo Jogo 1 Adidas 2026', desc:'Camisa titular 2026, tecido leve com tecnologia AEROREADY.', cat:'Camisas', color:brand, price:449.99, vendido:142, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191302-485-485' },
+    { name:'Manto Flamengo Jogo 3 Adidas 2026', desc:'Terceiro uniforme 2026, edição alternativa da temporada.', cat:'Camisas', color:brand, price:449.99, vendido:96, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191421-485-485' },
+    { name:'Manto Flamengo Authentic Jogo 1 Adidas 2026', desc:'Versão jogador, corte slim e tecido de alta performance.', cat:'Camisas', color:brand, price:799.99, vendido:31, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/167531-485-485' },
+    { name:'Manto Flamengo Authentic Jogo 3 Adidas 2026', desc:'Versão jogador do terceiro uniforme, tecido premium.', cat:'Camisas', color:brand, price:799.99, vendido:22, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191391-485-485' },
+    { name:'Manto Flamengo Fan Jogo 1 Adidas 2025', desc:'Versão torcedor, corte confortável para o dia a dia.', cat:'Camisas', color:brand, price:299.99, vendido:88, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/184560-485-485' },
+    { name:'Manto Flamengo Fanshirt Jogo 1 Adidas 2026', desc:'Modelo fanshirt, tecido macio e caimento solto.', cat:'Camisas', color:brand, price:279.99, vendido:75, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/189794-485-485' },
+    { name:'Manto Flamengo Goleiro 3 Adidas 2025', desc:'Camisa oficial da linha goleiro, cores exclusivas.', cat:'Camisas', color:brand, price:329.99, vendido:18, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/186108-485-485' },
+    { name:'Manto Flamengo Jogo 1 Branco Adidas 2026', desc:'Edição especial branca do manto titular.', cat:'Camisas', color:brand, price:449.99, vendido:54, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/188253-485-485' },
+    { name:'Manto Flamengo Infantil Jogo 3 Adidas 2026', desc:'Camisa infantil do terceiro uniforme 2026.', cat:'Infantil', color:gold, price:299.99, vendido:61, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191476-485-485' },
+    { name:'Manto Flamengo Feminina Jogo 1 Adidas 2026', desc:'Corte feminino do manto titular 2026.', cat:'Vestuário', color:brand2, price:449.99, vendido:47, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191326-485-485' },
+    { name:'Manto Flamengo Feminina Jogo 3 Adidas 2026', desc:'Corte feminino do terceiro uniforme.', cat:'Vestuário', color:brand2, price:449.99, vendido:39, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191451-485-485' },
+    { name:'Cropped Flamengo Feminina Jogo 3 Adidas 2026', desc:'Modelo cropped inspirado no terceiro uniforme.', cat:'Vestuário', color:brand2, price:329.99, vendido:42, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/191598-485-485' },
+    { name:'Camiseta Gávea Brasão Off White', desc:'Linha lifestyle Gávea com o brasão bordado.', cat:'Vestuário', color:brand2, price:179.99, vendido:66, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/190119-485-485' },
+    { name:'Camiseta Gávea Brasão Preto', desc:'Linha lifestyle Gávea, versão preta.', cat:'Vestuário', color:brand2, price:179.99, vendido:58, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/190135-485-485' },
+    { name:'Camiseta Gávea Lettering Outdoor Branco', desc:'Estampa lettering da coleção outdoor Gávea.', cat:'Vestuário', color:brand2, price:169.99, vendido:44, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/190151-485-485' },
+    { name:'Camiseta Gávea Lettering Outdoor Preto', desc:'Estampa lettering, versão preta.', cat:'Vestuário', color:brand2, price:169.99, vendido:51, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/190167-485-485' },
+    { name:'Boné Flamengo Treino Adidas 2026', desc:'Boné oficial da linha de treino Adidas.', cat:'Acessórios', color:teal, price:129.99, vendido:130, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/167690-485-485' },
+    { name:'Boné Flamengo Snapback Adidas 2026', desc:'Modelo snapback ajustável, aba reta.', cat:'Acessórios', color:teal, price:99.99, vendido:118, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/167698-485-485' },
+    { name:'Boné Flamengo Aba Curva CRF Zico Preto', desc:'Aba curva com bordado em homenagem ao Zico.', cat:'Acessórios', color:teal, price:89.90, vendido:95, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/177206-485-485' },
+    { name:'Boné Flamengo Aba Curva Zico 6 Gomos Preto', desc:'Modelo 6 gomos, linha Zico.', cat:'Acessórios', color:teal, price:94.90, vendido:72, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/179592-485-485' },
+    { name:'Boné Flamengo CRF Preto Starter', desc:'Boné casual com escudo bordado, parceria Starter.', cat:'Acessórios', color:teal, price:79.90, vendido:143, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/189191-485-485' },
+    { name:'Boné Flamengo Silk 3D Zico Vermelho', desc:'Estampa silk 3D em homenagem ao Zico.', cat:'Acessórios', color:teal, price:94.90, vendido:68, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/177210-485-485' },
+    { name:'Boné Flamengo Aba Curva Remo Laser Preto', desc:'Detalhe a laser em homenagem ao Clube de Regatas.', cat:'Acessórios', color:teal, price:89.90, vendido:55, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/179599-485-485' },
+    { name:'Boné Flamengo Runner Preto e Vermelho', desc:'Modelo runner esportivo, parceria Starter.', cat:'Acessórios', color:teal, price:79.90, vendido:84, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/189165-485-485' },
+    { name:'Chapéu Flamengo Bucket Dupla Face', desc:'Bucket hat reversível cinza/preto.', cat:'Acessórios', color:teal, price:99.90, vendido:33, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/179646-485-485' },
+    { name:'Boné Flamengo Black Label Patch Frontal', desc:'Linha Black Label com patch bordado frontal.', cat:'Acessórios', color:teal, price:89.90, vendido:47, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/189150-485-485' },
+    { name:'Boné Flamengo CRF Bordado Gold Starter', desc:'Bordado dourado sobre base preta, parceria Starter.', cat:'Acessórios', color:teal, price:84.90, vendido:39, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/169705-485-485' },
+    { name:'Mini Bag Jogo 3 Adidas 2025', desc:'Pochete/mini bag no padrão do terceiro uniforme.', cat:'Acessórios', color:teal, price:149.90, vendido:26, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/166480-485-485' },
+    { name:'Copo Térmico Flamengo Manto 3 Arell 500ml', desc:'Copo térmico 500ml estampado com o terceiro manto.', cat:'Colecionáveis', color:amber, price:79.90, vendido:91, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/181263-485-485' },
+    { name:'Chaveiro Flamengo Escudo Emborrachado', desc:'Chaveiro emborrachado com o escudo do clube.', cat:'Colecionáveis', color:amber, price:24.90, vendido:210, img:'https://lojaflamengo.vtexassets.com/arquivos/ids/180070-485-485' },
   ],
   corinthians:[
-    { name:'Camisa I 2026/27 Torcedor Pro Nike', cat:'Camisas', icon:'camisa', color:brand, price:349.99, vendido:105 },
-    { name:'Camisa Goleiro Nike 2026/27', cat:'Camisas', icon:'camisa', color:brand, price:399.99, vendido:28 },
-    { name:'Camisa II Infantil Nike 2026/27', cat:'Infantil', icon:'camisa', color:gold, price:349.99, vendido:63 },
-    { name:'Camisa III (retrô) Nike 2026', cat:'Camisas', icon:'camisa', color:brand, price:379.99, vendido:58 },
-    { name:'Boné oficial Nike', cat:'Acessórios', icon:'bone', color:teal, price:79.90, vendido:180 },
-    { name:'Moletom oficial Nike', cat:'Vestuário', icon:'moletom', color:brand2, price:249.90, vendido:38 },
-    { name:'Caneca oficial', cat:'Colecionáveis', icon:'caneca', color:amber, price:44.90, vendido:150 },
-    { name:'Miniatura da Neo Química Arena', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:119.90, vendido:35 },
+    { name:'Camisa Corinthians I 26/27 s/n Torcedor Nike', desc:'Camisa titular 26/27, versão torcedor sem numeração.', cat:'Camisas', color:brand, price:349.99, vendido:128, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-sn-torcedor-nike-masculina/28/SGL-0539-028/SGL-0539-028_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 s/n Torcedor Nike', desc:'Segundo uniforme 26/27, versão torcedor.', cat:'Camisas', color:brand, price:349.99, vendido:110, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-sn-torcedor-nike-masculina/26/SGL-053A-026/SGL-053A-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 s/n Jogador Nike', desc:'Versão jogador, tecido premium Dri-FIT ADV.', cat:'Camisas', color:brand, price:599.99, vendido:34, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-sn-jogador-nike-masculina/28/SGL-058U-028/SGL-058U-028_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 s/n Jogador Nike', desc:'Versão jogador do segundo uniforme.', cat:'Camisas', color:brand, price:599.99, vendido:29, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-sn-jogador-nike-masculina/26/SGL-058V-026/SGL-058V-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 s/n Fã Nike', desc:'Versão fã, tecido leve e preço mais acessível.', cat:'Camisas', color:brand, price:249.99, vendido:96, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-sn-fa-nike-masculina/28/SGL-0537-028/SGL-0537-028_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 s/n Fã Nike', desc:'Versão fã do segundo uniforme.', cat:'Camisas', color:brand, price:249.99, vendido:88, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-sn-fa-nike-masculina/26/SGL-0538-026/SGL-0538-026_zoom1.jpg' },
+    { name:'Camisa Corinthians Goleiro 26/27 Torcedor Nike', desc:'Camisa oficial da linha goleiro.', cat:'Camisas', color:brand, price:329.99, vendido:19, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-goleiro-2627-sn-torcedor-nike-masculina/83/SGL-0534-483/SGL-0534-483_zoom1.jpg' },
+    { name:'Camisa Corinthians 26/27 Pré Jogo Nike', desc:'Camisa de aquecimento usada antes das partidas.', cat:'Camisas', color:brand, price:279.99, vendido:41, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-2627-pre-jogo-nike-masculina/28/SGL-0535-028/SGL-0535-028_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 Patch Campeão CB', desc:'Camisa titular com patch comemorativo de campeão.', cat:'Camisas', color:brand, price:379.99, vendido:25, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-patch-campeao-cb/28/SGL-05K6-028/SGL-05K6-028_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 Patch Campeão CB', desc:'Segundo uniforme com patch comemorativo.', cat:'Camisas', color:brand, price:379.99, vendido:22, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-nike-patch-campeao-cb/26/SGL-05K7-026/SGL-05K7-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 s/n Torcedor Feminina', desc:'Corte feminino do manto titular.', cat:'Vestuário', color:brand2, price:349.99, vendido:57, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-sn-torcedor-nike-feminina/28/SGL-0536-028/SGL-0536-028_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 s/n Torcedor Feminina', desc:'Corte feminino do segundo uniforme.', cat:'Vestuário', color:brand2, price:349.99, vendido:49, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-sn-torcedor-nike-feminina/26/SGL-053B-026/SGL-053B-026_zoom1.jpg' },
+    { name:'Camisa Infantil Corinthians I 26/27 Torcedor', desc:'Camisa titular no tamanho infantil.', cat:'Infantil', color:gold, price:249.99, vendido:63, img:'https://static.shoptimao.com.br/produtos/camisa-infantil-corinthians-i-2627-sn-torcedor-nike/28/SGL-053D-028/SGL-053D-028_zoom1.jpg' },
+    { name:'Camisa Infantil Corinthians II 26/27', desc:'Segundo uniforme no tamanho infantil.', cat:'Infantil', color:gold, price:249.99, vendido:58, img:'https://static.shoptimao.com.br/produtos/camisa-infantil-corinthians-ii-2627-sn-nike/26/SGL-053F-026/SGL-053F-026_zoom1.jpg' },
+    { name:'Camiseta Infantil Corinthians Crest Nike', desc:'Camiseta casual infantil com o escudo bordado.', cat:'Infantil', color:gold, price:139.99, vendido:71, img:'https://static.shoptimao.com.br/produtos/camiseta-infantil-corinthians-crest-nike/14/SGL-052V-014/SGL-052V-014_zoom1.jpg' },
+    { name:'Camiseta Corinthians Nike Masculina', desc:'Camiseta casual para o dia a dia.', cat:'Vestuário', color:brand2, price:199.99, vendido:82, img:'https://static.shoptimao.com.br/produtos/camiseta-corinthians-nike-masculina/14/SGL-053E-014/SGL-053E-014_zoom1.jpg' },
+    { name:'Camiseta Corinthians Crest Nike Masculina', desc:'Camiseta casual com escudo bordado.', cat:'Vestuário', color:brand2, price:179.99, vendido:75, img:'https://static.shoptimao.com.br/produtos/camiseta-corinthians-crest-nike-masculina/06/SGL-053G-006/SGL-053G-006_zoom1.jpg' },
+    { name:'Camiseta Corinthians Crest Nike Feminina', desc:'Versão feminina da camiseta casual com escudo.', cat:'Vestuário', color:brand2, price:179.99, vendido:68, img:'https://static.shoptimao.com.br/produtos/camiseta-corinthians-crest-nike-feminina/14/SGL-053H-014/SGL-053H-014_zoom1.jpg' },
+    { name:'Camiseta Corinthians Pride Nike', desc:'Edição especial Pride, celebrando a diversidade.', cat:'Vestuário', color:brand2, price:179.99, vendido:31, img:'https://static.shoptimao.com.br/produtos/camiseta-corinthians-pride-nike-masculina/06/SGL-052S-006/SGL-052S-006_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 Yuri Alberto N° 9', desc:'Camisa personalizada com o nome do artilheiro.', cat:'Camisas', color:brand, price:399.99, vendido:145, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-yuri-alberto-n-9-torcedor-nike-masculina/14/SGL-05RA-014/SGL-05RA-014_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 Garro N° 8', desc:'Camisa personalizada com o camisa 8 do meio-campo.', cat:'Camisas', color:brand, price:399.99, vendido:138, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-garro-n-8-torcedor-nike-masculina/26/SGL-05S4-026/SGL-05S4-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 Gustavo H. N° 13', desc:'Camisa personalizada, lateral Gustavo Henrique.', cat:'Camisas', color:brand, price:399.99, vendido:79, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-gustavo-h-n-13-torcedor-nike-masculina/14/SGL-05QI-014/SGL-05QI-014_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 Bidon N° 7', desc:'Camisa personalizada, volante da base Breno Bidon.', cat:'Camisas', color:brand, price:399.99, vendido:66, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-bidon-n-7-torcedor-nike-masculina/26/SGL-05S3-026/SGL-05S3-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 Carrillo N° 19', desc:'Camisa personalizada, atacante peruano Carrillo.', cat:'Camisas', color:brand, price:399.99, vendido:44, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-carrillo-d-n-19-torcedor-nike-masculina/14/SGL-05QL-014/SGL-05QL-014_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 Matheuzinho N° 2', desc:'Camisa personalizada, lateral Matheuzinho.', cat:'Camisas', color:brand, price:399.99, vendido:52, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-matheuzinho-n-2-torcedor-nike-masculina/26/SGL-05RN-026/SGL-05RN-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 João Pedro N° 4', desc:'Camisa personalizada, zagueiro João Pedro.', cat:'Camisas', color:brand, price:399.99, vendido:37, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-joao-pedro-n-4-torcedor-nike-masculina/14/SGL-05R6-014/SGL-05R6-014_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 Memphis N° 10', desc:'Camisa personalizada, camisa 10 Memphis Depay.', cat:'Camisas', color:brand, price:399.99, vendido:167, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-memphis-n-10-torcedor-nike-masculina/26/SGL-05S6-026/SGL-05S6-026_zoom1.jpg' },
+    { name:'Camisa Corinthians I 26/27 Memphis N° 10', desc:'Camisa titular personalizada com o camisa 10.', cat:'Camisas', color:brand, price:399.99, vendido:159, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-i-2627-memphis-n-10-torcedor-nike-masculina/14/SGL-05RB-014/SGL-05RB-014_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 Vitinho N° 11', desc:'Camisa personalizada, ponta Vitinho.', cat:'Camisas', color:brand, price:399.99, vendido:48, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-vitinho-n-11-torcedor-nike-masculina/26/SGL-05S7-026/SGL-05S7-026_zoom1.jpg' },
+    { name:'Camisa Corinthians II 26/27 André N° 49', desc:'Camisa personalizada, jovem promessa da base.', cat:'Camisas', color:brand, price:399.99, vendido:28, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-andre-n-49-torcedor-nike-masculina/26/SGL-05RS-026/SGL-05RS-026_zoom1.jpg' },
   ],
 };
 function renderCommerceProducts(){
@@ -4075,11 +4129,15 @@ function renderCommerceProducts(){
   const products = PRODUCTS_BY_CLUB[currentClubId] || PRODUCTS_BY_CLUB.flamengo;
   el.innerHTML = products.map(p=>{
     const receita = p.price * p.vendido;
+    const media = p.img
+      ? `<img src="${p.img}" alt="${p.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover; border-radius:12px;" onerror="this.parentElement.innerHTML='${commerceProductIconSvg(p.icon||'colecionavel', p.color).replace(/'/g,"\\'")}'" />`
+      : commerceProductIconSvg(p.icon||'colecionavel', p.color);
     return `<div class="card clickable" style="background:var(--surface-2);" onclick="showToast('Produto oficial sincronizado via VTEX · SKU consultado na Ontologia')">
-      <div style="width:100%; aspect-ratio:1; border-radius:12px; background:linear-gradient(135deg, ${p.color}26, ${p.color}0d); display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
-        ${commerceProductIconSvg(p.icon, p.color)}
+      <div style="width:100%; aspect-ratio:1; border-radius:12px; background:linear-gradient(135deg, ${p.color}26, ${p.color}0d); display:flex; align-items:center; justify-content:center; margin-bottom:12px; overflow:hidden;">
+        ${media}
       </div>
       <div style="font-weight:700; font-size:13px; margin-bottom:2px;">${p.name}</div>
+      ${p.desc ? `<div class="hero-note" style="margin-bottom:6px;">${p.desc}</div>` : ''}
       <div class="hero-note" style="margin-bottom:10px;">${p.cat} · R$ ${p.price.toFixed(2).replace('.',',')}</div>
       <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); padding-top:10px; border-top:1px solid var(--border);">
         <span>${p.vendido} vendidos</span><span style="font-weight:700; color:${p.color};">R$ ${receita.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2})}</span>
@@ -5040,6 +5098,63 @@ function buildOps(){
   const cls = {ERROR:'status-error', WARN:'status-warn'};
   document.getElementById('error-log').innerHTML = logs.map(l=>`
     <tr><td class="mono">${l[0]}</td><td><span class="status-dot ${cls[l[1]]}">${l[1]}</span></td><td>${l[2]}</td><td class="mono">${l[3]}</td><td>${l[4]}</td></tr>`).join('');
+}
+
+/* ============ INTEGRATION HUB ============ */
+const INTEGRATIONS = {
+  pagamentos: [
+    { name:'Pix (Banco Central)', badge:'PIX', color:'#22e07a', status:'active', desc:'Pagamentos instantâneos de sócio-torcedor, ingressos e commerce.', sync:'há 2 min' },
+    { name:'Stripe', badge:'ST', color:brand, status:'active', desc:'Assinaturas internacionais e pagamentos recorrentes.', sync:'há 4 min' },
+    { name:'Mercado Pago', badge:'MP', color:'#00b1ea', status:'active', desc:'Checkout transparente e split de pagamento do commerce.', sync:'há 1 min' },
+    { name:'Cielo', badge:'CI', color:amber, status:'active', desc:'Maquininhas e POS físico no dia de jogo (matchday).', sync:'há 6 min' },
+    { name:'TOTVS Protheus (ERP)', badge:'TP', color:'#ff8a3d', status:'warn', desc:'Conciliação financeira e faturamento — token expira em 3 dias.', sync:'há 38 min' },
+  ],
+  commerce: [
+    { name:'VTEX', badge:'VT', color:brand2, status:'active', desc:'Catálogo, preços e pedidos da loja oficial em tempo real.', sync:'há 1 min' },
+    { name:'Ingresse', badge:'IN', color:teal, status:'active', desc:'Venda, check-in e validação de ingressos do estádio.', sync:'há 3 min' },
+    { name:'Salesforce CRM', badge:'SF', color:'#00a1e0', status:'active', desc:'Histórico de relacionamento e atendimento do sócio-torcedor.', sync:'há 5 min' },
+    { name:'Zendesk', badge:'ZD', color:'#03363d', status:'active', desc:'Tickets e SLA de atendimento ao torcedor.', sync:'há 7 min' },
+  ],
+  marketing: [
+    { name:'WhatsApp Business API', badge:'WA', color:'#25D366', status:'active', desc:'Notificações transacionais e atendimento via Meta.', sync:'há 1 min' },
+    { name:'Meta Graph API', badge:'MT', color:'#0866FF', status:'warn', desc:'Métricas de Instagram/Facebook — latência acima do normal.', sync:'há 22 min' },
+    { name:'RD Station', badge:'RD', color:'#DD3B34', status:'active', desc:'Automação de e-mail marketing e jornadas de nutrição.', sync:'há 4 min' },
+    { name:'Google Analytics 4', badge:'GA', color:gold, status:'active', desc:'Tráfego, conversão e atribuição do site e app.', sync:'há 2 min' },
+  ],
+};
+function buildIntegrations(){
+  const statusLabel = { active:'Conectado', warn:'Atenção', error:'Erro' };
+  const statusCls = { active:'status-active', warn:'status-warn', error:'status-error' };
+  const renderGroup = (elId, items) => {
+    document.getElementById(elId).innerHTML = items.map(i=>`
+      <div class="card clickable" style="background:var(--surface-2);" onclick="showToast('${i.name.replace(/'/g,"\\'")} · detalhes da integração (webhooks, escopo de API, credenciais)')">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <span class="chip-avatar" style="background:${i.color}; width:38px; height:38px; font-size:12px;">${i.badge}</span>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:700; font-size:13px;">${i.name}</div>
+            <span class="status-dot ${statusCls[i.status]}">${statusLabel[i.status]}</span>
+          </div>
+        </div>
+        <div class="hero-note" style="margin-bottom:10px;">${i.desc}</div>
+        <div style="font-size:11.5px; color:var(--text-faint); padding-top:10px; border-top:1px solid var(--border);">Última sincronização: ${i.sync}</div>
+      </div>`).join('');
+  };
+  renderGroup('integrations-pagamentos', INTEGRATIONS.pagamentos);
+  renderGroup('integrations-commerce', INTEGRATIONS.commerce);
+  renderGroup('integrations-marketing', INTEGRATIONS.marketing);
+
+  const logs = [
+    ['há 1 min','Pix (Banco Central)','Webhook de pagamento confirmado','1','<span class="status-dot status-active">OK</span>'],
+    ['há 2 min','VTEX','Sincronização de catálogo','842 SKUs','<span class="status-dot status-active">OK</span>'],
+    ['há 4 min','Mercado Pago','Split de pagamento processado','1','<span class="status-dot status-active">OK</span>'],
+    ['há 7 min','WhatsApp Business API','Notificações enviadas','1.204','<span class="status-dot status-active">OK</span>'],
+    ['há 22 min','Meta Graph API','Consulta de métricas','—','<span class="status-dot status-warn">Latência alta</span>'],
+    ['há 38 min','TOTVS Protheus (ERP)','Renovação de token','—','<span class="status-dot status-warn">Expira em 3 dias</span>'],
+    ['há 1h','Ingresse','Validação de ingressos (portão 3)','3.618','<span class="status-dot status-active">OK</span>'],
+    ['há 1h','RD Station','Disparo de jornada de e-mail','9.402','<span class="status-dot status-active">OK</span>'],
+  ];
+  document.getElementById('integrations-log').innerHTML = logs.map(l=>`
+    <tr><td class="mono">${l[0]}</td><td>${l[1]}</td><td>${l[2]}</td><td class="mono">${l[3]}</td><td>${l[4]}</td></tr>`).join('');
 }
 
 /* init first view */
