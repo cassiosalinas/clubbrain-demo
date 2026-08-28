@@ -736,6 +736,7 @@ canvas{ max-width:100%; }
     <section class="view" id="view-clubmgmt">
       <div class="subtabs" id="clubmgmt-subtabs">
         <div class="subtab active" data-sub="elenco">Elenco profissional</div>
+        <div class="subtab" data-sub="performance">Performance &amp; Saúde</div>
         <div class="subtab" data-sub="base">Categorias de base</div>
         <div class="subtab" data-sub="ativos">Ativos do clube</div>
         <div class="subtab" data-sub="comissao">Equipe técnica &amp; médica</div>
@@ -759,6 +760,47 @@ canvas{ max-width:100%; }
           <table>
             <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Score de performance</th><th>Valor de marca</th><th>Valor de mercado</th></tr></thead>
             <tbody id="elenco-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sub: Performance & Saude -->
+      <div class="subview" id="clubmgmt-sub-performance">
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-title"><h3>Radar tático</h3></div>
+            <div class="hero-note" style="margin:-6px 0 14px;">Perfil coletivo do time nas últimas 5 partidas — PerformanceBrain.</div>
+            <canvas id="chart-tactical-radar" height="220"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title"><h3>Valor do elenco</h3></div>
+            <div class="hero-note" style="margin:-6px 0 6px;">Tendência dos últimos 6 meses — FinanceBrain.</div>
+            <div class="value" id="squad-value-total" style="font-size:26px; margin-bottom:2px;">—</div>
+            <div class="delta up" id="squad-value-delta" style="margin-bottom:10px;">—</div>
+            <canvas id="chart-squad-value" height="120"></canvas>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Risco de lesão por jogador</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Carga de treino acumulada e risco estimado pelo MedicalBrain — elenco masculino profissional.</div>
+          <table>
+            <thead><tr><th>Jogador</th><th>Posição</th><th>Carga de treino</th><th>Risco de lesão</th><th>Recomendação</th></tr></thead>
+            <tbody id="injury-risk-table"></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(34,224,122,.06), var(--surface));">
+          <div class="card-title"><h3>Insights da IA</h3></div>
+          <div id="performance-ai-insights"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>Scouting — alvos recomendados</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">ScoutBrain cruza perfil técnico, idade e orçamento disponível para sugerir reforços — nomes e valores fictícios.</div>
+          <table>
+            <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Clube atual</th><th>Valor estimado</th><th>Compatibilidade</th></tr></thead>
+            <tbody id="scouting-table"></tbody>
           </table>
         </div>
       </div>
@@ -2531,6 +2573,88 @@ const SQUAD_BY_CLUB = {
 };
 let elencoGender = 'masc';
 
+/* ---------- Performance & Saude (PerformanceBrain, MedicalBrain, ScoutBrain) ---------- */
+const TACTICAL_RADAR_BY_CLUB = {
+  flamengo: { Ataque:88, Posse:79, Pressão:82, Defesa:76, Físico:84 },
+  corinthians: { Ataque:74, Posse:71, Pressão:78, Defesa:80, Físico:77 },
+};
+const SQUAD_VALUE_TREND_BY_CLUB = {
+  flamengo: [742, 768, 795, 810, 838, 861],
+  corinthians: [432, 419, 438, 445, 451, 457],
+};
+const SCOUTING_TARGETS_BY_CLUB = {
+  flamengo:[
+    { name:'Bento Azevedo', pos:'Lateral Esquerdo', age:21, clube:'Athletico-PR', valor:'€ 7,5M', compat:92 },
+    { name:'Kaká Ferreira', pos:'Volante', age:23, clube:'Bahia', valor:'€ 9,0M', compat:87 },
+    { name:'Iago Marreiros', pos:'Zagueiro', age:24, clube:'Bragantino', valor:'€ 6,2M', compat:81 },
+  ],
+  corinthians:[
+    { name:'Denner Lucas', pos:'Atacante', age:22, clube:'Cuiabá', valor:'€ 8,0M', compat:90 },
+    { name:'Vitor Hugo Reis', pos:'Meia', age:20, clube:'Criciúma', valor:'€ 5,4M', compat:85 },
+    { name:'Samir Peixoto', pos:'Lateral Direito', age:23, clube:'Vitória', valor:'€ 4,8M', compat:79 },
+  ],
+};
+function getInjuryRiskData(){
+  const rnd = mulberry32(hashSeed(currentClubId + ':injury'));
+  return SQUAD_BY_CLUB[currentClubId].masc.map(p=>{
+    const carga = Math.round(70 + rnd()*45);
+    let risco, cor, recomendacao;
+    if(carga >= 110){ risco='Alto'; cor=red; recomendacao='Poupar do próximo treino de carga'; }
+    else if(carga >= 90){ risco='Médio'; cor=amber; recomendacao='Monitorar e ajustar volume de treino'; }
+    else { risco='Baixo'; cor='#22e07a'; recomendacao='Rotina normal'; }
+    return { name:p.name, pos:p.pos, carga, risco, cor, recomendacao };
+  });
+}
+function renderPerformanceTab(){
+  if(!document.getElementById('chart-tactical-radar')) return;
+  const radar = TACTICAL_RADAR_BY_CLUB[currentClubId] || TACTICAL_RADAR_BY_CLUB.flamengo;
+  const radarLabels = Object.keys(radar);
+  if(window.__tacticalRadarChart) window.__tacticalRadarChart.destroy();
+  window.__tacticalRadarChart = new Chart(document.getElementById('chart-tactical-radar'), {
+    type:'radar',
+    data:{ labels: radarLabels, datasets:[{ data: radarLabels.map(k=>radar[k]), backgroundColor: brand+'33', borderColor: brand, borderWidth:2, pointBackgroundColor: brand }]},
+    options:{ responsive:true, maintainAspectRatio:false, scales:{ r:{ min:0, max:100, ticks:{display:false}, grid:{color:'#232a44'}, angleLines:{color:'#232a44'}, pointLabels:{color:'#c7cbe0', font:{size:11}} } }, plugins:{legend:{display:false}} }
+  });
+
+  const trend = SQUAD_VALUE_TREND_BY_CLUB[currentClubId] || SQUAD_VALUE_TREND_BY_CLUB.flamengo;
+  const total = trend[trend.length-1];
+  const pctChange = Math.round((trend[trend.length-1]/trend[0]-1)*100);
+  document.getElementById('squad-value-total').textContent = `R$ ${total}M`;
+  document.getElementById('squad-value-delta').textContent = `${pctChange>=0?'↑':'↓'} ${Math.abs(pctChange)}% em 6 meses`;
+  if(window.__squadValueChart) window.__squadValueChart.destroy();
+  window.__squadValueChart = new Chart(document.getElementById('chart-squad-value'), {
+    type:'line',
+    data:{ labels:['-5m','-4m','-3m','-2m','-1m','Hoje'], datasets:[{ data:trend, borderColor:gold, backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2.4 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>'R$'+v+'M'}} } }
+  });
+
+  const injuryData = getInjuryRiskData();
+  document.getElementById('injury-risk-table').innerHTML = injuryData.map(p=>`
+    <tr><td class="strong">${p.name}</td><td>${p.pos}</td><td>${p.carga}%</td>
+    <td><span class="tag" style="background:${p.cor}1f; border-color:${p.cor}44; color:${p.cor};">${p.risco}</span></td>
+    <td>${p.recomendacao}</td></tr>`).join('');
+
+  const altoRisco = injuryData.filter(p=>p.risco==='Alto').sort((a,b)=>b.carga-a.carga)[0];
+  const scoutTop = (SCOUTING_TARGETS_BY_CLUB[currentClubId]||SCOUTING_TARGETS_BY_CLUB.flamengo)[0];
+  const staffFin = STAFF_BY_CLUB[currentClubId].find(s=>s.role==='Técnico')?.name;
+  const insights = [
+    { badge:'M', color:'#22e07a', name:'MedicalBrain', text: altoRisco ? `${altoRisco.name} acumulou carga ${altoRisco.carga}% acima do ideal. Sugiro poupar no próximo treino.` : 'Nenhum jogador em risco alto de lesão nesta semana.' },
+    { badge:'S', color:teal, name:'ScoutBrain', text: `${scoutTop.compat}% de compatibilidade: ${scoutTop.name} (${scoutTop.pos}, ${scoutTop.clube}) dentro do perfil buscado pelo técnico ${staffFin}.` },
+    { badge:'F', color:gold, name:'FinanceBrain', text: `Valor do elenco cresceu ${Math.abs(Math.round((trend[trend.length-1]/trend[0]-1)*100))}% nos últimos 6 meses — renovar contratos dos jogadores em alta agora preserva valor de ativo.` },
+    { badge:'P', color:brand2, name:'PerformanceBrain', text: `Ponto mais forte do time: ${radarLabels.reduce((a,b)=>radar[a]>radar[b]?a:b)}. Ponto de atenção: ${radarLabels.reduce((a,b)=>radar[a]<radar[b]?a:b)}.` },
+  ];
+  document.getElementById('performance-ai-insights').innerHTML = insights.map(i=>`
+    <div class="status-row">
+      <span class="chip-avatar" style="background:${i.color}; width:26px; height:26px; font-size:11px;">${i.badge}</span>
+      <div style="flex:1; font-size:12.5px;"><b style="color:${i.color};">${i.name}:</b> ${i.text}</div>
+    </div>`).join('');
+
+  const scouting = SCOUTING_TARGETS_BY_CLUB[currentClubId] || SCOUTING_TARGETS_BY_CLUB.flamengo;
+  document.getElementById('scouting-table').innerHTML = scouting.map(s=>`
+    <tr><td class="strong">${s.name}</td><td>${s.pos}</td><td>${s.age}</td><td>${s.clube}</td><td>${s.valor}</td>
+    <td><div class="progress" style="width:80px; display:inline-block; vertical-align:middle;"><div style="width:${s.compat}%; background:${teal};"></div></div> <span class="mono" style="font-size:11px;">${s.compat}%</span></td></tr>`).join('');
+}
+
 const BASE_CATEGORIES_BY_CLUB = {
   flamengo:[
     { name:'Sub-20', count:28, star:'João Vitor Almeida' },
@@ -2694,6 +2818,7 @@ function renderMarca(){
 function refreshClubManagementForClub(){
   if(!document.getElementById('elenco-table')) return;
   renderTeamStats(); renderElencoTable(); renderBaseGrid(); renderAtivosGrid(); renderComissaoGrid(); renderViagensTable(); renderPatrocinioTable(); renderMarca();
+  renderPerformanceTab();
 }
 function buildClubManagement(){
   document.getElementById('clubmgmt-subtabs').addEventListener('click', (e)=>{
