@@ -13,7 +13,7 @@
 
 header('Content-Type: application/json');
 
-$allowedOrigins = ['https://clubbrain.ai', 'https://www.clubbrain.ai', 'https://demo.clubbrain.ai', 'https://vfans.netlify.app'];
+$allowedOrigins = ['https://clubbrain.ai', 'https://www.clubbrain.ai', 'https://demo.clubbrain.ai', 'https://demo-clubbrain.netlify.app'];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowedOrigins, true)) {
     header('Access-Control-Allow-Origin: ' . $origin);

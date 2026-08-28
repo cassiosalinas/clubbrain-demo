@@ -15,7 +15,7 @@ const ALLOWED_ORIGINS = [
   'https://clubbrain.ai',
   'https://www.clubbrain.ai',
   'https://demo.clubbrain.ai',
-  'https://vfans.netlify.app',
+  'https://demo-clubbrain.netlify.app',
 ];
 
 function corsHeaders(event) {
