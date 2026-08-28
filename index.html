@@ -528,17 +528,6 @@ canvas{ max-width:100%; }
       <span class="platform-mark-logo" id="platform-mark-logo"></span>
       <span>Powered by ClubBrain.ai</span>
     </div>
-    <div class="club-select" id="club-select-toggle" onclick="toggleClubDropdown(event)">
-      <div class="club-badge" id="sidebar-club-badge">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><path d="M12 7.3 13.4 10.4 16.8 10.7 14.2 12.9 15 16.2 12 14.4 9 16.2 9.8 12.9 7.2 10.7 10.6 10.4Z" fill="white"/></svg>
-      </div>
-      <div>
-        <div class="name" id="sidebar-club-name">Estrela FC</div>
-        <div class="sub" id="sidebar-club-sub">Temporada 2026</div>
-      </div>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      <div class="club-dropdown" id="club-dropdown"></div>
-    </div>
 
     <nav class="nav" id="nav">
       <div class="nav-group-label">Executivo</div>
@@ -1202,6 +1191,14 @@ canvas{ max-width:100%; }
           <div id="trending-topics" style="line-height:2.4;"></div>
         </div>
       </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title"><h3>Top 10 influenciadores falando do clube</h3></div>
+        <div class="hero-note" style="margin-bottom:10px;">Ranqueados por alcance ponderado pela menção — inclui vozes positivas e críticas.</div>
+        <table>
+          <thead><tr><th>#</th><th>Perfil</th><th>Rede</th><th>Seguidores</th><th>Menções (7d)</th><th>Sentimento</th><th>Alcance estimado</th></tr></thead>
+          <tbody id="influencers-table"></tbody>
+        </table>
+      </div>
     </section>
 
     <!-- ================= CONTENT ================= -->
@@ -1478,8 +1475,15 @@ canvas{ max-width:100%; }
         </div>
       </div>
 
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Vendas por canal de origem</h3></div>
+        <div class="hero-note" style="margin-bottom:14px;">De onde vem cada venda antes de virar um evento estruturado na Ontologia (Camada 1).</div>
+        <div class="grid g-4" id="commerce-channels"></div>
+      </div>
+
       <div class="card">
         <div class="card-title"><h3>Top produtos do mês</h3></div>
+        <div class="hero-note" style="margin-bottom:12px;">O selo no canto de cada produto mostra o canal de origem da venda.</div>
         <div class="grid g-4" id="commerce-products"></div>
       </div>
     </section>
@@ -2182,15 +2186,6 @@ const CLUB_PROFILES = {
 };
 let currentClubId = 'flamengo';
 
-function renderClubDropdown(){
-  document.getElementById('club-dropdown').innerHTML = Object.keys(CLUB_PROFILES).map(id=>{
-    const c = CLUB_PROFILES[id];
-    return `<div class="club-dropdown-item" onclick="event.stopPropagation(); selectClub('${id}'); toggleClubDropdown();">
-      <span class="mini-badge" style="background:${c.badgeBg};">${c.crest}</span>
-      <span>${c.name}</span>
-    </div>`;
-  }).join('');
-}
 const CLUB_COVER_ORDER = ['estrela', 'corinthians', 'flamengo'];
 function renderClubCover(){
   document.getElementById('club-cover-grid').innerHTML = CLUB_COVER_ORDER.map(id=>{
@@ -2206,25 +2201,10 @@ function chooseClubFromCover(id){
   selectClub(id, true);
   document.getElementById('club-cover-screen').style.display = 'none';
 }
-function toggleClubDropdown(e){
-  if(e) e.stopPropagation();
-  renderClubDropdown();
-  document.getElementById('club-dropdown').classList.toggle('open');
-}
-document.addEventListener('click', (e)=>{
-  const dd = document.getElementById('club-dropdown');
-  if(dd && !e.target.closest('#club-select-toggle')) dd.classList.remove('open');
-});
-
 function selectClub(id, silent){
   const c = CLUB_PROFILES[id];
   if(!c) return;
   currentClubId = id;
-
-  document.getElementById('sidebar-club-badge').style.background = c.badgeBg;
-  document.getElementById('sidebar-club-badge').innerHTML = c.crest;
-  document.getElementById('sidebar-club-name').textContent = c.name;
-  document.getElementById('sidebar-club-sub').textContent = c.sub;
 
   document.getElementById('topbar-club-badge').style.background = c.badgeBg;
   document.getElementById('topbar-club-badge').innerHTML = c.crest;
@@ -2272,7 +2252,6 @@ function selectClub(id, silent){
   setText('kpi-mon-churn', c.kpi.subChurn);
   setText('kpi-mon-churn-delta', c.kpi.subChurnDelta);
 
-  renderClubDropdown();
   refreshCdpForClub();
   refreshEventsForClub();
   if(document.getElementById('ontology-grid')) buildOntology();
@@ -3754,6 +3733,29 @@ function buildSentiment(){
   const colors = [posGreen, '#3fb6ff', '#a3e635', '#7f88a8'];
   document.getElementById('trending-topics').innerHTML = topics.map(([t,size],i)=>
     `<span style="font-size:${size}px; font-weight:700; color:${colors[i%colors.length]}; margin-right:16px;">${t}</span>`).join('');
+
+  const influencers = [
+    { handle:'@torcida_estrela', rede:'X', seguidores:'842K', mencoes:128, sent:'Positivo', sentCls:'status-active', alcance:'4,1M' },
+    { handle:'@arena_vibes', rede:'Instagram', seguidores:'615K', mencoes:96, sent:'Positivo', sentCls:'status-active', alcance:'3,2M' },
+    { handle:'@golaco_sp', rede:'TikTok', seguidores:'1,2M', mencoes:74, sent:'Positivo', sentCls:'status-active', alcance:'5,8M' },
+    { handle:'@voznodeezaogem', rede:'YouTube', seguidores:'480K', mencoes:61, sent:'Misto', sentCls:'status-warn', alcance:'2,0M' },
+    { handle:'@reclamaarbitro', rede:'YouTube', seguidores:'390K', mencoes:52, sent:'Negativo', sentCls:'status-error', alcance:'1,6M' },
+    { handle:'@futcast_oficial', rede:'X', seguidores:'720K', mencoes:47, sent:'Misto', sentCls:'status-warn', alcance:'2,9M' },
+    { handle:'@fielrubroverde', rede:'Instagram', seguidores:'305K', mencoes:41, sent:'Positivo', sentCls:'status-active', alcance:'1,1M' },
+    { handle:'@criticaesportiva', rede:'X', seguidores:'265K', mencoes:38, sent:'Negativo', sentCls:'status-error', alcance:'980K' },
+    { handle:'@resenhadobar', rede:'TikTok', seguidores:'510K', mencoes:33, sent:'Positivo', sentCls:'status-active', alcance:'2,3M' },
+    { handle:'@analisetatica_br', rede:'YouTube', seguidores:'198K', mencoes:29, sent:'Misto', sentCls:'status-warn', alcance:'740K' },
+  ];
+  document.getElementById('influencers-table').innerHTML = influencers.map((inf,i)=>`
+    <tr class="clickable" onclick="showToast('Perfil completo de ${inf.handle.replace(/'/g,"\\'")} aberto na Ontologia do Clube')">
+      <td class="mono">${i+1}</td>
+      <td class="strong">${inf.handle}</td>
+      <td>${inf.rede}</td>
+      <td>${inf.seguidores}</td>
+      <td>${inf.mencoes}</td>
+      <td><span class="status-dot ${inf.sentCls}">${inf.sent}</span></td>
+      <td>${inf.alcance}</td>
+    </tr>`).join('');
 }
 
 /* ============ CONTENT ============ */
@@ -4301,16 +4303,32 @@ const PRODUCTS_BY_CLUB = {
     { name:'Miniatura do Estádio Municipal', desc:'Réplica em miniatura do estádio do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:59.90, vendido:12 },
   ],
 };
+const SALES_CHANNELS = [
+  { key:'loja', name:'Loja oficial (site)', color:teal, desc:'Venda direta pelo e-commerce oficial do clube, via VTEX.' },
+  { key:'marketplace', name:'Marketplace', color:brand2, desc:'Mercado Livre, Shopee e outros marketplaces autorizados.' },
+  { key:'varejo', name:'Loja física / varejo', color:amber, desc:'Redes de varejo esportivo e lojas físicas parceiras.' },
+  { key:'marca', name:'Direto da marca', color:gold, desc:'Canal direto do fornecedor (Nike/Adidas) em parceria com o clube.' },
+];
+function channelForProduct(p, i){
+  const seed = hashSeed((p.name||'') + ':' + i);
+  const rnd = mulberry32(seed)();
+  if(p.cat === 'Camisas') return rnd < 0.55 ? SALES_CHANNELS[0] : (rnd < 0.8 ? SALES_CHANNELS[3] : SALES_CHANNELS[1]);
+  if(p.cat === 'Infantil' || p.cat === 'Vestuário') return rnd < 0.45 ? SALES_CHANNELS[0] : (rnd < 0.75 ? SALES_CHANNELS[2] : SALES_CHANNELS[1]);
+  return rnd < 0.4 ? SALES_CHANNELS[1] : (rnd < 0.7 ? SALES_CHANNELS[2] : SALES_CHANNELS[0]);
+}
 function renderCommerceProducts(){
   const el = document.getElementById('commerce-products');
   if(!el) return;
   const products = PRODUCTS_BY_CLUB[currentClubId] || PRODUCTS_BY_CLUB.flamengo;
-  el.innerHTML = products.map(p=>{
+  const withChannel = products.map((p,i)=>({ ...p, channel: channelForProduct(p,i) }));
+
+  el.innerHTML = withChannel.map(p=>{
     const receita = p.price * p.vendido;
     const media = p.img
       ? `<img src="${p.img}" alt="${p.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover; border-radius:12px;" onerror="this.parentElement.innerHTML='${commerceProductIconSvg(p.icon||'colecionavel', p.color).replace(/'/g,"\\'")}'" />`
       : commerceProductIconSvg(p.icon||'colecionavel', p.color);
-    return `<div class="card clickable" style="background:var(--surface-2);" onclick="showToast('Produto oficial sincronizado via VTEX · SKU consultado na Ontologia')">
+    return `<div class="card clickable" style="background:var(--surface-2); position:relative;" onclick="showToast('Canal de origem: ${p.channel.name} · Produto sincronizado via VTEX · SKU consultado na Ontologia')">
+      <span class="tag" style="position:absolute; top:10px; left:10px; right:10px; background:${p.channel.color}22; border-color:${p.channel.color}44; color:${p.channel.color}; font-size:10px; justify-content:center;">${p.channel.name}</span>
       <div style="width:100%; aspect-ratio:1; border-radius:12px; background:linear-gradient(135deg, ${p.color}26, ${p.color}0d); display:flex; align-items:center; justify-content:center; margin-bottom:12px; overflow:hidden;">
         ${media}
       </div>
@@ -4322,6 +4340,24 @@ function renderCommerceProducts(){
       </div>
     </div>`;
   }).join('');
+
+  const channelsEl = document.getElementById('commerce-channels');
+  if(channelsEl){
+    const totals = SALES_CHANNELS.map(ch=>{
+      const items = withChannel.filter(p=>p.channel.key === ch.key);
+      const receita = items.reduce((s,p)=>s+p.price*p.vendido,0);
+      const unidades = items.reduce((s,p)=>s+p.vendido,0);
+      return { ...ch, receita, unidades };
+    });
+    const totalReceita = totals.reduce((s,t)=>s+t.receita,0) || 1;
+    channelsEl.innerHTML = totals.map(t=>`
+      <div class="card" style="background:var(--surface-2);">
+        <div class="label" style="margin-bottom:8px;">${t.name}</div>
+        <div class="value" style="font-size:20px;">R$ ${(t.receita/1000).toFixed(1).replace('.',',')}K</div>
+        <div class="hero-note" style="margin-bottom:8px;">${t.unidades} unidades · ${Math.round(t.receita/totalReceita*100)}% da receita</div>
+        <div class="progress"><div style="width:${Math.round(t.receita/totalReceita*100)}%; background:${t.color};"></div></div>
+      </div>`).join('');
+  }
 }
 
 /* ============ CRM ============ */
