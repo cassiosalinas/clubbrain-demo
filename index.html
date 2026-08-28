@@ -1149,7 +1149,7 @@ canvas{ max-width:100%; }
       <div class="card" style="margin-top:16px; background:linear-gradient(135deg, rgba(242,201,76,.08), var(--surface)); border-color:rgba(242,201,76,.25);">
         <div class="card-title">
           <span class="icon-badge" style="background:rgba(242,201,76,.18); color:#f2c94c;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>
-          <h3>Agente de Precificação Dinâmica (IA real — Claude)</h3>
+          <h3>FinanceBrain (IA real — Claude)</h3>
         </div>
         <div class="hero-note" style="margin:-6px 0 14px;">Cruza o calendário de jogos e eventos acima, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.</div>
         <div id="pricing-chat-log" style="max-height:260px; overflow-y:auto; margin-bottom:12px;"></div>
@@ -1863,7 +1863,7 @@ function toggleNotifications(e){
   const dd = document.getElementById('notif-dropdown');
   if(dd.style.display === 'block'){ dd.style.display='none'; return; }
   const notifs = [
-    ['Novo alerta do Agente de CRM', 'Torcedor de alto valor com risco de churn', '2 min'],
+    ['Novo alerta do FanBrain', 'Torcedor de alto valor com risco de churn', '2 min'],
     ['Meta de check-in atingida', '90% dos ingressos já validados', '15 min'],
     ['Relatório de patrocínio pronto', 'ArenaX · Série do Campeonato', '1h'],
   ];
@@ -2129,7 +2129,7 @@ function buildOpsCenter(){
     ['Problema de login no app do torcedor', 'Diego Farias', 'Resolvido', '#22e07a'],
   ];
   document.getElementById('support-queue').innerHTML = queue.map(q=>`
-    <div class="queue-item clickable" onclick="showModal('<h3 style=\\'margin-bottom:10px;\\'>${q[0]}</h3>', '<div class=\\'hero-note\\' style=\\'margin-bottom:14px;\\'>Torcedor: <b style=\\'color:var(--text)\\'>${q[1]}</b></div><div style=\\'font-size:13px; color:var(--text-dim); line-height:1.6;\\'>Sugestão do Agente de Experiência do Fã: priorizar esse chamado, torcedor é <b style=\\'color:var(--text)\\'>Super Fã</b> segundo a Ontologia — resolver em até 2h mantém o LTV do torcedor.</div>')">
+    <div class="queue-item clickable" onclick="showModal('<h3 style=\\'margin-bottom:10px;\\'>${q[0]}</h3>', '<div class=\\'hero-note\\' style=\\'margin-bottom:14px;\\'>Torcedor: <b style=\\'color:var(--text)\\'>${q[1]}</b></div><div style=\\'font-size:13px; color:var(--text-dim); line-height:1.6;\\'>Sugestão do FanBrain: priorizar esse chamado, torcedor é <b style=\\'color:var(--text)\\'>Super Fã</b> segundo a Ontologia — resolver em até 2h mantém o LTV do torcedor.</div>')">
       <span class="status-dotlive" style="background:${q[3]}; box-shadow:0 0 0 3px ${q[3]}22;"></span>
       <div style="flex:1;">
         <div style="font-size:13px; font-weight:600;">${q[0]}</div>
@@ -2140,12 +2140,12 @@ function buildOpsCenter(){
   // --- Alertas dos agentes ---
   const agentColors = {'Aquisição':brand,'Monetização':gold,'Experiência':teal,'Estratégia':brand2};
   const alerts = [
-    ['Aquisição','Agente de CRM','Torcedor "TorcidaAlma" com sinais de possível churn — oferta de retenção sugerida', '2 min'],
-    ['Monetização','Agente Comercial','Contrapartida do patrocinador ArenaX atingiu 92% do cumprimento contratual', '6 min'],
-    ['Experiência','Agente de Experiência do Fã','320 torcedores prontos para a próxima missão de gamificação', '11 min'],
-    ['Estratégia','Agente de Performance','Receita de bilheteria da próxima rodada 8% abaixo do previsto', '18 min'],
-    ['Monetização','Agente de Ingressos','Setor 108 com baixa procura — desconto dinâmico sugerido', '24 min'],
-    ['Aquisição','Agente de Marketing','82 torcedores engajados sem cadastro — campanha de conversão pronta para disparo', '31 min'],
+    ['Aquisição','FanBrain','Torcedor "TorcidaAlma" com sinais de possível churn — oferta de retenção sugerida', '2 min'],
+    ['Monetização','FinanceBrain','Contrapartida do patrocinador ArenaX atingiu 92% do cumprimento contratual', '6 min'],
+    ['Experiência','FanBrain','320 torcedores prontos para a próxima missão de gamificação', '11 min'],
+    ['Estratégia','FinanceBrain','Receita de bilheteria da próxima rodada 8% abaixo do previsto', '18 min'],
+    ['Monetização','FinanceBrain','Setor 108 com baixa procura — desconto dinâmico sugerido', '24 min'],
+    ['Aquisição','FanBrain','82 torcedores engajados sem cadastro — campanha de conversão pronta para disparo', '31 min'],
   ];
   document.getElementById('alerts-feed').innerHTML = alerts.map(a=>`
     <div class="status-row">
@@ -2245,17 +2245,17 @@ function buildCockpit(){
     data:{ labels:['Jul','Ago','Set','Out','Nov','Dez'],
       datasets:[
         { label:'Realizado', data:[3.06,3.2,null,null,null,null], borderColor:gold, backgroundColor:'transparent', borderWidth:2.4, pointRadius:3, pointBackgroundColor:gold, spanGaps:false },
-        { label:'Previsto (Agente de Performance)', data:[null,3.2,3.35,3.55,3.9,4.3], borderColor:gold, borderDash:[6,4], backgroundColor:'transparent', borderWidth:2, pointRadius:2, spanGaps:false },
+        { label:'Previsto (FinanceBrain)', data:[null,3.2,3.35,3.55,3.9,4.3], borderColor:gold, borderDash:[6,4], backgroundColor:'transparent', borderWidth:2, pointRadius:2, spanGaps:false },
       ]},
     options:{ plugins:{legend:{position:'top', labels:{boxWidth:10, font:{size:10.5}}}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>'R$'+v+'M'}} } }
   });
 
   // Alertas estratégicos (categoria Estratégia + destaques de outras)
   const stratAlerts = [
-    ['Estratégia','Agente de Performance','Receita de bilheteria da próxima rodada 8% abaixo do previsto — recomenda campanha de última hora', brand2],
+    ['Estratégia','FinanceBrain','Receita de bilheteria da próxima rodada 8% abaixo do previsto — recomenda campanha de última hora', brand2],
     ['Estratégia','Agente Executivo','Patrocínio ArenaX é responsável por 43% da receita de patrocínio — risco de concentração', brand2],
-    ['Aquisição','Agente de CRM','84 mil torcedores da base reconhecida com sinais de risco de churn nos últimos 30 dias', brand],
-    ['Monetização','Agente Comercial','3 contratos de patrocínio vencem nos próximos 90 dias — iniciar renegociação', gold],
+    ['Aquisição','FanBrain','84 mil torcedores da base reconhecida com sinais de risco de churn nos últimos 30 dias', brand],
+    ['Monetização','FinanceBrain','3 contratos de patrocínio vencem nos próximos 90 dias — iniciar renegociação', gold],
   ];
   document.getElementById('cockpit-alerts').innerHTML = stratAlerts.map(a=>`
     <div class="status-row">
@@ -2368,7 +2368,7 @@ function buildOntology(){
     { name:'Gêmeo Digital do Sócio-Torcedor', icon:ONTOLOGY_ICONS.socio, color:gold, based:'Sócio-Torcedor',
       desc:'Modelo comportamental individual (Fan Score, propensão de compra, risco de churn) usado pelos Agentes de IA para prever a próxima ação antes de ativar uma campanha.' },
     { name:'Gêmeo Digital do Jogo', icon:ONTOLOGY_ICONS.jogo, color:brand2, based:'Jogo / Evento',
-      desc:'Simula cenários de precificação dinâmica por setor — velocidade de vendas, ocupação esperada e receita projetada — antes do Agente de Precificação Dinâmica sugerir um preço.' },
+      desc:'Simula cenários de precificação dinâmica por setor — velocidade de vendas, ocupação esperada e receita projetada — antes do FinanceBrain sugerir um preço.' },
     { name:'Gêmeo Digital do Ativo do Clube', icon:ONTOLOGY_ICONS.ativo, color:gold, based:'Ativo do Clube',
       desc:'Monitoramento preditivo de manutenção do estádio, CT e sede — antecipa desgaste de gramado e estrutura antes de virar problema operacional.' },
   ];
@@ -2394,7 +2394,7 @@ const SOCIO_SCHEMA = [
   ['fanScore','integer (0–100)','Composto por Engagement, Comercial, Conteúdo, Matchday, Gamificação, Fidelidade'],
   ['ltv / gastoTotal','currency','Valor gerado desde que virou sócio-torcedor pagante'],
   ['churnRisco','enum','Baixo · Médio · Alto'],
-  ['propensaoDeCompra','percent','Calculada pelo Agente de CRM'],
+  ['propensaoDeCompra','percent','Calculada pelo FanBrain'],
   ['timeCoracao / tambemTorce','string','Time principal e clubes secundários'],
   ['tags / segments','array','Interesses e segmentos ativos vindos das Audiences'],
 ];
@@ -2731,23 +2731,23 @@ function buildAgents(){
   const categories = [
     { name:'Aquisição', sub:'Marketing, CRM', color:brand, icon:'📣',
       agents:[
-        ['Agente de Marketing','Detecta um torcedor engajado mas sem cadastro e dispara uma oferta de boas-vindas personalizada para convertê-lo em sócio.'],
-        ['Agente de CRM','Identifica sinais de possível churn num torcedor de alto valor e aciona uma campanha de retenção antes que ele suma.'],
+        ['FanBrain','Detecta um torcedor engajado mas sem cadastro e dispara uma oferta de boas-vindas personalizada para convertê-lo em sócio.'],
+        ['FanBrain','Identifica sinais de possível churn num torcedor de alto valor e aciona uma campanha de retenção antes que ele suma.'],
       ]},
     { name:'Monetização', sub:'Comercial, Ingressos', color:gold, icon:'💰',
       agents:[
-        ['Agente Comercial','Consulta as contrapartidas contratuais de um patrocinador na Ontologia e gera o relatório de cumprimento e ROI automaticamente.'],
-        ['Agente de Ingressos','Detecta ingressos parados perto da data do jogo e sugere um desconto dinâmico para torcedores de alta propensão de compra.'],
-        ['Agente de Precificação Dinâmica','Cruza o calendário de jogos e eventos, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.'],
+        ['FinanceBrain','Consulta as contrapartidas contratuais de um patrocinador na Ontologia e gera o relatório de cumprimento e ROI automaticamente.'],
+        ['FinanceBrain','Detecta ingressos parados perto da data do jogo e sugere um desconto dinâmico para torcedores de alta propensão de compra.'],
+        ['FinanceBrain','Cruza o calendário de jogos e eventos, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.'],
       ]},
     { name:'Experiência', sub:'Experiência do fã, Operações', color:teal, icon:'🎟',
       agents:[
-        ['Agente de Experiência do Fã','Recomenda a próxima missão de gamificação com base no histórico de interações daquele torcedor específico.'],
+        ['FanBrain','Recomenda a próxima missão de gamificação com base no histórico de interações daquele torcedor específico.'],
         ['Agente de Operações','Cruza histórico de público com o calendário de jogos e sugere reforço de staff nos setores de maior fluxo esperado.'],
       ]},
     { name:'Estratégia', sub:'Performance, Executivo', color:brand2, icon:'📊',
       agents:[
-        ['Agente de Performance','Cruza bilheteria, e-commerce e patrocínio na Ontologia e sinaliza antecipadamente uma queda de receita prevista.'],
+        ['FinanceBrain','Cruza bilheteria, e-commerce e patrocínio na Ontologia e sinaliza antecipadamente uma queda de receita prevista.'],
         ['Agente Executivo','Responde perguntas em linguagem natural do CEO consultando toda a Ontologia do Clube, sem precisar de um analista no meio.'],
       ]},
   ];
@@ -2755,23 +2755,27 @@ function buildAgents(){
   window.__agentsFlat = [];
   categories.forEach(cat=>cat.agents.forEach(a=>window.__agentsFlat.push({name:a[0], desc:a[1], color:cat.color, cat:cat.name})));
 
+  let agentIdx = 0;
   document.getElementById('agents-grid').innerHTML = categories.map(cat=>`
     <div class="agent-card" style="background:linear-gradient(135deg, ${cat.color}14, var(--surface)); border-color:${cat.color}33;">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
         <span class="icon-badge" style="background:${cat.color}26; color:${cat.color};">${cat.icon}</span>
         <div><div style="font-weight:700; font-size:14.5px;">${cat.name}</div><div class="hero-note">${cat.sub}</div></div>
       </div>
-      ${cat.agents.map(a=>`
-        <div class="agent-item clickable" onclick="simulateAgentLog('${a[0].replace(/'/g,"\\'")}')">
+      ${cat.agents.map(a=>{
+        const idx = agentIdx++;
+        return `
+        <div class="agent-item clickable" onclick="simulateAgentLog(${idx})">
           <span class="ic" style="background:${cat.color}22; color:${cat.color};">●</span>
           <div><div class="ttl">${a[0]}</div><div class="dsc">${a[1]}</div></div>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>`).join('');
 
   renderAgentChatSelector();
 }
-function simulateAgentLog(name){
-  const info = (window.__agentsFlat||[]).find(a=>a.name===name);
+function simulateAgentLog(idx){
+  const info = (window.__agentsFlat||[])[idx];
   if(!info) return;
   showModal(
     `<h3 style="color:${info.color};">${info.name}</h3>`,
@@ -2968,8 +2972,8 @@ async function sendAgentChat(){
   }
 }
 
-/* ============ PRICING CHAT (Agente de Precificação Dinâmica — Eventos) ============ */
-const PRICING_AGENT = { name:'Agente de Precificação Dinâmica', desc:'Cruza o calendário de jogos e eventos, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.' };
+/* ============ PRICING CHAT (FinanceBrain — Eventos) ============ */
+const PRICING_AGENT = { name:'FinanceBrain', desc:'Cruza o calendário de jogos e eventos, a velocidade de vendas e a ocupação prevista para sugerir preço por setor e projetar o lucro esperado de cada evento.' };
 let pricingChatHistory = [];
 
 function renderPricingChatLog(){
@@ -3423,7 +3427,7 @@ function showStadiumSectorModal(key){
        <div><div class="hero-note">Preço</div><div class="value" style="font-size:17px; font-weight:700;">${s.price}</div></div>
        <div><div class="hero-note">Receita estimada</div><div class="value" style="font-size:17px; font-weight:700;">R$ ${revenue.toLocaleString('pt-BR')}</div></div>
      </div>
-     <div class="hero-note" style="margin-top:14px;">${occupancyLabel(s.sold)}${s.sold<0.75 ? ' — peça ao Agente de Precificação Dinâmica uma sugestão de desconto para este setor.' : '.'}</div>`
+     <div class="hero-note" style="margin-top:14px;">${occupancyLabel(s.sold)}${s.sold<0.75 ? ' — peça ao FinanceBrain uma sugestão de desconto para este setor.' : '.'}</div>`
   );
 }
 
@@ -3618,7 +3622,7 @@ function buildMonetization(){
     ['TechNova','Recompensas da Torcida','4,1M','150K','R$ 280.000','380%', [20,24,22,28,26,32,35]],
   ];
   document.getElementById('sponsor-table').innerHTML = sponsors.map(s=>`
-    <tr class="clickable" onclick="showModal('<h3>${s[0]} — ${s[1]}</h3>', '<div class=\\'hero-note\\' style=\\'margin:10px 0 16px;\\'>Detalhe gerado pelo Agente Comercial a partir da Ontologia do Clube</div><table style=\\'width:100%; font-size:12.5px;\\'><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Impressões</td><td style=\\'text-align:right; font-weight:600;\\'>${s[2]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Cliques</td><td style=\\'text-align:right; font-weight:600;\\'>${s[3]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Receita gerada</td><td style=\\'text-align:right; font-weight:600;\\'>${s[4]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>ROI</td><td style=\\'text-align:right; font-weight:600; color:#22e07a;\\'>${s[5]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Contrapartidas cumpridas</td><td style=\\'text-align:right; font-weight:600;\\'>92%</td></tr></table>')">
+    <tr class="clickable" onclick="showModal('<h3>${s[0]} — ${s[1]}</h3>', '<div class=\\'hero-note\\' style=\\'margin:10px 0 16px;\\'>Detalhe gerado pelo FinanceBrain a partir da Ontologia do Clube</div><table style=\\'width:100%; font-size:12.5px;\\'><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Impressões</td><td style=\\'text-align:right; font-weight:600;\\'>${s[2]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Cliques</td><td style=\\'text-align:right; font-weight:600;\\'>${s[3]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Receita gerada</td><td style=\\'text-align:right; font-weight:600;\\'>${s[4]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>ROI</td><td style=\\'text-align:right; font-weight:600; color:#22e07a;\\'>${s[5]}</td></tr><tr><td style=\\'padding:6px 0; color:var(--text-dim);\\'>Contrapartidas cumpridas</td><td style=\\'text-align:right; font-weight:600;\\'>92%</td></tr></table>')">
     <td class="strong">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td>${s[4]}</td>
     <td><span class="status-dot status-active">${s[5]}</span></td></tr>`).join('');
 
