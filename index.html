@@ -3301,7 +3301,9 @@ async function sendAgentChat(){
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || ('status ' + response.status));
     const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
-    const answer = textBlocks.join('\n').trim() || '(sem resposta de texto)';
+    const answer = textBlocks.join('\n').trim() || (data.stop_reason === 'max_tokens'
+      ? '⚠️ A resposta foi cortada antes de terminar (pergunta complexa demais para o limite atual). Tente reformular de forma mais direta ou dividir em partes menores.'
+      : '(sem resposta de texto)');
 
     hist.push({role:'assistant', content: answer});
     typingEl.remove();
@@ -3365,7 +3367,9 @@ async function sendPricingChat(){
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || ('status ' + response.status));
     const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
-    const answer = textBlocks.join('\n').trim() || '(sem resposta de texto)';
+    const answer = textBlocks.join('\n').trim() || (data.stop_reason === 'max_tokens'
+      ? '⚠️ A resposta foi cortada antes de terminar (pergunta complexa demais para o limite atual). Tente reformular de forma mais direta ou dividir em partes menores.'
+      : '(sem resposta de texto)');
 
     pricingChatHistory.push({role:'assistant', content: answer});
     typingEl.remove();

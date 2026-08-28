@@ -66,7 +66,7 @@ $body = json_encode([
     // 'claude-haiku-4-5-20251001' se quiser respostas mais rápidas/baratas,
     // ou confira o modelo mais recente em https://docs.claude.com/en/docs/about-claude/models/overview
     'model' => 'claude-sonnet-5',
-    'max_tokens' => 500,
+    'max_tokens' => 2048,
     'system' => $payload['system'] ?? null,
     'messages' => $payload['messages'],
 ]);
