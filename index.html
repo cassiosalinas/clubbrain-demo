@@ -2682,7 +2682,7 @@ function renderMedicalTab(){
 
   document.getElementById('medical-apto-pct').textContent = `${aptoPct}% (${aptoCount}/${data.length})`;
   document.getElementById('medical-dias-perdidos').textContent = `${diasPerdidosTotal} dias`;
-  document.getElementById('medical-custo').textContent = `R$ ${(custoMedico/1000).toFixed(0)}K`;
+  document.getElementById('medical-custo').textContent = custoMedico >= 1000000 ? `R$ ${(custoMedico/1000000).toFixed(1).replace('.',',')}M` : `R$ ${Math.round(custoMedico/1000).toLocaleString('pt-BR')}K`;
   document.getElementById('medical-responsavel').textContent = medico;
   document.getElementById('medical-fisio').textContent = `Fisioterapeuta: ${fisio}`;
 
