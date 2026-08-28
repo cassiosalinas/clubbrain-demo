@@ -547,7 +547,7 @@ canvas{ max-width:100%; }
       <div class="nav-group-label">Inteligência</div>
       <div class="nav-item" data-view="ontology">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v6M12 13.5L6.8 17.2M12 13.5l5.2 3.7"/></svg>
-        Ontologia do Clube
+        Football Ontology™
       </div>
       <div class="nav-item" data-view="agents">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
@@ -706,7 +706,7 @@ canvas{ max-width:100%; }
       </div>
 
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Recursos da Ontologia do Clube</h3></div>
+        <div class="card-title"><h3>Recursos da Football Ontology™</h3></div>
         <div class="hero-note" style="margin:-6px 0 14px;">O grafo de conhecimento que conecta cada dado do clube — torcedor, ingresso, jogador, patrocínio, produto e ativo — num modelo único, consultado pelos Agentes de IA (Camada 4).</div>
         <div class="grid" id="ontology-resources" style="grid-template-columns:repeat(5,1fr); gap:10px;"></div>
       </div>
@@ -714,7 +714,7 @@ canvas{ max-width:100%; }
       <div class="card" style="margin-bottom:16px;">
         <div class="card-title">
           <h3>Tipos de objeto recentemente modificados</h3>
-          <span class="tag" id="ontology-count-tag" style="margin-left:auto;">9</span>
+          <span class="tag" id="ontology-count-tag" style="margin-left:auto;">13</span>
         </div>
         <div class="hero-note" style="margin:-6px 0 14px;">Cada card é um tipo de objeto na Ontologia do Clube — clique para ver como ele se conecta aos demais.</div>
         <div class="grid g-3" id="ontology-grid"></div>
@@ -795,13 +795,33 @@ canvas{ max-width:100%; }
           <div id="performance-ai-insights"></div>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom:16px;">
           <div class="card-title"><h3>Scouting — alvos recomendados</h3></div>
           <div class="hero-note" style="margin:-6px 0 14px;">ScoutBrain cruza perfil técnico, idade e orçamento disponível para sugerir reforços — nomes e valores fictícios.</div>
           <table>
             <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Clube atual</th><th>Valor estimado</th><th>Compatibilidade</th></tr></thead>
             <tbody id="scouting-table"></tbody>
           </table>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface));">
+          <div class="card-title"><h3>Simulador de cenários — "E se...?"</h3></div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Inteligência estratégica: simule o impacto de uma decisão antes de agir.</div>
+          <div class="grid g-2" style="margin-bottom:14px;">
+            <div>
+              <label class="seg-label">Cenário</label>
+              <select id="scenario-type" class="seg-input" onchange="updateScenarioOptions()">
+                <option value="vender">E se vendermos esse atleta?</option>
+                <option value="contratar">E se contratarmos um reforço (scouting)?</option>
+              </select>
+            </div>
+            <div>
+              <label class="seg-label" id="scenario-target-label">Jogador</label>
+              <select id="scenario-target" class="seg-input"></select>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="runScenarioSimulation()">Simular →</button>
+          <div id="scenario-result" style="margin-top:16px;"></div>
         </div>
       </div>
 
@@ -1846,7 +1866,7 @@ function logoutDemo(){
 const titles = {
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
-  ontology: ["Ontologia do Clube", "Camada 3 — o grafo de conhecimento que conecta torcedor, jogo, jogador, patrocínio e ativos num modelo único"],
+  ontology: ["Football Ontology™", "Camada 3 — o grafo de conhecimento que conecta torcedor, jogo, jogador, treino, saúde, contrato, patrocínio e ativos num modelo único"],
   clubmgmt: ["Gestão do clube", "Elenco, categorias de base, ativos, comissão técnica e médica, viagens, patrocínio e marca — a visão de quem administra o clube"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
   cdp: ["Torcedor 360", "CDP + CRM — base de torcedores por nível, Identity Resolution, Fan 360°, Jornada, AI Insights e Ativação — tudo num só lugar"],
@@ -2330,6 +2350,10 @@ const ONTOLOGY_ICONS = {
   setor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>',
   funcionario:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c0-1.5 1.5-2.5 3-2.5s3 1 3 2.5M15 9h4M15 13h4"/></svg>',
   ativo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h.01M15 16h.01"/></svg>',
+  treino:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>',
+  saude:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/><path d="M8 12h2l1.5-3L13 15l1.5-3H16"/></svg>',
+  performance:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg>',
+  contrato:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>',
 };
 let ontologyTypesCache = [];
 function buildOntologyTypes(){
@@ -2344,9 +2368,17 @@ function buildOntologyTypes(){
       desc:'Cada ingresso vendido, ligado a um setor do estádio e a um torcedor.', linked:['Setor do Estádio','Jogo'] },
     { key:'jogo', name:'Jogo / Evento', icon:ONTOLOGY_ICONS.jogo, color:brand2, count:`${jogos} no calendário`, dependents:9,
       desc:'Partidas e eventos sob gestão do clube — calendário, ocupação e receita.', linked:['Ingresso','Jogador','Patrocinador'] },
-    { key:'jogador', name:'Jogador', icon:ONTOLOGY_ICONS.jogador, color:red, count:'58 atletas', dependents:7, prominent:true,
-      desc:'Elenco profissional masculino e feminino — posição, idade, score de performance e valor de mercado.', linked:['Jogo','Comissão Técnica'] },
-    { key:'patrocinador', name:'Patrocinador', icon:ONTOLOGY_ICONS.patrocinador, color:amber, count:'8 marcas parceiras', dependents:4,
+    { key:'jogador', name:'Jogador', icon:ONTOLOGY_ICONS.jogador, color:red, count:`${SQUAD_BY_CLUB[currentClubId].masc.length + SQUAD_BY_CLUB[currentClubId].fem.length} atletas`, dependents:7, prominent:true,
+      desc:'Elenco profissional masculino e feminino — posição, idade, score de performance e valor de mercado.', linked:['Treino','Saúde','Performance','Contrato'] },
+    { key:'treino', name:'Treino', icon:ONTOLOGY_ICONS.treino, color:teal, count:'12 sessões/semana', dependents:2,
+      desc:'Cada sessão de treino registra carga física, presença e intensidade — a origem do sinal de risco de lesão.', linked:['Jogador','Saúde'] },
+    { key:'saude', name:'Saúde', icon:ONTOLOGY_ICONS.saude, color:'#22e07a', count:`${getInjuryRiskData().length} atletas monitorados`, dependents:3,
+      desc:'Histórico de saúde e risco de lesão de cada atleta, calculado pelo MedicalBrain a partir da carga de treino acumulada.', linked:['Jogador','Treino'] },
+    { key:'performance', name:'Performance', icon:ONTOLOGY_ICONS.performance, color:brand2, count:'5 dimensões monitoradas', dependents:4,
+      desc:'Radar tático do time (Ataque, Posse, Pressão, Defesa, Físico) e score individual de cada jogador, atualizado pelo PerformanceBrain.', linked:['Jogador','Jogo'] },
+    { key:'contrato', name:'Contrato', icon:ONTOLOGY_ICONS.contrato, color:gold, count:`${SQUAD_BY_CLUB[currentClubId].masc.length + SQUAD_BY_CLUB[currentClubId].fem.length} vínculos ativos`, dependents:3,
+      desc:'Vínculo contratual de cada atleta — vigência e valor — conectado ao valor de mercado e à decisão de renovar ou negociar, pelo FinanceBrain.', linked:['Jogador','Patrocinador'] },
+    { key:'patrocinador', name:'Patrocinador', icon:ONTOLOGY_ICONS.patrocinador, color:amber, count:`${SPONSORS_BY_CLUB[currentClubId].length} marcas parceiras`, dependents:4,
       desc:'Marcas parceiras do clube — contrato, contrapartidas e ROI de patrocínio.', linked:['Jogo','Contrato'] },
     { key:'produto', name:'Produto (Loja oficial)', icon:ONTOLOGY_ICONS.produto, color:brand2, count:'128 itens no catálogo', dependents:3,
       desc:'Catálogo da loja oficial (VTEX) — camisas, acessórios e colecionáveis.', linked:['Torcedor','Pedido'] },
@@ -2354,7 +2386,7 @@ function buildOntologyTypes(){
       desc:`Cada setor do ${st.name} — capacidade, preço e ocupação em tempo real.`, linked:['Ingresso','Ativo do Clube'] },
     { key:'funcionario', name:'Funcionário', icon:ONTOLOGY_ICONS.funcionario, color:brand, count:'340 colaboradores', dependents:5,
       desc:'Comissão técnica, médica, administrativa e operacional do clube.', linked:['Departamento','Jogador'] },
-    { key:'ativo', name:'Ativo do Clube', icon:ONTOLOGY_ICONS.ativo, color:gold, count:'3 instalações', dependents:6,
+    { key:'ativo', name:'Ativo do Clube', icon:ONTOLOGY_ICONS.ativo, color:gold, count:`${CLUB_ASSETS_BY_CLUB[currentClubId].length} instalações`, dependents:6,
       desc:'Estádio, centro de treinamento e sede social — o patrimônio físico do clube.', linked:['Setor do Estádio','Funcionário'] },
   ];
 }
@@ -2375,7 +2407,7 @@ function ontologyCardHtml(o){
 }
 function buildOntology(){
   const stats = [
-    ['Tipos de objeto','9'], ['Propriedades','186'], ['Propriedades compartilhadas','24'],
+    ['Tipos de objeto','13'], ['Propriedades','244'], ['Propriedades compartilhadas','31'],
     ['Tipos de link','34'], ['Tipos de ação','58'], ['Grupos','9'],
     ['Interfaces','4'], ['Tipos de valor','12'], ['Funções','146'], ['Problemas de saúde','0'],
   ];
@@ -2653,6 +2685,69 @@ function renderPerformanceTab(){
   document.getElementById('scouting-table').innerHTML = scouting.map(s=>`
     <tr><td class="strong">${s.name}</td><td>${s.pos}</td><td>${s.age}</td><td>${s.clube}</td><td>${s.valor}</td>
     <td><div class="progress" style="width:80px; display:inline-block; vertical-align:middle;"><div style="width:${s.compat}%; background:${teal};"></div></div> <span class="mono" style="font-size:11px;">${s.compat}%</span></td></tr>`).join('');
+
+  updateScenarioOptions();
+}
+
+/* ---------- Simulador de cenarios ("E se...?") — inteligencia estrategica ---------- */
+function parseMarketToM(str){
+  const s = String(str);
+  let num = parseFloat(s.replace(/[^\d,.-]/g,'').replace(',','.')) || 0;
+  if(s.includes('€')) num *= 6;
+  return num;
+}
+function updateScenarioOptions(){
+  const typeEl = document.getElementById('scenario-type');
+  if(!typeEl) return;
+  const type = typeEl.value;
+  const label = document.getElementById('scenario-target-label');
+  const select = document.getElementById('scenario-target');
+  if(type === 'vender'){
+    label.textContent = 'Jogador';
+    select.innerHTML = SQUAD_BY_CLUB[currentClubId].masc.map(p=>`<option value="${p.name}">${p.name} (${p.pos})</option>`).join('');
+  } else {
+    label.textContent = 'Alvo de scouting';
+    select.innerHTML = (SCOUTING_TARGETS_BY_CLUB[currentClubId]||SCOUTING_TARGETS_BY_CLUB.flamengo).map(s=>`<option value="${s.name}">${s.name} (${s.pos})</option>`).join('');
+  }
+  document.getElementById('scenario-result').innerHTML = '';
+}
+function runScenarioSimulation(){
+  const type = document.getElementById('scenario-type').value;
+  const targetName = document.getElementById('scenario-target').value;
+  const trend = SQUAD_VALUE_TREND_BY_CLUB[currentClubId] || SQUAD_VALUE_TREND_BY_CLUB.flamengo;
+  const currentTotal = trend[trend.length-1];
+  const radar = TACTICAL_RADAR_BY_CLUB[currentClubId] || TACTICAL_RADAR_BY_CLUB.flamengo;
+
+  if(type === 'vender'){
+    const player = SQUAD_BY_CLUB[currentClubId].masc.find(p=>p.name===targetName);
+    if(!player) return;
+    const valorM = Math.round(parseMarketToM(player.market));
+    const newTotal = currentTotal - valorM;
+    const pctImpact = Math.round((valorM/currentTotal)*100);
+    const posImpact = { 'Goleiro':'Defesa','Zagueiro':'Defesa','Lateral Direito':'Defesa','Lateral Esquerdo':'Defesa','Volante':'Posse','Meia':'Posse','Atacante':'Ataque' }[player.pos] || 'Físico';
+    document.getElementById('scenario-result').innerHTML = `
+      <div class="grid g-2" style="margin-bottom:12px;">
+        <div><div class="hero-note">Valor recebido na venda</div><div class="value" style="font-size:18px;">R$ ${valorM}M</div></div>
+        <div><div class="hero-note">Novo valor do elenco</div><div class="value" style="font-size:18px;">R$ ${newTotal}M <span style="font-size:12px; color:${red};">(-${pctImpact}%)</span></div></div>
+      </div>
+      <div class="hero-note" style="margin-bottom:6px; font-weight:600; color:var(--text);">Impacto tático estimado</div>
+      <div style="font-size:12.5px; color:var(--text-dim); margin-bottom:12px;">Dimensão mais afetada: <b style="color:var(--text);">${posImpact}</b> (score atual: ${radar[posImpact]}/100) — recomenda-se buscar reposição via ScoutBrain antes de fechar negócio.</div>
+      <div class="status-row"><span class="chip-avatar" style="background:${gold}; width:26px; height:26px; font-size:11px;">F</span><div style="flex:1; font-size:12.5px;"><b style="color:${gold};">FinanceBrain:</b> Vender ${player.name} por R$ ${valorM}M representa ${pctImpact}% do valor total do elenco — considere reinvestir em scouting na posição de ${player.pos}.</div></div>
+    `;
+  } else {
+    const target = (SCOUTING_TARGETS_BY_CLUB[currentClubId]||SCOUTING_TARGETS_BY_CLUB.flamengo).find(s=>s.name===targetName);
+    if(!target) return;
+    const valorM = Math.round(parseMarketToM(target.valor));
+    const newTotal = currentTotal + valorM;
+    const pctImpact = Math.round((valorM/currentTotal)*100);
+    document.getElementById('scenario-result').innerHTML = `
+      <div class="grid g-2" style="margin-bottom:12px;">
+        <div><div class="hero-note">Investimento estimado</div><div class="value" style="font-size:18px;">R$ ${valorM}M</div></div>
+        <div><div class="hero-note">Novo valor do elenco</div><div class="value" style="font-size:18px; color:#22e07a;">R$ ${newTotal}M (+${pctImpact}%)</div></div>
+      </div>
+      <div class="status-row"><span class="chip-avatar" style="background:${teal}; width:26px; height:26px; font-size:11px;">S</span><div style="flex:1; font-size:12.5px;"><b style="color:${teal};">ScoutBrain:</b> ${target.name} tem ${target.compat}% de compatibilidade com o perfil buscado — reforço na posição de ${target.pos}, dentro do orçamento estimado.</div></div>
+    `;
+  }
 }
 
 const BASE_CATEGORIES_BY_CLUB = {
