@@ -1863,44 +1863,58 @@ canvas{ max-width:100%; }
 
     <!-- ================= INTEGRATION HUB ================= -->
     <section class="view" id="view-integrations">
-      <div class="grid g-4" style="margin-bottom:16px;">
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg></span>Integrações ativas</div>
-          <div class="value">11</div><div class="hero-note">de 13 conectadas ao todo</div>
+      <div class="subtabs" id="integrations-subtabs">
+        <div class="subtab active" data-sub="overview">Visão geral</div>
+        <div class="subtab" data-sub="config">Configurações</div>
+      </div>
+
+      <!-- Sub: Visão geral -->
+      <div class="subview active" id="sub-int-overview">
+        <div class="grid g-4" style="margin-bottom:16px;">
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg></span>Integrações ativas</div>
+            <div class="value">11</div><div class="hero-note">de 13 conectadas ao todo</div>
+          </div>
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Taxa de sucesso (24h)</div>
+            <div class="value">99,6%</div><div class="delta up">↑ 0,2pp vs ontem</div>
+          </div>
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Volume processado (mês)</div>
+            <div class="value">R$ 4,2M</div><div class="hero-note">via pagamentos + commerce</div>
+          </div>
+          <div class="card kpi">
+            <div class="label"><span class="icon-badge badge-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>Precisam de atenção</div>
+            <div class="value">2</div><div class="hero-note">token expirando · latência alta</div>
+          </div>
         </div>
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Taxa de sucesso (24h)</div>
-          <div class="value">99,6%</div><div class="delta up">↑ 0,2pp vs ontem</div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><h3>Mapa de conexões</h3></div>
+          <div class="hero-note" style="margin-bottom:14px;">Cada linha é uma integração ativa com o ClubBrain — verde sólido é saudável, âmbar tracejado precisa de atenção. Clique num sistema para ver detalhes.</div>
+          <div id="integrations-map" style="width:100%; overflow-x:auto;"></div>
         </div>
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Volume processado (mês)</div>
-          <div class="value">R$ 4,2M</div><div class="hero-note">via pagamentos + commerce</div>
-        </div>
-        <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.6 18a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>Precisam de atenção</div>
-          <div class="value">2</div><div class="hero-note">token expirando · latência alta</div>
+
+        <div class="card">
+          <div class="card-title"><h3>Log de sincronizações</h3></div>
+          <table>
+            <thead><tr><th>Horário</th><th>Integração</th><th>Evento</th><th>Registros</th><th>Status</th></tr></thead>
+            <tbody id="integrations-log"></tbody>
+          </table>
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Pagamentos &amp; financeiro</h3></div>
-        <div class="grid g-3" id="integrations-pagamentos"></div>
-      </div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Comércio, ingressos &amp; CRM</h3></div>
-        <div class="grid g-3" id="integrations-commerce"></div>
-      </div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title"><h3>Marketing, redes &amp; analytics</h3></div>
-        <div class="grid g-3" id="integrations-marketing"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><h3>Log de sincronizações</h3></div>
-        <table>
-          <thead><tr><th>Horário</th><th>Integração</th><th>Evento</th><th>Registros</th><th>Status</th></tr></thead>
-          <tbody id="integrations-log"></tbody>
-        </table>
+      <!-- Sub: Configurações -->
+      <div class="subview" id="sub-int-config">
+        <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface));">
+          <div class="hero-note" style="font-size:12.5px;">Credenciais, escopos e frequência de sincronização de cada integração. Chaves de API são mascaradas por segurança.</div>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Integração</th><th>Categoria</th><th>Ativo</th><th>Chave de API</th><th>Webhook</th><th>Sincronização</th><th></th></tr></thead>
+            <tbody id="integrations-config"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -5103,45 +5117,86 @@ function buildOps(){
 /* ============ INTEGRATION HUB ============ */
 const INTEGRATIONS = {
   pagamentos: [
-    { name:'Pix (Banco Central)', badge:'PIX', color:'#22e07a', status:'active', desc:'Pagamentos instantâneos de sócio-torcedor, ingressos e commerce.', sync:'há 2 min' },
-    { name:'Stripe', badge:'ST', color:brand, status:'active', desc:'Assinaturas internacionais e pagamentos recorrentes.', sync:'há 4 min' },
-    { name:'Mercado Pago', badge:'MP', color:'#00b1ea', status:'active', desc:'Checkout transparente e split de pagamento do commerce.', sync:'há 1 min' },
-    { name:'Cielo', badge:'CI', color:amber, status:'active', desc:'Maquininhas e POS físico no dia de jogo (matchday).', sync:'há 6 min' },
-    { name:'TOTVS Protheus (ERP)', badge:'TP', color:'#ff8a3d', status:'warn', desc:'Conciliação financeira e faturamento — token expira em 3 dias.', sync:'há 38 min' },
+    { name:'Pix (Banco Central)', badge:'PIX', color:'#22e07a', status:'active', desc:'Pagamentos instantâneos de sócio-torcedor, ingressos e commerce.', sync:'há 2 min', cat:'Pagamentos', key:'pix_cert_••••••a01', webhook:'/webhooks/pix', freq:'Tempo real' },
+    { name:'Stripe', badge:'ST', color:brand, status:'active', desc:'Assinaturas internacionais e pagamentos recorrentes.', sync:'há 4 min', cat:'Pagamentos', key:'sk_live_••••••3f2a', webhook:'/webhooks/stripe', freq:'Tempo real' },
+    { name:'Mercado Pago', badge:'MP', color:'#00b1ea', status:'active', desc:'Checkout transparente e split de pagamento do commerce.', sync:'há 1 min', cat:'Pagamentos', key:'APP_USR-••••••91cd', webhook:'/webhooks/mercadopago', freq:'Tempo real' },
+    { name:'Cielo', badge:'CI', color:amber, status:'active', desc:'Maquininhas e POS físico no dia de jogo (matchday).', sync:'há 6 min', cat:'Pagamentos', key:'MerchantId ••••••7b1', webhook:'—', freq:'A cada 5 min' },
+    { name:'TOTVS Protheus (ERP)', badge:'TP', color:'#ff8a3d', status:'warn', desc:'Conciliação financeira e faturamento — token expira em 3 dias.', sync:'há 38 min', cat:'Financeiro', key:'oauth_tok_••••••e40', webhook:'/webhooks/totvs', freq:'Diário' },
   ],
   commerce: [
-    { name:'VTEX', badge:'VT', color:brand2, status:'active', desc:'Catálogo, preços e pedidos da loja oficial em tempo real.', sync:'há 1 min' },
-    { name:'Ingresse', badge:'IN', color:teal, status:'active', desc:'Venda, check-in e validação de ingressos do estádio.', sync:'há 3 min' },
-    { name:'Salesforce CRM', badge:'SF', color:'#00a1e0', status:'active', desc:'Histórico de relacionamento e atendimento do sócio-torcedor.', sync:'há 5 min' },
-    { name:'Zendesk', badge:'ZD', color:'#03363d', status:'active', desc:'Tickets e SLA de atendimento ao torcedor.', sync:'há 7 min' },
+    { name:'VTEX', badge:'VT', color:brand2, status:'active', desc:'Catálogo, preços e pedidos da loja oficial em tempo real.', sync:'há 1 min', cat:'Commerce', key:'vtex_app_••••••2c9', webhook:'/webhooks/vtex', freq:'Tempo real' },
+    { name:'Ingresse', badge:'IN', color:teal, status:'active', desc:'Venda, check-in e validação de ingressos do estádio.', sync:'há 3 min', cat:'Ingressos', key:'ing_key_••••••88a', webhook:'/webhooks/ingresse', freq:'Tempo real' },
+    { name:'Salesforce CRM', badge:'SF', color:'#00a1e0', status:'active', desc:'Histórico de relacionamento e atendimento do sócio-torcedor.', sync:'há 5 min', cat:'CRM', key:'sf_oauth_••••••1d4', webhook:'—', freq:'A cada 15 min' },
+    { name:'Zendesk', badge:'ZD', color:'#4fc9df', status:'active', desc:'Tickets e SLA de atendimento ao torcedor.', sync:'há 7 min', cat:'CRM', key:'zd_token_••••••ff2', webhook:'/webhooks/zendesk', freq:'Tempo real' },
   ],
   marketing: [
-    { name:'WhatsApp Business API', badge:'WA', color:'#25D366', status:'active', desc:'Notificações transacionais e atendimento via Meta.', sync:'há 1 min' },
-    { name:'Meta Graph API', badge:'MT', color:'#0866FF', status:'warn', desc:'Métricas de Instagram/Facebook — latência acima do normal.', sync:'há 22 min' },
-    { name:'RD Station', badge:'RD', color:'#DD3B34', status:'active', desc:'Automação de e-mail marketing e jornadas de nutrição.', sync:'há 4 min' },
-    { name:'Google Analytics 4', badge:'GA', color:gold, status:'active', desc:'Tráfego, conversão e atribuição do site e app.', sync:'há 2 min' },
+    { name:'WhatsApp Business API', badge:'WA', color:'#25D366', status:'active', desc:'Notificações transacionais e atendimento via Meta.', sync:'há 1 min', cat:'Marketing', key:'wa_token_••••••0a6', webhook:'/webhooks/whatsapp', freq:'Tempo real' },
+    { name:'Meta Graph API', badge:'MT', color:'#0866FF', status:'warn', desc:'Métricas de Instagram/Facebook — latência acima do normal.', sync:'há 22 min', cat:'Redes sociais', key:'meta_tok_••••••5e7', webhook:'—', freq:'A cada 30 min' },
+    { name:'RD Station', badge:'RD', color:'#DD3B34', status:'active', desc:'Automação de e-mail marketing e jornadas de nutrição.', sync:'há 4 min', cat:'Marketing', key:'rd_api_••••••c31', webhook:'/webhooks/rdstation', freq:'A cada 10 min' },
+    { name:'Google Analytics 4', badge:'GA', color:gold, status:'active', desc:'Tráfego, conversão e atribuição do site e app.', sync:'há 2 min', cat:'Analytics', key:'ga4_prop_••••••409', webhook:'—', freq:'Diário' },
   ],
 };
 function buildIntegrations(){
   const statusLabel = { active:'Conectado', warn:'Atenção', error:'Erro' };
   const statusCls = { active:'status-active', warn:'status-warn', error:'status-error' };
-  const renderGroup = (elId, items) => {
-    document.getElementById(elId).innerHTML = items.map(i=>`
-      <div class="card clickable" style="background:var(--surface-2);" onclick="showToast('${i.name.replace(/'/g,"\\'")} · detalhes da integração (webhooks, escopo de API, credenciais)')">
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-          <span class="chip-avatar" style="background:${i.color}; width:38px; height:38px; font-size:12px;">${i.badge}</span>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:700; font-size:13px;">${i.name}</div>
-            <span class="status-dot ${statusCls[i.status]}">${statusLabel[i.status]}</span>
-          </div>
+  const all = [...INTEGRATIONS.pagamentos, ...INTEGRATIONS.commerce, ...INTEGRATIONS.marketing];
+
+  // subtab switching (liga só uma vez)
+  const subtabsEl = document.getElementById('integrations-subtabs');
+  if(!subtabsEl.dataset.wired){
+    subtabsEl.dataset.wired = '1';
+    subtabsEl.addEventListener('click', (e)=>{
+      const t = e.target.closest('.subtab'); if(!t) return;
+      document.querySelectorAll('#integrations-subtabs .subtab').forEach(s=>s.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('#view-integrations .subview').forEach(s=>s.classList.remove('active'));
+      document.getElementById('sub-int-'+t.dataset.sub).classList.add('active');
+    });
+  }
+
+  // --- Mapa de conexões (hub-and-spoke, estilo OIC) ---
+  const W = 900, H = 560, cx = W/2, cy = H/2, r = 210;
+  const nodes = all.map((it,i)=>{
+    const angle = (i / all.length) * Math.PI*2 - Math.PI/2;
+    return { ...it, x: cx + Math.cos(angle)*r, y: cy + Math.sin(angle)*r };
+  });
+  const linesSvg = nodes.map(n=>{
+    const warn = n.status === 'warn';
+    return `<line x1="${cx}" y1="${cy}" x2="${n.x}" y2="${n.y}" stroke="${warn?amber:'#22e07a'}" stroke-width="1.6" ${warn?'stroke-dasharray="5,4"':''} opacity="0.55"/>`;
+  }).join('');
+  const nodesSvg = nodes.map(n=>`
+    <g class="int-node" style="cursor:pointer;" onclick="showToast('${n.name.replace(/'/g,"\\'")} · ${n.freq} · ${statusLabel[n.status]}')">
+      <circle cx="${n.x}" cy="${n.y}" r="26" fill="${n.color}22" stroke="${n.color}" stroke-width="1.6"/>
+      <text x="${n.x}" y="${n.y+4}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${n.color}" font-family="inherit">${n.badge}</text>
+      <text x="${n.x}" y="${n.y+42}" text-anchor="middle" font-size="10.5" fill="var(--text-dim)" font-family="inherit">${n.name.length>18 ? n.name.slice(0,16)+'…' : n.name}</text>
+    </g>`).join('');
+  document.getElementById('integrations-map').innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%; min-width:640px; height:auto; display:block;">
+      ${linesSvg}
+      <circle cx="${cx}" cy="${cy}" r="46" fill="url(#intHubGrad)" stroke="${brand}" stroke-width="2"/>
+      <defs><linearGradient id="intHubGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${brand}" stop-opacity="0.35"/><stop offset="1" stop-color="${brand2}" stop-opacity="0.35"/>
+      </linearGradient></defs>
+      <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" font-family="inherit">ClubBrain</text>
+      <text x="${cx}" y="${cy+13}" text-anchor="middle" font-size="9.5" fill="var(--text-faint)" font-family="inherit">Ontologia do Clube</text>
+      ${nodesSvg}
+    </svg>`;
+
+  // --- Configurações ---
+  document.getElementById('integrations-config').innerHTML = all.map(i=>`
+    <tr>
+      <td class="strong">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="chip-avatar" style="background:${i.color}; width:26px; height:26px; font-size:10px;">${i.badge}</span>${i.name}
         </div>
-        <div class="hero-note" style="margin-bottom:10px;">${i.desc}</div>
-        <div style="font-size:11.5px; color:var(--text-faint); padding-top:10px; border-top:1px solid var(--border);">Última sincronização: ${i.sync}</div>
-      </div>`).join('');
-  };
-  renderGroup('integrations-pagamentos', INTEGRATIONS.pagamentos);
-  renderGroup('integrations-commerce', INTEGRATIONS.commerce);
-  renderGroup('integrations-marketing', INTEGRATIONS.marketing);
+      </td>
+      <td><span class="tag">${i.cat}</span></td>
+      <td><span class="status-dot ${statusCls[i.status]}">${statusLabel[i.status]}</span></td>
+      <td class="mono">${i.key}</td>
+      <td class="mono">${i.webhook}</td>
+      <td>${i.freq}</td>
+      <td><span class="card-foot-link" style="margin-top:0;" onclick="showToast('${i.name.replace(/'/g,"\\'")} · configuração aberta (somente leitura na demo)')">Editar</span></td>
+    </tr>`).join('');
 
   const logs = [
     ['há 1 min','Pix (Banco Central)','Webhook de pagamento confirmado','1','<span class="status-dot status-active">OK</span>'],
