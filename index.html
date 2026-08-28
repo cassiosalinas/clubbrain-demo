@@ -2262,6 +2262,7 @@ function selectClub(id, silent){
   refreshCdpForClub();
   refreshEventsForClub();
   if(document.getElementById('ontology-grid')) buildOntology();
+  renderContentPosts();
   refreshClubManagementForClub();
   renderCommerceProducts();
   if(document.getElementById('seg-nivel')) updateSegmentBuilder();
@@ -3806,25 +3807,45 @@ function buildSentiment(){
 }
 
 /* ============ CONTENT ============ */
-function buildContent(){
-  const posts = [
-    {n:'01', label:'GOL', icon:'▶', likes:'125K', comments:'3,2K', shares:'8,7K', views:'2,3M', c1:'#6c6bff', c2:'#3a2f8f'},
-    {n:'02', label:'AO VIVO', icon:'●', likes:'98K', comments:'2,1K', shares:'6,2K', views:'1,8M', c1:'#1fd6b8', c2:'#0f6e5f'},
-    {n:'03', label:'BASTIDORES', icon:'🎥', likes:'76K', comments:'1,9K', shares:'4,3K', views:'1,2M', c1:'#b06bff', c2:'#5c3499'},
-    {n:'04', label:'ENTREVISTA', icon:'🎙', likes:'65K', comments:'1,4K', shares:'3,8K', views:'1,1M', c1:'#ffb454', c2:'#8f5a12'},
-  ];
-  document.getElementById('top-content').innerHTML = posts.map(p=>`
+const CONTENT_BY_CLUB = {
+  flamengo: [
+    {n:'01', label:'GOL', icon:'▶', desc:'Pedro decide no fim contra o Rival FC', likes:'125K', comments:'3,2K', shares:'8,7K', views:'2,3M', c1:'#6c6bff', c2:'#3a2f8f'},
+    {n:'02', label:'AO VIVO', icon:'●', desc:'Flamengo x Cruzeiro — Libertadores', likes:'98K', comments:'2,1K', shares:'6,2K', views:'1,8M', c1:'#1fd6b8', c2:'#0f6e5f'},
+    {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino no Ninho do Urubu', likes:'76K', comments:'1,9K', shares:'4,3K', views:'1,2M', c1:'#b06bff', c2:'#5c3499'},
+    {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Léo Pereira fala sobre a Libertadores', likes:'65K', comments:'1,4K', shares:'3,8K', views:'1,1M', c1:'#ffb454', c2:'#8f5a12'},
+  ],
+  corinthians: [
+    {n:'01', label:'GOL', icon:'▶', desc:'Yuri Alberto marca de calcanhar', likes:'112K', comments:'2,8K', shares:'7,4K', views:'2,0M', c1:'#6c6bff', c2:'#3a2f8f'},
+    {n:'02', label:'AO VIVO', icon:'●', desc:'Corinthians x Santos — Brasileirão', likes:'89K', comments:'1,9K', shares:'5,6K', views:'1,6M', c1:'#1fd6b8', c2:'#0f6e5f'},
+    {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino no CT Joaquim Grava', likes:'68K', comments:'1,6K', shares:'3,9K', views:'1,0M', c1:'#b06bff', c2:'#5c3499'},
+    {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Memphis Depay fala sobre a temporada', likes:'59K', comments:'1,3K', shares:'3,4K', views:'980K', c1:'#ffb454', c2:'#8f5a12'},
+  ],
+  estrela: [
+    {n:'01', label:'GOL', icon:'▶', desc:'Matheus Estrela marca no fim do jogo', likes:'18K', comments:'620', shares:'1,2K', views:'340K', c1:'#6c6bff', c2:'#3a2f8f'},
+    {n:'02', label:'AO VIVO', icon:'●', desc:'Estrela FC x Rival FC — Série B', likes:'14K', comments:'480', shares:'890', views:'260K', c1:'#1fd6b8', c2:'#0f6e5f'},
+    {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino no CT Constelação', likes:'9,8K', comments:'310', shares:'520', views:'170K', c1:'#b06bff', c2:'#5c3499'},
+    {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Técnico Ricardo Fontoura fala sobre a Série B', likes:'7,2K', comments:'240', shares:'410', views:'130K', c1:'#ffb454', c2:'#8f5a12'},
+  ],
+};
+function renderContentPosts(){
+  const el = document.getElementById('top-content');
+  if(!el) return;
+  const posts = CONTENT_BY_CLUB[currentClubId] || CONTENT_BY_CLUB.flamengo;
+  el.innerHTML = posts.map(p=>`
     <div class="card" style="padding:0; overflow:hidden;">
       <div style="height:120px; background:linear-gradient(135deg, ${p.c1}, ${p.c2}); display:flex; align-items:center; justify-content:center; font-size:28px; position:relative;">
         <span style="position:absolute; top:8px; left:8px; font-size:11px; background:rgba(0,0,0,.4); padding:2px 8px; border-radius:20px;">#${p.n}</span>
         <span style="position:absolute; top:8px; right:8px; font-size:10px; background:rgba(0,0,0,.4); padding:2px 8px; border-radius:20px;">${p.label}</span>
         ${p.icon}
       </div>
-      <div style="padding:12px 14px; display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim);">
+      <div style="padding:10px 14px 4px; font-size:12px; font-weight:600;">${p.desc}</div>
+      <div style="padding:6px 14px 12px; display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim);">
         <span>♥ ${p.likes}</span><span>💬 ${p.comments}</span><span>↗ ${p.shares}</span><span>👁 ${p.views}</span>
       </div>
     </div>`).join('');
-
+}
+function buildContent(){
+  renderContentPosts();
   const ctx = document.getElementById('chart-reach').getContext('2d');
   new Chart(ctx, {
     type:'line',
