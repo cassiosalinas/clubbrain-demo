@@ -367,6 +367,30 @@ canvas{ max-width:100%; }
 #login-error{ display:none; color:#ff8ea0; font-size:12px; margin:-4px 0 14px; text-align:left; }
 .login-hint{ font-size:11px; color:var(--text-faint); margin-top:18px; }
 
+#club-cover-screen{
+  position:fixed; inset:0; z-index:999; display:none;
+  background: radial-gradient(circle at 70% 10%, rgba(108,107,255,.16), transparent 55%), linear-gradient(180deg, #0c1020 0%, #060810 100%);
+  align-items:center; justify-content:center; flex-direction:column; padding:32px;
+}
+.club-cover-title{ font-size:24px; font-weight:800; letter-spacing:-.01em; margin-bottom:6px; text-align:center; }
+.club-cover-sub{ font-size:13px; color:var(--text-faint); margin-bottom:36px; text-align:center; }
+.club-cover-grid{ display:flex; gap:22px; flex-wrap:wrap; justify-content:center; max-width:920px; }
+.club-cover-card{
+  width:220px; background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  padding:28px 20px; text-align:center; cursor:pointer;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.club-cover-card:hover{ transform:translateY(-4px); border-color:var(--brand); box-shadow:0 16px 34px -12px rgba(108,107,255,.35); }
+.club-cover-badge{
+  width:84px; height:84px; border-radius:50%; margin:0 auto 16px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 10px 24px -8px rgba(0,0,0,.5);
+  overflow:hidden;
+}
+.club-cover-badge svg, .club-cover-badge img{ width:44px; height:44px; }
+.club-cover-name{ font-size:15.5px; font-weight:700; margin-bottom:3px; }
+.club-cover-sub2{ font-size:11px; color:var(--text-faint); }
+
 #global-chat-panel{
   position:fixed; top:0; right:-420px; width:400px; max-width:92vw; height:100vh;
   background:var(--surface); border-left:1px solid var(--border);
@@ -489,6 +513,12 @@ canvas{ max-width:100%; }
     </form>
     <div class="login-hint">Ambiente de demonstração — usuário <b>admin</b>, senha <b>admin</b></div>
   </div>
+</div>
+
+<div id="club-cover-screen">
+  <div class="club-cover-title">Escolha um clube para explorar</div>
+  <div class="club-cover-sub">Dados de demonstração — reais para Corinthians e Flamengo, fictícios para o Estrela FC</div>
+  <div class="club-cover-grid" id="club-cover-grid"></div>
 </div>
 
 <div class="app">
@@ -802,7 +832,7 @@ canvas{ max-width:100%; }
               <div class="subtab" data-gender="fem">Feminino</div>
             </div>
           </div>
-          <div class="hero-note" style="margin:-6px 0 14px;">Elenco oficial real, pesquisado publicamente (nomes, posições e idades). Valor de mercado em € reflete Transfermarkt quando disponível; score de performance e valor de marca são estimativas para fins de demonstração.</div>
+          <div class="hero-note" style="margin:-6px 0 14px;" id="elenco-disclaimer">Elenco oficial real, pesquisado publicamente (nomes, posições e idades). Valor de mercado em € reflete Transfermarkt quando disponível; score de performance e valor de marca são estimativas para fins de demonstração.</div>
           <div class="grid g-4" id="team-stats-grid" style="margin-bottom:16px;"></div>
           <table>
             <thead><tr><th>Jogador</th><th>Posição</th><th>Idade</th><th>Score de performance</th><th>Valor de marca</th><th>Valor de mercado</th></tr></thead>
@@ -1959,6 +1989,8 @@ canvas{ max-width:100%; }
     if (user === 'admin' && pass === 'admin') {
       screen.style.display = 'none';
       errorEl.style.display = 'none';
+      renderClubCover();
+      document.getElementById('club-cover-screen').style.display = 'flex';
     } else {
       errorEl.style.display = 'block';
     }
@@ -1969,6 +2001,7 @@ function logoutDemo(){
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
   document.getElementById('login-error').style.display = 'none';
+  document.getElementById('club-cover-screen').style.display = 'none';
   screen.style.display = 'flex';
   document.getElementById('login-user').focus();
 }
@@ -2101,6 +2134,7 @@ document.getElementById('platform-mark-logo').innerHTML = CLUBBRAIN_LOGO_HTML;
 document.getElementById('sidebar-powered-logo').innerHTML = CLUBBRAIN_LOGO_HTML;
 const FLAMENGO_CREST_HTML = '<img src="data:image/svg+xml;base64,' + FLAMENGO_CREST_B64 + '" alt="Flamengo">';
 const CORINTHIANS_CREST_HTML = '<img src="data:image/png;base64,' + CORINTHIANS_CREST_B64 + '" alt="Corinthians">';
+const ESTRELA_CREST_HTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><path d="M12 7.3 13.4 10.4 16.8 10.7 14.2 12.9 15 16.2 12 14.4 9 16.2 9.8 12.9 7.2 10.7 10.6 10.4Z" fill="white"/></svg>';
 
 const CLUB_PROFILES = {
   flamengo: {
@@ -2131,6 +2165,20 @@ const CLUB_PROFILES = {
     },
     ai:'Corinthians, Neo Química Arena (49 mil lugares). Torcedores ativos: 7,1 milhões (de ~30 milhões de apaixonados estimados). Torcedores com perfil 360° completo na plataforma Torcedor 360: 12.000, sendo 800 sócios-torcedores pagantes (programa Fiel Torcedor). Receita consolidada do período: R$ 17,8M. Números estimados/ilustrativos para fins de demonstração.',
   },
+  estrela: {
+    name:'Estrela FC', sub:'Temporada 2026', crest:ESTRELA_CREST_HTML, badgeBg:'linear-gradient(135deg,#2e5aac,#1b3a75)',
+    kpi:{
+      receita:'R$ 3,1M', receitaDelta:'↑ 6,2% vs. período anterior',
+      ativos:'1,24M', ativosDelta:'↑ 5,8%',
+      nps:'58', npsDelta:'↑ 2 pts',
+      churn:'6,8%', churnBase:'≈ 84 mil torcedores com sinais de risco',
+      cdpTotal:'5,2M', cdpIdentificados:'1,24M', cdpPerfis:'30.000', cdpSocios:'1.000',
+      engajamento:'6,2%', engajamentoDelta:'↑ 0,3pp vs. mês anterior',
+      novos:'95K', novosDelta:'↑ 7%', interacoes:'12M', interacoesDelta:'↑ 11%', recorrentes:'58%', recorrentesDelta:'↑ 5%',
+      mrr:'R$ 450,0K', mrrDelta:'↑ 9,0%', arpu:'R$ 450,00', arpuDelta:'↑ 4,0%', subChurn:'3,4%', subChurnDelta:'↓ 0,4pp',
+    },
+    ai:'Estrela FC (clube fictício), Estádio Municipal (24 mil lugares), Curitiba, PR. Torcedores ativos: 1,24 milhão (de ~5,2 milhões de apaixonados estimados). Torcedores com perfil 360° completo na plataforma Torcedor 360: 30.000, sendo 1.000 sócios-torcedores pagantes. Receita consolidada do período: R$ 3,1M. Clube menor, disputando a Série B do Brasileirão. Números fictícios, criados para fins de demonstração comercial.',
+  },
 };
 let currentClubId = 'flamengo';
 
@@ -2142,6 +2190,21 @@ function renderClubDropdown(){
       <span>${c.name}</span>
     </div>`;
   }).join('');
+}
+const CLUB_COVER_ORDER = ['estrela', 'corinthians', 'flamengo'];
+function renderClubCover(){
+  document.getElementById('club-cover-grid').innerHTML = CLUB_COVER_ORDER.map(id=>{
+    const c = CLUB_PROFILES[id];
+    return `<div class="club-cover-card" onclick="chooseClubFromCover('${id}')">
+      <div class="club-cover-badge" style="background:${c.badgeBg};">${c.crest}</div>
+      <div class="club-cover-name">${c.name}</div>
+      <div class="club-cover-sub2">${c.sub}</div>
+    </div>`;
+  }).join('');
+}
+function chooseClubFromCover(id){
+  selectClub(id, true);
+  document.getElementById('club-cover-screen').style.display = 'none';
 }
 function toggleClubDropdown(e){
   if(e) e.stopPropagation();
@@ -2723,6 +2786,28 @@ const SQUAD_BY_CLUB = {
       { name:'Jaqueline', pos:'Atacante', age:32, score:88, brand:'R$ 1,3M', market:'€ 0,25M' },
     ],
   },
+  estrela: {
+    masc:[
+      { name:'Ederson Vale', pos:'Goleiro', age:26, score:74, brand:'R$ 1,2M', market:'€ 1,5M' },
+      { name:'Bruno Kanieski', pos:'Zagueiro', age:29, score:72, brand:'R$ 0,9M', market:'€ 1,2M' },
+      { name:'Diogo Marcelino', pos:'Zagueiro', age:24, score:70, brand:'R$ 0,7M', market:'€ 0,9M' },
+      { name:'Kaique Ferraz', pos:'Lateral Direito', age:22, score:71, brand:'R$ 0,8M', market:'€ 1,1M' },
+      { name:'Renan Bittencourt', pos:'Lateral Esquerdo', age:25, score:69, brand:'R$ 0,6M', market:'€ 0,8M' },
+      { name:'Thiaguinho Rocha', pos:'Volante', age:27, score:73, brand:'R$ 1,0M', market:'€ 1,4M' },
+      { name:'Everaldo Junior', pos:'Meia', age:23, score:76, brand:'R$ 1,5M', market:'€ 2,2M' },
+      { name:'Vinícius Aracaju', pos:'Meia', age:21, score:78, brand:'R$ 1,8M', market:'€ 2,8M' },
+      { name:'Robson Ilhéus', pos:'Atacante', age:28, score:75, brand:'R$ 1,3M', market:'€ 1,9M' },
+      { name:'Matheus Estrela', pos:'Atacante', age:20, score:80, brand:'R$ 2,5M', market:'€ 3,6M' },
+    ],
+    fem:[
+      { name:'Paula Menezes', pos:'Goleira', age:27, score:70, brand:'R$ 0,15M', market:'€ 0,05M' },
+      { name:'Renata Souto', pos:'Zagueira', age:25, score:71, brand:'R$ 0,2M', market:'€ 0,07M' },
+      { name:'Ana Beatriz Lima', pos:'Lateral', age:23, score:68, brand:'R$ 0,15M', market:'€ 0,05M' },
+      { name:'Camila Duarte', pos:'Volante', age:26, score:72, brand:'R$ 0,25M', market:'€ 0,08M' },
+      { name:'Juliana Prates', pos:'Meia', age:24, score:74, brand:'R$ 0,3M', market:'€ 0,10M' },
+      { name:'Bianca Estrela', pos:'Atacante', age:22, score:77, brand:'R$ 0,4M', market:'€ 0,12M' },
+    ],
+  },
 };
 let elencoGender = 'masc';
 
@@ -2730,10 +2815,12 @@ let elencoGender = 'masc';
 const TACTICAL_RADAR_BY_CLUB = {
   flamengo: { Ataque:88, Posse:79, Pressão:82, Defesa:76, Físico:84 },
   corinthians: { Ataque:74, Posse:71, Pressão:78, Defesa:80, Físico:77 },
+  estrela: { Ataque:68, Posse:65, Pressão:70, Defesa:66, Físico:72 },
 };
 const SQUAD_VALUE_TREND_BY_CLUB = {
   flamengo: [742, 768, 795, 810, 838, 861],
   corinthians: [432, 419, 438, 445, 451, 457],
+  estrela: [58, 61, 63, 65, 68, 71],
 };
 const SCOUTING_TARGETS_BY_CLUB = {
   flamengo:[
@@ -2747,6 +2834,11 @@ const SCOUTING_TARGETS_BY_CLUB = {
     { name:'Vitor Hugo Reis', pos:'Meia', age:20, clube:'Criciúma', liga:'Brasileirão Série A', valor:'€ 5,4M', compat:85, status:'Proposta enviada' },
     { name:'Samir Peixoto', pos:'Lateral Direito', age:23, clube:'Vitória', liga:'Brasileirão Série A', valor:'€ 4,8M', compat:79, status:'Em observação' },
     { name:'Théo Barreto', pos:'Atacante', age:21, clube:'Farense', liga:'Primeira Liga (POR)', valor:'€ 6,0M', compat:74, status:'Em observação' },
+  ],
+  estrela:[
+    { name:'Igor Marreco', pos:'Atacante', age:19, clube:'Porto União-SC', liga:'Brasileirão Série C', valor:'€ 0,8M', compat:82, status:'Em observação' },
+    { name:'Wallace Nunes', pos:'Volante', age:21, clube:'Rio Preto FC', liga:'Brasileirão Série C', valor:'€ 0,6M', compat:77, status:'Em observação' },
+    { name:'Kelvin Andrade', pos:'Zagueiro', age:20, clube:'Sabará EC', liga:'Brasileirão Série D', valor:'€ 0,4M', compat:71, status:'Proposta enviada' },
   ],
 };
 function getInjuryRiskData(){
@@ -2941,6 +3033,13 @@ const BASE_CATEGORIES_BY_CLUB = {
     { name:'Sub-14', count:21, star:'—' },
     { name:'Sub-13', count:19, star:'—' },
   ],
+  estrela:[
+    { name:'Sub-20', count:18, star:'Théo Marreiros' },
+    { name:'Sub-17', count:16, star:'Kauã Estrela' },
+    { name:'Sub-15', count:14, star:'—' },
+    { name:'Sub-14', count:12, star:'—' },
+    { name:'Sub-13', count:10, star:'—' },
+  ],
 };
 
 const CLUB_ASSETS_BY_CLUB = {
@@ -2953,6 +3052,11 @@ const CLUB_ASSETS_BY_CLUB = {
     { name:'Neo Química Arena', type:'Estádio', location:'Itaquera, São Paulo', extra:'48.905 lugares', built:'Inaugurada em 2014 · ampliada em 2025', desc:'Estádio próprio do Corinthians, construído em terreno antes usado para treino de base.' },
     { name:'CT Joaquim Grava', type:'Centro de Treinamento', location:'Parque Ecológico do Tietê, São Paulo', extra:'170.000 m²', built:'Inaugurado em 17/09/2010', desc:'Centro de treinamento do elenco profissional.' },
     { name:'Parque São Jorge', type:'Sede', location:'Parque São Jorge, São Paulo', extra:'Sede histórica', built:'Sede social do clube desde a fundação', desc:'Sede social e administrativa do Corinthians.' },
+  ],
+  estrela:[
+    { name:'Estádio Municipal', type:'Estádio', location:'Curitiba, PR', extra:'24.000 lugares', built:'Inaugurado em 1978 · reformado em 2019', desc:'Estádio fictício onde o Estrela FC manda seus jogos.' },
+    { name:'CT Constelação', type:'Centro de Treinamento', location:'Curitiba, PR', extra:'4 campos de treino', built:'Inaugurado em 2015', desc:'Centro de treinamento do elenco profissional e da base.' },
+    { name:'Sede social — Vila Estrela', type:'Sede', location:'Curitiba, PR', extra:'Sede histórica', built:'Sede social desde a fundação, em 1963', desc:'Sede social e administrativa do clube.' },
   ],
 };
 
@@ -2977,6 +3081,16 @@ const STAFF_BY_CLUB = {
     { role:'Fisioterapeuta Chefe', name:'Renata Cavalcante' },
     { role:'Nutricionista', name:'Dr. Marcos Villela' },
   ],
+  estrela:[
+    { role:'Técnico', name:'Ricardo Fontoura' },
+    { role:'Auxiliar Técnico', name:'Sérgio Malta' },
+    { role:'Preparador Físico', name:'Diego Andrade Melo' },
+    { role:'Preparador de Goleiros', name:'Vagner Prado' },
+    { role:'Analista de Desempenho', name:'Bianca Correia' },
+    { role:'Médico Chefe', name:'Dr. Otávio Nunes' },
+    { role:'Fisioterapeuta Chefe', name:'Renata Lopes' },
+    { role:'Nutricionista', name:'Dra. Camila Reis' },
+  ],
 };
 
 const TRAVEL_BY_CLUB = {
@@ -2989,6 +3103,11 @@ const TRAVEL_BY_CLUB = {
     ['La Plata, Argentina', '09 set, 2026', 'Estudiantes x Corinthians — Libertadores (ida)', 'Voo internacional fretado', 'Hotel Hilton La Plata', 'Confirmado'],
     ['Rio de Janeiro, RJ', '13 set, 2026', 'Flamengo x Corinthians — Brasileirão', 'Voo fretado', 'Hotel Windsor Barra', 'Confirmado'],
     ['Porto Alegre, RS', '27 set, 2026', 'Internacional x Corinthians — Brasileirão', 'Voo comercial fretado', 'Hotel Sheraton POA', 'Planejamento'],
+  ],
+  estrela:[
+    ['Recife, PE', '14 ago, 2026', 'Náutico x Estrela FC — Copa Regional', 'Voo comercial fretado', 'Hotel Recife Praia', 'Confirmado'],
+    ['São Paulo, SP', '22 ago, 2026', 'Rival FC x Estrela FC — Brasileirão Série B', 'Ônibus fretado', 'Hotel Ibirapuera', 'Confirmado'],
+    ['Vitória, ES', '30 ago, 2026', 'Porto Vitória x Estrela FC — Brasileirão Série B', 'Voo comercial fretado', 'Hotel Vitória Palace', 'Planejamento'],
   ],
 };
 
@@ -3005,6 +3124,11 @@ const SPONSORS_BY_CLUB = {
     ['BetParque', 'Apostas esportivas', 'R$ 35,0M/ano', '480%', '89%'],
     ['Alvinegra Bebidas', 'Bebidas', 'R$ 15,0M/ano', '290%', '82%'],
   ],
+  estrela:[
+    ['TurboEnergy', 'Máster', 'R$ 5,0M/ano', '650%', '92%'],
+    ['Banco Atlas', 'Bancário', 'R$ 2,2M/ano', '410%', '88%'],
+    ['TechNova', 'Tecnologia', 'R$ 1,0M/ano', '380%', '85%'],
+  ],
 };
 
 const BRAND_BY_CLUB = {
@@ -3012,11 +3136,14 @@ const BRAND_BY_CLUB = {
     categorias:['Vestuário','Brinquedos','Games','Papelaria','Alimentos & bebidas','Eletrônicos','Decoração','Beleza','Automotivo','Calçados','Pet','Editorial'] },
   corinthians:{ value:'R$ 1,4 bi', social:'32M', licensees:'9 categorias', reach:'10 países com núcleos de torcida',
     categorias:['Vestuário','Brinquedos','Games','Papelaria','Alimentos & bebidas','Eletrônicos','Decoração','Calçados','Editorial'] },
+  estrela:{ value:'R$ 180M', social:'2,1M', licensees:'5 categorias', reach:'2 países com núcleos de torcida',
+    categorias:['Vestuário','Brinquedos','Papelaria','Alimentos & bebidas','Calçados'] },
 };
 
 const TEAM_STATS_BY_CLUB = {
   flamengo:{ posicao:'2º lugar · 45 pts', vitorias:'8V–3E–2D', artilheiro:'Pedro · 14 gols', defesa:'19 gols sofridos (melhor defesa)' },
   corinthians:{ posicao:'10º lugar · 18 pts (16 jogos)', vitorias:'4V–6E–6D · 37% aproveitamento', artilheiro:'Yuri Alberto · 6 gols (geral) · André · 3 (Brasileirão)', defesa:'—' },
+  estrela:{ posicao:'6º lugar · 29 pts (18 jogos) — Série B', vitorias:'8V–5E–5D · 48% aproveitamento', artilheiro:'Matheus Estrela · 9 gols', defesa:'22 gols sofridos' },
 };
 function renderTeamStats(){
   const t = TEAM_STATS_BY_CLUB[currentClubId] || TEAM_STATS_BY_CLUB.flamengo;
@@ -3032,6 +3159,12 @@ function renderElencoTable(){
   const rows = squad[elencoGender] || squad.masc;
   document.getElementById('elenco-table').innerHTML = rows.map(p=>`
     <tr><td class="strong">${p.name}</td><td>${p.pos}</td><td>${p.age}</td><td>${p.score}/100</td><td>${p.brand}</td><td>${p.market}</td></tr>`).join('');
+  const disclaimer = document.getElementById('elenco-disclaimer');
+  if(disclaimer){
+    disclaimer.textContent = currentClubId === 'estrela'
+      ? 'Elenco fictício, criado para fins de demonstração. Score de performance, valor de marca e valor de mercado são estimativas.'
+      : 'Elenco oficial real, pesquisado publicamente (nomes, posições e idades). Valor de mercado em € reflete Transfermarkt quando disponível; score de performance e valor de marca são estimativas para fins de demonstração.';
+  }
 }
 function renderBaseGrid(){
   const cats = BASE_CATEGORIES_BY_CLUB[currentClubId] || BASE_CATEGORIES_BY_CLUB.flamengo;
@@ -3695,6 +3828,17 @@ const STADIUM_BY_CLUB = {
       { key:'camarotes', name:'Camarotes', cap:1900, sold:0.79, price:'R$ 420', desc:'Camarotes corporativos com hospitalidade completa.' },
     ],
   },
+  estrela: {
+    name:'Estádio Municipal', capacity:24000,
+    nextMatch:{ date:'18 jun, 2026', label:'Estrela FC x Rival FC — Brasileirão Série B', time:'19h00' },
+    sectors:[
+      { key:'norte', name:'Norte', cap:6000, sold:0.95, price:'R$ 35', desc:'Setor popular, torcida organizada do Estrela FC.' },
+      { key:'sul', name:'Sul', cap:6000, sold:0.90, price:'R$ 35', desc:'Setor popular, atrás do gol.' },
+      { key:'leste', name:'Leste', cap:5000, sold:0.85, price:'R$ 60', desc:'Lateral coberta, bom custo-benefício.' },
+      { key:'oeste', name:'Oeste', cap:5000, sold:0.92, price:'R$ 70', desc:'Setor mais valorizado, melhor visão do gramado.' },
+      { key:'camarotes', name:'Camarotes', cap:2000, sold:0.80, price:'R$ 150', desc:'Camarotes corporativos, poucos parceiros no momento.' },
+    ],
+  },
 };
 function getStadium(){ return STADIUM_BY_CLUB[currentClubId] || STADIUM_BY_CLUB.flamengo; }
 function occupancyColor(sold){ return sold >= 0.90 ? red : (sold >= 0.75 ? amber : teal); }
@@ -3821,6 +3965,14 @@ const EVENTS_BY_CLUB = {
     ['13 set, 2026', 'Futebol masculino', 'Flamengo x Corinthians — Brasileirão (27ª rodada)', 'Maracanã (fora de casa)', 'Fora de casa'],
     ['16 set, 2026', 'Futebol masculino', 'Corinthians x Estudiantes — Libertadores (quartas, volta)', 'Neo Química Arena', 'Pré-venda Fiel Torcedor'],
     ['20 set, 2026', 'Futebol masculino', 'Corinthians x Fluminense — Brasileirão (28ª rodada)', 'Neo Química Arena', '52% vendido'],
+  ],
+  estrela: [
+    ['18 jun, 2026', 'Futebol masculino', 'Estrela FC x Rival FC — Brasileirão Série B', 'Estádio Municipal', '92% vendido'],
+    ['21 jun, 2026', 'Futebol feminino', 'Estrela FC Feminino x Atlética SC', 'Estádio Municipal', '58% vendido'],
+    ['27 jun, 2026', 'Show', 'Turnê Nacional — Banda Ravena', 'Estádio Municipal', '74% vendido'],
+    ['03 jul, 2026', 'Futebol masculino', 'Estrela FC x Náutico — Copa Regional', 'Estádio Municipal', '41% vendido'],
+    ['10 jul, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Sede social — Vila Estrela', 'Confirmado'],
+    ['15 jul, 2026', 'Futebol feminino', 'Estrela FC Feminino x Porto Vitória', 'Estádio Municipal', '33% vendido'],
   ],
 };
 function renderUpcomingEvents(){
@@ -4136,6 +4288,18 @@ const PRODUCTS_BY_CLUB = {
     { name:'Camisa Corinthians II 26/27 Vitinho N° 11', desc:'Camisa personalizada, ponta Vitinho.', cat:'Camisas', color:brand, price:399.99, vendido:48, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-vitinho-n-11-torcedor-nike-masculina/26/SGL-05S7-026/SGL-05S7-026_zoom1.jpg' },
     { name:'Camisa Corinthians II 26/27 André N° 49', desc:'Camisa personalizada, jovem promessa da base.', cat:'Camisas', color:brand, price:399.99, vendido:28, img:'https://static.shoptimao.com.br/produtos/camisa-corinthians-ii-2627-andre-n-49-torcedor-nike-masculina/26/SGL-05RS-026/SGL-05RS-026_zoom1.jpg' },
   ],
+  estrela:[
+    { name:'Manto I 2026 (titular)', desc:'Camisa titular do Estrela FC, azul e dourado.', cat:'Camisas', icon:'camisa', color:brand, price:179.99, vendido:45 },
+    { name:'Manto II 2026', desc:'Segundo uniforme, branco com detalhes dourados.', cat:'Camisas', icon:'camisa', color:brand2, price:179.99, vendido:30 },
+    { name:'Camisa Pré-Jogo 2026', desc:'Camisa de aquecimento usada antes das partidas.', cat:'Camisas', icon:'camisa', color:teal, price:129.99, vendido:22 },
+    { name:'Camisa Infantil', desc:'Manto titular no tamanho infantil.', cat:'Infantil', icon:'camisa', color:gold, price:99.99, vendido:20 },
+    { name:'Camisa de Treino', desc:'Usada nos treinos pela comissão técnica.', cat:'Vestuário', icon:'moletom', color:brand2, price:99.99, vendido:15 },
+    { name:'Moletom oficial', desc:'Moletom com o escudo do Estrela FC.', cat:'Vestuário', icon:'moletom', color:brand2, price:119.90, vendido:18 },
+    { name:'Boné oficial', desc:'Boné bordado com o escudo do clube.', cat:'Acessórios', icon:'bone', color:teal, price:49.90, vendido:60 },
+    { name:'Cachecol oficial', desc:'Cachecol azul e dourado para o dia de jogo.', cat:'Acessórios', icon:'bone', color:teal, price:39.90, vendido:35 },
+    { name:'Caneca oficial', desc:'Caneca de porcelana com o escudo do clube.', cat:'Colecionáveis', icon:'caneca', color:amber, price:29.90, vendido:50 },
+    { name:'Miniatura do Estádio Municipal', desc:'Réplica em miniatura do estádio do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:59.90, vendido:12 },
+  ],
 };
 function renderCommerceProducts(){
   const el = document.getElementById('commerce-products');
@@ -4366,6 +4530,100 @@ const FANS_DB_BY_CLUB = {
       ],
     },
   ],
+  estrela: [
+    {
+      id:'rafael', name:'Rafael Souza', initials:'RS', color1:'#2e5aac', color2:'#1b3a75', nivel:'platina',
+      fanId:'FAN-EST-00041', fanScore:82, jogadorFavorito:'Matheus Estrela (camisa 9)', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',85],['Comercial',68],['Conteúdo',80],['Matchday',70],['Gamificação',88],['Fidelidade',90]],
+      aiInsight:'Rafael tem baixo risco de churn e LTV consistente — bom candidato para oferta de upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para nível superior','61%'],['Convidar para experiência no Estádio Municipal','48%']],
+      idade:'25–34', sexo:'Masculino', cidade:'São Paulo, SP', regiao:'Sudeste',
+      timeCoracao:'Estrela FC', tambemTorce:'Seleção Brasileira',
+      socioDesde:'mar/2022', segmentoTitulo:'Torcedor fiel', segmentoCor:gold,
+      ltv:'R$ 1.200', gastoTotal:'R$ 1.200', transacoes:'9', ticketMedio:'R$ 133', produtoFavorito:'Camisas oficiais',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'70%', propensaoCor:teal,
+      tags:['Estádio Municipal · setor Norte','Sócio fiel','Newsletter'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Foi ao jogo: Estrela FC 2x1 Rival FC','18 mai, 2026', brand, '🎟'],
+        ['Comprou camisa oficial · R$ 180','15 mai, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','mar/2022', gold, '★'],
+      ],
+    },
+    {
+      id:'diego', name:'Diego Farias', initials:'DF', color1:'#1b3a75', color2:'#2e5aac', nivel:'prata',
+      fanId:'FAN-EST-00087', fanScore:41, jogadorFavorito:'Vinícius Aracaju', competicaoFavorita:'Copa Regional',
+      scoreDims:[['Engagement',35],['Comercial',40],['Conteúdo',30],['Matchday',22],['Gamificação',48],['Fidelidade',55]],
+      aiInsight:'Diego está sem compras há 70 dias e cancelou notificações — alto risco de churn, recomenda-se oferta de reativação.',
+      nextBestActions:[['Enviar oferta de reativação com desconto','66%'],['Reengajar via push de próximo jogo','44%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Salvador, BA', regiao:'Nordeste',
+      timeCoracao:'Estrela FC', tambemTorce:'—',
+      socioDesde:'out/2023', segmentoTitulo:'Em risco de churn', segmentoCor:red,
+      ltv:'R$ 340', gastoTotal:'R$ 340', transacoes:'3', ticketMedio:'R$ 113', produtoFavorito:'Ingressos avulsos',
+      churnRisco:'Alto', churnCor:red, propensao:'22%', propensaoCor:red,
+      tags:['Sem compra há 70 dias','Cancelou notificações'],
+      segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
+      history:[
+        ['Cancelou notificações push','20 mar, 2026', brand2, '🔕'],
+        ['Última compra: ingresso avulso · R$ 45','12 fev, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','out/2023', gold, '★'],
+      ],
+    },
+    {
+      id:'larissa', name:'Larissa Melo', initials:'LM', color1:'#f2c94c', color2:'#2e5aac', nivel:'platina',
+      fanId:'FAN-EST-00019', fanScore:94, jogadorFavorito:'Bianca Estrela', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',96],['Comercial',82],['Conteúdo',90],['Matchday',85],['Gamificação',92],['Fidelidade',98]],
+      aiInsight:'Larissa é sócia vitalícia há 10 anos e tem o maior LTV da base — candidata a programa de embaixadores.',
+      nextBestActions:[['Convidar para programa de embaixadores','78%'],['Oferecer experiência VIP exclusiva','65%']],
+      idade:'35–44', sexo:'Feminino', cidade:'Porto Alegre, RS', regiao:'Sul',
+      timeCoracao:'Estrela FC', tambemTorce:'—',
+      socioDesde:'jun/2016', segmentoTitulo:'Top torcedora', segmentoCor:gold,
+      ltv:'R$ 5.180', gastoTotal:'R$ 5.180', transacoes:'38', ticketMedio:'R$ 136', produtoFavorito:'Camarote',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'91%', propensaoCor:teal,
+      tags:['Sócia vitalícia','Camarote fixo','Embaixadora informal da torcida'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 520','20 mai, 2026', amber, '🛒'],
+        ['Foi ao jogo: Estrela FC 2x1 Rival FC','18 mai, 2026', brand, '🎟'],
+        ['Sócia-torcedora desde','jun/2016', gold, '★'],
+      ],
+    },
+    {
+      id:'camila', name:'Camila Alves', initials:'CA', color1:'#2e5aac', color2:'#f2c94c', nivel:'ouro',
+      fanId:'FAN-EST-00058', fanScore:76, jogadorFavorito:'Everaldo Junior', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',74],['Comercial',80],['Conteúdo',68],['Matchday',78],['Gamificação',55],['Fidelidade',82]],
+      aiInsight:'Camila costuma comprar camarote nos jogos importantes — boa candidata a upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para Platina','52%']],
+      idade:'25–34', sexo:'Feminino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
+      timeCoracao:'Estrela FC', tambemTorce:'—',
+      socioDesde:'jan/2021', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
+      ltv:'R$ 2.100', gastoTotal:'R$ 2.100', transacoes:'16', ticketMedio:'R$ 131', produtoFavorito:'Ingressos VIP',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'68%', propensaoCor:teal,
+      tags:['Compra camarote em jogos importantes','App power user'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 300','16 mai, 2026', amber, '🛒'],
+        ['Renovou plano de sócio','jan/2026', gold, '★'],
+      ],
+    },
+    {
+      id:'bruno', name:'Bruno Lima', initials:'BL', color1:'#7f88a8', color2:'#2e5aac', nivel:'bronze',
+      fanId:'FAN-EST-00203', fanScore:38, jogadorFavorito:'—', competicaoFavorita:'—',
+      scoreDims:[['Engagement',30],['Comercial',20],['Conteúdo',25],['Matchday',10],['Gamificação',40],['Fidelidade',35]],
+      aiInsight:'Bruno é sócio novo e ainda não foi ao estádio — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.',
+      nextBestActions:[['Enviar convite para o primeiro jogo com desconto','58%']],
+      idade:'18–24', sexo:'Masculino', cidade:'Recife, PE', regiao:'Nordeste',
+      timeCoracao:'Estrela FC', tambemTorce:'—',
+      socioDesde:'mai/2026', segmentoTitulo:'Sócio novo', segmentoCor:brand2,
+      ltv:'R$ 90', gastoTotal:'R$ 90', transacoes:'1', ticketMedio:'R$ 90', produtoFavorito:'—',
+      churnRisco:'Médio', churnCor:amber, propensao:'35%', propensaoCor:amber,
+      tags:['Sócio novo','Ainda não foi ao estádio'],
+      segments:[['Novos sócios','Baixo engajamento inicial', brand2]],
+      history:[
+        ['Virou sócio-torcedor','mai/2026', gold, '★'],
+      ],
+    },
+  ],
 };
 
 /* ============ NÍVEIS DE SÓCIO-TORCEDOR (por clube) ============ */
@@ -4383,6 +4641,13 @@ const TIER_DB_BY_CLUB = {
     { key:'prata', name:'Prata', color:'#b7c0d8', count:240, desc:'Sócio-torcedor · benefícios intermediários' },
     { key:'ouro', name:'Ouro', color:'#f2c94c', count:96, desc:'Sócio-torcedor · benefícios avançados' },
     { key:'platina', name:'Platina', color:'#b06bff', count:24, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+  ],
+  estrela: [
+    { key:'basico', name:'Básico', color:'#7f88a8', count:29000, desc:'Identificado na Ontologia, sem assinatura paga' },
+    { key:'bronze', name:'Bronze', color:'#c98a4b', count:550, desc:'Sócio-torcedor · plano de entrada' },
+    { key:'prata', name:'Prata', color:'#b7c0d8', count:300, desc:'Sócio-torcedor · benefícios intermediários' },
+    { key:'ouro', name:'Ouro', color:'#f2c94c', count:120, desc:'Sócio-torcedor · benefícios avançados' },
+    { key:'platina', name:'Platina', color:'#b06bff', count:30, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
   ],
 };
 /* ---------- Base de torcedores gerada (diversa: regiao, idade 12-85, poucos fora do Brasil) ----------
@@ -4462,7 +4727,7 @@ function generateFanPool(clubId, total, sociosCount){
   }
   return pool;
 }
-const FAN_POOL_TOTALS = { flamengo:{ total:15000, socios:1000 }, corinthians:{ total:12000, socios:800 } };
+const FAN_POOL_TOTALS = { flamengo:{ total:15000, socios:1000 }, corinthians:{ total:12000, socios:800 }, estrela:{ total:30000, socios:1000 } };
 let FAN_POOL_CACHE = {};
 function getFanPool(){
   const key = currentClubId;
