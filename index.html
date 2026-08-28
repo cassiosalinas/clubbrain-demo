@@ -453,13 +453,15 @@ canvas{ max-width:100%; }
   .topbar h1{ font-size:18px; }
   .topbar .subtitle{ font-size:11.5px; }
   .topbar-actions{ flex-wrap:wrap; }
-  .card{ padding:14px 15px; }
+  .card{ padding:14px 15px; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .kpi .value{ font-size:24px; }
   .subtabs{ max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .subtab{ white-space:nowrap; }
-  table{ display:block; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch; }
+  table{ white-space:nowrap; }
   .modal-box{ width:94vw; padding:20px 18px; }
+  .modal-box table{ white-space:normal; }
   .stadium-grid{ grid-template-columns: 1fr 1.6fr 1fr; }
+  .two-col, .grid{ max-width:100%; }
 }
 
 </style>
