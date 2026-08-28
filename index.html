@@ -401,6 +401,12 @@ canvas{ max-width:100%; }
 .global-chat-header{ padding:16px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex:none; }
 .global-chat-body{ flex:1; overflow-y:auto; padding:16px 18px; }
 .global-chat-footer{ padding:14px 18px; border-top:1px solid var(--border); flex:none; }
+.chat-suggestion-chip{
+  font-size:11.5px; font-weight:600; padding:7px 12px; border-radius:20px;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--text-dim);
+  cursor:pointer; transition:all .15s ease;
+}
+.chat-suggestion-chip:hover{ border-color:var(--brand); color:var(--text); background:rgba(108,107,255,.12); }
 #global-chat-backdrop{
   position:fixed; inset:0; background:rgba(4,6,12,.4); z-index:199;
   opacity:0; pointer-events:none; transition:opacity .2s ease;
@@ -1972,6 +1978,7 @@ canvas{ max-width:100%; }
     <div id="agent-chat-log"></div>
   </div>
   <div class="global-chat-footer">
+    <div id="agent-chat-suggestions" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;"></div>
     <div style="display:flex; gap:8px;">
       <input id="agent-chat-input" type="text" placeholder="Pergunte algo a este agente…" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 14px; color:var(--text); font-size:13px; font-family:inherit;" onkeydown="if(event.key==='Enter') sendAgentChat();">
       <button class="btn-primary" id="agent-chat-send" onclick="sendAgentChat()">Perguntar</button>
@@ -3307,16 +3314,54 @@ function renderAgentChatSelector(){
     <span class="agent-chip-select active" style="background:${ORCHESTRATOR_AGENT.color}; border-color:${ORCHESTRATOR_AGENT.color}; cursor:default;">🧠 ${ORCHESTRATOR_AGENT.name} — todos os tópicos</span>
   `;
   renderAgentChatLog();
+  renderChatSuggestions();
 }
 function renderAgentChatLog(){
   const log = document.getElementById('agent-chat-log');
   const hist = agentChatHistories[selectedAgentName] || [];
   if(hist.length === 0){
-    log.innerHTML = `<div class="hero-note">Nenhuma pergunta ainda para este agente. Pergunte algo como "quais torcedores estão em risco de churn?" ou "como está o ROI de patrocínio este mês?".</div>`;
+    log.innerHTML = `<div class="hero-note">Nenhuma pergunta ainda para este agente. Pergunte algo como "quais torcedores estão em risco de churn?" ou "como está o ROI de patrocínio este mês?", ou escolha uma sugestão abaixo.</div>`;
     return;
   }
   log.innerHTML = hist.map(m => `<div class="chat-bubble ${m.role==='user'?'user':(m.error?'error':'agent')}">${m.content}</div>`).join('');
   log.scrollTop = log.scrollHeight;
+}
+
+/* ---- Sugestões clicáveis durante a conversa (escolhas interativas) ---- */
+const CHAT_SUGGESTION_POOL = [
+  'Quais torcedores estão em maior risco de churn agora?',
+  'Qual patrocinador tem o melhor ROI este mês?',
+  'Mostre o top 10 de torcedores por LTV',
+  'Como está a saúde do elenco para o próximo jogo?',
+  'Qual é a previsão de receita para o próximo trimestre?',
+  'Quais posições do elenco precisam de reforço, segundo o scouting?',
+  'Compare o sentimento da torcida com o mês passado',
+  'Quais ações a IA recomenda para reduzir o churn?',
+  'Qual produto da loja oficial vendeu mais este mês?',
+  'Quanto o clube arrecadou com bilheteria no último jogo?',
+  'Quais torcedores são candidatos a upgrade de plano?',
+  'Resuma os principais riscos do clube esta semana',
+];
+function pickChatSuggestions(){
+  const hist = agentChatHistories[selectedAgentName] || [];
+  const asked = new Set(hist.filter(m=>m.role==='user').map(m=>m.content));
+  const available = CHAT_SUGGESTION_POOL.filter(q=>!asked.has(q));
+  const pool = available.length >= 3 ? available : CHAT_SUGGESTION_POOL;
+  const seed = hashSeed(selectedAgentName + ':' + hist.length);
+  const rnd = mulberry32(seed);
+  const shuffled = pool.slice().sort(()=>rnd()-0.5);
+  return shuffled.slice(0, 3);
+}
+function renderChatSuggestions(){
+  const el = document.getElementById('agent-chat-suggestions');
+  if(!el) return;
+  el.innerHTML = pickChatSuggestions().map(q=>`
+    <span class="chat-suggestion-chip" onclick="askQuickReply('${q.replace(/'/g,"\\'")}')">${q}</span>`).join('');
+}
+function askQuickReply(text){
+  const input = document.getElementById('agent-chat-input');
+  input.value = text;
+  sendAgentChat();
 }
 
 const CLUBBRAIN_CONTEXT = `
@@ -3473,10 +3518,12 @@ async function sendAgentChat(){
     hist.push({role:'assistant', content: answer});
     typingEl.remove();
     renderAgentChatLog();
+    renderChatSuggestions();
   }catch(err){
     typingEl.remove();
     hist.push({role:'assistant', content: '⚠️ Não consegui chamar o backend agora. Verifique: (1) se o site foi publicado com a pasta netlify/functions incluída, (2) se a variável de ambiente ANTHROPIC_API_KEY está configurada no Netlify (Site settings → Environment variables), (3) se você tem uma chave de API válida em console.anthropic.com — isso é diferente de uma conta Claude.ai comum. Detalhe técnico: ' + err.message, error:true});
     renderAgentChatLog();
+    renderChatSuggestions();
   }finally{
     btn.disabled = false; btn.textContent = 'Perguntar';
   }
