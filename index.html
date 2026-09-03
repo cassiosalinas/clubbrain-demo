@@ -523,7 +523,7 @@ canvas{ max-width:100%; }
 
 <div id="club-cover-screen">
   <div class="club-cover-title">Escolha um clube para explorar</div>
-  <div class="club-cover-sub">Dados de demonstração — reais para Corinthians e Flamengo, fictícios para o Estrela FC</div>
+  <div class="club-cover-sub">Dados de demonstração — reais para Guarani e Botafogo-SP, fictícios para o Estrela FC</div>
   <div class="club-cover-grid" id="club-cover-grid"></div>
 </div>
 
@@ -625,7 +625,7 @@ canvas{ max-width:100%; }
       <div class="avatar-round">AM</div>
       <div style="flex:1;">
         <div class="name">Ana Martins</div>
-        <div class="role">Diretora de Marketing</div>
+        <div class="role">CEO</div>
       </div>
       <span class="hero-note clickable" style="white-space:nowrap;" onclick="logoutDemo()">Sair</span>
     </div>
@@ -2025,8 +2025,8 @@ const titles = {
   clubmgmt: ["Gestão do clube", "Elenco, categorias de base, ativos, comissão técnica e médica, viagens, patrocínio e marca — a visão de quem administra o clube"],
   opscenter: ["Central operacional", "Atendimento do dia, alertas dos agentes e saúde de toda a stack, em um só lugar"],
   cdp: ["Torcedor 360", "CDP + CRM — base de torcedores por nível, Identity Resolution, Fan 360°, Jornada, AI Insights e Ativação — tudo num só lugar"],
-  overview: ["Visão geral", "Como a torcida do Estrela FC está se comportando agora"],
-  audience: ["Audiência", "Quem são os torcedores do Estrela FC"],
+  overview: ["Visão geral", "Como a torcida do clube está se comportando agora"],
+  audience: ["Audiência", "Quem são os torcedores do clube"],
   engagement: ["Comunidades", "Saúde da comunidade, torcidas organizadas e membros mais ativos"],
   sentiment: ["Sentimento & buzz", "O que a torcida está falando agora nas redes"],
   content: ["Conteúdo", "Desempenho de posts, vídeos e transmissões"],
@@ -2146,6 +2146,8 @@ document.getElementById('sidebar-powered-logo').innerHTML = CLUBBRAIN_LOGO_HTML;
 const FLAMENGO_CREST_HTML = '<img src="data:image/svg+xml;base64,' + FLAMENGO_CREST_B64 + '" alt="Flamengo">';
 const CORINTHIANS_CREST_HTML = '<img src="data:image/png;base64,' + CORINTHIANS_CREST_B64 + '" alt="Corinthians">';
 const ESTRELA_CREST_HTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><path d="M12 7.3 13.4 10.4 16.8 10.7 14.2 12.9 15 16.2 12 14.4 9 16.2 9.8 12.9 7.2 10.7 10.6 10.4Z" fill="white"/></svg>';
+const GUARANI_CREST_HTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><text x="12" y="15.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="white" font-family="inherit">G</text></svg>';
+const BOTAFOGO_CREST_HTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.2 4.4 5v5.6C4.4 16 7.7 19.8 12 21c4.3-1.2 7.6-5 7.6-10.4V5L12 2.2Z" fill="white" fill-opacity=".18" stroke="white" stroke-width="1.1" stroke-linejoin="round"/><text x="12" y="15.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="white" font-family="inherit">B</text></svg>';
 
 const CLUB_PROFILES = {
   flamengo: {
@@ -2190,10 +2192,38 @@ const CLUB_PROFILES = {
     },
     ai:'Estrela FC (clube fictício), Estádio Municipal (24 mil lugares), Curitiba, PR. Torcedores ativos: 1,24 milhão (de ~5,2 milhões de apaixonados estimados). Torcedores com perfil 360° completo na plataforma Torcedor 360: 30.000, sendo 1.000 sócios-torcedores pagantes. Receita consolidada do período: R$ 3,1M. Clube menor, disputando a Série B do Brasileirão. Números fictícios, criados para fins de demonstração comercial.',
   },
+  guarani: {
+    name:'Guarani', sub:'Temporada 2026', crest:GUARANI_CREST_HTML, badgeBg:'linear-gradient(135deg,#1c8a45,#0d5c2c)',
+    kpi:{
+      receita:'R$ 5,8M', receitaDelta:'↑ 5,4% vs. período anterior',
+      ativos:'480K', ativosDelta:'↑ 4,2%',
+      nps:'61', npsDelta:'↑ 2 pts',
+      churn:'6,4%', churnBase:'≈ 28 mil torcedores da base reconhecida',
+      cdpTotal:'1,6M', cdpIdentificados:'480K', cdpPerfis:'200.000', cdpSocios:'40.000',
+      engajamento:'5,1%', engajamentoDelta:'↑ 0,3pp vs. mês anterior',
+      novos:'9,8K', novosDelta:'↑ 6%', interacoes:'2,4M', interacoesDelta:'↑ 9%', recorrentes:'54%', recorrentesDelta:'↑ 4%',
+      mrr:'R$ 880,0K', mrrDelta:'↑ 5,4%', arpu:'R$ 22,00', arpuDelta:'↑ 2,1%', subChurn:'3,8%', subChurnDelta:'↓ 0,3pp',
+    },
+    ai:'Guarani Futebol Clube ("Bugre"), fundado em 1911, Campinas, SP. Estádio Brinco de Ouro da Princesa, capacidade atual autorizada de 20.580 lugares (já operou com até ~29 mil). Cores oficiais verde e branco. Disputa a Série C do Campeonato Brasileiro 2026. Patrocinador máster: RIO Investidora e Construtora (desde mai/2026). Torcedores ativos: ~480 mil (de ~1,6 milhão de apaixonados estimados na região de Campinas e interior de SP). Torcedores com perfil 360° completo na plataforma Torcedor 360: 200.000, sendo 40.000 sócios-torcedores pagantes — números de base de torcedores informados pelo cliente para esta demonstração. Receita consolidada do período: R$ 5,8M (estimativa ilustrativa).',
+  },
+  botafogo: {
+    name:'Botafogo-SP', sub:'Temporada 2026', crest:BOTAFOGO_CREST_HTML, badgeBg:'linear-gradient(135deg,#3a3a3a,#0d0d0d)',
+    kpi:{
+      receita:'R$ 6,4M', receitaDelta:'↑ 6,8% vs. período anterior',
+      ativos:'360K', ativosDelta:'↑ 3,6%',
+      nps:'59', npsDelta:'↑ 1 pt',
+      churn:'6,9%', churnBase:'≈ 22 mil torcedores da base reconhecida',
+      cdpTotal:'1,3M', cdpIdentificados:'360K', cdpPerfis:'150.000', cdpSocios:'20.000',
+      engajamento:'4,8%', engajamentoDelta:'↑ 0,2pp vs. mês anterior',
+      novos:'7,1K', novosDelta:'↑ 5%', interacoes:'1,9M', interacoesDelta:'↑ 8%', recorrentes:'51%', recorrentesDelta:'↑ 3%',
+      mrr:'R$ 480,0K', mrrDelta:'↑ 6,8%', arpu:'R$ 24,00', arpuDelta:'↑ 1,8%', subChurn:'4,1%', subChurnDelta:'↓ 0,2pp',
+    },
+    ai:'Botafogo Futebol Clube ("Pantera"), fundado em 12/10/1918, Ribeirão Preto, SP. Estádio Santa Cruz, hoje Arena Nicnet Eurobike, capacidade de 28.292 lugares. Cores oficiais preto e branco. Disputa a Série B do Campeonato Brasileiro 2026 — ano do centenário do clube. Patrocinador máster: HanzBet; demais patrocinadores: Nicnet e Sermed Saúde. Torcedores ativos: ~360 mil (de ~1,3 milhão de apaixonados estimados na região de Ribeirão Preto e interior de SP). Torcedores com perfil 360° completo na plataforma Torcedor 360: 150.000, sendo 20.000 sócios-torcedores pagantes — números de base de torcedores informados pelo cliente para esta demonstração. Receita consolidada do período: R$ 6,4M (estimativa ilustrativa).',
+  },
 };
-let currentClubId = 'flamengo';
+let currentClubId = 'guarani';
 
-const CLUB_COVER_ORDER = ['estrela', 'corinthians', 'flamengo'];
+const CLUB_COVER_ORDER = ['estrela', 'guarani', 'botafogo'];
 function renderClubCover(){
   document.getElementById('club-cover-grid').innerHTML = CLUB_COVER_ORDER.map(id=>{
     const c = CLUB_PROFILES[id];
@@ -2795,6 +2825,36 @@ const SQUAD_BY_CLUB = {
       { name:'Bianca Estrela', pos:'Atacante', age:22, score:77, brand:'R$ 0,4M', market:'€ 0,12M' },
     ],
   },
+  guarani: {
+    masc:[
+      { name:'Caíque França', pos:'Goleiro', age:31, score:68, brand:'R$ 0,3M', market:'€ 0,35M' },
+      { name:'Rafael Donato', pos:'Zagueiro', age:37, score:70, brand:'R$ 0,25M', market:'€ 0,20M' },
+      { name:'Renan Castro', pos:'Zagueiro', age:30, score:67, brand:'R$ 0,2M', market:'€ 0,25M' },
+      { name:'Emerson Barbosa', pos:'Lateral Direito', age:28, score:65, brand:'R$ 0,15M', market:'€ 0,18M' },
+      { name:'Dudu Marques', pos:'Lateral Esquerdo', age:29, score:64, brand:'R$ 0,15M', market:'€ 0,18M' },
+      { name:'Willian Farias', pos:'Volante', age:37, score:69, brand:'R$ 0,2M', market:'€ 0,15M' },
+      { name:'Isaque', pos:'Meia', age:29, score:71, brand:'R$ 0,3M', market:'€ 0,40M' },
+      { name:'Nathan Melo', pos:'Meia', age:25, score:68, brand:'R$ 0,25M', market:'€ 0,45M' },
+      { name:'Éverton Brito', pos:'Atacante', age:31, score:72, brand:'R$ 0,35M', market:'€ 0,30M' },
+      { name:'Guilherme Parede', pos:'Atacante', age:30, score:70, brand:'R$ 0,3M', market:'€ 0,25M' },
+    ],
+    fem:[],
+  },
+  botafogo: {
+    masc:[
+      { name:'Victor Souza', pos:'Goleiro', age:34, score:70, brand:'R$ 0,3M', market:'€ 0,30M' },
+      { name:'Vilar', pos:'Zagueiro', age:26, score:69, brand:'R$ 0,25M', market:'€ 0,40M' },
+      { name:'Carlão', pos:'Zagueiro', age:25, score:66, brand:'R$ 0,2M', market:'€ 0,30M' },
+      { name:'Jonathan Lemos', pos:'Lateral Direito', age:34, score:67, brand:'R$ 0,2M', market:'€ 0,15M' },
+      { name:'Guilherme Mariano', pos:'Lateral Esquerdo', age:26, score:65, brand:'R$ 0,18M', market:'€ 0,25M' },
+      { name:'Leandro Maciel', pos:'Volante', age:30, score:70, brand:'R$ 0,3M', market:'€ 0,35M' },
+      { name:'Everton Morelli', pos:'Volante', age:28, score:68, brand:'R$ 0,25M', market:'€ 0,30M' },
+      { name:'Rafael Gava', pos:'Meia', age:33, score:71, brand:'R$ 0,3M', market:'€ 0,20M' },
+      { name:'Kelvin', pos:'Atacante', age:29, score:74, brand:'R$ 0,4M', market:'€ 0,55M' },
+      { name:'Jefferson Nem', pos:'Atacante', age:30, score:69, brand:'R$ 0,3M', market:'€ 0,25M' },
+    ],
+    fem:[],
+  },
 };
 let elencoGender = 'masc';
 
@@ -2803,11 +2863,15 @@ const TACTICAL_RADAR_BY_CLUB = {
   flamengo: { Ataque:88, Posse:79, Pressão:82, Defesa:76, Físico:84 },
   corinthians: { Ataque:74, Posse:71, Pressão:78, Defesa:80, Físico:77 },
   estrela: { Ataque:68, Posse:65, Pressão:70, Defesa:66, Físico:72 },
+  guarani: { Ataque:64, Posse:60, Pressão:66, Defesa:63, Físico:70 },
+  botafogo: { Ataque:70, Posse:66, Pressão:71, Defesa:68, Físico:73 },
 };
 const SQUAD_VALUE_TREND_BY_CLUB = {
   flamengo: [742, 768, 795, 810, 838, 861],
   corinthians: [432, 419, 438, 445, 451, 457],
   estrela: [58, 61, 63, 65, 68, 71],
+  guarani: [18, 19, 21, 22, 24, 26],
+  botafogo: [28, 30, 29, 32, 35, 38],
 };
 const SCOUTING_TARGETS_BY_CLUB = {
   flamengo:[
@@ -2826,6 +2890,16 @@ const SCOUTING_TARGETS_BY_CLUB = {
     { name:'Igor Marreco', pos:'Atacante', age:19, clube:'Porto União-SC', liga:'Brasileirão Série C', valor:'€ 0,8M', compat:82, status:'Em observação' },
     { name:'Wallace Nunes', pos:'Volante', age:21, clube:'Rio Preto FC', liga:'Brasileirão Série C', valor:'€ 0,6M', compat:77, status:'Em observação' },
     { name:'Kelvin Andrade', pos:'Zagueiro', age:20, clube:'Sabará EC', liga:'Brasileirão Série D', valor:'€ 0,4M', compat:71, status:'Proposta enviada' },
+  ],
+  guarani:[
+    { name:'Kauê Bittencourt', pos:'Atacante', age:20, clube:'Grêmio Novorizontino', liga:'Brasileirão Série C', valor:'€ 0,5M', compat:80, status:'Em observação' },
+    { name:'Rian Nascimento', pos:'Volante', age:22, clube:'Ferroviária', liga:'Brasileirão Série D', valor:'€ 0,3M', compat:75, status:'Em observação' },
+    { name:'Diego Alcântara', pos:'Zagueiro', age:23, clube:'Portuguesa', liga:'Brasileirão Série C', valor:'€ 0,35M', compat:72, status:'Proposta enviada' },
+  ],
+  botafogo:[
+    { name:'Vitinho Passos', pos:'Meia', age:21, clube:'São Bento', liga:'Brasileirão Série C', valor:'€ 0,6M', compat:81, status:'Negociação iniciada' },
+    { name:'Cauê Ferrari', pos:'Lateral Direito', age:22, clube:'Ituano', liga:'Campeonato Paulista', valor:'€ 0,4M', compat:76, status:'Em observação' },
+    { name:'Otávio Ramalho', pos:'Atacante', age:20, clube:'Novorizontino', liga:'Brasileirão Série C', valor:'€ 0,55M', compat:78, status:'Em observação' },
   ],
 };
 function getInjuryRiskData(){
@@ -3027,6 +3101,20 @@ const BASE_CATEGORIES_BY_CLUB = {
     { name:'Sub-14', count:12, star:'—' },
     { name:'Sub-13', count:10, star:'—' },
   ],
+  guarani:[
+    { name:'Sub-20', count:24, star:'Wictor' },
+    { name:'Sub-17', count:22, star:'Renan Oliveira' },
+    { name:'Sub-15', count:20, star:'—' },
+    { name:'Sub-14', count:18, star:'—' },
+    { name:'Sub-13', count:16, star:'—' },
+  ],
+  botafogo:[
+    { name:'Sub-20', count:23, star:'Pedro Henrique' },
+    { name:'Sub-17', count:21, star:'Henrique Lôvo' },
+    { name:'Sub-15', count:19, star:'—' },
+    { name:'Sub-14', count:17, star:'—' },
+    { name:'Sub-13', count:15, star:'—' },
+  ],
 };
 
 const CLUB_ASSETS_BY_CLUB = {
@@ -3044,6 +3132,16 @@ const CLUB_ASSETS_BY_CLUB = {
     { name:'Estádio Municipal', type:'Estádio', location:'Curitiba, PR', extra:'24.000 lugares', built:'Inaugurado em 1978 · reformado em 2019', desc:'Estádio fictício onde o Estrela FC manda seus jogos.' },
     { name:'CT Constelação', type:'Centro de Treinamento', location:'Curitiba, PR', extra:'4 campos de treino', built:'Inaugurado em 2015', desc:'Centro de treinamento do elenco profissional e da base.' },
     { name:'Sede social — Vila Estrela', type:'Sede', location:'Curitiba, PR', extra:'Sede histórica', built:'Sede social desde a fundação, em 1963', desc:'Sede social e administrativa do clube.' },
+  ],
+  guarani:[
+    { name:'Estádio Brinco de Ouro da Princesa', type:'Estádio', location:'Jardim Guarani, Campinas, SP', extra:'20.580 lugares (capacidade autorizada)', built:'Inaugurado em 31/05/1953', desc:'Estádio próprio onde o Guarani manda seus jogos, no bairro que empresta o nome ao clube.' },
+    { name:'CT do Guarani', type:'Centro de Treinamento', location:'Campinas, SP', extra:'Campos de treino do profissional e da base', built:'—', desc:'Centro de treinamento do elenco profissional e das categorias de base.' },
+    { name:'Sede social', type:'Sede', location:'Campinas, SP', extra:'Sede histórica', built:'Sede social desde a fundação, em 1911', desc:'Sede social e administrativa do clube.' },
+  ],
+  botafogo:[
+    { name:'Estádio Santa Cruz (Arena Nicnet Eurobike)', type:'Estádio', location:'Ribeirão Preto, SP', extra:'28.292 lugares', built:'Inaugurado em 1968 · modernizado com a Arena Eurobike em 2019', desc:'Estádio próprio do Botafogo-SP, com área multiuso para shows e eventos.' },
+    { name:'CT do Botafogo-SP', type:'Centro de Treinamento', location:'Ribeirão Preto, SP', extra:'Campos de treino do profissional e da base', built:'—', desc:'Centro de treinamento do elenco profissional e das categorias de base.' },
+    { name:'Sede social', type:'Sede', location:'Ribeirão Preto, SP', extra:'Sede histórica', built:'Sede social desde a fundação, em 1918', desc:'Sede social e administrativa do clube, que celebra o centenário em 2026.' },
   ],
 };
 
@@ -3078,6 +3176,26 @@ const STAFF_BY_CLUB = {
     { role:'Fisioterapeuta Chefe', name:'Renata Lopes' },
     { role:'Nutricionista', name:'Dra. Camila Reis' },
   ],
+  guarani:[
+    { role:'Técnico', name:'Anderson Salgado' },
+    { role:'Auxiliar Técnico', name:'Rogério Camargo' },
+    { role:'Preparador Físico', name:'Vinícius Bugre' },
+    { role:'Preparador de Goleiros', name:'Marcelo Andrade' },
+    { role:'Analista de Desempenho', name:'Fernanda Piza' },
+    { role:'Médico Chefe', name:'Dr. Alexandre Motta' },
+    { role:'Fisioterapeuta Chefe', name:'Juliana Barreto' },
+    { role:'Nutricionista', name:'Dra. Camila Ortiz' },
+  ],
+  botafogo:[
+    { role:'Técnico', name:'Wagner Coelho' },
+    { role:'Auxiliar Técnico', name:'Leandro Pantera' },
+    { role:'Preparador Físico', name:'Rodolfo Assis' },
+    { role:'Preparador de Goleiros', name:'Cássio Ribeirão' },
+    { role:'Analista de Desempenho', name:'Talita Nogueira' },
+    { role:'Médico Chefe', name:'Dr. Fábio Cerqueira' },
+    { role:'Fisioterapeuta Chefe', name:'Renata Duque' },
+    { role:'Nutricionista', name:'Dr. Guilherme Paschoal' },
+  ],
 };
 
 const TRAVEL_BY_CLUB = {
@@ -3095,6 +3213,16 @@ const TRAVEL_BY_CLUB = {
     ['Recife, PE', '14 ago, 2026', 'Náutico x Estrela FC — Copa Regional', 'Voo comercial fretado', 'Hotel Recife Praia', 'Confirmado'],
     ['São Paulo, SP', '22 ago, 2026', 'Rival FC x Estrela FC — Brasileirão Série B', 'Ônibus fretado', 'Hotel Ibirapuera', 'Confirmado'],
     ['Vitória, ES', '30 ago, 2026', 'Porto Vitória x Estrela FC — Brasileirão Série B', 'Voo comercial fretado', 'Hotel Vitória Palace', 'Planejamento'],
+  ],
+  guarani:[
+    ['São José do Rio Preto, SP', '20 set, 2026', 'Rio Preto EC x Guarani — Série C', 'Ônibus fretado', 'Hotel Rio Preto Plaza', 'Confirmado'],
+    ['Vitória, ES', '27 set, 2026', 'Porto Vitória x Guarani — Série C', 'Voo comercial fretado', 'Hotel Vitória Palace', 'Confirmado'],
+    ['Sorocaba, SP', '04 out, 2026', 'São Bento x Guarani — Série C', 'Ônibus fretado', 'Hotel Sorocaba Center', 'Planejamento'],
+  ],
+  botafogo:[
+    ['Chapecó, SC', '19 set, 2026', 'Chapecoense x Botafogo-SP — Série B', 'Voo comercial fretado', 'Hotel Executivo Chapecó', 'Confirmado'],
+    ['Novo Hamburgo, RS', '26 set, 2026', 'Novo Hamburgo x Botafogo-SP — Série B', 'Voo fretado', 'Hotel Cross Towers', 'Confirmado'],
+    ['Manaus, AM', '03 out, 2026', 'Amazonas FC x Botafogo-SP — Série B', 'Voo comercial fretado', 'Hotel Manaus Millennium', 'Planejamento'],
   ],
 };
 
@@ -3116,6 +3244,15 @@ const SPONSORS_BY_CLUB = {
     ['Banco Atlas', 'Bancário', 'R$ 2,2M/ano', '410%', '88%'],
     ['TechNova', 'Tecnologia', 'R$ 1,0M/ano', '380%', '85%'],
   ],
+  guarani:[
+    ['RIO Investidora e Construtora', 'Máster', 'R$ 3,0M/ano', '340%', '88%'],
+    ['Bitx.bet', 'Apostas esportivas', 'R$ 1,8M/ano', '410%', '84%'],
+  ],
+  botafogo:[
+    ['HanzBet', 'Máster', 'R$ 6,0M/ano', '520%', '92%'],
+    ['Nicnet', 'Internet & Tecnologia', 'R$ 1,2M/ano', '380%', '85%'],
+    ['Sermed Saúde', 'Saúde', 'R$ 0,8M/ano', '350%', '80%'],
+  ],
 };
 
 const BRAND_BY_CLUB = {
@@ -3125,12 +3262,18 @@ const BRAND_BY_CLUB = {
     categorias:['Vestuário','Brinquedos','Games','Papelaria','Alimentos & bebidas','Eletrônicos','Decoração','Calçados','Editorial'] },
   estrela:{ value:'R$ 180M', social:'2,1M', licensees:'5 categorias', reach:'2 países com núcleos de torcida',
     categorias:['Vestuário','Brinquedos','Papelaria','Alimentos & bebidas','Calçados'] },
+  guarani:{ value:'R$ 60M', social:'480K', licensees:'4 categorias', reach:'Região de Campinas e interior de SP',
+    categorias:['Vestuário','Calçados','Papelaria','Alimentos & bebidas'] },
+  botafogo:{ value:'R$ 75M', social:'420K', licensees:'4 categorias', reach:'Região de Ribeirão Preto e interior de SP',
+    categorias:['Vestuário','Calçados','Papelaria','Alimentos & bebidas'] },
 };
 
 const TEAM_STATS_BY_CLUB = {
   flamengo:{ posicao:'2º lugar · 45 pts', vitorias:'8V–3E–2D', artilheiro:'Pedro · 14 gols', defesa:'19 gols sofridos (melhor defesa)' },
   corinthians:{ posicao:'10º lugar · 18 pts (16 jogos)', vitorias:'4V–6E–6D · 37% aproveitamento', artilheiro:'Yuri Alberto · 6 gols (geral) · André · 3 (Brasileirão)', defesa:'—' },
   estrela:{ posicao:'6º lugar · 29 pts (18 jogos) — Série B', vitorias:'8V–5E–5D · 48% aproveitamento', artilheiro:'Matheus Estrela · 9 gols', defesa:'22 gols sofridos' },
+  guarani:{ posicao:'7º lugar · 24 pts (16 jogos) — Série C', vitorias:'6V–6E–4D · 50% aproveitamento', artilheiro:'Éverton Brito · 7 gols', defesa:'18 gols sofridos' },
+  botafogo:{ posicao:'15º lugar · 28 pts (24 jogos) — Série B', vitorias:'7V–7E–10D · 39% aproveitamento', artilheiro:'Kelvin · 8 gols', defesa:'31 gols sofridos' },
 };
 function renderTeamStats(){
   const t = TEAM_STATS_BY_CLUB[currentClubId] || TEAM_STATS_BY_CLUB.flamengo;
@@ -3826,6 +3969,18 @@ const CONTENT_BY_CLUB = {
     {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino no CT Constelação', likes:'9,8K', comments:'310', shares:'520', views:'170K', c1:'#b06bff', c2:'#5c3499'},
     {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Técnico Ricardo Fontoura fala sobre a Série B', likes:'7,2K', comments:'240', shares:'410', views:'130K', c1:'#ffb454', c2:'#8f5a12'},
   ],
+  guarani: [
+    {n:'01', label:'GOL', icon:'▶', desc:'Éverton Brito marca de cabeça contra o Rio Preto', likes:'6,4K', comments:'210', shares:'380', views:'92K', c1:'#6c6bff', c2:'#3a2f8f'},
+    {n:'02', label:'AO VIVO', icon:'●', desc:'Guarani x São Bento — Série C', likes:'5,1K', comments:'180', shares:'260', views:'74K', c1:'#1fd6b8', c2:'#0f6e5f'},
+    {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino no CT do Bugre', likes:'3,2K', comments:'110', shares:'150', views:'48K', c1:'#b06bff', c2:'#5c3499'},
+    {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Técnico Anderson Salgado fala sobre a Série C', likes:'2,6K', comments:'90', shares:'120', views:'39K', c1:'#ffb454', c2:'#8f5a12'},
+  ],
+  botafogo: [
+    {n:'01', label:'GOL', icon:'▶', desc:'Kelvin marca no fim contra o Amazonas', likes:'8,9K', comments:'290', shares:'520', views:'130K', c1:'#6c6bff', c2:'#3a2f8f'},
+    {n:'02', label:'AO VIVO', icon:'●', desc:'Botafogo-SP x Chapecoense — Série B', likes:'7,2K', comments:'240', shares:'410', views:'105K', c1:'#1fd6b8', c2:'#0f6e5f'},
+    {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino na Arena Nicnet Eurobike', likes:'4,6K', comments:'150', shares:'210', views:'68K', c1:'#b06bff', c2:'#5c3499'},
+    {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Técnico Wagner Coelho fala sobre o centenário do clube', likes:'3,8K', comments:'130', shares:'170', views:'55K', c1:'#ffb454', c2:'#8f5a12'},
+  ],
 };
 function renderContentPosts(){
   const el = document.getElementById('top-content');
@@ -3872,7 +4027,7 @@ function buildContent(){
 /* ---------- Mapa de setores do estádio (real, por clube) ---------- */
 const STADIUM_BY_CLUB = {
   flamengo: {
-    name:'Maracanã', capacity:78000,
+    name:'Maracanã', city:'Rio de Janeiro, RJ', capacity:78000,
     nextMatch:{ date:'19 ago, 2026', label:'Flamengo x Cruzeiro — Libertadores (oitavas, volta)', time:'21h30' },
     sectors:[
       { key:'norte', name:'Norte', cap:18000, sold:0.97, price:'R$ 70', desc:'Setor mais animado — coração da torcida organizada.' },
@@ -3899,7 +4054,7 @@ const STADIUM_BY_CLUB = {
     ],
   },
   estrela: {
-    name:'Estádio Municipal', capacity:24000,
+    name:'Estádio Municipal', city:'Curitiba, PR', capacity:24000,
     nextMatch:{ date:'18 jun, 2026', label:'Estrela FC x Rival FC — Brasileirão Série B', time:'19h00' },
     sectors:[
       { key:'norte', name:'Norte', cap:6000, sold:0.95, price:'R$ 35', desc:'Setor popular, torcida organizada do Estrela FC.' },
@@ -3907,6 +4062,28 @@ const STADIUM_BY_CLUB = {
       { key:'leste', name:'Leste', cap:5000, sold:0.85, price:'R$ 60', desc:'Lateral coberta, bom custo-benefício.' },
       { key:'oeste', name:'Oeste', cap:5000, sold:0.92, price:'R$ 70', desc:'Setor mais valorizado, melhor visão do gramado.' },
       { key:'camarotes', name:'Camarotes', cap:2000, sold:0.80, price:'R$ 150', desc:'Camarotes corporativos, poucos parceiros no momento.' },
+    ],
+  },
+  guarani: {
+    name:'Estádio Brinco de Ouro da Princesa', city:'Campinas, SP', capacity:20580,
+    nextMatch:{ date:'20 set, 2026', label:'Guarani x Rio Preto EC — Brasileirão Série C', time:'20h00' },
+    sectors:[
+      { key:'norte', name:'Norte', cap:5000, sold:0.88, price:'R$ 30', desc:'Setor popular, torcida organizada bugrina.' },
+      { key:'sul', name:'Sul', cap:5000, sold:0.82, price:'R$ 30', desc:'Setor popular, atrás do gol.' },
+      { key:'leste', name:'Leste (coberta)', cap:6000, sold:0.75, price:'R$ 55', desc:'Arquibancada coberta, bom custo-benefício.' },
+      { key:'oeste', name:'Oeste (social)', cap:3580, sold:0.90, price:'R$ 80', desc:'Setor social, cadeiras numeradas, melhor visão do gramado.' },
+      { key:'camarotes', name:'Camarotes', cap:1000, sold:0.70, price:'R$ 220', desc:'Camarotes corporativos, poucos parceiros no momento.' },
+    ],
+  },
+  botafogo: {
+    name:'Estádio Santa Cruz (Arena Nicnet Eurobike)', city:'Ribeirão Preto, SP', capacity:28292,
+    nextMatch:{ date:'13 set, 2026', label:'Botafogo-SP x Novorizontino — Brasileirão Série B', time:'21h30' },
+    sectors:[
+      { key:'norte', name:'Norte', cap:7000, sold:0.85, price:'R$ 35', desc:'Setor popular, torcida organizada Pantera.' },
+      { key:'sul', name:'Sul', cap:7000, sold:0.80, price:'R$ 35', desc:'Setor popular, atrás do gol.' },
+      { key:'leste', name:'Leste (coberta)', cap:7292, sold:0.72, price:'R$ 65', desc:'Arquibancada coberta lateral.' },
+      { key:'oeste', name:'Oeste (social)', cap:5500, sold:0.88, price:'R$ 95', desc:'Setor social, melhor visão do gramado, próximo à Arena Eurobike.' },
+      { key:'camarotes', name:'Camarotes', cap:1500, sold:0.75, price:'R$ 260', desc:'Camarotes corporativos com hospitalidade da Arena Eurobike.' },
     ],
   },
 };
@@ -3952,7 +4129,7 @@ function stadiumIllustrationSvg(clubId, st){
     <ellipse cx="150" cy="72" rx="46" ry="17" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
     <line x1="150" y1="55" x2="150" y2="89" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
     <circle cx="150" cy="72" r="8" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
-    <text x="150" y="141" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(255,255,255,.4)" font-family="inherit">MARACANÃ · RIO DE JANEIRO</text>
+    <text x="150" y="141" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(255,255,255,.4)" font-family="inherit">${st.name.toUpperCase()}${st.city ? ' · ' + st.city.toUpperCase() : ''}</text>
   </svg>`;
 }
 function buildStadiumMap(){
@@ -4043,6 +4220,22 @@ const EVENTS_BY_CLUB = {
     ['03 jul, 2026', 'Futebol masculino', 'Estrela FC x Náutico — Copa Regional', 'Estádio Municipal', '41% vendido'],
     ['10 jul, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Sede social — Vila Estrela', 'Confirmado'],
     ['15 jul, 2026', 'Futebol feminino', 'Estrela FC Feminino x Porto Vitória', 'Estádio Municipal', '33% vendido'],
+  ],
+  guarani: [
+    ['20 set, 2026', 'Futebol masculino', 'Guarani x Rio Preto EC — Brasileirão Série C', 'Estádio Brinco de Ouro da Princesa', '78% vendido'],
+    ['27 set, 2026', 'Futebol masculino', 'Porto Vitória x Guarani — Brasileirão Série C', 'Vitória, ES (fora de casa)', 'Fora de casa'],
+    ['04 out, 2026', 'Futebol masculino', 'São Bento x Guarani — Brasileirão Série C', 'Sorocaba, SP (fora de casa)', 'Fora de casa'],
+    ['11 out, 2026', 'Futebol masculino', 'Guarani x Ferroviária — Clássico Campineiro (amistoso)', 'Estádio Brinco de Ouro da Princesa', 'Pré-venda' ],
+    ['18 out, 2026', 'Evento', 'Feira de Sócios & Ativação RIO Investidora', 'Sede social', 'Confirmado'],
+    ['25 out, 2026', 'Evento', 'Visita guiada ao Brinco de Ouro da Princesa', 'Estádio Brinco de Ouro da Princesa', '41% vendido'],
+  ],
+  botafogo: [
+    ['13 set, 2026', 'Futebol masculino', 'Botafogo-SP x Novorizontino — Brasileirão Série B', 'Arena Nicnet Eurobike', '82% vendido'],
+    ['19 set, 2026', 'Futebol masculino', 'Chapecoense x Botafogo-SP — Brasileirão Série B', 'Chapecó, SC (fora de casa)', 'Fora de casa'],
+    ['26 set, 2026', 'Futebol masculino', 'Novo Hamburgo x Botafogo-SP — Brasileirão Série B', 'Novo Hamburgo, RS (fora de casa)', 'Fora de casa'],
+    ['03 out, 2026', 'Futebol masculino', 'Amazonas FC x Botafogo-SP — Brasileirão Série B', 'Manaus, AM (fora de casa)', 'Fora de casa'],
+    ['10 out, 2026', 'Evento', 'Celebração do Centenário do Botafogo-SP (1918–2026)', 'Arena Nicnet Eurobike', 'Confirmado'],
+    ['17 out, 2026', 'Show', 'Arena Eurobike Live — show na área multiuso', 'Arena Nicnet Eurobike', '66% vendido'],
   ],
 };
 function renderUpcomingEvents(){
@@ -4369,6 +4562,28 @@ const PRODUCTS_BY_CLUB = {
     { name:'Cachecol oficial', desc:'Cachecol azul e dourado para o dia de jogo.', cat:'Acessórios', icon:'bone', color:teal, price:39.90, vendido:35 },
     { name:'Caneca oficial', desc:'Caneca de porcelana com o escudo do clube.', cat:'Colecionáveis', icon:'caneca', color:amber, price:29.90, vendido:50 },
     { name:'Miniatura do Estádio Municipal', desc:'Réplica em miniatura do estádio do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:59.90, vendido:12 },
+  ],
+  guarani:[
+    { name:'Camisa I Guarani 2026', desc:'Camisa titular verde e branca, temporada 2026.', cat:'Camisas', icon:'camisa', color:brand, price:249.90, vendido:210 },
+    { name:'Camisa II Guarani 2026', desc:'Camisa reserva, tecido leve.', cat:'Camisas', icon:'camisa', color:teal, price:249.90, vendido:140 },
+    { name:'Camisa Pré-Jogo 2026', desc:'Camisa de aquecimento usada antes das partidas.', cat:'Camisas', icon:'camisa', color:brand2, price:159.90, vendido:60 },
+    { name:'Camisa Infantil', desc:'Manto titular no tamanho infantil.', cat:'Infantil', icon:'camisa', color:gold, price:129.90, vendido:75 },
+    { name:'Moletom oficial Bugre', desc:'Moletom com o escudo do clube.', cat:'Vestuário', icon:'moletom', color:brand2, price:149.90, vendido:48 },
+    { name:'Boné oficial Bugre', desc:'Boné bordado com o escudo do clube.', cat:'Acessórios', icon:'bone', color:teal, price:79.90, vendido:95 },
+    { name:'Cachecol oficial', desc:'Cachecol verde e branco para o dia de jogo.', cat:'Acessórios', icon:'bone', color:brand, price:44.90, vendido:70 },
+    { name:'Caneca oficial', desc:'Caneca de porcelana com o escudo do clube.', cat:'Colecionáveis', icon:'caneca', color:amber, price:34.90, vendido:88 },
+    { name:'Miniatura do Brinco de Ouro da Princesa', desc:'Réplica em miniatura do estádio do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:69.90, vendido:22 },
+  ],
+  botafogo:[
+    { name:'Camisa I Botafogo-SP 2026', desc:'Camisa titular preta e branca, temporada 2026.', cat:'Camisas', icon:'camisa', color:brand, price:259.90, vendido:180 },
+    { name:'Camisa II Botafogo-SP 2026', desc:'Camisa reserva, tecido leve.', cat:'Camisas', icon:'camisa', color:teal, price:259.90, vendido:120 },
+    { name:'Camisa do Centenário 1918–2026', desc:'Edição comemorativa dos 100 anos do clube.', cat:'Camisas', icon:'camisa', color:gold, price:299.90, vendido:95 },
+    { name:'Camisa Infantil', desc:'Manto titular no tamanho infantil.', cat:'Infantil', icon:'camisa', color:gold, price:139.90, vendido:62 },
+    { name:'Moletom oficial Pantera', desc:'Moletom com o escudo do clube.', cat:'Vestuário', icon:'moletom', color:brand2, price:159.90, vendido:40 },
+    { name:'Boné oficial Pantera', desc:'Boné bordado com o escudo do clube.', cat:'Acessórios', icon:'bone', color:teal, price:84.90, vendido:80 },
+    { name:'Cachecol oficial', desc:'Cachecol preto e branco para o dia de jogo.', cat:'Acessórios', icon:'bone', color:brand, price:44.90, vendido:58 },
+    { name:'Caneca oficial', desc:'Caneca de porcelana com o escudo do clube.', cat:'Colecionáveis', icon:'caneca', color:amber, price:34.90, vendido:70 },
+    { name:'Miniatura da Arena Nicnet Eurobike', desc:'Réplica em miniatura do estádio do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:69.90, vendido:18 },
   ],
 };
 const SALES_CHANNELS = [
@@ -4728,6 +4943,194 @@ const FANS_DB_BY_CLUB = {
       ],
     },
   ],
+  guarani: [
+    {
+      id:'rafael', name:'Rafael Bugre', initials:'RB', color1:'#1c8a45', color2:'#0d5c2c', nivel:'platina',
+      fanId:'FAN-GUA-00041', fanScore:80, jogadorFavorito:'Éverton Brito (camisa 9)', competicaoFavorita:'Brasileirão Série C',
+      scoreDims:[['Engagement',82],['Comercial',66],['Conteúdo',76],['Matchday',72],['Gamificação',85],['Fidelidade',88]],
+      aiInsight:'Rafael tem baixo risco de churn e LTV consistente — bom candidato para oferta de upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para nível superior','60%'],['Convidar para experiência no Brinco de Ouro da Princesa','46%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Campinas, SP', regiao:'Sudeste',
+      timeCoracao:'Guarani', tambemTorce:'Seleção Brasileira',
+      socioDesde:'mar/2021', segmentoTitulo:'Torcedor fiel', segmentoCor:gold,
+      ltv:'R$ 980', gastoTotal:'R$ 980', transacoes:'8', ticketMedio:'R$ 122', produtoFavorito:'Camisas oficiais',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'66%', propensaoCor:teal,
+      tags:['Brinco de Ouro da Princesa · setor Oeste','Sócio fiel','Newsletter'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Foi ao jogo: Guarani 2x0 São Bento','16 mai, 2026', brand, '🎟'],
+        ['Comprou camisa oficial · R$ 250','12 mai, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','mar/2021', gold, '★'],
+      ],
+    },
+    {
+      id:'patricia', name:'Patrícia Camargo', initials:'PC', color1:'#0d5c2c', color2:'#1c8a45', nivel:'prata',
+      fanId:'FAN-GUA-00087', fanScore:40, jogadorFavorito:'Isaque', competicaoFavorita:'Brasileirão Série C',
+      scoreDims:[['Engagement',33],['Comercial',38],['Conteúdo',28],['Matchday',20],['Gamificação',45],['Fidelidade',50]],
+      aiInsight:'Patrícia está sem compras há 68 dias e cancelou notificações — alto risco de churn, recomenda-se oferta de reativação.',
+      nextBestActions:[['Enviar oferta de reativação com desconto','63%'],['Reengajar via push de próximo jogo','42%']],
+      idade:'25–34', sexo:'Feminino', cidade:'Indaiatuba, SP', regiao:'Sudeste',
+      timeCoracao:'Guarani', tambemTorce:'—',
+      socioDesde:'out/2023', segmentoTitulo:'Em risco de churn', segmentoCor:red,
+      ltv:'R$ 310', gastoTotal:'R$ 310', transacoes:'3', ticketMedio:'R$ 103', produtoFavorito:'Ingressos avulsos',
+      churnRisco:'Alto', churnCor:red, propensao:'23%', propensaoCor:red,
+      tags:['Sem compra há 68 dias','Cancelou notificações'],
+      segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
+      history:[
+        ['Cancelou notificações push','18 mar, 2026', brand2, '🔕'],
+        ['Última compra: ingresso avulso · R$ 40','10 fev, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','out/2023', gold, '★'],
+      ],
+    },
+    {
+      id:'marcelo', name:'Marcelo Piza', initials:'MP', color1:'#f2c94c', color2:'#1c8a45', nivel:'platina',
+      fanId:'FAN-GUA-00019', fanScore:93, jogadorFavorito:'Nathan Melo', competicaoFavorita:'Brasileirão Série C',
+      scoreDims:[['Engagement',94],['Comercial',80],['Conteúdo',88],['Matchday',82],['Gamificação',90],['Fidelidade',96]],
+      aiInsight:'Marcelo é sócio vitalício há 9 anos e tem o maior LTV da base — candidato a programa de embaixadores.',
+      nextBestActions:[['Convidar para programa de embaixadores','76%'],['Oferecer experiência VIP exclusiva','63%']],
+      idade:'35–44', sexo:'Masculino', cidade:'Piracicaba, SP', regiao:'Sudeste',
+      timeCoracao:'Guarani', tambemTorce:'—',
+      socioDesde:'jun/2017', segmentoTitulo:'Top torcedor', segmentoCor:gold,
+      ltv:'R$ 4.620', gastoTotal:'R$ 4.620', transacoes:'34', ticketMedio:'R$ 136', produtoFavorito:'Camarote',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'89%', propensaoCor:teal,
+      tags:['Sócio vitalício','Camarote fixo','Embaixador informal da torcida'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 480','19 mai, 2026', amber, '🛒'],
+        ['Foi ao jogo: Guarani 2x0 São Bento','16 mai, 2026', brand, '🎟'],
+        ['Sócio-torcedor desde','jun/2017', gold, '★'],
+      ],
+    },
+    {
+      id:'juliana', name:'Juliana Aparecida', initials:'JA', color1:'#1c8a45', color2:'#f2c94c', nivel:'ouro',
+      fanId:'FAN-GUA-00058', fanScore:74, jogadorFavorito:'Willian Farias', competicaoFavorita:'Brasileirão Série C',
+      scoreDims:[['Engagement',72],['Comercial',78],['Conteúdo',66],['Matchday',75],['Gamificação',52],['Fidelidade',80]],
+      aiInsight:'Juliana costuma comprar camarote nos jogos importantes — boa candidata a upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para Platina','50%']],
+      idade:'25–34', sexo:'Feminino', cidade:'Sumaré, SP', regiao:'Sudeste',
+      timeCoracao:'Guarani', tambemTorce:'—',
+      socioDesde:'jan/2022', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
+      ltv:'R$ 1.850', gastoTotal:'R$ 1.850', transacoes:'14', ticketMedio:'R$ 132', produtoFavorito:'Ingressos VIP',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'65%', propensaoCor:teal,
+      tags:['Compra camarote em jogos importantes','App power user'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 280','14 mai, 2026', amber, '🛒'],
+        ['Renovou plano de sócio','jan/2026', gold, '★'],
+      ],
+    },
+    {
+      id:'thiago', name:'Thiago Nascimento', initials:'TN', color1:'#7f88a8', color2:'#1c8a45', nivel:'bronze',
+      fanId:'FAN-GUA-00203', fanScore:36, jogadorFavorito:'—', competicaoFavorita:'—',
+      scoreDims:[['Engagement',28],['Comercial',18],['Conteúdo',22],['Matchday',8],['Gamificação',38],['Fidelidade',32]],
+      aiInsight:'Thiago é sócio novo e ainda não foi ao estádio — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.',
+      nextBestActions:[['Enviar convite para o primeiro jogo com desconto','56%']],
+      idade:'18–24', sexo:'Masculino', cidade:'Americana, SP', regiao:'Sudeste',
+      timeCoracao:'Guarani', tambemTorce:'—',
+      socioDesde:'mai/2026', segmentoTitulo:'Sócio novo', segmentoCor:brand2,
+      ltv:'R$ 70', gastoTotal:'R$ 70', transacoes:'1', ticketMedio:'R$ 70', produtoFavorito:'—',
+      churnRisco:'Médio', churnCor:amber, propensao:'33%', propensaoCor:amber,
+      tags:['Sócio novo','Ainda não foi ao estádio'],
+      segments:[['Novos sócios','Baixo engajamento inicial', brand2]],
+      history:[
+        ['Virou sócio-torcedor','mai/2026', gold, '★'],
+      ],
+    },
+  ],
+  botafogo: [
+    {
+      id:'rafael', name:'Rafael Pantera', initials:'RP', color1:'#1a1a1a', color2:'#3a3a3a', nivel:'platina',
+      fanId:'FAN-BOT-00041', fanScore:79, jogadorFavorito:'Kelvin (camisa 7)', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',81],['Comercial',65],['Conteúdo',75],['Matchday',71],['Gamificação',84],['Fidelidade',87]],
+      aiInsight:'Rafael tem baixo risco de churn e LTV consistente — bom candidato para oferta de upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para nível superior','59%'],['Convidar para experiência na Arena Nicnet Eurobike','45%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Ribeirão Preto, SP', regiao:'Sudeste',
+      timeCoracao:'Botafogo-SP', tambemTorce:'Seleção Brasileira',
+      socioDesde:'mar/2021', segmentoTitulo:'Torcedor fiel', segmentoCor:gold,
+      ltv:'R$ 1.020', gastoTotal:'R$ 1.020', transacoes:'8', ticketMedio:'R$ 128', produtoFavorito:'Camisas oficiais',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'64%', propensaoCor:teal,
+      tags:['Arena Nicnet Eurobike · setor Oeste','Sócio fiel','Newsletter'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Foi ao jogo: Botafogo-SP 1x0 Amazonas FC','17 mai, 2026', brand, '🎟'],
+        ['Comprou camisa oficial · R$ 260','13 mai, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','mar/2021', gold, '★'],
+      ],
+    },
+    {
+      id:'fernanda', name:'Fernanda Duque', initials:'FD', color1:'#3a3a3a', nivel:'prata', color2:'#1a1a1a',
+      fanId:'FAN-BOT-00087', fanScore:39, jogadorFavorito:'Rafael Gava', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',32],['Comercial',37],['Conteúdo',27],['Matchday',19],['Gamificação',44],['Fidelidade',49]],
+      aiInsight:'Fernanda está sem compras há 71 dias e cancelou notificações — alto risco de churn, recomenda-se oferta de reativação.',
+      nextBestActions:[['Enviar oferta de reativação com desconto','62%'],['Reengajar via push de próximo jogo','41%']],
+      idade:'25–34', sexo:'Feminino', cidade:'Sertãozinho, SP', regiao:'Sudeste',
+      timeCoracao:'Botafogo-SP', tambemTorce:'—',
+      socioDesde:'out/2023', segmentoTitulo:'Em risco de churn', segmentoCor:red,
+      ltv:'R$ 290', gastoTotal:'R$ 290', transacoes:'3', ticketMedio:'R$ 97', produtoFavorito:'Ingressos avulsos',
+      churnRisco:'Alto', churnCor:red, propensao:'22%', propensaoCor:red,
+      tags:['Sem compra há 71 dias','Cancelou notificações'],
+      segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
+      history:[
+        ['Cancelou notificações push','21 mar, 2026', brand2, '🔕'],
+        ['Última compra: ingresso avulso · R$ 45','11 fev, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','out/2023', gold, '★'],
+      ],
+    },
+    {
+      id:'eduardo', name:'Eduardo Ribeirão', initials:'ER', color1:'#f2c94c', color2:'#1a1a1a', nivel:'platina',
+      fanId:'FAN-BOT-00019', fanScore:92, jogadorFavorito:'Leandro Maciel', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',93],['Comercial',79],['Conteúdo',87],['Matchday',81],['Gamificação',89],['Fidelidade',95]],
+      aiInsight:'Eduardo é sócio vitalício há 8 anos e tem o maior LTV da base — candidato a programa de embaixadores.',
+      nextBestActions:[['Convidar para programa de embaixadores','75%'],['Oferecer experiência VIP exclusiva','61%']],
+      idade:'35–44', sexo:'Masculino', cidade:'Ribeirão Preto, SP', regiao:'Sudeste',
+      timeCoracao:'Botafogo-SP', tambemTorce:'—',
+      socioDesde:'jun/2018', segmentoTitulo:'Top torcedor', segmentoCor:gold,
+      ltv:'R$ 4.380', gastoTotal:'R$ 4.380', transacoes:'32', ticketMedio:'R$ 137', produtoFavorito:'Camarote',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'87%', propensaoCor:teal,
+      tags:['Sócio vitalício','Camarote fixo','Embaixador informal da torcida'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 500','20 mai, 2026', amber, '🛒'],
+        ['Foi ao jogo: Botafogo-SP 1x0 Amazonas FC','17 mai, 2026', brand, '🎟'],
+        ['Sócio-torcedor desde','jun/2018', gold, '★'],
+      ],
+    },
+    {
+      id:'camila', name:'Camila Sertão', initials:'CS', color1:'#1a1a1a', color2:'#f2c94c', nivel:'ouro',
+      fanId:'FAN-BOT-00058', fanScore:73, jogadorFavorito:'Everton Morelli', competicaoFavorita:'Brasileirão Série B',
+      scoreDims:[['Engagement',71],['Comercial',77],['Conteúdo',65],['Matchday',74],['Gamificação',51],['Fidelidade',79]],
+      aiInsight:'Camila costuma comprar camarote nos jogos importantes — boa candidata a upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para Platina','49%']],
+      idade:'25–34', sexo:'Feminino', cidade:'Franca, SP', regiao:'Sudeste',
+      timeCoracao:'Botafogo-SP', tambemTorce:'—',
+      socioDesde:'jan/2022', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
+      ltv:'R$ 1.780', gastoTotal:'R$ 1.780', transacoes:'13', ticketMedio:'R$ 137', produtoFavorito:'Ingressos VIP',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'63%', propensaoCor:teal,
+      tags:['Compra camarote em jogos importantes','App power user'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 260','15 mai, 2026', amber, '🛒'],
+        ['Renovou plano de sócio','jan/2026', gold, '★'],
+      ],
+    },
+    {
+      id:'gustavo', name:'Gustavo Passos', initials:'GP', color1:'#7f88a8', color2:'#1a1a1a', nivel:'bronze',
+      fanId:'FAN-BOT-00203', fanScore:35, jogadorFavorito:'—', competicaoFavorita:'—',
+      scoreDims:[['Engagement',27],['Comercial',17],['Conteúdo',21],['Matchday',8],['Gamificação',37],['Fidelidade',31]],
+      aiInsight:'Gustavo é sócio novo e ainda não foi ao estádio — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.',
+      nextBestActions:[['Enviar convite para o primeiro jogo com desconto','55%']],
+      idade:'18–24', sexo:'Masculino', cidade:'Ribeirão Preto, SP', regiao:'Sudeste',
+      timeCoracao:'Botafogo-SP', tambemTorce:'—',
+      socioDesde:'mai/2026', segmentoTitulo:'Sócio novo', segmentoCor:brand2,
+      ltv:'R$ 65', gastoTotal:'R$ 65', transacoes:'1', ticketMedio:'R$ 65', produtoFavorito:'—',
+      churnRisco:'Médio', churnCor:amber, propensao:'32%', propensaoCor:amber,
+      tags:['Sócio novo','Ainda não foi ao estádio'],
+      segments:[['Novos sócios','Baixo engajamento inicial', brand2]],
+      history:[
+        ['Virou sócio-torcedor','mai/2026', gold, '★'],
+      ],
+    },
+  ],
 };
 
 /* ============ NÍVEIS DE SÓCIO-TORCEDOR (por clube) ============ */
@@ -4752,6 +5155,20 @@ const TIER_DB_BY_CLUB = {
     { key:'prata', name:'Prata', color:'#b7c0d8', count:300, desc:'Sócio-torcedor · benefícios intermediários' },
     { key:'ouro', name:'Ouro', color:'#f2c94c', count:120, desc:'Sócio-torcedor · benefícios avançados' },
     { key:'platina', name:'Platina', color:'#b06bff', count:30, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+  ],
+  guarani: [
+    { key:'basico', name:'Básico', color:'#7f88a8', count:160000, desc:'Identificado na Ontologia, sem assinatura paga' },
+    { key:'bronze', name:'Bronze', color:'#c98a4b', count:22000, desc:'Sócio-torcedor · plano de entrada' },
+    { key:'prata', name:'Prata', color:'#b7c0d8', count:12000, desc:'Sócio-torcedor · benefícios intermediários' },
+    { key:'ouro', name:'Ouro', color:'#f2c94c', count:4680, desc:'Sócio-torcedor · benefícios avançados' },
+    { key:'platina', name:'Platina', color:'#b06bff', count:1320, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+  ],
+  botafogo: [
+    { key:'basico', name:'Básico', color:'#7f88a8', count:130000, desc:'Identificado na Ontologia, sem assinatura paga' },
+    { key:'bronze', name:'Bronze', color:'#c98a4b', count:11000, desc:'Sócio-torcedor · plano de entrada' },
+    { key:'prata', name:'Prata', color:'#b7c0d8', count:6000, desc:'Sócio-torcedor · benefícios intermediários' },
+    { key:'ouro', name:'Ouro', color:'#f2c94c', count:2340, desc:'Sócio-torcedor · benefícios avançados' },
+    { key:'platina', name:'Platina', color:'#b06bff', count:660, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
   ],
 };
 /* ---------- Base de torcedores gerada (diversa: regiao, idade 12-85, poucos fora do Brasil) ----------
@@ -4831,7 +5248,7 @@ function generateFanPool(clubId, total, sociosCount){
   }
   return pool;
 }
-const FAN_POOL_TOTALS = { flamengo:{ total:15000, socios:1000 }, corinthians:{ total:12000, socios:800 }, estrela:{ total:30000, socios:1000 } };
+const FAN_POOL_TOTALS = { flamengo:{ total:15000, socios:1000 }, corinthians:{ total:12000, socios:800 }, estrela:{ total:30000, socios:1000 }, guarani:{ total:200000, socios:40000 }, botafogo:{ total:150000, socios:20000 } };
 let FAN_POOL_CACHE = {};
 function getFanPool(){
   const key = currentClubId;
