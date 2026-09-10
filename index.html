@@ -510,7 +510,7 @@ canvas{ max-width:100%; }
     <form id="login-form">
       <div class="login-field">
         <label for="login-user">Usuário</label>
-        <input id="login-user" type="text" autocomplete="username" placeholder="admin" autofocus>
+        <input id="login-user" type="text" autocomplete="username" placeholder="Digite seu usuário" autofocus>
       </div>
       <div class="login-field">
         <label for="login-pass">Senha</label>
@@ -519,13 +519,13 @@ canvas{ max-width:100%; }
       <div id="login-error">Usuário ou senha incorretos.</div>
       <button type="submit" class="btn-primary" style="width:100%; padding:12px; font-size:13.5px;">Entrar</button>
     </form>
-    <div class="login-hint">Ambiente de demonstração — usuário <b>admin</b>, senha <b>admin</b></div>
+    <div class="login-hint">Ambiente de demonstração — acesso restrito</div>
   </div>
 </div>
 
 <div id="club-cover-screen">
   <div class="club-cover-title">Escolha um clube para explorar</div>
-  <div class="club-cover-sub">Dados de demonstração — reais para Guarani e Botafogo-SP, fictícios para o Estrela FC</div>
+  <div class="club-cover-sub">Dados de demonstração — reais para Flamengo, Guarani e Botafogo-SP, fictícios para o Estrela FC</div>
   <div class="club-cover-grid" id="club-cover-grid"></div>
 </div>
 
@@ -1999,7 +1999,7 @@ canvas{ max-width:100%; }
     const user = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value;
     const errorEl = document.getElementById('login-error');
-    if (user === 'admin' && pass === 'admin') {
+    if (user === 'admin' && pass === 'vfans00') {
       screen.style.display = 'none';
       errorEl.style.display = 'none';
       renderClubCover();
@@ -2227,7 +2227,7 @@ const CLUB_PROFILES = {
 };
 let currentClubId = 'guarani';
 
-const CLUB_COVER_ORDER = ['estrela', 'guarani', 'botafogo'];
+const CLUB_COVER_ORDER = ['estrela', 'guarani', 'botafogo', 'flamengo'];
 function renderClubCover(){
   document.getElementById('club-cover-grid').innerHTML = CLUB_COVER_ORDER.map(id=>{
     const c = CLUB_PROFILES[id];
@@ -2766,10 +2766,10 @@ const SQUAD_BY_CLUB = {
       { name:'Léo Pereira', pos:'Zagueiro', age:29, score:84, brand:'R$ 8,0M', market:'€ 12,0M' },
       { name:'Wesley', pos:'Lateral Direito', age:20, score:81, brand:'R$ 7,0M', market:'€ 15,0M' },
       { name:'Ayrton Lucas', pos:'Lateral Esquerdo', age:27, score:79, brand:'R$ 5,0M', market:'€ 9,0M' },
-      { name:'Erick Pulgar', pos:'Volante', age:32, score:83, brand:'R$ 6,0M', market:'€ 5,0M' },
+      { name:'Joaquín Freitas', pos:'Meia', age:19, score:78, brand:'R$ 4,0M', market:'€ 12,0M' },
       { name:'Lucas Paquetá', pos:'Meia', age:28, score:92, brand:'R$ 25,0M', market:'€ 40,6M' },
       { name:'Samuel Lino', pos:'Meia', age:25, score:86, brand:'R$ 10,0M', market:'€ 18,0M' },
-      { name:'Everton (Cebolinha)', pos:'Atacante', age:29, score:84, brand:'R$ 9,0M', market:'€ 8,0M' },
+      { name:'Anthony Valencia', pos:'Atacante', age:23, score:82, brand:'R$ 6,0M', market:'€ 9,0M' },
       { name:'Pedro', pos:'Atacante', age:28, score:94, brand:'R$ 20,0M', market:'€ 18,0M' },
     ],
     fem:[
@@ -2871,7 +2871,7 @@ const TACTICAL_RADAR_BY_CLUB = {
   botafogo: { Ataque:70, Posse:66, Pressão:71, Defesa:68, Físico:73 },
 };
 const SQUAD_VALUE_TREND_BY_CLUB = {
-  flamengo: [742, 768, 795, 810, 838, 861],
+  flamengo: [768, 795, 810, 838, 861, 895],
   corinthians: [432, 419, 438, 445, 451, 457],
   estrela: [58, 61, 63, 65, 68, 71],
   guarani: [18, 19, 21, 22, 24, 26],
@@ -3204,9 +3204,9 @@ const STAFF_BY_CLUB = {
 
 const TRAVEL_BY_CLUB = {
   flamengo:[
-    ['Belo Horizonte, MG', '12 ago, 2026', 'Cruzeiro x Flamengo — Libertadores (ida)', 'Voo fretado', 'Hotel Ouro Minas', 'Confirmado'],
-    ['Salvador, BA', '25 ago, 2026', 'Bahia x Flamengo — Brasileirão', 'Voo comercial fretado', 'Hotel Fera Palace', 'Confirmado'],
-    ['Porto Alegre, RS', '14 set, 2026', 'Grêmio x Flamengo — Brasileirão', 'Voo fretado', 'Hotel Plaza São Rafael', 'Planejamento'],
+    ['Belo Horizonte, MG', '20 set, 2026', 'Cruzeiro x Flamengo — Brasileirão', 'Voo fretado', 'Hotel Ouro Minas', 'Confirmado'],
+    ['Salvador, BA', '27 set, 2026', 'Bahia x Flamengo — Brasileirão', 'Voo comercial fretado', 'Hotel Fera Palace', 'Confirmado'],
+    ['Porto Alegre, RS', '04 out, 2026', 'Grêmio x Flamengo — Brasileirão', 'Voo fretado', 'Hotel Plaza São Rafael', 'Planejamento'],
   ],
   corinthians:[
     ['La Plata, Argentina', '09 set, 2026', 'Estudiantes x Corinthians — Libertadores (ida)', 'Voo internacional fretado', 'Hotel Hilton La Plata', 'Confirmado'],
@@ -3273,7 +3273,7 @@ const BRAND_BY_CLUB = {
 };
 
 const TEAM_STATS_BY_CLUB = {
-  flamengo:{ posicao:'2º lugar · 45 pts', vitorias:'8V–3E–2D', artilheiro:'Pedro · 14 gols', defesa:'19 gols sofridos (melhor defesa)' },
+  flamengo:{ posicao:'1º lugar · 54 pts (24 jogos)', vitorias:'17V–3E–4D · 75% aproveitamento', artilheiro:'Pedro · 19 gols', defesa:'23 gols sofridos (melhor defesa)' },
   corinthians:{ posicao:'10º lugar · 18 pts (16 jogos)', vitorias:'4V–6E–6D · 37% aproveitamento', artilheiro:'Yuri Alberto · 6 gols (geral) · André · 3 (Brasileirão)', defesa:'—' },
   estrela:{ posicao:'6º lugar · 29 pts (18 jogos) — Série B', vitorias:'8V–5E–5D · 48% aproveitamento', artilheiro:'Matheus Estrela · 9 gols', defesa:'22 gols sofridos' },
   guarani:{ posicao:'7º lugar · 24 pts (16 jogos) — Série C', vitorias:'6V–6E–4D · 50% aproveitamento', artilheiro:'Éverton Brito · 7 gols', defesa:'18 gols sofridos' },
@@ -4032,7 +4032,7 @@ function buildContent(){
 const STADIUM_BY_CLUB = {
   flamengo: {
     name:'Maracanã', city:'Rio de Janeiro, RJ', capacity:78000,
-    nextMatch:{ date:'19 ago, 2026', label:'Flamengo x Cruzeiro — Libertadores (oitavas, volta)', time:'21h30' },
+    nextMatch:{ date:'13 set, 2026', label:'Flamengo x Corinthians — Brasileirão (25ª rodada)', time:'19h30' },
     sectors:[
       { key:'norte', name:'Norte', cap:18000, sold:0.97, price:'R$ 70', desc:'Setor mais animado — coração da torcida organizada.' },
       { key:'sul', name:'Sul', cap:17000, sold:0.94, price:'R$ 70', desc:'Setor popular, forte presença da torcida.' },
@@ -4202,12 +4202,12 @@ function showStadiumSectorModal(key){
 /* ---------- Próximos jogos reais (por clube) ---------- */
 const EVENTS_BY_CLUB = {
   flamengo: [
-    ['12 ago, 2026', 'Futebol masculino', 'Cruzeiro x Flamengo — Libertadores (oitavas, ida)', 'Mineirão (fora de casa)', 'Fora de casa'],
-    ['19 ago, 2026', 'Futebol masculino', 'Flamengo x Cruzeiro — Libertadores (oitavas, volta)', 'Maracanã', '95% vendido'],
-    ['13 set, 2026', 'Futebol masculino', 'Flamengo x Corinthians — Brasileirão (27ª rodada)', 'Maracanã', 'Clássico — pré-venda'],
-    ['21 jun, 2026', 'Futebol feminino', 'Flamengo Feminino x Atlética SC', 'Maracanã', '58% vendido'],
-    ['27 jun, 2026', 'Show', 'Turnê Nacional — Banda Ravena', 'Maracanã', '74% vendido'],
-    ['10 jul, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Sede social — Gávea', 'Confirmado'],
+    ['13 set, 2026', 'Futebol masculino', 'Flamengo x Corinthians — Brasileirão (25ª rodada)', 'Maracanã', 'Clássico — pré-venda'],
+    ['20 set, 2026', 'Futebol masculino', 'Flamengo x Mirassol — Brasileirão (26ª rodada)', 'Maracanã', '81% vendido'],
+    ['27 set, 2026', 'Futebol masculino', 'Botafogo x Flamengo — Brasileirão (27ª rodada)', 'Estádio Nilton Santos (fora de casa)', 'Fora de casa'],
+    ['04 out, 2026', 'Futebol feminino', 'Flamengo Feminino x Atlética SC', 'Maracanã', '58% vendido'],
+    ['11 out, 2026', 'Show', 'Turnê Nacional — Banda Ravena', 'Maracanã', '74% vendido'],
+    ['18 out, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Sede social — Gávea', 'Confirmado'],
   ],
   corinthians: [
     ['30 ago, 2026', 'Futebol masculino', 'Corinthians x Santos — Brasileirão (25ª rodada)', 'Neo Química Arena', '87% vendido'],
