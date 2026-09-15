@@ -37,11 +37,15 @@ superfície de query livre.
 
 ## Simplificações deliberadas do Alpha (dívida técnica conhecida, não esquecimento)
 
-1. **`/ai/ask` não chama a API da Anthropic ainda** (`backend/api/v1/ai.py`)
-   — monta a resposta combinando as tools controladas com um template de
-   texto fixo. Suficiente para validar o contrato (`AIAskResponse`) e o
-   fluxo Fan360 -> Segmento -> Pergunta ponta a ponta sem gastar
-   orçamento de LLM. Trocar por GraphRAG real é isolado a este arquivo.
+1. **`/ai/ask` chama a API da Anthropic quando `ANTHROPIC_API_KEY` está
+   configurada** (`backend/api/v1/ai.py`) — loop de tool-use com Claude
+   chamando `search_fans_at_risk` e `get_fan_360` (as mesmas duas
+   funções controladas usadas pelos outros endpoints), até 4 turnos.
+   Sem a env var, cai de volta no template de texto fixo antigo (mesmo
+   contrato `AIAskResponse`, não quebra nada que já consome o endpoint).
+   Ainda não é GraphRAG completo: só 2 tools, sem busca vetorial/semântica
+   sobre o grafo — é "Claude + duas funções", suficiente para validar o
+   loop Fan360 -> Segmento -> Pergunta ponta a ponta.
 2. **Risco de churn é pré-calculado no seed, não em tempo real** —
    `ChurnRisk.risk_score` é gerado como `(1 - engagement_score) * ruído`
    dentro de `database/seed/seed.py`. Isso não é a regra de negócio real

@@ -5,7 +5,8 @@ brief completo do projeto e `docs/architecture/vision.md` para decisões
 de arquitetura e simplificações deliberadas do Alpha.
 
 Stack: FastAPI + PostgreSQL (Identity) + Neo4j (Knowledge Graph) +
-Claude API (Intelligence, ainda não conectada — ver vision.md item 1).
+Claude API (Intelligence — ver vision.md item 1; requer
+`ANTHROPIC_API_KEY` no `.env`, senão cai num template de texto fixo).
 
 ## Rodando localmente (5 minutos)
 
