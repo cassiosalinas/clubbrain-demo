@@ -80,8 +80,9 @@
       <button class="primary" onclick="testConnection()">Conectar</button>
     </div>
     <p class="muted" style="margin: 10px 0 0">
-      Cole a URL pública da porta 8000 do seu Codespace (aba Ports no VS Code, copiar "Forwarded Address"),
-      ou <code>http://localhost:8000</code> se estiver rodando localmente.
+      Se esta página foi aberta em <code>/demo/fan-explorer.html</code> do próprio backend, o campo já
+      vem preenchido (mesma origem — evita problemas de CORS/proxy). Só troque se estiver apontando
+      para outro backend.
     </p>
   </div>
 
@@ -121,6 +122,14 @@
 </div>
 
 <script>
+// Same-origin deploy (served by FastAPI at /demo/): prefill with the
+// current origin so there's nothing to paste.
+if (location.pathname.startsWith('/demo/')) {
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('baseUrl').value = location.origin;
+  });
+}
+
 function baseUrl() { return document.getElementById('baseUrl').value.trim().replace(/\/$/, ''); }
 
 // credentials: 'include' is required when the backend runs behind GitHub

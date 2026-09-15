@@ -40,6 +40,13 @@ curl "http://localhost:8000/api/v1/segments/at-risk?min_score=0.7"
 
 Docs interativas: `http://localhost:8000/docs`
 
+Demo visual (Fan Explorer — lista fãs em risco, Fan 360, pergunta à IA):
+`http://localhost:8000/demo/fan-explorer.html`. Servida pelo próprio
+backend (mesma origem) de propósito — rodando atrás do proxy de porta do
+GitHub Codespaces, um POST feito de uma origem diferente (ex. um
+`http.server` numa outra porta) tem seu preflight CORS bloqueado pelo
+proxy antes de chegar no FastAPI. Same-origin evita o problema inteiro.
+
 ## Estrutura
 
 ```
