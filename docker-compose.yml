@@ -64,6 +64,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./database:/app/database
+      - ./frontend:/app/frontend
 
 volumes:
   vasco_pgdata:
