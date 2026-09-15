@@ -1,0 +1,68 @@
+# MVP Vasco — Arquitetura e decisões do Alpha
+
+## Core loop
+
+Toda funcionalidade deve alimentar: **SEE -> UNDERSTAND -> DECIDE -> ACT ->
+MEASURE -> LEARN**.
+
+No Alpha (90 dias), o MVP cobre **SEE** e o começo de **UNDERSTAND**:
+Fan 360 (`GET /api/v1/fans/{id}/360`), busca de segmento
+(`GET /api/v1/segments/at-risk`) e uma primeira pergunta em linguagem
+natural (`POST /api/v1/ai/ask`) sobre o Knowledge Graph.
+
+## As 7 camadas (ver CLAUDE.md)
+
+1. Integration Hub — ainda não implementado nesta rodada; os dados hoje
+   entram só pelo seed fictício (`database/seed/seed.py`). Quando os
+   conectores reais (CRM, Ticketing, E-commerce) forem liberados, eles
+   escrevem no mesmo lugar que o seed escreve hoje: Postgres (Identity) +
+   Neo4j (Graph).
+2. Identity + Data — `database/migrations/001_init.sql` (Postgres). Fonte
+   de verdade de "quem é quem"; resolve Person -> Fan/Employee.
+3. Sports Ontology v1 — `ontology/vasco_sports_ontology_v1.yaml`.
+4. Knowledge Graph — `ontology/vasco_neo4j_schema.cypher` + Neo4j.
+5. Intelligence — `backend/agents/tools.py` + `backend/api/v1/ai.py`.
+6. Agents — ainda 1 endpoint genérico (`/ai/ask`), não 3 agentes
+   separados (Executive/Fan/Marketing). Próximo passo depois do loop
+   ponta a ponta validar.
+7. Experience — não plugado ainda. `demo.clubbrain.ai` deveria consumir
+   estes endpoints no lugar dos dados simulados atuais.
+
+## Princípio não-negociável
+
+A IA **nunca** tem acesso direto ao banco/grafo — só chama funções
+controladas em `backend/agents/tools.py`. Isso existe para que toda
+resposta da IA seja auditável e para não expor a ontologia inteira como
+superfície de query livre.
+
+## Simplificações deliberadas do Alpha (dívida técnica conhecida, não esquecimento)
+
+1. **`/ai/ask` não chama a API da Anthropic ainda** (`backend/api/v1/ai.py`)
+   — monta a resposta combinando as tools controladas com um template de
+   texto fixo. Suficiente para validar o contrato (`AIAskResponse`) e o
+   fluxo Fan360 -> Segmento -> Pergunta ponta a ponta sem gastar
+   orçamento de LLM. Trocar por GraphRAG real é isolado a este arquivo.
+2. **Risco de churn é pré-calculado no seed, não em tempo real** —
+   `ChurnRisk.risk_score` é gerado como `(1 - engagement_score) * ruído`
+   dentro de `database/seed/seed.py`. Isso não é a regra de negócio real
+   do Vasco (que depende de dado real de engajamento); é só o suficiente
+   para o endpoint `/segments/at-risk` retornar algo plausível.
+3. **Só o domínio Core + parte de Sport/FanIntelligence está no seed** —
+   `Sponsor`, `SponsorshipContract`, `Product`/`Order`/`OrderItem`,
+   `SocialAccount`/`MediaContent` existem na ontologia mas não são
+   povoados ainda. Adicionar quando os agentes Marketing/Executive
+   precisarem desses domínios.
+4. **1 clube piloto, sem multi-tenant** — `club_id` existe nos dados mas
+   nenhum endpoint filtra por ele ainda (só há 1 club no seed).
+5. **Sem approval gate em ações** — não há ainda nenhuma ação de
+   escrita/campanha neste MVP (Alpha 1 aqui é só SEE), então esta
+   simplificação do clubbrain-alpha ainda não se aplica — mas vai
+   precisar existir antes do primeiro endpoint de ACT.
+
+## Campos `[confirmar]` na ontologia
+
+`ontology/vasco_sports_ontology_v1.yaml` marca com `[confirmar]` todo
+campo que depende de acesso real aos sistemas do Vasco (CRM, ticketing,
+VTEX). Esses campos **não são gerados no seed fictício** — ou ficam
+ausentes, ou usam um placeholder óbvio (ex. `example.invalid`). Não
+inventar valores realistas para eles.

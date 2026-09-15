@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: vasco-postgres
+    environment:
+      POSTGRES_USER: vasco
+      POSTGRES_PASSWORD: vasco
+      POSTGRES_DB: vasco
+    ports:
+      - "5432:5432"
+    volumes:
+      - vasco_pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vasco"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: vasco-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/vasco12345
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"   # browser UI
+      - "7687:7687"   # bolt
+    volumes:
+      - vasco_neo4jdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O /dev/null -q http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: vasco-backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://vasco:vasco@postgres:5432/vasco
+      NEO4J_URI: bolt://neo4j:7687
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+
+volumes:
+  vasco_pgdata:
+  vasco_neo4jdata:
