@@ -8,10 +8,16 @@ app = FastAPI(title="ClubBrain — MVP Vasco", version="0.1.0")
 # Alpha only: the demo frontend (frontend/fan-explorer.html) is opened as a
 # static file or from a different origin than the API, so CORS is wide
 # open here. Tighten this to the real frontend's origin before any
-# non-fictitious data touches this API.
+# non-fictitious data touches this API. allow_origin_regex (not
+# allow_origins=["*"]) is required so the response reflects the actual
+# request origin — needed because the frontend sends credentials:
+# 'include' (necessary when the backend sits behind GitHub Codespaces'
+# port-forwarding auth), and browsers reject a wildcard origin on
+# credentialed requests.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=".*",
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
