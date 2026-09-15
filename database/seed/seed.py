@@ -378,12 +378,281 @@ def seed_graph_fans(fans_summary: list[dict], match_ids: list[str]) -> None:
         print(f"  segment chunk {i + 1} ({len(chunk)} rows) gravado.")
 
 
+SPONSOR_NAMES = [
+    ("Vetor Seguros", "insurance"),
+    ("Litoral Bank", "finance"),
+    ("Andina Bebidas", "beverages"),
+    ("Praxis Tech", "technology"),
+]
+
+PRODUCT_CATALOG = [
+    ("Camisa I 2026", "jersey"),
+    ("Camisa II 2026", "jersey"),
+    ("Camisa III 2026", "jersey"),
+    ("Camisa Retro 1998", "jersey"),
+    ("Bone Vasco", "accessory"),
+    ("Cachecol Vasco", "accessory"),
+    ("Mochila Vasco", "accessory"),
+    ("Caneca Vasco", "accessory"),
+]
+
+SOCIAL_PLATFORMS = ["instagram", "tiktok", "x", "youtube"]
+CONTENT_TYPES = ["post", "video", "story", "live"]
+INTERACTION_TYPES = ["view", "like", "comment", "share"]
+
+
+def seed_graph_commercial(club_id: uuid.UUID) -> None:
+    sponsor_rows = [
+        {"id": str(uuid.uuid4()), "name": name, "industry": industry, "tier": tier}
+        for (name, industry), tier in zip(
+            SPONSOR_NAMES, ["master", "official", "official", "supporter"]
+        )
+    ]
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (s:Sponsor {id: row.id})
+        SET s.name = row.name, s.industry = row.industry, s.tier = row.tier
+        """,
+        rows=sponsor_rows,
+    )
+
+    contract_rows = []
+    for sponsor in sponsor_rows:
+        starts_at = fake.date_between(start_date="-2y", end_date="-6m")
+        contract_rows.append(
+            {
+                "id": str(uuid.uuid4()),
+                "sponsor_id": sponsor["id"],
+                "annual_value": round(random.uniform(500_000, 8_000_000), 2),
+                "starts_at": starts_at.isoformat(),
+                "ends_at": (starts_at + timedelta(days=730)).isoformat(),
+            }
+        )
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (c:SponsorshipContract {id: row.id})
+        SET c.annual_value = row.annual_value,
+            c.starts_at = date(row.starts_at), c.ends_at = date(row.ends_at)
+        WITH c, row
+        MATCH (s:Sponsor {id: row.sponsor_id}), (club:Club {id: $club_id})
+        MERGE (c)-[:CONTRACT_OF]->(s)
+        MERGE (c)-[:SPONSORS]->(club)
+        """,
+        rows=contract_rows,
+        club_id=str(club_id),
+    )
+
+    activation_rows = [
+        {
+            "id": str(uuid.uuid4()),
+            "contract_id": contract["id"],
+            "activation_type": random.choice(
+                ["post_patrocinado", "experiencia_em_jogo", "naming_arena"]
+            ),
+            "occurred_at": fake.date_time_between(
+                start_date="-6m", end_date="now"
+            ).isoformat(),
+        }
+        for contract in contract_rows
+        for _ in range(random.randint(1, 3))
+    ]
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (a:SponsorActivation {id: row.id})
+        SET a.activation_type = row.activation_type, a.occurred_at = datetime(row.occurred_at)
+        WITH a, row
+        MATCH (c:SponsorshipContract {id: row.contract_id})
+        MERGE (a)-[:ACTIVATES]->(c)
+        """,
+        rows=activation_rows,
+    )
+
+    print(
+        f"Commercial: {len(sponsor_rows)} sponsors, {len(contract_rows)} contracts, "
+        f"{len(activation_rows)} activations."
+    )
+
+
+def seed_graph_commerce(fans_summary: list[dict]) -> None:
+    product_rows = [
+        {
+            "id": str(uuid.uuid4()),
+            "sku": f"VASCO-{i:04d}",
+            "name": name,
+            "category": category,
+            "price": round(random.uniform(59.9, 349.9), 2),
+        }
+        for i, (name, category) in enumerate(PRODUCT_CATALOG, start=1)
+    ]
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (p:Product {id: row.id})
+        SET p.sku = row.sku, p.name = row.name, p.category = row.category, p.price = row.price
+        """,
+        rows=product_rows,
+    )
+
+    order_rows = []
+    item_rows = []
+    buyers = random.sample(fans_summary, k=int(len(fans_summary) * 0.4))
+    for entry in buyers:
+        for _ in range(random.randint(1, 2)):
+            order_id = str(uuid.uuid4())
+            items = random.sample(product_rows, k=random.randint(1, 3))
+            total = 0.0
+            for product in items:
+                qty = random.randint(1, 2)
+                total += product["price"] * qty
+                item_rows.append(
+                    {
+                        "id": str(uuid.uuid4()),
+                        "order_id": order_id,
+                        "product_id": product["id"],
+                        "quantity": qty,
+                        "unit_price": product["price"],
+                    }
+                )
+            order_rows.append(
+                {
+                    "id": order_id,
+                    "fan_id": str(entry["fan_id"]),
+                    "total_value": round(total, 2),
+                    "status": random.choices(
+                        ["paid", "pending", "refunded"], weights=[0.85, 0.1, 0.05]
+                    )[0],
+                    "placed_at": fake.date_time_between(
+                        start_date="-1y", end_date="now"
+                    ).isoformat(),
+                }
+            )
+
+    for i, chunk in enumerate(chunks(order_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MERGE (o:Order {id: row.id})
+            SET o.order_type = 'merchandise', o.total_value = row.total_value,
+                o.status = row.status, o.placed_at = datetime(row.placed_at)
+            WITH o, row
+            MATCH (f:Fan {id: row.fan_id})
+            MERGE (o)-[:PLACED_BY]->(f)
+            """,
+            rows=chunk,
+        )
+        print(f"  order chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    for i, chunk in enumerate(chunks(item_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MERGE (oi:OrderItem {id: row.id})
+            SET oi.quantity = row.quantity, oi.unit_price = row.unit_price
+            WITH oi, row
+            MATCH (o:Order {id: row.order_id}), (p:Product {id: row.product_id})
+            MERGE (oi)-[:LINE_OF]->(o)
+            MERGE (oi)-[:FOR_PRODUCT]->(p)
+            """,
+            rows=chunk,
+        )
+        print(f"  order-item chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    print(
+        f"Commerce: {len(product_rows)} products, {len(order_rows)} orders, "
+        f"{len(item_rows)} order items."
+    )
+
+
+def seed_graph_media(fans_summary: list[dict], match_ids: list[str]) -> None:
+    account_rows = [
+        {"id": str(uuid.uuid4()), "platform": platform, "handle": f"@vasco.{platform}"}
+        for platform in SOCIAL_PLATFORMS
+    ]
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (sa:SocialAccount {id: row.id})
+        SET sa.platform = row.platform, sa.handle = row.handle
+        """,
+        rows=account_rows,
+    )
+
+    content_rows = [
+        {
+            "id": str(uuid.uuid4()),
+            "account_id": random.choice(account_rows)["id"],
+            "content_type": random.choice(CONTENT_TYPES),
+            "published_at": fake.date_time_between(
+                start_date="-6m", end_date="now"
+            ).isoformat(),
+            "match_id": random.choice(match_ids) if random.random() < 0.5 else None,
+        }
+        for _ in range(40)
+    ]
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (mc:MediaContent {id: row.id})
+        SET mc.content_type = row.content_type, mc.published_at = datetime(row.published_at)
+        WITH mc, row
+        MATCH (sa:SocialAccount {id: row.account_id})
+        MERGE (mc)-[:PUBLISHED_ON]->(sa)
+        WITH mc, row
+        OPTIONAL MATCH (m:Match {id: row.match_id})
+        FOREACH (_ IN CASE WHEN m IS NOT NULL THEN [1] ELSE [] END | MERGE (mc)-[:ABOUT]->(m))
+        """,
+        rows=content_rows,
+    )
+
+    consumption_rows = []
+    consumers = random.sample(fans_summary, k=int(len(fans_summary) * 0.6))
+    for entry in consumers:
+        for _ in range(random.randint(1, 5)):
+            content = random.choice(content_rows)
+            consumption_rows.append(
+                {
+                    "fan_id": str(entry["fan_id"]),
+                    "content_id": content["id"],
+                    "interaction_type": random.choice(INTERACTION_TYPES),
+                    "occurred_at": fake.date_time_between(
+                        start_date="-6m", end_date="now"
+                    ).isoformat(),
+                }
+            )
+
+    for i, chunk in enumerate(chunks(consumption_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MATCH (f:Fan {id: row.fan_id}), (mc:MediaContent {id: row.content_id})
+            MERGE (mcons:MediaConsumption {id: randomUUID()})
+            SET mcons.interaction_type = row.interaction_type,
+                mcons.occurred_at = datetime(row.occurred_at)
+            MERGE (mcons)-[:INTERACTION_WITH]->(mc)
+            MERGE (mcons)-[:BY_FAN]->(f)
+            """,
+            rows=chunk,
+        )
+        print(f"  media-consumption chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    print(
+        f"Media: {len(account_rows)} social accounts, {len(content_rows)} content "
+        f"pieces, {len(consumption_rows)} consumption events."
+    )
+
+
 def main():
     club_id, person_rows, fan_rows, membership_rows, fans_summary = build_fan_rows()
 
     seed_postgres(club_id, person_rows, fan_rows, membership_rows)
     _, match_ids = seed_graph_sport(club_id)
     seed_graph_fans(fans_summary, match_ids)
+    seed_graph_commercial(club_id)
+    seed_graph_commerce(fans_summary)
+    seed_graph_media(fans_summary, match_ids)
 
     print(f"Seed completo. club_id={club_id}")
     print(f"{len(fans_summary)} fans criados (Postgres + Neo4j).")
