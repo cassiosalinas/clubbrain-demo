@@ -11,6 +11,12 @@ hashed with PII_HASH_SALT before it touches either database — per the
 Nothing here is real club data; fields the ontology marks `[confirmar]`
 are either omitted or filled with an obviously-fake placeholder.
 
+Writes are batched (bulk Postgres inserts, UNWIND-based Neo4j writes) and
+committed in chunks rather than one giant transaction — this dataset was
+originally written record-by-record and lost all ~500 fans when a single
+dropped connection rolled back the one final commit. Batching also cuts
+this from ~4500 individual round trips to a few dozen.
+
 Run inside the backend container:
     docker compose exec backend python -m database.seed.seed
 """
@@ -19,10 +25,9 @@ import hashlib
 import os
 import random
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import timedelta, datetime, timezone
 
 from faker import Faker
-from sqlalchemy.orm import Session
 
 from backend import models
 from backend.database import Base, SessionLocal, engine
@@ -37,86 +42,132 @@ PII_SALT = os.environ.get("PII_HASH_SALT", "dev-only-change-me")
 N_FANS = 500
 N_PLAYERS = 23
 N_MATCHES = 10
+CHUNK_SIZE = 100
 
 
 def pii_hash(value: str) -> str:
     return hashlib.sha256(f"{PII_SALT}:{value}".encode()).hexdigest()
 
 
-def seed_postgres(db: Session) -> tuple[uuid.UUID, list[dict]]:
-    Base.metadata.create_all(bind=engine)
+def chunks(seq, size):
+    for i in range(0, len(seq), size):
+        yield seq[i : i + size]
 
-    club = models.Club(
-        name="Club de Regatas Vasco da Gama",
-        short_name="Vasco",
-        founded_year="1898",
-        primary_color="black-white",
-        crest_url="https://example.invalid/crest/vasco.png",
-    )
-    db.add(club)
-    db.flush()
 
+def build_fan_rows():
+    """Pure-Python generation of all rows, no DB access yet."""
+    club_id = uuid.uuid4()
+    person_rows, fan_rows, membership_rows = [], [], []
     fans_summary = []
+
     for _ in range(N_FANS):
-        name = fake.name()
-        person = models.Person(
-            full_name_hash=pii_hash(name),
-            email_hash=pii_hash(fake.email()),
-            phone_hash=pii_hash(fake.phone_number()),
-            birth_date=fake.date_of_birth(minimum_age=14, maximum_age=80),
-            city=fake.city(),
-            state="RJ",
-            country="BR",
-            source_systems=["seed_fixture"],
-        )
-        db.add(person)
-        db.flush()
-
+        person_id = uuid.uuid4()
+        fan_id = uuid.uuid4()
         fan_since = fake.date_between(start_date="-10y", end_date="-1m")
-        fan = models.Fan(
-            person_id=person.id,
-            fan_since=fan_since,
-            lifetime_value=round(random.uniform(50, 8000), 2),
-            acquisition_channel=random.choice(["organic", "campaign", "referral"]),
-        )
-        db.add(fan)
-        db.flush()
 
-        has_membership = random.random() < 0.7
-        membership = None
-        if has_membership:
-            status = random.choices(
-                ["active", "cancelled", "expired"], weights=[0.75, 0.15, 0.10]
-            )[0]
-            started_at = fake.date_between(start_date=fan_since, end_date="today")
-            renews_at = started_at + timedelta(days=365)
-            membership = models.Membership(
-                fan_id=fan.id,
-                plan_name=random.choice(["Basico", "Prata", "Ouro", "Patrimonial"]),
-                status=status,
-                monthly_value=round(random.uniform(29.9, 249.9), 2),
-                started_at=started_at,
-                renews_at=renews_at,
-                cancelled_at=fake.date_between(start_date=started_at, end_date="today")
-                if status == "cancelled"
-                else None,
-            )
-            db.add(membership)
-            db.flush()
-
-        fans_summary.append(
+        person_rows.append(
             {
-                "fan_id": fan.id,
-                "membership_id": membership.id if membership else None,
-                "membership_status": membership.status if membership else None,
+                "id": person_id,
+                "full_name_hash": pii_hash(fake.name()),
+                "email_hash": pii_hash(fake.email()),
+                "phone_hash": pii_hash(fake.phone_number()),
+                "birth_date": fake.date_of_birth(minimum_age=14, maximum_age=80),
+                "city": fake.city(),
+                "state": "RJ",
+                "country": "BR",
+                "source_systems": ["seed_fixture"],
+            }
+        )
+        fan_rows.append(
+            {
+                "id": fan_id,
+                "person_id": person_id,
+                "fan_since": fan_since,
+                "lifetime_value": round(random.uniform(50, 8000), 2),
+                "acquisition_channel": random.choice(
+                    ["organic", "campaign", "referral"]
+                ),
             }
         )
 
-    db.commit()
-    return club.id, fans_summary
+        membership_id = None
+        membership_status = None
+        if random.random() < 0.7:
+            membership_id = uuid.uuid4()
+            membership_status = random.choices(
+                ["active", "cancelled", "expired"], weights=[0.75, 0.15, 0.10]
+            )[0]
+            started_at = fake.date_between(start_date=fan_since, end_date="today")
+            membership_rows.append(
+                {
+                    "id": membership_id,
+                    "fan_id": fan_id,
+                    "plan_name": random.choice(
+                        ["Basico", "Prata", "Ouro", "Patrimonial"]
+                    ),
+                    "status": membership_status,
+                    "monthly_value": round(random.uniform(29.9, 249.9), 2),
+                    "started_at": started_at,
+                    "renews_at": started_at + timedelta(days=365),
+                    "cancelled_at": fake.date_between(
+                        start_date=started_at, end_date="today"
+                    )
+                    if membership_status == "cancelled"
+                    else None,
+                }
+            )
+
+        fans_summary.append(
+            {
+                "fan_id": fan_id,
+                "membership_id": membership_id,
+                "membership_status": membership_status,
+            }
+        )
+
+    return club_id, person_rows, fan_rows, membership_rows, fans_summary
 
 
-def seed_graph(club_id: uuid.UUID, fans_summary: list[dict]) -> None:
+def seed_postgres(club_id, person_rows, fan_rows, membership_rows):
+    Base.metadata.create_all(bind=engine)
+
+    db = SessionLocal()
+    try:
+        db.execute(
+            models.Club.__table__.insert(),
+            [
+                {
+                    "id": club_id,
+                    "name": "Club de Regatas Vasco da Gama",
+                    "short_name": "Vasco",
+                    "founded_year": "1898",
+                    "primary_color": "black-white",
+                    "crest_url": "https://example.invalid/crest/vasco.png",
+                }
+            ],
+        )
+        db.commit()
+        print("Club criado.")
+
+        for i, chunk in enumerate(chunks(person_rows, CHUNK_SIZE)):
+            db.execute(models.Person.__table__.insert(), chunk)
+            db.commit()
+            print(f"  person chunk {i + 1} ({len(chunk)} rows) commitado.")
+
+        for i, chunk in enumerate(chunks(fan_rows, CHUNK_SIZE)):
+            db.execute(models.Fan.__table__.insert(), chunk)
+            db.commit()
+            print(f"  fan chunk {i + 1} ({len(chunk)} rows) commitado.")
+
+        for i, chunk in enumerate(chunks(membership_rows, CHUNK_SIZE)):
+            db.execute(models.Membership.__table__.insert(), chunk)
+            db.commit()
+            print(f"  membership chunk {i + 1} ({len(chunk)} rows) commitado.")
+    finally:
+        db.close()
+
+
+def seed_graph_sport(club_id) -> tuple[str, list[str]]:
     run_query(
         "MERGE (c:Club {id: $id}) SET c.name = $name, c.short_name = $short_name",
         id=str(club_id),
@@ -137,22 +188,27 @@ def seed_graph(club_id: uuid.UUID, fans_summary: list[dict]) -> None:
         club_id=str(club_id),
     )
 
-    for _ in range(N_PLAYERS):
-        run_query(
-            """
-            MERGE (p:Player {id: $id})
-            SET p.full_name = $name, p.position = $position,
-                p.shirt_number = $number
-            WITH p
-            MATCH (t:Team {id: $team_id})
-            MERGE (p)-[:PLAYS_FOR]->(t)
-            """,
-            id=str(uuid.uuid4()),
-            name=fake.name(),
-            position=random.choice(["GOL", "ZAG", "LAT", "VOL", "MEI", "ATA"]),
-            number=random.randint(1, 99),
-            team_id=team_id,
-        )
+    player_rows = [
+        {
+            "id": str(uuid.uuid4()),
+            "name": fake.name(),
+            "position": random.choice(["GOL", "ZAG", "LAT", "VOL", "MEI", "ATA"]),
+            "number": random.randint(1, 99),
+        }
+        for _ in range(N_PLAYERS)
+    ]
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (p:Player {id: row.id})
+        SET p.full_name = row.name, p.position = row.position, p.shirt_number = row.number
+        WITH p
+        MATCH (t:Team {id: $team_id})
+        MERGE (p)-[:PLAYS_FOR]->(t)
+        """,
+        rows=player_rows,
+        team_id=team_id,
+    )
 
     venue_id = str(uuid.uuid4())
     run_query(
@@ -178,115 +234,156 @@ def seed_graph(club_id: uuid.UUID, fans_summary: list[dict]) -> None:
     )
 
     match_ids = []
+    match_rows = []
     for i in range(N_MATCHES):
         match_id = str(uuid.uuid4())
         match_ids.append(match_id)
         scheduled_at = datetime.now(timezone.utc) - timedelta(days=(N_MATCHES - i) * 7)
-        run_query(
-            """
-            MERGE (m:Match {id: $id})
-            SET m.scheduled_at = datetime($scheduled_at), m.status = 'finished',
-                m.home_score = $home_score, m.away_score = $away_score
-            WITH m
-            MATCH (t:Team {id: $team_id}), (v:Venue {id: $venue_id}), (s:Season {id: $season_id})
-            MERGE (m)-[:PART_OF]->(s)
-            MERGE (m)-[:HELD_AT]->(v)
-            MERGE (m)-[:HOME_TEAM]->(t)
-            """,
-            id=match_id,
-            scheduled_at=scheduled_at.isoformat(),
-            home_score=random.randint(0, 4),
-            away_score=random.randint(0, 4),
-            team_id=team_id,
-            venue_id=venue_id,
-            season_id=season_id,
+        match_rows.append(
+            {
+                "id": match_id,
+                "scheduled_at": scheduled_at.isoformat(),
+                "home_score": random.randint(0, 4),
+                "away_score": random.randint(0, 4),
+            }
         )
+    run_query(
+        """
+        UNWIND $rows AS row
+        MERGE (m:Match {id: row.id})
+        SET m.scheduled_at = datetime(row.scheduled_at), m.status = 'finished',
+            m.home_score = row.home_score, m.away_score = row.away_score
+        WITH m
+        MATCH (t:Team {id: $team_id}), (v:Venue {id: $venue_id}), (s:Season {id: $season_id})
+        MERGE (m)-[:PART_OF]->(s)
+        MERGE (m)-[:HELD_AT]->(v)
+        MERGE (m)-[:HOME_TEAM]->(t)
+        """,
+        rows=match_rows,
+        team_id=team_id,
+        venue_id=venue_id,
+        season_id=season_id,
+    )
+
+    print(f"Grafo esportivo criado: 1 team, {N_PLAYERS} players, {N_MATCHES} matches.")
+    return team_id, match_ids
+
+
+def seed_graph_fans(fans_summary: list[dict], match_ids: list[str]) -> None:
+    profile_rows = []
+    ticket_rows = []
+    membership_rows = []
+    risk_rows = []
+    segment_rows = []
 
     for entry in fans_summary:
         fan_id = str(entry["fan_id"])
         engagement_score = round(random.uniform(0, 1), 2)
-        matches_attended = random.randint(0, N_MATCHES)
+        matches_attended = random.randint(0, len(match_ids))
 
-        run_query(
-            """
-            MERGE (f:Fan {id: $fan_id})
-            MERGE (fp:FanProfile {id: $fan_id + '-profile'})
-            SET fp.engagement_score = $engagement_score,
-                fp.matches_attended_count = $matches_attended,
-                fp.updated_at = datetime()
-            MERGE (fp)-[:PROFILE_OF]->(f)
-            """,
-            fan_id=fan_id,
-            engagement_score=engagement_score,
-            matches_attended=matches_attended,
+        profile_rows.append(
+            {
+                "fan_id": fan_id,
+                "engagement_score": engagement_score,
+                "matches_attended": matches_attended,
+            }
         )
 
-        attended = random.sample(match_ids, k=min(matches_attended, len(match_ids)))
-        for m_id in attended:
-            run_query(
-                """
-                MATCH (f:Fan {id: $fan_id}), (m:Match {id: $match_id})
-                MERGE (t:Ticket {id: randomUUID()})
-                MERGE (t)-[:ADMITS_TO]->(m)
-                MERGE (t)-[:HELD_BY]->(f)
-                """,
-                fan_id=fan_id,
-                match_id=m_id,
-            )
+        for m_id in random.sample(match_ids, k=min(matches_attended, len(match_ids))):
+            ticket_rows.append({"fan_id": fan_id, "match_id": m_id})
 
         if entry["membership_id"] and entry["membership_status"] == "active":
-            run_query(
-                "MERGE (m:Membership {id: $mid}) SET m.status = $status "
-                "WITH m MATCH (f:Fan {id: $fan_id}) MERGE (f)-[:HAS_MEMBERSHIP]->(m)",
-                mid=str(entry["membership_id"]),
-                status=entry["membership_status"],
-                fan_id=fan_id,
+            mid = str(entry["membership_id"])
+            membership_rows.append(
+                {"mid": mid, "status": entry["membership_status"], "fan_id": fan_id}
             )
 
             risk_score = round(
                 max(0.0, min(1.0, (1 - engagement_score) * random.uniform(0.6, 1.1))), 2
             )
             if risk_score >= 0.5:
-                run_query(
-                    """
-                    MATCH (m:Membership {id: $mid})
-                    MERGE (cr:ChurnRisk {id: $mid + '-risk'})
-                    SET cr.risk_score = $risk_score,
-                        cr.reason_codes = ['baixo_engajamento'],
-                        cr.calculated_at = datetime()
-                    MERGE (cr)-[:RISK_OF]->(m)
-                    """,
-                    mid=str(entry["membership_id"]),
-                    risk_score=risk_score,
-                )
+                risk_rows.append({"mid": mid, "risk_score": risk_score})
 
-        if entry["fan_id"]:
-            segment_name = (
-                "socios_alto_valor" if engagement_score > 0.8 else None
-            )
-            if segment_name:
-                run_query(
-                    """
-                    MERGE (seg:FanSegment {id: $seg_id})
-                    SET seg.name = $seg_name, seg.definition_rule = 'engagement_score > 0.8'
-                    WITH seg
-                    MATCH (f:Fan {id: $fan_id})
-                    MERGE (f)-[:BELONGS_TO_SEGMENT]->(seg)
-                    """,
-                    seg_id=f"segment-{segment_name}",
-                    seg_name=segment_name,
-                    fan_id=fan_id,
-                )
+        if engagement_score > 0.8:
+            segment_rows.append({"fan_id": fan_id, "seg_name": "socios_alto_valor"})
+
+    for i, chunk in enumerate(chunks(profile_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MERGE (f:Fan {id: row.fan_id})
+            MERGE (fp:FanProfile {id: row.fan_id + '-profile'})
+            SET fp.engagement_score = row.engagement_score,
+                fp.matches_attended_count = row.matches_attended,
+                fp.updated_at = datetime()
+            MERGE (fp)-[:PROFILE_OF]->(f)
+            """,
+            rows=chunk,
+        )
+        print(f"  fan/profile chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    for i, chunk in enumerate(chunks(ticket_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MATCH (f:Fan {id: row.fan_id}), (m:Match {id: row.match_id})
+            MERGE (t:Ticket {id: randomUUID()})
+            MERGE (t)-[:ADMITS_TO]->(m)
+            MERGE (t)-[:HELD_BY]->(f)
+            """,
+            rows=chunk,
+        )
+        print(f"  ticket chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    for i, chunk in enumerate(chunks(membership_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MERGE (m:Membership {id: row.mid}) SET m.status = row.status
+            WITH m, row
+            MATCH (f:Fan {id: row.fan_id})
+            MERGE (f)-[:HAS_MEMBERSHIP]->(m)
+            """,
+            rows=chunk,
+        )
+        print(f"  membership-edge chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    for i, chunk in enumerate(chunks(risk_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MATCH (m:Membership {id: row.mid})
+            MERGE (cr:ChurnRisk {id: row.mid + '-risk'})
+            SET cr.risk_score = row.risk_score,
+                cr.reason_codes = ['baixo_engajamento'],
+                cr.calculated_at = datetime()
+            MERGE (cr)-[:RISK_OF]->(m)
+            """,
+            rows=chunk,
+        )
+        print(f"  churn-risk chunk {i + 1} ({len(chunk)} rows) gravado.")
+
+    for i, chunk in enumerate(chunks(segment_rows, CHUNK_SIZE)):
+        run_query(
+            """
+            UNWIND $rows AS row
+            MERGE (seg:FanSegment {id: 'segment-' + row.seg_name})
+            SET seg.name = row.seg_name, seg.definition_rule = 'engagement_score > 0.8'
+            WITH seg, row
+            MATCH (f:Fan {id: row.fan_id})
+            MERGE (f)-[:BELONGS_TO_SEGMENT]->(seg)
+            """,
+            rows=chunk,
+        )
+        print(f"  segment chunk {i + 1} ({len(chunk)} rows) gravado.")
 
 
 def main():
-    db = SessionLocal()
-    try:
-        club_id, fans_summary = seed_postgres(db)
-    finally:
-        db.close()
+    club_id, person_rows, fan_rows, membership_rows, fans_summary = build_fan_rows()
 
-    seed_graph(club_id, fans_summary)
+    seed_postgres(club_id, person_rows, fan_rows, membership_rows)
+    _, match_ids = seed_graph_sport(club_id)
+    seed_graph_fans(fans_summary, match_ids)
 
     print(f"Seed completo. club_id={club_id}")
     print(f"{len(fans_summary)} fans criados (Postgres + Neo4j).")
