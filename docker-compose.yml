@@ -1,20 +1,30 @@
 version: "3.9"
 
+# NOTE: uses host networking (network_mode: host) instead of Docker's
+# default bridge network. In some nested/sandboxed Docker environments
+# (observed in GitHub Codespaces here) the bridge network intermittently
+# black-holes inter-container TCP traffic — DNS resolves fine but the
+# TCP handshake to a sibling container times out. Host networking makes
+# every service share the machine's network namespace directly (reach
+# each other via localhost), sidestepping that bridge entirely. Locally
+# on Docker Desktop this also works fine, just means ports map 1:1 to
+# the host with no remapping possible.
+
 services:
   postgres:
     image: postgres:16
     container_name: vasco-postgres
+    network_mode: host
     environment:
       POSTGRES_USER: vasco
       POSTGRES_PASSWORD: vasco
       POSTGRES_DB: vasco
-    ports:
-      - "5432:5432"
+      PGPORT: 5432
     volumes:
       - vasco_pgdata:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vasco"]
+      test: ["CMD-SHELL", "pg_isready -U vasco -p 5432"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,12 +32,11 @@ services:
   neo4j:
     image: neo4j:5-community
     container_name: vasco-neo4j
+    network_mode: host
     environment:
       NEO4J_AUTH: neo4j/vasco12345
       NEO4J_PLUGINS: '["apoc"]'
-    ports:
-      - "7474:7474"   # browser UI
-      - "7687:7687"   # bolt
+      NEO4J_server_default__listen__address: 0.0.0.0
     volumes:
       - vasco_neo4jdata:/data
     healthcheck:
@@ -41,12 +50,12 @@ services:
       context: .
       dockerfile: docker/backend.Dockerfile
     container_name: vasco-backend
+    network_mode: host
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://vasco:vasco@postgres:5432/vasco
-      NEO4J_URI: bolt://neo4j:7687
-    ports:
-      - "8000:8000"
+      DATABASE_URL: postgresql://vasco:vasco@localhost:5432/vasco
+      NEO4J_URI: bolt://localhost:7687
+      PORT: 8000
     depends_on:
       postgres:
         condition: service_healthy
