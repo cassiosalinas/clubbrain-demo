@@ -21,12 +21,18 @@ natural (`POST /api/v1/ai/ask`) sobre o Knowledge Graph.
    de verdade de "quem é quem"; resolve Person -> Fan/Employee.
 3. Sports Ontology v1 — `ontology/vasco_sports_ontology_v1.yaml`.
 4. Knowledge Graph — `ontology/vasco_neo4j_schema.cypher` + Neo4j.
-5. Intelligence — `backend/agents/tools.py` + `backend/api/v1/ai.py`.
-6. Agents — ainda 1 endpoint genérico (`/ai/ask`), não 3 agentes
-   separados (Executive/Fan/Marketing). Próximo passo depois do loop
-   ponta a ponta validar.
+5. Intelligence — `backend/agents/tools.py` (3 tools: `search_fans_at_risk`,
+   `get_fan_360`, `get_club_overview`) + `backend/agents/runner.py` (loop
+   de tool-use do Claude, compartilhado por todos os agentes).
+6. Agents — `backend/agents/personas.py` define 3 personas (Executive,
+   Fan, Marketing), cada uma com system prompt e subconjunto de tools
+   próprio, expostas em `POST /api/v1/agents/{nome}/ask`. `/ai/ask`
+   continua existindo como persona genérica (todas as tools, sem
+   restrição) para compatibilidade com quem já chama esse endpoint.
 7. Experience — não plugado ainda. `demo.clubbrain.ai` deveria consumir
-   estes endpoints no lugar dos dados simulados atuais.
+   estes endpoints no lugar dos dados simulados atuais. Existe um
+   frontend de demo mínimo em `frontend/fan-explorer.html`
+   (`/demo/fan-explorer.html`), mas não é o front real do produto.
 
 ## Princípio não-negociável
 
@@ -51,11 +57,11 @@ superfície de query livre.
    dentro de `database/seed/seed.py`. Isso não é a regra de negócio real
    do Vasco (que depende de dado real de engajamento); é só o suficiente
    para o endpoint `/segments/at-risk` retornar algo plausível.
-3. **Só o domínio Core + parte de Sport/FanIntelligence está no seed** —
-   `Sponsor`, `SponsorshipContract`, `Product`/`Order`/`OrderItem`,
-   `SocialAccount`/`MediaContent` existem na ontologia mas não são
-   povoados ainda. Adicionar quando os agentes Marketing/Executive
-   precisarem desses domínios.
+3. ~~Só o domínio Core + parte de Sport/FanIntelligence está no seed~~ —
+   resolvido: `Sponsor`/`SponsorshipContract`/`SponsorActivation`,
+   `Product`/`Order`/`OrderItem` e `SocialAccount`/`MediaContent`/
+   `MediaConsumption` agora são povoados também (ver
+   `database/seed/seed.py`, funções `seed_graph_commercial/commerce/media`).
 4. **1 clube piloto, sem multi-tenant** — `club_id` existe nos dados mas
    nenhum endpoint filtra por ele ainda (só há 1 club no seed).
 5. **Sem approval gate em ações** — não há ainda nenhuma ação de

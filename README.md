@@ -57,8 +57,11 @@ mvp-vasco/
 │   └── vasco_neo4j_schema.cypher       ← constraints/índices do grafo
 ├── backend/
 │   ├── main.py                ← junta os routers
-│   ├── api/v1/                ← fans.py, segments.py, ai.py
-│   ├── agents/tools.py        ← tools controladas (única porta pra IA)
+│   ├── api/v1/                ← fans.py, segments.py, ai.py, agents.py
+│   ├── agents/
+│   │   ├── tools.py           ← tools controladas (única porta pra IA)
+│   │   ├── personas.py        ← Executive/Fan/Marketing (CLAUDE.md camada 6)
+│   │   └── runner.py          ← loop de tool-use do Claude (compartilhado)
 │   ├── graph/neo4j_client.py  ← único ponto de acesso ao driver Neo4j
 │   ├── models/                ← SQLAlchemy (Identity layer)
 │   └── schemas.py             ← contrato Pydantic da API
@@ -69,19 +72,25 @@ mvp-vasco/
 └── frontend/                  ← plugar demo.clubbrain.ai aqui depois
 ```
 
-## Endpoints do Alpha (SEE)
+## Endpoints do Alpha (SEE + começo de UNDERSTAND)
 
 - `GET /api/v1/fans/{fan_id}/360` — identidade + memberships (Postgres) +
   engajamento/risco/segmentos (Neo4j)
 - `GET /api/v1/segments/at-risk?min_score=0.7` — busca de segmento
-- `POST /api/v1/ai/ask` — pergunta em linguagem natural (ainda sem LLM
-  real, ver `docs/architecture/vision.md`)
+- `POST /api/v1/ai/ask` — pergunta em linguagem natural, persona
+  genérica com acesso a todas as tools (chama a Claude API de verdade
+  com `ANTHROPIC_API_KEY` configurada, senão cai num template)
+- `GET /api/v1/agents` — lista os agentes especializados disponíveis
+- `POST /api/v1/agents/{executive|fan|marketing}/ask` — mesma mecânica,
+  mas cada persona só enxerga um subconjunto de tools e tem um system
+  prompt focado (ver `backend/agents/personas.py`)
 
 ## Status
 
-Este é o primeiro commit: ontologia, schema do grafo, scaffolding do
-backend e seed fictício. **Nada foi rodado/testado ainda neste ambiente**
-(sem Docker/Python disponíveis localmente) — precisa rodar
-`docker compose up --build` e o seed antes de confiar em qualquer
-endpoint. Ver "Primeiras tarefas concretas" em `CLAUDE.md` para os
-próximos passos (conectar ao front existente, integrações reais).
+Ontologia, schema do grafo, backend completo (Fan 360, segmentos, IA
+genérica + 3 agentes especializados), seed cobrindo os 6 domínios da
+ontologia, e um frontend de demo (`/demo/fan-explorer.html`) — tudo
+rodado e verificado via GitHub Codespaces (ver `CLAUDE.md` para o brief
+original). Ainda não plugado: front-end real (`demo.clubbrain.ai`) e
+deploy em produção (Neo4j Aura + Supabase + Railway — recomendado no
+`CLAUDE.md`, ainda não configurado).

@@ -34,8 +34,8 @@
   .config { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
   .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 260px; }
   .field label { font-size: 0.7rem; letter-spacing: .05em; text-transform: uppercase; color: var(--text-3); }
-  .field input { background: var(--surface-2); border: 1px solid var(--line); color: var(--text); border-radius: var(--radius-sm); padding: 10px 12px; font-size: .88rem; font-family: inherit; }
-  .field input:focus { outline: none; border-color: var(--accent); }
+  .field input, .field select { background: var(--surface-2); border: 1px solid var(--line); color: var(--text); border-radius: var(--radius-sm); padding: 10px 12px; font-size: .88rem; font-family: inherit; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
   .status-pill { font-size: .76rem; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--line); color: var(--text-3); white-space: nowrap; }
   .status-pill.ok { color: var(--risk-lo); border-color: var(--risk-lo); }
   .status-pill.err { color: var(--risk-hi); border-color: var(--risk-hi); }
@@ -113,6 +113,17 @@
 
   <div class="card">
     <h2>Perguntar à IA (GraphRAG)</h2>
+    <div class="config" style="margin-bottom: 12px">
+      <div class="field" style="max-width: 220px; min-width: 180px">
+        <label>Agente</label>
+        <select id="agentSelect">
+          <option value="">Genérico (/ai/ask)</option>
+          <option value="executive">Executive</option>
+          <option value="fan">Fan (atendimento)</option>
+          <option value="marketing">Marketing</option>
+        </select>
+      </div>
+    </div>
     <textarea id="aiQuestion" placeholder="Ex: Quantos torcedores estão em risco de cancelar o plano?"></textarea>
     <div style="margin-top: 10px">
       <button class="primary" onclick="askAI()">Perguntar</button>
@@ -207,12 +218,14 @@ async function loadFan360(fanId) {
 
 async function askAI() {
   const q = document.getElementById('aiQuestion').value.trim();
+  const agent = document.getElementById('agentSelect').value;
   const answerBox = document.getElementById('aiAnswer');
   if (!q) return;
   answerBox.style.display = 'block';
   answerBox.textContent = 'pensando...';
+  const path = agent ? `/api/v1/agents/${agent}/ask` : '/api/v1/ai/ask';
   try {
-    const r = await apiFetch('/api/v1/ai/ask', {
+    const r = await apiFetch(path, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ club_id: '00000000-0000-0000-0000-000000000000', question: q })

@@ -8,6 +8,7 @@ with read-only Cypher against the Neo4j knowledge graph.
 
 import uuid
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend import models
@@ -72,3 +73,41 @@ def search_fans_at_risk(min_risk_score: float = 0.7) -> list[str]:
         min_risk_score=min_risk_score,
     )
     return [row["fan_id"] for row in rows]
+
+
+def get_club_overview(db: Session) -> dict:
+    """Aggregate business-health numbers for the Executive agent: fan base
+    size, recurring membership revenue (Postgres) plus merchandise and
+    sponsorship revenue (Neo4j — Commerce/Commercial domains)."""
+
+    total_fans = db.query(models.Fan).count()
+    active_memberships = (
+        db.query(models.Membership)
+        .filter(models.Membership.status == "active")
+        .count()
+    )
+    mrr = (
+        db.query(func.sum(models.Membership.monthly_value))
+        .filter(models.Membership.status == "active")
+        .scalar()
+    ) or 0
+
+    merch_rows = run_query(
+        "MATCH (o:Order {status: 'paid'}) RETURN sum(o.total_value) AS v"
+    )
+    sponsorship_rows = run_query(
+        "MATCH (c:SponsorshipContract) RETURN sum(c.annual_value) AS v"
+    )
+
+    at_risk_count = len(search_fans_at_risk(min_risk_score=0.7))
+
+    return {
+        "total_fans": total_fans,
+        "active_memberships": active_memberships,
+        "monthly_recurring_revenue": float(mrr),
+        "merchandise_revenue_paid": merch_rows[0]["v"] or 0 if merch_rows else 0,
+        "sponsorship_annual_value": sponsorship_rows[0]["v"] or 0
+        if sponsorship_rows
+        else 0,
+        "fans_at_risk_070": at_risk_count,
+    }
