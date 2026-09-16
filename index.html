@@ -2717,7 +2717,14 @@ function patchHubspotSourceRow(){
 // "HubSpot CRM" da CDP Overview e, se a Integration Hub já foi visitada
 // (sem canvas/Chart.js lá, seguro remontar), o card e o toast de clique
 // do nó HubSpot no mapa de conexões.
+// Guarda contra chamadas concorrentes — selectClub('vasco') pode disparar
+// mais de uma vez em sequência rápida (ex.: troca de clube + volta), e cada
+// chamada já faz 8 requisições sequenciais à API do HubSpot; duas em paralelo
+// estouram o limite "por segundo" da conta (erro real, visto ao testar).
+let hubspotStatsLoading = false;
 async function loadHubSpotStats(){
+  if(hubspotStatsLoading) return;
+  hubspotStatsLoading = true;
   const note = document.getElementById('hubspot-live-note');
   if(note){ note.style.display = 'flex'; note.innerHTML = '<span class="live-dot"></span> Carregando dados ao vivo do HubSpot…'; }
   try{
@@ -2740,6 +2747,8 @@ async function loadHubSpotStats(){
     patchHubspotSourceRow();
     if(initialized.integrations) buildIntegrations();
     if(note) note.innerHTML = '<span class="live-dot" style="background:#ff6b5e"></span> Não foi possível carregar o HubSpot agora (' + e.message + ') — mostrando os últimos números conhecidos';
+  }finally{
+    hubspotStatsLoading = false;
   }
 }
 function hideHubSpotLiveNote(){
