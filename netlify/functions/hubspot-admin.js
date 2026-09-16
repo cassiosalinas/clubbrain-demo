@@ -1017,20 +1017,28 @@ exports.handler = async function (event) {
       }
       const taskResults = createData.results || [];
 
-      // Usa os IDs numéricos de tipo de objeto (0-27 = Task, 0-1 = Contact)
-      // em vez dos aliases em texto ("tasks"/"contacts") — o alias em texto
-      // devolveu 404 nesse sub-recurso de associação, descoberto testando
-      // ao vivo (a Search API aceita o alias normalmente, esse endpoint não).
-      const assocInputs = taskResults.map((t, i) => ({ from: { id: t.id }, to: { id: contacts[i].id } }));
-      const assocRes = await hsFetch('/crm/v4/associations/0-27/0-1/batch/create-default', {
-        method: 'POST',
-        body: JSON.stringify({ inputs: assocInputs }),
-      });
-      const assocData = await assocRes.json().catch(() => ({}));
+      // O endpoint de associação-padrão em LOTE ("batch/create-default")
+      // devolveu 404 tanto com aliases de texto quanto com IDs numéricos —
+      // descoberto ao vivo que esse sub-recurso simplesmente não existe.
+      // O que existe de verdade (confirmado via busca na documentação) é a
+      // versão de UM objeto por vez: PUT /crm/v4/objects/{from}/{fromId}/
+      // associations/default/{to}/{toId}. Chama em pequenos lotes paralelos
+      // (não uma de cada vez, não todas juntas) pra ficar rápido sem repetir
+      // o erro de "secondly limit" já visto com chamadas 100% simultâneas.
+      const assocOne = async (taskId, contactId) => {
+        const r = await hsFetch('/crm/v4/objects/tasks/' + taskId + '/associations/default/contacts/' + contactId, { method: 'PUT' });
+        return r.ok;
+      };
+      let associatedCount = 0;
+      const ASSOC_BATCH = 3;
+      for (let i = 0; i < taskResults.length; i += ASSOC_BATCH) {
+        const chunk = taskResults.slice(i, i + ASSOC_BATCH);
+        const oks = await Promise.all(chunk.map((t, j) => assocOne(t.id, contacts[i + j].id)));
+        associatedCount += oks.filter(Boolean).length;
+      }
       // Falha de associação não desfaz as tarefas já criadas — reporta como
       // aviso, não erro fatal, já que a tarefa em si já existe de verdade.
-      const assocOk = assocRes.ok;
-      if (!assocOk) console.log('assoc error', assocRes.status, JSON.stringify(assocData));
+      const assocOk = associatedCount === taskResults.length;
 
       return {
         statusCode: 200,
@@ -1038,8 +1046,8 @@ exports.handler = async function (event) {
         body: JSON.stringify({
           ok: true,
           created: taskResults.length,
-          associated: assocOk ? taskResults.length : 0,
-          associationWarning: assocOk ? undefined : ('Tarefas criadas, associação falhou (HTTP ' + assocRes.status + '): ' + (assocData.message || JSON.stringify(assocData))),
+          associated: associatedCount,
+          associationWarning: assocOk ? undefined : (associatedCount + ' de ' + taskResults.length + ' tarefas associadas ao contato — o resto ficou criado mas solto.'),
           contacts: contacts.map(c => ({ firstname: c.properties.firstname, lastname: c.properties.lastname, fanScore: Number(c.properties.fan_score) || 0 })),
         }),
       };
