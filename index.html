@@ -2441,15 +2441,20 @@ const CLUB_PROFILES = {
   },
   vasco: {
     name:'Vasco da Gama', sub:'Temporada 2026', crest:VASCO_CREST_HTML, badgeBg:'transparent',
+    // Escala do piloto real (500 torcedores, 261 sócios, 44 em risco — ver
+    // /club/overview) mesmo nos campos que ainda não são sobrescritos ao vivo
+    // por loadVascoLiveOverview(); antes estes números eram do mesmo porte
+    // fictício dos outros clubes (2,3M ativos etc.), contradizendo o piloto
+    // real mostrado em Torcedor 360 e no Cockpit assim que o fetch termina.
     kpi:{
-      receita:'R$ 15,2M', receitaDelta:'↑ 8,1% vs. período anterior',
-      ativos:'2,3M', ativosDelta:'↑ 6,4%',
+      receita:'R$ 14,0M', receitaDelta:'Piloto real — Postgres + Neo4j',
+      ativos:'500', ativosDelta:'Piloto de 500 torcedores',
       nps:'55', npsDelta:'↑ 2 pts',
-      churn:'7,8%', churnBase:'≈ 39 mil torcedores da base reconhecida',
-      cdpTotal:'…', cdpIdentificados:'…', cdpPerfis:'…', cdpSocios:'…',
+      churn:'8,8%', churnBase:'44 de 500 torcedores da base real',
+      cdpTotal:'500', cdpIdentificados:'500', cdpPerfis:'500', cdpSocios:'261',
       engajamento:'5,6%', engajamentoDelta:'↑ 0,3pp vs. mês anterior',
-      novos:'62K', novosDelta:'↑ 6%', interacoes:'9,4M', interacoesDelta:'↑ 10%', recorrentes:'56%', recorrentesDelta:'↑ 4%',
-      mrr:'R$ 380,0K', mrrDelta:'↑ 8,1%', arpu:'R$ 38,00', arpuDelta:'↑ 3,2%', subChurn:'3,6%', subChurnDelta:'↓ 0,2pp',
+      novos:'8', novosDelta:'↑ 6%', interacoes:'4,2K', interacoesDelta:'↑ 10%', recorrentes:'56%', recorrentesDelta:'↑ 4%',
+      mrr:'R$ 36,0K', mrrDelta:'Dado ao vivo', arpu:'R$ 137,00', arpuDelta:'↑ 3,2%', subChurn:'8,8%', subChurnDelta:'↓ 0,2pp',
     },
     ai:'Club de Regatas Vasco da Gama ("Cruzmaltino", "Gigante da Colina"), fundado em 21/08/1898, Rio de Janeiro, RJ. Estádio São Januário, capacidade de 21.880 lugares. Cores oficiais preto e branco, escudo com a cruz de Malta. Os quatro números de Torcedor 360 → Overview deste clube (universo total, Identity Graph, perfis na Ontologia, sócios-torcedores) NÃO são estimativa — vêm ao vivo do backend real do MVP Vasco (Postgres + Neo4j), com um piloto de 500 torcedores fictícios pseudonimizados. É por isso que os números são muito menores que os dos outros clubes desta demo: aqui é a prova de que o pipeline Dado → Ontologia → Inteligência funciona ponta a ponta, não uma estimativa de mercado.',
   },
