@@ -29,6 +29,13 @@
 //                           ALLOWED_ORIGINS abaixo) — sem risco de PII real
 //                           porque TODO contato nesta conta é fictício
 //                           (e-mails em example.com / vasco-demo.example.com).
+//   { "action": "fulfill_stripe_order", "session_id": "cs_test_..." } →
+//                           confirma o pagamento de verdade no Stripe (ver
+//                           stripe-checkout.js) e grava a mudança real no
+//                           contato do HubSpot (numero_compras, LTV, partidas
+//                           assistidas etc., dependendo do produto) — fecha o
+//                           ciclo real da Loja do Vasco / Sócio Torcedor.
+//                           Precisa de STRIPE_SECRET_KEY também.
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → HUBSPOT_API_KEY
@@ -793,7 +800,88 @@ exports.handler = async function (event) {
       };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists" ou "stats".' }) };
+    if (payload.action === 'fulfill_stripe_order') {
+      // Fecha o ciclo real da "jornada do torcedor": confirma o pagamento de
+      // verdade no Stripe (modo teste) e grava a mudança de verdade no
+      // contato do HubSpot — sem isso, a compra seria só um checkout bonito
+      // sem efeito nenhum no CRM.
+      const stripeKey = process.env.STRIPE_SECRET_KEY;
+      if (!stripeKey) {
+        return { statusCode: 500, headers: cors, body: JSON.stringify({ error: 'STRIPE_SECRET_KEY não configurada no Netlify.' }) };
+      }
+      if (!payload.session_id) {
+        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "session_id" obrigatório.' }) };
+      }
+
+      const sessionRes = await fetch('https://api.stripe.com/v1/checkout/sessions/' + encodeURIComponent(payload.session_id), {
+        headers: { Authorization: 'Bearer ' + stripeKey },
+      });
+      const session = await sessionRes.json();
+      if (!sessionRes.ok) {
+        return { statusCode: sessionRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: (session.error && session.error.message) || 'Sessão do Stripe não encontrada.' }) };
+      }
+      if (session.payment_status !== 'paid') {
+        return { statusCode: 402, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: 'Pagamento ainda não confirmado (status: ' + session.payment_status + ').' }) };
+      }
+
+      const fanEmail = session.metadata && session.metadata.fan_email;
+      const product = session.metadata && session.metadata.product;
+      if (!fanEmail || !product) {
+        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Sessão do Stripe sem metadata de torcedor/produto.' }) };
+      }
+
+      const props = ['firstname', 'lastname', 'numero_compras', 'ticket_medio', 'produto_favorito', 'ltv_torcedor', 'partidas_assistidas_temporada', 'taxa_presenca', 'engajamento_app', 'fan_score', 'sinal_alerta', 'data_ultima_interacao'];
+      const contactRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(fanEmail) + '?idProperty=email&properties=' + props.join(','));
+      const contactData = await contactRes.json().catch(() => ({}));
+      if (!contactRes.ok) {
+        return { statusCode: contactRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: contactData.message || 'Torcedor não encontrado no HubSpot: ' + fanEmail }) };
+      }
+      const before = contactData.properties || {};
+      const numAmount = product === 'camisa' ? 299 : 80;
+
+      const updates = {
+        ltv_torcedor: (Number(before.ltv_torcedor) || 0) + numAmount,
+        data_ultima_interacao: new Date().toISOString().slice(0, 10),
+        sinal_alerta: '',
+      };
+      if (product === 'camisa') {
+        const priorCompras = Number(before.numero_compras) || 0;
+        const priorTicket = Number(before.ticket_medio) || 0;
+        updates.numero_compras = priorCompras + 1;
+        updates.ticket_medio = Math.round((priorTicket * priorCompras + numAmount) / (priorCompras + 1));
+        updates.produto_favorito = 'Camisas';
+        updates.engajamento_app = Math.min(100, (Number(before.engajamento_app) || 0) + 3);
+      } else {
+        updates.partidas_assistidas_temporada = (Number(before.partidas_assistidas_temporada) || 0) + 1;
+        updates.taxa_presenca = Math.min(100, (Number(before.taxa_presenca) || 0) + 6);
+        updates.fan_score = Math.min(100, (Number(before.fan_score) || 0) + 2);
+      }
+
+      const patchRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(fanEmail) + '?idProperty=email', {
+        method: 'PATCH',
+        body: JSON.stringify({ properties: updates }),
+      });
+      const patchData = await patchRes.json().catch(() => ({}));
+      if (!patchRes.ok) {
+        return { statusCode: patchRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: patchData.message || 'Falha ao gravar a compra no HubSpot.' }) };
+      }
+
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({
+          ok: true,
+          fanEmail,
+          fanName: (before.firstname || '') + ' ' + (before.lastname || ''),
+          product,
+          amount: numAmount,
+          before,
+          after: patchData.properties || updates,
+        }),
+      };
+    }
+
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats" ou "fulfill_stripe_order".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
