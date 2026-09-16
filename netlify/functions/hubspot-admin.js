@@ -45,10 +45,21 @@ function corsHeaders(event) {
 // avançado (embaixador, acessibilidade, geração familiar).
 const CUSTOM_PROPERTIES = [
   // -- já existia --
+  // "nivel_socio" sozinho deixava ambíguo se 'basico' = sócio no nível mais
+  // baixo ou = não-sócio (é a 2ª opção — o mesmo problema que o resto do
+  // demo já tem em TIER_DB_BY_CLUB). e_socio_torcedor abaixo resolve isso
+  // com um filtro direto, sem depender de interpretar o valor de nivel_socio.
+  {
+    name: 'e_socio_torcedor', label: 'É sócio-torcedor?', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'Sim', value: 'sim' },
+      { label: 'Não', value: 'nao' },
+    ],
+  },
   {
     name: 'nivel_socio', label: 'Nível de sócio-torcedor', type: 'enumeration', fieldType: 'select',
     options: [
-      { label: 'Básico', value: 'basico' },
+      { label: 'Básico (não-sócio)', value: 'basico' },
       { label: 'Bronze', value: 'bronze' },
       { label: 'Prata', value: 'prata' },
       { label: 'Ouro', value: 'ouro' },
@@ -119,6 +130,9 @@ const CUSTOM_PROPERTIES = [
   { name: 'ticket_medio', label: 'Ticket médio (R$)', type: 'number', fieldType: 'number' },
   { name: 'produto_favorito', label: 'Produto/categoria favorita', type: 'string', fieldType: 'text' },
   { name: 'numero_compras', label: 'Número de compras', type: 'number', fieldType: 'number' },
+  // Pontos de loyalty valem pra sócio E não-sócio — ver Loyalty & Recompensas
+  // no demo (catálogo de 800 a 15.000 pts), mesma escala usada aqui.
+  { name: 'pontos_loyalty', label: 'Pontos de loyalty acumulados', type: 'number', fieldType: 'number' },
 
   // -- 5. Risco & retenção --
   { name: 'motivo_cancelamento', label: 'Motivo de cancelamento', type: 'string', fieldType: 'text' },
@@ -174,7 +188,7 @@ const CUSTOM_PROPERTIES = [
 // documentação/teste (RFC 2606), nunca alcançam ninguém real.
 const TORCEDORES_VASCO = [
   { firstname:'Rafael', lastname:'Colina', email:'rafael.colina@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'platina', fan_score:81, jogador_favorito:'Philippe Coutinho', ltv_torcedor:1240, risco_churn:'baixo', propensao_upgrade:66, segmento_torcedor:'Torcedor fiel', socio_desde:'2019-03-01',
+    nivel_socio:'platina', e_socio_torcedor:'sim', pontos_loyalty:6200, fan_score:81, jogador_favorito:'Philippe Coutinho', ltv_torcedor:1240, risco_churn:'baixo', propensao_upgrade:66, segmento_torcedor:'Torcedor fiel', socio_desde:'2019-03-01',
     data_nascimento:'1988-05-14', genero:'masculino', fonte_aquisicao:'app',
     status_assinatura:'ativo', plano_mensalidade:149.90, torcedor_desde:'2005-01-01', torcida_organizada:'Força Jovem do Vasco',
     partidas_assistidas_temporada:14, taxa_presenca:82, setor_preferido:'Norte', engajamento_app:88, engajamento_redes_sociais:74,
@@ -185,7 +199,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
 
   { firstname:'Fernanda', lastname:'Malta', email:'fernanda.malta@vasco-demo.example.com', city:'Niterói', state:'RJ',
-    nivel_socio:'prata', fan_score:37, jogador_favorito:'Pablo Vegetti', ltv_torcedor:260, risco_churn:'alto', propensao_upgrade:21, segmento_torcedor:'Em risco de churn', socio_desde:'2023-07-01',
+    nivel_socio:'prata', e_socio_torcedor:'sim', pontos_loyalty:900, fan_score:37, jogador_favorito:'Pablo Vegetti', ltv_torcedor:260, risco_churn:'alto', propensao_upgrade:21, segmento_torcedor:'Em risco de churn', socio_desde:'2023-07-01',
     data_nascimento:'1995-11-02', genero:'feminino', fonte_aquisicao:'campanha',
     status_assinatura:'inadimplente', plano_mensalidade:49.90, torcedor_desde:'2015-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:1, taxa_presenca:18, setor_preferido:'Sul', engajamento_app:22, engajamento_redes_sociais:15,
@@ -196,7 +210,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
 
   { firstname:'Eduardo', lastname:'Colina', email:'eduardo.colina@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'platina', fan_score:91, jogador_favorito:'Thiago Mendes', ltv_torcedor:4680, risco_churn:'baixo', propensao_upgrade:85, segmento_torcedor:'Top torcedor', socio_desde:'2017-08-01',
+    nivel_socio:'platina', e_socio_torcedor:'sim', pontos_loyalty:18500, fan_score:91, jogador_favorito:'Thiago Mendes', ltv_torcedor:4680, risco_churn:'baixo', propensao_upgrade:85, segmento_torcedor:'Top torcedor', socio_desde:'2017-08-01',
     data_nascimento:'1975-03-20', genero:'masculino', fonte_aquisicao:'loja_fisica',
     status_assinatura:'ativo', plano_mensalidade:149.90, torcedor_desde:'1985-01-01', torcida_organizada:'Força Jovem do Vasco',
     partidas_assistidas_temporada:22, taxa_presenca:96, setor_preferido:'Camarotes', engajamento_app:95, engajamento_redes_sociais:90,
@@ -207,7 +221,7 @@ const TORCEDORES_VASCO = [
     embaixador:'sim', indicacoes_feitas:12, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'3ª geração+' },
 
   { firstname:'Camila', lastname:'Cruzmaltina', email:'camila.cruzmaltina@vasco-demo.example.com', city:'São Gonçalo', state:'RJ',
-    nivel_socio:'ouro', fan_score:75, jogador_favorito:'Lucas Piton', ltv_torcedor:1920, risco_churn:'baixo', propensao_upgrade:65, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-02-01',
+    nivel_socio:'ouro', e_socio_torcedor:'sim', pontos_loyalty:8100, fan_score:75, jogador_favorito:'Lucas Piton', ltv_torcedor:1920, risco_churn:'baixo', propensao_upgrade:65, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-02-01',
     data_nascimento:'1992-08-09', genero:'feminino', fonte_aquisicao:'indicacao',
     status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2010-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:16, taxa_presenca:85, setor_preferido:'Camarotes', engajamento_app:79, engajamento_redes_sociais:68,
@@ -218,7 +232,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:2, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
 
   { firstname:'Gustavo', lastname:'Januário', email:'gustavo.januario@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'bronze', fan_score:36, jogador_favorito:'—', ltv_torcedor:70, risco_churn:'medio', propensao_upgrade:33, segmento_torcedor:'Sócio novo', socio_desde:'2026-08-01',
+    nivel_socio:'bronze', e_socio_torcedor:'sim', pontos_loyalty:300, fan_score:36, jogador_favorito:'—', ltv_torcedor:70, risco_churn:'medio', propensao_upgrade:33, segmento_torcedor:'Sócio novo', socio_desde:'2026-08-01',
     data_nascimento:'2003-06-25', genero:'masculino', fonte_aquisicao:'app',
     status_assinatura:'ativo', plano_mensalidade:29.90, torcedor_desde:'2026-08-01', torcida_organizada:'',
     partidas_assistidas_temporada:0, taxa_presenca:0, setor_preferido:'', engajamento_app:40, engajamento_redes_sociais:30,
@@ -229,7 +243,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
 
   { firstname:'Marina', lastname:'Vascaína', email:'marina.vascaina@vasco-demo.example.com', city:'Duque de Caxias', state:'RJ',
-    nivel_socio:'ouro', fan_score:69, jogador_favorito:'Carlos Cuesta', ltv_torcedor:1580, risco_churn:'baixo', propensao_upgrade:58, segmento_torcedor:'Torcedora fiel', socio_desde:'2020-05-01',
+    nivel_socio:'ouro', e_socio_torcedor:'sim', pontos_loyalty:6700, fan_score:69, jogador_favorito:'Carlos Cuesta', ltv_torcedor:1580, risco_churn:'baixo', propensao_upgrade:58, segmento_torcedor:'Torcedora fiel', socio_desde:'2020-05-01',
     data_nascimento:'1990-02-17', genero:'feminino', fonte_aquisicao:'redes_sociais',
     status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2008-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:12, taxa_presenca:74, setor_preferido:'Oeste', engajamento_app:71, engajamento_redes_sociais:65,
@@ -240,7 +254,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
 
   { firstname:'Thiago', lastname:'Malta', email:'thiago.malta@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'bronze', fan_score:44, jogador_favorito:'Carlos Andrés Gómez', ltv_torcedor:180, risco_churn:'medio', propensao_upgrade:39, segmento_torcedor:'Sócio novo', socio_desde:'2026-05-01',
+    nivel_socio:'bronze', e_socio_torcedor:'sim', pontos_loyalty:550, fan_score:44, jogador_favorito:'Carlos Andrés Gómez', ltv_torcedor:180, risco_churn:'medio', propensao_upgrade:39, segmento_torcedor:'Sócio novo', socio_desde:'2026-05-01',
     data_nascimento:'1999-12-01', genero:'masculino', fonte_aquisicao:'app',
     status_assinatura:'ativo', plano_mensalidade:29.90, torcedor_desde:'2018-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:2, taxa_presenca:40, setor_preferido:'Leste', engajamento_app:48, engajamento_redes_sociais:41,
@@ -251,7 +265,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
 
   { firstname:'Larissa', lastname:'Sãojanuário', email:'larissa.saojanuario@vasco-demo.example.com', city:'Nova Iguaçu', state:'RJ',
-    nivel_socio:'prata', fan_score:58, jogador_favorito:'Léo Jardim', ltv_torcedor:410, risco_churn:'baixo', propensao_upgrade:47, segmento_torcedor:'Torcedora fiel', socio_desde:'2022-11-01',
+    nivel_socio:'prata', e_socio_torcedor:'sim', pontos_loyalty:2100, fan_score:58, jogador_favorito:'Léo Jardim', ltv_torcedor:410, risco_churn:'baixo', propensao_upgrade:47, segmento_torcedor:'Torcedora fiel', socio_desde:'2022-11-01',
     data_nascimento:'1997-04-30', genero:'feminino', fonte_aquisicao:'indicacao',
     status_assinatura:'ativo', plano_mensalidade:49.90, torcedor_desde:'2012-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:8, taxa_presenca:61, setor_preferido:'Norte', engajamento_app:60, engajamento_redes_sociais:52,
@@ -262,18 +276,20 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
 
   { firstname:'Bruno', lastname:'Colina', email:'bruno.colina@vasco-demo.example.com', city:'São João de Meriti', state:'RJ',
-    nivel_socio:'basico', fan_score:22, jogador_favorito:'—', ltv_torcedor:0, risco_churn:'alto', propensao_upgrade:14, segmento_torcedor:'Identificado, não-sócio',
+    // Não-sócio, mas com atividade real: comprou na loja e foi a um jogo
+    // avulso — sinal claro de que dá pra converter, não é uma base zerada.
+    nivel_socio:'basico', e_socio_torcedor:'nao', pontos_loyalty:150, fan_score:22, jogador_favorito:'—', ltv_torcedor:190, risco_churn:'alto', propensao_upgrade:14, segmento_torcedor:'Identificado, não-sócio',
     data_nascimento:'2001-09-13', genero:'masculino', fonte_aquisicao:'organico',
     status_assinatura:'nao_aplicavel', plano_mensalidade:0, torcedor_desde:'2015-01-01', torcida_organizada:'',
-    partidas_assistidas_temporada:0, taxa_presenca:0, setor_preferido:'', engajamento_app:12, engajamento_redes_sociais:20,
-    ticket_medio:0, produto_favorito:'', numero_compras:0,
-    motivo_cancelamento:'', data_ultima_interacao:'2026-06-01', sinal_alerta:'Identificado mas nunca virou sócio',
+    partidas_assistidas_temporada:1, taxa_presenca:8, setor_preferido:'Norte', engajamento_app:12, engajamento_redes_sociais:20,
+    ticket_medio:95, produto_favorito:'Camisas', numero_compras:2,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-06-01', sinal_alerta:'Comprou na loja e foi a 1 jogo, mas nunca virou sócio',
     canal_preferido:'push', opt_in_marketing:'nao', frequencia_contato_desejada:'ocasioes_especiais',
-    next_best_action:'Identificado na base mas nunca converteu em sócio — enviar oferta de primeira assinatura com desconto.',
+    next_best_action:'Já compra na loja e foi ao estádio uma vez — enviar oferta de primeira assinatura com desconto de conversão.',
     embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
 
   { firstname:'Patrícia', lastname:'Malta', email:'patricia.malta@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'ouro', fan_score:72, jogador_favorito:'Hugo Moura', ltv_torcedor:1340, risco_churn:'baixo', propensao_upgrade:55, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-09-01',
+    nivel_socio:'ouro', e_socio_torcedor:'sim', pontos_loyalty:5600, fan_score:72, jogador_favorito:'Hugo Moura', ltv_torcedor:1340, risco_churn:'baixo', propensao_upgrade:55, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-09-01',
     data_nascimento:'1985-07-22', genero:'feminino', fonte_aquisicao:'app',
     status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2000-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:13, taxa_presenca:78, setor_preferido:'Premium', engajamento_app:75, engajamento_redes_sociais:60,
@@ -284,7 +300,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
 
   { firstname:'Felipe', lastname:'Almirante', email:'felipe.almirante@vasco-demo.example.com', city:'Niterói', state:'RJ',
-    nivel_socio:'platina', fan_score:88, jogador_favorito:'Philippe Coutinho', ltv_torcedor:3900, risco_churn:'baixo', propensao_upgrade:78, segmento_torcedor:'Top torcedor', socio_desde:'2018-04-01',
+    nivel_socio:'platina', e_socio_torcedor:'sim', pontos_loyalty:15200, fan_score:88, jogador_favorito:'Philippe Coutinho', ltv_torcedor:3900, risco_churn:'baixo', propensao_upgrade:78, segmento_torcedor:'Top torcedor', socio_desde:'2018-04-01',
     data_nascimento:'1980-01-11', genero:'masculino', fonte_aquisicao:'loja_fisica',
     status_assinatura:'ativo', plano_mensalidade:149.90, torcedor_desde:'1990-01-01', torcida_organizada:'Força Jovem do Vasco',
     partidas_assistidas_temporada:20, taxa_presenca:92, setor_preferido:'Camarotes', engajamento_app:90, engajamento_redes_sociais:80,
@@ -295,7 +311,7 @@ const TORCEDORES_VASCO = [
     embaixador:'sim', indicacoes_feitas:8, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'3ª geração+' },
 
   { firstname:'Juliana', lastname:'Cruzmaltina', email:'juliana.cruzmaltina@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'bronze', fan_score:41, jogador_favorito:'Paulo Henrique', ltv_torcedor:150, risco_churn:'alto', propensao_upgrade:19, segmento_torcedor:'Em risco de churn', socio_desde:'2024-01-01',
+    nivel_socio:'bronze', e_socio_torcedor:'sim', pontos_loyalty:480, fan_score:41, jogador_favorito:'Paulo Henrique', ltv_torcedor:150, risco_churn:'alto', propensao_upgrade:19, segmento_torcedor:'Em risco de churn', socio_desde:'2024-01-01',
     data_nascimento:'1998-10-05', genero:'feminino', fonte_aquisicao:'campanha',
     status_assinatura:'inadimplente', plano_mensalidade:29.90, torcedor_desde:'2019-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:1, taxa_presenca:20, setor_preferido:'Sul', engajamento_app:25, engajamento_redes_sociais:18,
@@ -306,7 +322,7 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
 
   { firstname:'Rodrigo', lastname:'Colina', email:'rodrigo.colina@vasco-demo.example.com', city:'Belford Roxo', state:'RJ',
-    nivel_socio:'prata', fan_score:63, jogador_favorito:'Lucas Freitas', ltv_torcedor:520, risco_churn:'baixo', propensao_upgrade:50, segmento_torcedor:'Torcedor fiel', socio_desde:'2022-06-01',
+    nivel_socio:'prata', e_socio_torcedor:'sim', pontos_loyalty:2600, fan_score:63, jogador_favorito:'Lucas Freitas', ltv_torcedor:520, risco_churn:'baixo', propensao_upgrade:50, segmento_torcedor:'Torcedor fiel', socio_desde:'2022-06-01',
     data_nascimento:'1993-05-28', genero:'masculino', fonte_aquisicao:'indicacao',
     status_assinatura:'ativo', plano_mensalidade:49.90, torcedor_desde:'2005-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:9, taxa_presenca:66, setor_preferido:'Leste', engajamento_app:64, engajamento_redes_sociais:55,
@@ -317,18 +333,20 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
 
   { firstname:'Ana', lastname:'Sãojanuário', email:'ana.saojanuario@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'basico', fan_score:18, jogador_favorito:'—', ltv_torcedor:0, risco_churn:'alto', propensao_upgrade:11, segmento_torcedor:'Identificado, não-sócio',
+    // Perfil diferente do Bruno: não-sócia, nunca foi ao estádio, mas já
+    // comprou na loja online — engajamento digital, não presencial.
+    nivel_socio:'basico', e_socio_torcedor:'nao', pontos_loyalty:80, fan_score:18, jogador_favorito:'—', ltv_torcedor:60, risco_churn:'alto', propensao_upgrade:11, segmento_torcedor:'Identificado, não-sócio',
     data_nascimento:'2004-02-14', genero:'feminino', fonte_aquisicao:'redes_sociais',
     status_assinatura:'nao_aplicavel', plano_mensalidade:0, torcedor_desde:'2016-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:0, taxa_presenca:0, setor_preferido:'', engajamento_app:9, engajamento_redes_sociais:24,
-    ticket_medio:0, produto_favorito:'', numero_compras:0,
-    motivo_cancelamento:'', data_ultima_interacao:'2026-05-20', sinal_alerta:'Identificado mas nunca virou sócio',
+    ticket_medio:60, produto_favorito:'Colecionáveis', numero_compras:1,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-05-20', sinal_alerta:'Compra na loja online mas nunca foi ao estádio nem virou sócia',
     canal_preferido:'push', opt_in_marketing:'nao', frequencia_contato_desejada:'ocasioes_especiais',
-    next_best_action:'Identificada na base mas nunca converteu em sócia — testar campanha de conversão com desconto de entrada.',
+    next_best_action:'Engajamento só digital — convidar para o primeiro jogo com ingresso promocional antes de oferecer assinatura.',
     embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Libras', geracao_familiar:'1ª geração' },
 
   { firstname:'Diego', lastname:'Malta', email:'diego.malta@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'ouro', fan_score:70, jogador_favorito:'Pablo Vegetti', ltv_torcedor:1210, risco_churn:'baixo', propensao_upgrade:54, segmento_torcedor:'Torcedor fiel', socio_desde:'2020-10-01',
+    nivel_socio:'ouro', e_socio_torcedor:'sim', pontos_loyalty:5100, fan_score:70, jogador_favorito:'Pablo Vegetti', ltv_torcedor:1210, risco_churn:'baixo', propensao_upgrade:54, segmento_torcedor:'Torcedor fiel', socio_desde:'2020-10-01',
     data_nascimento:'1991-12-19', genero:'masculino', fonte_aquisicao:'app',
     status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2003-01-01', torcida_organizada:'',
     partidas_assistidas_temporada:12, taxa_presenca:76, setor_preferido:'Norte', engajamento_app:73, engajamento_redes_sociais:66,
@@ -416,6 +434,8 @@ exports.handler = async function (event) {
           city: t.city,
           state: t.state,
           nivel_socio: t.nivel_socio,
+          e_socio_torcedor: t.e_socio_torcedor,
+          pontos_loyalty: t.pontos_loyalty,
           fan_score: t.fan_score,
           jogador_favorito: t.jogador_favorito,
           ltv_torcedor: t.ltv_torcedor,
