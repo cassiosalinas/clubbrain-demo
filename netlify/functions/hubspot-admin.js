@@ -100,15 +100,15 @@ function corsHeaders(event) {
 // Criados pela action "setup" via POST /crm/v3/properties/contacts/groups
 // (idempotente — 409 se já existe).
 const PROPERTY_GROUPS = [
-  { name: 'torcedor_core', displayName: 'Torcedor · Visão Geral' },
-  { name: 'torcedor_identidade', displayName: 'Torcedor · Identidade & Perfil' },
-  { name: 'torcedor_relacao', displayName: 'Torcedor · Relação com o Clube' },
-  { name: 'torcedor_engajamento', displayName: 'Torcedor · Comportamento & Engajamento' },
-  { name: 'torcedor_comercial', displayName: 'Torcedor · Comercial & Financeiro' },
-  { name: 'torcedor_risco', displayName: 'Torcedor · Risco & Retenção' },
-  { name: 'torcedor_atividade', displayName: 'Torcedor · Última Atividade' },
-  { name: 'torcedor_comunicacao', displayName: 'Torcedor · Comunicação & Preferências' },
-  { name: 'torcedor_ia_avancado', displayName: 'Torcedor · IA & Avançado' },
+  { name: 'torcedor_core', label: 'Torcedor · Visão Geral' },
+  { name: 'torcedor_identidade', label: 'Torcedor · Identidade & Perfil' },
+  { name: 'torcedor_relacao', label: 'Torcedor · Relação com o Clube' },
+  { name: 'torcedor_engajamento', label: 'Torcedor · Comportamento & Engajamento' },
+  { name: 'torcedor_comercial', label: 'Torcedor · Comercial & Financeiro' },
+  { name: 'torcedor_risco', label: 'Torcedor · Risco & Retenção' },
+  { name: 'torcedor_atividade', label: 'Torcedor · Última Atividade' },
+  { name: 'torcedor_comunicacao', label: 'Torcedor · Comunicação & Preferências' },
+  { name: 'torcedor_ia_avancado', label: 'Torcedor · IA & Avançado' },
 ];
 
 const CUSTOM_PROPERTIES = [
@@ -673,7 +673,7 @@ exports.handler = async function (event) {
       for (const grp of PROPERTY_GROUPS) {
         const gr = await hsFetch('/crm/v3/properties/contacts/groups', {
           method: 'POST',
-          body: JSON.stringify({ name: grp.name, displayName: grp.displayName }),
+          body: JSON.stringify({ name: grp.name, label: grp.label }),
         });
         const gdata = await gr.json().catch(() => ({}));
         groupResults.push({ name: grp.name, status: gr.status, alreadyExists: gr.status === 409, detail: gdata.message || gdata });
