@@ -102,3 +102,51 @@ async function initFanLogin() {
     }
   } catch (e) { /* silencioso — usuário só vê a barra de login vazia */ }
 }
+
+// ---- Catálogo de recompensas Minu (dados reais — Nuvem Minu, set/2026) ----
+// Compartilhado entre ShopVasco, Sócio Torcedor e Museu Virtual — mesma
+// "vantagem de sócio" visível nos três lugares, não só escondida numa
+// página. name/brand/cat/gmv vêm direto da planilha de parceiros da Minu;
+// pointsCost é a conversão local pro sistema de pontos do clube (10 pontos
+// = R$1, mesma ordem de grandeza do pontos_loyalty já usado no CRM).
+const MINU_REWARDS = [
+  { brand: 'Uber', cat: 'Transporte', name: 'Desconto de R$30 para uma viagem no app Uber', gmv: 30 },
+  { brand: 'Zé Delivery', cat: 'Alimentação', name: 'Cupom de R$50 para usar no Zé Delivery', gmv: 50 },
+  { brand: 'Outback', cat: 'Alimentação', name: 'Cartão-presente de R$100 para usar no Outback', gmv: 100 },
+  { brand: 'Netshoes', cat: 'Compras', name: 'Desconto de R$100 na loja virtual (compras acima de R$600)', gmv: 100 },
+  { brand: 'Asics', cat: 'Compras', name: 'Crédito de R$50 para compras de produtos ASICS', gmv: 50 },
+  { brand: 'Decathlon', cat: 'Compras', name: 'Cartão-presente de R$70', gmv: 70 },
+  { brand: 'Havaianas', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50 },
+  { brand: 'Xbox Cash', cat: 'Games', name: 'Cartão-presente Xbox Cash de R$50', gmv: 50 },
+  { brand: 'Sony Playstation', cat: 'Games', name: 'Cartão-presente PlayStation de R$60', gmv: 60 },
+  { brand: 'Cinemark', cat: 'Entretenimento', name: '2 Ingressos de Cinema 2D', gmv: 80 },
+  { brand: 'Deezer', cat: 'Entretenimento', name: 'Deezer Premium — Assinatura Mensal', gmv: 24 },
+  { brand: 'Petz', cat: 'Pets', name: 'Cartão-presente de R$30', gmv: 30 },
+  { brand: 'Riachuelo', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50 },
+  { brand: 'AACD', cat: 'Solidariedade', name: 'Doação para os projetos da AACD', gmv: 1 },
+];
+
+// targetId é opcional — default 'reward-grid', mas dá pra ter mais de uma
+// grade na mesma página (não usado hoje, mas mantém flexível).
+function renderRewards(targetId) {
+  const el = document.getElementById(targetId || 'reward-grid');
+  if (!el) return;
+  el.innerHTML = MINU_REWARDS.map(r => {
+    const pts = r.gmv * 10;
+    return `
+    <div class="reward-card">
+      <div class="reward-top">
+        <span class="reward-brand">${r.brand}</span>
+        <span class="reward-real-badge">🟢 catálogo real</span>
+      </div>
+      <div class="reward-cat">${r.cat}</div>
+      <div class="reward-name">${r.name}</div>
+      <div class="reward-cost">${pts.toLocaleString('pt-BR')}<small> pontos</small></div>
+      <button class="reward-redeem" onclick="resgatar('${r.brand.replace(/'/g, "\\'")}')">Resgatar</button>
+    </div>`;
+  }).join('');
+}
+
+function resgatar(brand) {
+  alert(`"${brand}" faz parte do catálogo real da Minu, mas o resgate em si ainda é simulado nesta demo — falta o acesso à API de produção da Minu para emitir o voucher de verdade. Assim que o clube tiver esse acesso, este botão vira uma chamada real.`);
+}
