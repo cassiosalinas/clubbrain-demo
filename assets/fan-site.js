@@ -108,23 +108,26 @@ async function initFanLogin() {
 // "vantagem de sócio" visível nos três lugares, não só escondida numa
 // página. name/brand/cat/gmv vêm direto da planilha de parceiros da Minu;
 // pointsCost é a conversão local pro sistema de pontos do clube (10 pontos
-// = R$1, mesma ordem de grandeza do pontos_loyalty já usado no CRM). "icon"
-// é um desenho simples (não o logo real da marca — evita qualquer questão
-// de marca registrada) numa cor de identificação por parceiro.
+// = R$1, mesma ordem de grandeza do pontos_loyalty já usado no CRM).
+// "logo" é o logo real de cada marca (Wikimedia Commons — clube tem contrato
+// real com a Minu, então usar as marcas de verdade aqui não é problema,
+// diferente de uma demo especulativa); "icon" é o desenho de fallback (usado
+// só se o logo falhar ao carregar, ou pra AACD, que não tem logo hospedado
+// lá) numa cor de identificação por parceiro.
 const MINU_REWARDS = [
-  { brand: 'Uber', cat: 'Transporte', name: 'Desconto de R$30 para uma viagem no app Uber', gmv: 30, icon: 'car', color: '#1fae64' },
-  { brand: 'Zé Delivery', cat: 'Alimentação', name: 'Cupom de R$50 para usar no Zé Delivery', gmv: 50, icon: 'drink', color: '#ffd400' },
-  { brand: 'Outback', cat: 'Alimentação', name: 'Cartão-presente de R$100 para usar no Outback', gmv: 100, icon: 'fork', color: '#c0392b' },
-  { brand: 'Netshoes', cat: 'Compras', name: 'Desconto de R$100 na loja virtual (compras acima de R$600)', gmv: 100, icon: 'shoe', color: '#ff7a00' },
-  { brand: 'Asics', cat: 'Compras', name: 'Crédito de R$50 para compras de produtos ASICS', gmv: 50, icon: 'shoe', color: '#3d5a99' },
-  { brand: 'Decathlon', cat: 'Compras', name: 'Cartão-presente de R$70', gmv: 70, icon: 'dumbbell', color: '#0082c3' },
-  { brand: 'Havaianas', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50, icon: 'sandal', color: '#00a19a' },
-  { brand: 'Xbox Cash', cat: 'Games', name: 'Cartão-presente Xbox Cash de R$50', gmv: 50, icon: 'controller', color: '#107c10' },
-  { brand: 'Sony Playstation', cat: 'Games', name: 'Cartão-presente PlayStation de R$60', gmv: 60, icon: 'controller', color: '#2e6fd9' },
-  { brand: 'Cinemark', cat: 'Entretenimento', name: '2 Ingressos de Cinema 2D', gmv: 80, icon: 'film', color: '#e4002b' },
-  { brand: 'Deezer', cat: 'Entretenimento', name: 'Deezer Premium — Assinatura Mensal', gmv: 24, icon: 'music', color: '#a238ff' },
-  { brand: 'Petz', cat: 'Pets', name: 'Cartão-presente de R$30', gmv: 30, icon: 'paw', color: '#f39200' },
-  { brand: 'Riachuelo', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50, icon: 'hanger', color: '#ee2737' },
+  { brand: 'Uber', cat: 'Transporte', name: 'Desconto de R$30 para uma viagem no app Uber', gmv: 30, icon: 'car', color: '#1fae64', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/250px-Uber_logo_2018.svg.png' },
+  { brand: 'Zé Delivery', cat: 'Alimentação', name: 'Cupom de R$50 para usar no Zé Delivery', gmv: 50, icon: 'drink', color: '#ffd400', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Z%C3%A9_Delivery_logo.png' },
+  { brand: 'Outback', cat: 'Alimentação', name: 'Cartão-presente de R$100 para usar no Outback', gmv: 100, icon: 'fork', color: '#c0392b', logo: 'https://upload.wikimedia.org/wikipedia/pt/2/27/Outback_Steakhouse.png' },
+  { brand: 'Netshoes', cat: 'Compras', name: 'Desconto de R$100 na loja virtual (compras acima de R$600)', gmv: 100, icon: 'shoe', color: '#ff7a00', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Netshoes_2024.svg/250px-Netshoes_2024.svg.png' },
+  { brand: 'Asics', cat: 'Compras', name: 'Crédito de R$50 para compras de produtos ASICS', gmv: 50, icon: 'shoe', color: '#3d5a99', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Asics_Logo.svg/250px-Asics_Logo.svg.png' },
+  { brand: 'Decathlon', cat: 'Compras', name: 'Cartão-presente de R$70', gmv: 70, icon: 'dumbbell', color: '#0082c3', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Decathlon_-_logo_%28France%2C_2024%29.svg/250px-Decathlon_-_logo_%28France%2C_2024%29.svg.png' },
+  { brand: 'Havaianas', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50, icon: 'sandal', color: '#00a19a', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Logotipo_da_Havaianas.svg/250px-Logotipo_da_Havaianas.svg.png' },
+  { brand: 'Xbox Cash', cat: 'Games', name: 'Cartão-presente Xbox Cash de R$50', gmv: 50, icon: 'controller', color: '#107c10', logo: 'https://upload.wikimedia.org/wikipedia/pt/thumb/7/75/XBOX_logo_%282026%29.png/250px-XBOX_logo_%282026%29.png' },
+  { brand: 'Sony Playstation', cat: 'Games', name: 'Cartão-presente PlayStation de R$60', gmv: 60, icon: 'controller', color: '#2e6fd9', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/PlayStation_logo_and_wordmark.svg/250px-PlayStation_logo_and_wordmark.svg.png' },
+  { brand: 'Cinemark', cat: 'Entretenimento', name: '2 Ingressos de Cinema 2D', gmv: 80, icon: 'film', color: '#e4002b', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Cinemark_Logo.svg/250px-Cinemark_Logo.svg.png' },
+  { brand: 'Deezer', cat: 'Entretenimento', name: 'Deezer Premium — Assinatura Mensal', gmv: 24, icon: 'music', color: '#a238ff', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Deezer_logo%2C_2023.svg/250px-Deezer_logo%2C_2023.svg.png' },
+  { brand: 'Petz', cat: 'Pets', name: 'Cartão-presente de R$30', gmv: 30, icon: 'paw', color: '#f39200', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Logotipo_da_Petz_%282023%29.svg/330px-Logotipo_da_Petz_%282023%29.svg.png' },
+  { brand: 'Riachuelo', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50, icon: 'hanger', color: '#ee2737', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Logotipo_da_Riachuelo_%282026%29.svg/250px-Logotipo_da_Riachuelo_%282026%29.svg.png' },
   { brand: 'AACD', cat: 'Solidariedade', name: 'Doação para os projetos da AACD', gmv: 1, icon: 'heart', color: '#ff5c72' },
 ];
 
@@ -147,6 +150,20 @@ function rewardIconSvg(iconName, color){
   return `<svg viewBox="0 0 100 100" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="color:${color};">${path}</svg>`;
 }
 
+// Logo real (marca do parceiro Minu de verdade — clube tem contrato, sem
+// problema nenhum em mostrar) num fundo claro pra ficar legível; se falhar
+// ao carregar, cai pro ícone desenhado com a cor da marca, sem quebrar o card.
+function onRewardLogoError(imgEl, index){
+  const r = MINU_REWARDS[index];
+  imgEl.closest('.reward-icon').outerHTML = `<div class="reward-icon" style="background:${r.color}1a; border-color:${r.color}44;">${rewardIconSvg(r.icon, r.color)}</div>`;
+}
+function rewardMedia(r, i){
+  if(r.logo){
+    return `<div class="reward-icon reward-icon-logo"><img src="${r.logo}" alt="${r.brand}" loading="lazy" onerror="onRewardLogoError(this, ${i})"></div>`;
+  }
+  return `<div class="reward-icon" style="background:${r.color}1a; border-color:${r.color}44;">${rewardIconSvg(r.icon, r.color)}</div>`;
+}
+
 // targetId é opcional — default 'reward-grid', mas dá pra ter mais de uma
 // grade na mesma página (não usado hoje, mas mantém flexível).
 function renderRewards(targetId) {
@@ -156,7 +173,7 @@ function renderRewards(targetId) {
     const pts = r.gmv * 10;
     return `
     <div class="reward-card">
-      <div class="reward-icon" style="background:${r.color}1a; border-color:${r.color}44;">${rewardIconSvg(r.icon, r.color)}</div>
+      ${rewardMedia(r, i)}
       <div class="reward-top">
         <span class="reward-brand">${r.brand}</span>
         <span class="reward-real-badge">🟢 catálogo real</span>
@@ -194,7 +211,7 @@ function resgatar(i){
     <div class="voucher-modal">
       <div class="voucher-check">✓</div>
       <div class="voucher-title">Voucher gerado!</div>
-      <div class="reward-icon" style="width:64px; height:64px; margin:0 auto 14px; background:${r.color}1a; border-color:${r.color}44;">${rewardIconSvg(r.icon, r.color)}</div>
+      <div class="voucher-logo-wrap">${rewardMedia(r, i)}</div>
       <div class="voucher-brand">${r.brand}</div>
       <div class="voucher-reward">${r.name}</div>
       <div class="voucher-code-label">Seu código de resgate</div>

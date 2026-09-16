@@ -293,6 +293,10 @@ a{ color:var(--gold); }
   display:flex; align-items:center; justify-content:center; flex:none;
 }
 .reward-icon svg{ width:60%; height:60%; }
+.reward-icon-logo{ background:#f6f4ee; padding:6px; }
+.reward-icon-logo img{ width:100%; height:100%; object-fit:contain; }
+.voucher-logo-wrap{ display:flex; justify-content:center; margin:0 auto 14px; }
+.voucher-logo-wrap .reward-icon{ width:72px; height:72px; border-radius:16px; }
 .reward-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .reward-brand{ font-family:'Oswald',sans-serif; font-size:13px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:.03em; }
 .reward-real-badge{
