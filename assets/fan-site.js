@@ -186,8 +186,11 @@ function renderRewards(targetId) {
   }).join('');
 }
 
-// Resgate — gera um voucher fake (código aleatório) na hora, pra demo. Não
-// desconta pontos de verdade nem chama nenhuma API externa.
+// Resgate — desconta pontos de verdade do pontos_loyalty do torcedor no
+// HubSpot ({action:'redeem_reward'}), na mesma taxa de conversão mostrada
+// no card (10 pontos = R$1 de gmv). Só depois do débito real confirmado é
+// que o voucher (código local, gerado na hora — a Minu não tem API de
+// emissão de voucher pra essa demo) é mostrado.
 function generateVoucherCode(){
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = 'MINU-';
@@ -200,15 +203,53 @@ function generateVoucherCode(){
 function closeVoucherModal(){
   document.querySelector('.voucher-overlay')?.remove();
 }
-function resgatar(i){
-  const r = MINU_REWARDS[i];
-  const code = generateVoucherCode();
-  const validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR');
+function showRewardMessage(html){
+  closeVoucherModal();
   const overlay = document.createElement('div');
   overlay.className = 'voucher-overlay';
   overlay.onclick = (e) => { if(e.target === overlay) closeVoucherModal(); };
-  overlay.innerHTML = `
-    <div class="voucher-modal">
+  overlay.innerHTML = `<div class="voucher-modal">${html}</div>`;
+  document.body.appendChild(overlay);
+}
+function showRewardError(message){
+  showRewardMessage(`
+    <div class="voucher-check" style="background:rgba(226,35,26,.16); border-color:rgba(226,35,26,.4); color:#ff8c85;">✕</div>
+    <div class="voucher-title">Não foi possível resgatar</div>
+    <div class="voucher-note" style="margin-bottom:22px;">${message}</div>
+    <button class="fan-btn" onclick="closeVoucherModal()">Fechar</button>`);
+}
+async function resgatar(i){
+  const r = MINU_REWARDS[i];
+  const cost = r.gmv * 10;
+
+  if(!(currentFan && currentFan.found)){
+    showRewardError('Faça login com seu e-mail de sócio-torcedor no topo da página pra resgatar com seus pontos de fidelidade.');
+    return;
+  }
+  if((currentFan.pontosLoyalty || 0) < cost){
+    showRewardError(`Você tem <b style="color:var(--paper);">${(currentFan.pontosLoyalty || 0).toLocaleString('pt-BR')} pontos</b> — esse resgate custa <b style="color:var(--paper);">${cost.toLocaleString('pt-BR')} pontos</b>.`);
+    return;
+  }
+
+  const btn = document.querySelectorAll('.reward-redeem')[i];
+  const original = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = 'Resgatando…'; }
+
+  try{
+    const res = await fetch(FAN_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'redeem_reward', email: currentFan.email, points: cost, reward_name: r.name }),
+    });
+    const d = await res.json();
+    if(!res.ok || !d.ok) throw new Error(d.error || 'Falha ao debitar pontos no HubSpot.');
+
+    currentFan.pontosLoyalty = d.newTotal;
+    renderLoginBar();
+
+    const code = generateVoucherCode();
+    const validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR');
+    showRewardMessage(`
       <div class="voucher-check">✓</div>
       <div class="voucher-title">Voucher gerado!</div>
       <div class="voucher-logo-wrap">${rewardMedia(r, i)}</div>
@@ -216,8 +257,11 @@ function resgatar(i){
       <div class="voucher-reward">${r.name}</div>
       <div class="voucher-code-label">Seu código de resgate</div>
       <div class="voucher-code">${code}</div>
-      <div class="voucher-note">Válido até ${validUntil} · apresente esse código no app ou site do parceiro</div>
-      <button class="fan-btn" onclick="closeVoucherModal()">Fechar</button>
-    </div>`;
-  document.body.appendChild(overlay);
+      <div class="voucher-note">-${cost.toLocaleString('pt-BR')} pontos gravados de verdade no HubSpot · saldo atual: <b style="color:var(--paper);">${d.newTotal.toLocaleString('pt-BR')} pontos</b><br>Válido até ${validUntil} · apresente esse código no app ou site do parceiro</div>
+      <button class="fan-btn" onclick="closeVoucherModal()">Fechar</button>`);
+  }catch(e){
+    showRewardError(e.message);
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = original; }
+  }
 }

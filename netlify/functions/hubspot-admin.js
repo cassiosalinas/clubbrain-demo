@@ -939,6 +939,49 @@ exports.handler = async function (event) {
       };
     }
 
+    if (payload.action === 'redeem_reward') {
+      // Resgate de recompensa Minu (ShopVasco/Sócio/Museu) — espelho do
+      // award_loyalty_points, mas descontando: confere o saldo real de
+      // pontos_loyalty no HubSpot antes de debitar, pra nunca deixar o
+      // torcedor ficar negativo. Também grava ultima_acao_descricao, então
+      // o resgate aparece no feed "Eventos chegando agora" igual a uma
+      // compra ou visita ao museu.
+      if (!payload.email || !Number.isFinite(Number(payload.points)) || Number(payload.points) <= 0) {
+        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campos "email" e "points" (> 0) são obrigatórios.' }) };
+      }
+      const spendPoints = Math.round(Number(payload.points));
+      const rewardName = (payload.reward_name || 'uma recompensa').slice(0, 200);
+
+      const contactRes2 = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email&properties=firstname,lastname,pontos_loyalty');
+      const contactData2 = await contactRes2.json().catch(() => ({}));
+      if (!contactRes2.ok) {
+        return { statusCode: contactRes2.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: contactData2.message || 'Torcedor não encontrado no HubSpot: ' + payload.email }) };
+      }
+      const before2 = contactData2.properties || {};
+      const currentPoints = Number(before2.pontos_loyalty) || 0;
+      if (spendPoints > currentPoints) {
+        return { statusCode: 402, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: 'Pontos insuficientes: saldo de ' + currentPoints.toLocaleString('pt-BR') + ', resgate custa ' + spendPoints.toLocaleString('pt-BR') + '.' }) };
+      }
+      const updates2 = {
+        pontos_loyalty: currentPoints - spendPoints,
+        ultima_acao_descricao: 'Resgatou ' + rewardName + ' na Minu (-' + spendPoints + ' pontos)',
+        data_ultima_interacao: new Date().toISOString().slice(0, 10),
+      };
+      const patchRes2 = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email', {
+        method: 'PATCH',
+        body: JSON.stringify({ properties: updates2 }),
+      });
+      const patchData2 = await patchRes2.json().catch(() => ({}));
+      if (!patchRes2.ok) {
+        return { statusCode: patchRes2.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: patchData2.message || 'Falha ao debitar pontos no HubSpot.' }) };
+      }
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({ ok: true, email: payload.email, pointsSpent: spendPoints, newTotal: (patchData2.properties || updates2).pontos_loyalty }),
+      };
+    }
+
     if (payload.action === 'fulfill_stripe_order') {
       // Fecha o ciclo real da "jornada do torcedor": confirma o pagamento de
       // verdade no Stripe (modo teste) e grava a mudança de verdade no
@@ -1112,7 +1155,7 @@ exports.handler = async function (event) {
       };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan", "award_loyalty_points", "fulfill_stripe_order" ou "create_retention_tasks".' }) };
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan", "award_loyalty_points", "redeem_reward", "fulfill_stripe_order" ou "create_retention_tasks".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
