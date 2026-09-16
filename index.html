@@ -599,6 +599,10 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a2 2 0 11-3.9 1"/></svg>
         Campanhas &amp; Promoções
       </div>
+      <div class="nav-item vasco-only-nav" data-view="loyalty" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg>
+        Loyalty &amp; Recompensas
+      </div>
 
       <div class="nav-group-label">Gestão do Clube</div>
       <div class="nav-item" data-view="clubmgmt">
@@ -1610,6 +1614,49 @@ canvas{ max-width:100%; }
       </div>
     </section>
 
+    <!-- ================= LOYALTY & RECOMPENSAS (piloto exclusivo do Vasco) ================= -->
+    <section class="view" id="view-loyalty">
+      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(242,201,76,.08), var(--surface)); border-color:rgba(242,201,76,.3);">
+        <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+          Módulo novo, piloto exclusivo do <b style="color:var(--text);">Vasco da Gama</b> — Camada 1 (Fan Experience) do Prompt Mestre: o sócio-torcedor acumula pontos por engajamento e troca por recompensas reais do clube. Escala proporcional ao piloto (261 sócios ativos); catálogo e resgates são <b style="color:var(--text);">ilustrativos</b>.
+        </div>
+      </div>
+
+      <div class="grid g-4" style="margin-bottom:16px;">
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge" style="background:rgba(242,201,76,.16); color:#f2c94c;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg></span>Pontos em circulação</div>
+          <div class="value" id="loyalty-kpi-pontos" style="color:#f2c94c;">34.500</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge" style="background:rgba(108,107,255,.16); color:#6c6bff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z"/></svg></span>Sócios no programa</div>
+          <div class="value">261</div>
+          <div class="hero-note">= sócios ativos do piloto</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>Missões concluídas</div>
+          <div class="value">812</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge" style="background:rgba(255,180,84,.16); color:#ffb454;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7C10.5 3 7 2 6 4s.5 3.5 6 3zM12 7c1.5-4 5-5 6-3s-.5 3.5-6 3z"/></svg></span>Recompensas resgatadas</div>
+          <div class="value" id="loyalty-kpi-resgates">46</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Catálogo de recompensas</h3></div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Clique em "Resgatar" pra simular um sócio-torcedor trocando pontos por uma recompensa — o resgate entra na lista abaixo na hora.</div>
+        <div class="grid g-3" id="loyalty-catalog"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><h3>Resgates recentes</h3></div>
+        <table>
+          <thead><tr><th>Sócio-torcedor</th><th>Recompensa</th><th>Pontos</th><th>Data</th><th>Status</th></tr></thead>
+          <tbody id="loyalty-redemptions-table"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- ================= CDP (Camada 2 — Fan Data Platform) ================= -->
     <section class="view" id="view-cdp">
       <div class="subtabs" id="cdp-subtabs">
@@ -2168,6 +2215,7 @@ const titles = {
   monetization: ["Receita & patrocínio", "Assinaturas, conversão e ROI de patrocinadores"],
   commerce: ["Gestão de commerce", "Integração com a loja oficial (Camada 1) — catálogo, preços e vendas em tempo real, alimentando a Ontologia do Clube"],
   promotions: ["Campanhas & Promoções", "Piloto exclusivo do Vasco — construtor de promoções cruzando segmentação, ingressos, loja oficial e eventos num lugar só"],
+  loyalty: ["Loyalty & Recompensas", "Piloto exclusivo do Vasco — Camada 1 (Fan Experience) do Prompt Mestre: catálogo de recompensas e resgate de pontos do sócio-torcedor"],
   marketing: ["Automação de marketing", "Jornadas e campanhas ativas por canal, e o construtor de segmentação (Audiences) de torcedores"],
   ops: ["Saúde do sistema", "Monitoramento de infraestrutura e APIs em tempo real"],
   integrations: ["Integration Hub", "Métodos de pagamento, APIs e soluções de terceiros conectadas ao ClubBrain — status, volume e sincronização em tempo real"],
@@ -2454,13 +2502,14 @@ function selectClub(id, silent){
 
   if(id === 'vasco'){ loadVascoLiveOverview(); } else { hideVascoLiveNote(); }
 
-  // Campanhas & Promoções — piloto exclusivo do Vasco, esconde o item do menu
-  // pros outros clubes; se o usuário estava nessa tela e trocou de clube, volta pro Cockpit.
+  // Módulos piloto exclusivos do Vasco (Campanhas & Promoções, Loyalty &
+  // Recompensas) — escondem o item do menu pros outros clubes; se o usuário
+  // estava numa dessas telas e trocou de clube, volta pro Cockpit.
   document.querySelectorAll('.vasco-only-nav').forEach(n => n.style.display = (id === 'vasco') ? 'flex' : 'none');
-  if(id !== 'vasco' && document.getElementById('view-promotions')?.classList.contains('active')){
+  if(id !== 'vasco' && (document.getElementById('view-promotions')?.classList.contains('active') || document.getElementById('view-loyalty')?.classList.contains('active'))){
     goToView('cockpit');
   }
-  if(id === 'vasco') renderVascoPromotions();
+  if(id === 'vasco'){ renderVascoPromotions(); renderVascoLoyalty(); }
 
   refreshCdpForClub();
   refreshEventsForClub();
@@ -2694,6 +2743,73 @@ function launchVascoPromotion(){
   showToast(`Promoção lançada: ${p.reach.toLocaleString('pt-BR')} torcedores impactados`, '#b06bff');
 }
 
+/* ============ LOYALTY & RECOMPENSAS (piloto exclusivo do Vasco) ============
+   Camada 1 (Fan Experience) do Prompt Mestre. Catálogo e resgates são
+   ilustrativos; escala de pontos/membros proporcional ao piloto real (261
+   sócios ativos). Sócios aparecem só pseudonimizados (#A231 etc.), nunca por nome. */
+const VASCO_LOYALTY_REWARDS = [
+  { id:'camisa', name:'Camisa autografada do elenco', cost:8000, stock:3, icon:'👕' },
+  { id:'vip', name:'Visita aos vestiários — São Januário', cost:12000, stock:2, icon:'🏟' },
+  { id:'desconto', name:'30% de desconto na loja oficial', cost:1500, stock:99, icon:'🏷' },
+  { id:'camarote', name:'Ingresso de camarote — próximo jogo', cost:6000, stock:5, icon:'🎟' },
+  { id:'meetgreet', name:'Meet & greet virtual com um jogador', cost:15000, stock:1, icon:'⭐' },
+  { id:'kit', name:'Kit brindes 125 anos', cost:800, stock:40, icon:'🎁' },
+];
+const VASCO_LOYALTY_PSEUDONYMS = ['#A231','#B889','#C104','#D562','#E077','#F918','#G340','#H625'];
+
+let vascoLoyaltyRedemptions = [
+  { member:'#A231', reward:'Kit brindes 125 anos', points:800, date:'02/09/2026', status:'Entregue' },
+  { member:'#C104', reward:'30% de desconto na loja oficial', points:1500, date:'05/09/2026', status:'Entregue' },
+  { member:'#E077', reward:'Ingresso de camarote — próximo jogo', points:6000, date:'11/09/2026', status:'Confirmado' },
+];
+
+function renderVascoLoyalty(){
+  const catalog = document.getElementById('loyalty-catalog');
+  if(!catalog) return;
+  catalog.innerHTML = VASCO_LOYALTY_REWARDS.map(r=>`
+    <div class="card" style="text-align:center;">
+      <div style="font-size:26px; margin-bottom:6px;">${r.icon}</div>
+      <div style="font-weight:600; font-size:13px; min-height:34px;">${r.name}</div>
+      <div class="value" style="font-size:18px; color:#f2c94c; margin:8px 0 2px;">${r.cost.toLocaleString('pt-BR')} pts</div>
+      <div class="hero-note" style="margin-bottom:10px;">${r.stock > 90 ? 'Estoque ilimitado' : r.stock + ' disponíveis'}</div>
+      <button class="pill" style="width:100%; justify-content:center;" onclick="redeemVascoReward('${r.id}')" ${r.stock<=0 ? 'disabled' : ''}>${r.stock<=0 ? 'Esgotado' : 'Resgatar'}</button>
+    </div>`).join('');
+  renderVascoLoyaltyRedemptions();
+}
+
+function renderVascoLoyaltyRedemptions(){
+  const tbody = document.getElementById('loyalty-redemptions-table');
+  if(!tbody) return;
+  tbody.innerHTML = vascoLoyaltyRedemptions.map(r=>`
+    <tr>
+      <td class="mono">${r.member}</td>
+      <td>${r.reward}</td>
+      <td>${r.points.toLocaleString('pt-BR')}</td>
+      <td>${r.date}</td>
+      <td><span class="tag" style="color:${r.status==='Entregue' ? '#22e07a' : 'var(--text-dim)'};">${r.status}</span></td>
+    </tr>`).join('');
+  const kpiResgates = document.getElementById('loyalty-kpi-resgates');
+  if(kpiResgates) kpiResgates.textContent = (46 + vascoLoyaltyRedemptions.length - 3).toLocaleString('pt-BR');
+  const kpiPontos = document.getElementById('loyalty-kpi-pontos');
+  if(kpiPontos){
+    // 42.800 = 34.500 (saldo exibido no estado inicial) + 8.300 (pontos já
+    // gastos nos 3 resgates-semente) — cada resgate novo desconta do saldo.
+    const spent = vascoLoyaltyRedemptions.reduce((s,r)=>s+r.points,0);
+    kpiPontos.textContent = Math.max(0, 42800 - spent).toLocaleString('pt-BR');
+  }
+}
+
+function redeemVascoReward(rewardId){
+  const reward = VASCO_LOYALTY_REWARDS.find(r=>r.id === rewardId);
+  if(!reward || reward.stock <= 0) return;
+  reward.stock -= 1;
+  const member = VASCO_LOYALTY_PSEUDONYMS[Math.floor(Math.random()*VASCO_LOYALTY_PSEUDONYMS.length)];
+  const today = new Date().toLocaleDateString('pt-BR');
+  vascoLoyaltyRedemptions = [{ member, reward: reward.name, points: reward.cost, date: today, status:'Confirmado' }, ...vascoLoyaltyRedemptions];
+  renderVascoLoyalty();
+  showToast(`Resgate confirmado: ${member} trocou ${reward.cost.toLocaleString('pt-BR')} pts por ${reward.name}`, '#f2c94c');
+}
+
 function refreshCdpForClub(){
   cdpFan360Id = 'rafael';
   crmTierFilter = null;
@@ -2750,6 +2866,7 @@ function initChartsFor(key){
   if(key==='monetization') buildMonetization();
   if(key==='commerce') buildCommerce();
   if(key==='promotions') renderVascoPromotions();
+  if(key==='loyalty') renderVascoLoyalty();
   if(key==='marketing') buildMarketing();
   if(key==='ops') buildOps();
   if(key==='integrations') buildIntegrations();
