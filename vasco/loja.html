@@ -48,27 +48,31 @@
 
 <script src="/assets/fan-site.js"></script>
 <script>
-// Nike é a fornecedora oficial de material esportivo do Vasco a partir de
-// 2026 (contrato até 2032, anunciado em 2026 — substitui a Kappa) — pesquisado
-// via ESPN/CNN Brasil/vasco.com.br. Camisa titular 2026: preta, com a faixa
-// diagonal branca reinterpretada com grafismos inspirados no movimento da água.
+// Catálogo real do ShopVasco (shopvasco.com.br) — nomes, preços e fotos
+// (CDN static.shopvasco.com.br, mesmo domínio real da loja) levantados ao
+// vivo navegando o site em 2026-09-16. Nike é a fornecedora oficial de
+// material esportivo do Vasco a partir de 2026 (contrato até 2032,
+// substitui a Kappa — pesquisado via ESPN/CNN Brasil). Preços podem
+// divergir um pouco do site real ao longo do tempo (promoções mudam) —
+// os que aparecem aqui foram conferidos direto na página do produto no
+// momento da pesquisa.
 const PRODUCTS = [
-  { id:'camisa1', name:'Camisa I Vasco da Gama Nike 2026', desc:'Camisa titular Nike, preta com a faixa diagonal branca reinterpretada — estreia da parceria com a Nike.', cat:'Camisas', price:299.90 },
-  { id:'camisa2', name:'Camisa II Vasco da Gama Nike 2026', desc:'Segundo uniforme Nike, tecido leve Dri-FIT.', cat:'Camisas', price:299.90 },
-  { id:'camisa3', name:'Camisa III Vasco da Gama Nike 2026', desc:'Terceiro uniforme, edição alternativa da estreia com a Nike.', cat:'Camisas', price:319.90 },
-  { id:'camisagoleiro', name:'Camisa Goleiro Vasco da Gama Nike 2026', desc:'Camisa oficial da linha goleiro, cores exclusivas.', cat:'Camisas', price:279.90 },
-  { id:'camisatreino', name:'Camisa de Treino Nike Vasco', desc:'Usada nos treinos pela comissão técnica — tecido leve de aquecimento.', cat:'Camisas', price:219.90 },
-  { id:'camisaretro', name:'Camisa Retrô Cruz de Malta', desc:'Edição retrô inspirada nos uniformes históricos do clube.', cat:'Camisas', price:329.90 },
-  { id:'camisafeminina', name:'Camisa I Nike 2026 Feminina', desc:'Corte feminino do manto titular Nike 2026.', cat:'Vestuário', price:299.90 },
-  { id:'camisainfantil', name:'Camisa Infantil Nike 2026', desc:'Manto titular Nike no tamanho infantil.', cat:'Infantil', price:159.90 },
-  { id:'moletom', name:'Moletom oficial Gigante da Colina', desc:'Moletom com o escudo do clube.', cat:'Vestuário', price:169.90 },
-  { id:'jaqueta', name:'Jaqueta corta-vento Nike Vasco', desc:'Linha de viagem Nike — leve, resistente ao vento.', cat:'Vestuário', price:249.90 },
-  { id:'bone', name:'Boné oficial Cruzmaltino', desc:'Boné bordado com o escudo do clube.', cat:'Acessórios', price:89.90 },
-  { id:'cachecol', name:'Cachecol oficial', desc:'Preto e branco para o dia de jogo.', cat:'Acessórios', price:44.90 },
-  { id:'mochila', name:'Mochila Nike Vasco da Gama', desc:'Linha de viagem Nike, compartimento para chuteiras.', cat:'Acessórios', price:179.90 },
-  { id:'caneca', name:'Caneca oficial', desc:'Porcelana com o escudo do clube.', cat:'Colecionáveis', price:34.90 },
-  { id:'miniatura', name:'Miniatura de São Januário', desc:'Réplica em miniatura do estádio histórico — "Gigante da Colina", inaugurado em 1927.', cat:'Colecionáveis', price:69.90 },
-  { id:'bolamini', name:'Mini bola oficial Vasco da Gama', desc:'Bola de decoração com o escudo do clube.', cat:'Colecionáveis', price:59.90 },
+  { id:'camisa1', name:'Camisa Vasco I 26/27 s/n Torcedor Nike Masculina', desc:'Camisa titular Nike, preta com a faixa diagonal branca reinterpretada — estreia da parceria com a Nike.', cat:'Camisas', price:399.90, img:'https://static.shopvasco.com.br/produtos/camisa-vasco-i-2627-sn-torcedor-nike-masculina/26/SGL-04JS-026/SGL-04JS-026_zoom1.jpg' },
+  { id:'camisa2', name:'Camisa Vasco II 26/27 s/n Torcedor Nike Masculina', desc:'Segundo uniforme Nike, tecido leve Dri-FIT.', cat:'Camisas', price:399.90, img:'https://static.shopvasco.com.br/produtos/camisa-vasco-ii-2627-sn-torcedor-nike-masculina/28/SGL-04XC-028/SGL-04XC-028_zoom1.jpg' },
+  { id:'camisa3', name:'Camisa Vasco III 26/27 s/n Torcedor Nike Masculina', desc:'Terceiro uniforme, edição alternativa da estreia com a Nike.', cat:'Camisas', price:399.90, img:'https://static.shopvasco.com.br/produtos/camisa-vasco-iii-2627-sn-torcedor-nike-masculina/30/SGL-06E4-030/SGL-06E4-030_zoom1.jpg' },
+  { id:'camisagoleiro', name:'Camisa Vasco III 25/26 s/n Goleiro Kappa Masculina', desc:'Camisa oficial da linha goleiro, cores exclusivas.', cat:'Camisas', price:349.90, img:'https://static.shopvasco.com.br/produtos/camisa-vasco-iii-2526-sn-goleiro-kappa-masculina/08/D24-70B5-008/D24-70B5-008_zoom1.jpg' },
+  { id:'camisatreino', name:'Camisa Manga Longa Vasco 26/27 Treino Nike Masculina', desc:'Usada nos treinos pela comissão técnica — tecido leve de aquecimento.', cat:'Camisas', price:249.90, img:'https://static.shopvasco.com.br/produtos/camisa-manga-longa-vasco-2627-treino-nike-masculina/72/SGL-04RS-172/SGL-04RS-172_zoom1.jpg' },
+  { id:'camisaretro', name:'Camiseta Vasco RetrôMania 1974 Nº10 Masculina', desc:'Edição retrô inspirada no título brasileiro de 1974.', cat:'Camisas', price:179.90, img:'https://static.shopvasco.com.br/produtos/camiseta-vasco-retromania-1974-n10-masculina/06/T70-2225-006/T70-2225-006_zoom1.jpg' },
+  { id:'camisafeminina', name:'Camisa Vasco II 26/27 s/n Torcedor Nike Feminina', desc:'Corte feminino do segundo uniforme Nike 26/27.', cat:'Vestuário', price:399.90, img:'https://static.shopvasco.com.br/produtos/camisa-vasco-ii-2627-sn-torcedor-nike-feminina/28/SGL-04XB-028/SGL-04XB-028_zoom1.jpg' },
+  { id:'camisainfantil', name:'Camisa Infantil Vasco I 26/27 Torcedor Nike', desc:'Manto titular Nike no tamanho infantil.', cat:'Infantil', price:349.90, img:'https://static.shopvasco.com.br/produtos/camisa-infantil-vasco-i-2627-torcedor-nike/06/SGL-05IZ-006/SGL-05IZ-006_zoom1.jpg' },
+  { id:'moletom', name:'Moletom Vasco c/ Capuz Masculino', desc:'Moletom com o escudo do clube.', cat:'Vestuário', price:229.90, img:'https://static.shopvasco.com.br/produtos/moletom-vasco-c-capuz-masculino/06/R2D-20MJ-006/R2D-20MJ-006_zoom1.jpg' },
+  { id:'jaqueta', name:'Jaqueta Corta-Vento Vasco c/ Capuz Masculina', desc:'Leve, resistente ao vento — ótima pro dia de jogo.', cat:'Vestuário', price:199.90, img:'https://static.shopvasco.com.br/produtos/jaqueta-corta-vento-vasco-c-capuz-masculina/06/R2D-20MK-006/R2D-20MK-006_zoom1.jpg' },
+  { id:'bone', name:'Boné Aba Curva SuperCap Vasco Cruz de Malta Snapback', desc:'Bordado com o escudo do clube.', cat:'Acessórios', price:99.90, img:'https://static.shopvasco.com.br/produtos/bone-aba-curva-supercap-vasco-cruz-de-malta-snapback/06/EYS-0304-006/EYS-0304-006_zoom1.jpg' },
+  { id:'mochila', name:'Mochila Nike Academy Team Unissex', desc:'Linha Nike, compartimento reforçado.', cat:'Acessórios', price:249.90, img:'https://static.shopvasco.com.br/produtos/mochila-nike-academy-team-unissex/26/JD8-3107-026/JD8-3107-026_zoom1.jpg' },
+  { id:'caneca', name:'Caneca Térmica com Tampa 500ml Vasco', desc:'Aço inox, mantém a temperatura.', cat:'Colecionáveis', price:69.90, img:'https://static.shopvasco.com.br/produtos/caneca-termica-com-tampa-500ml-vasco/06/BDF-1385-006/BDF-1385-006_zoom1.jpg' },
+  { id:'canecagel', name:'Caneca Gel Isolante Térmico do Vasco 300ml', desc:'Gel isolante mantém a bebida gelada por mais tempo.', cat:'Colecionáveis', price:39.90, img:'https://static.shopvasco.com.br/produtos/caneca-gel-isolante-termico-do-vasco-300ml-preto-cruz/06/BDF-1694-006/BDF-1694-006_zoom1.jpg' },
+  { id:'copocanudo', name:'Copo com Canudo 550ml e Mochila Tipo Saco Vasco', desc:'Kit copo + mochila saco, ideal pro dia de jogo.', cat:'Colecionáveis', price:49.90, img:'https://static.shopvasco.com.br/produtos/copo-com-canudo-550ml-e-mochila-tipo-saco-vasco/06/BDF-1071-006/BDF-1071-006_zoom1.jpg' },
+  { id:'kitcanecas', name:'Kit 2 Canecas Gel Isolante Térmico 400ml Vasco da Gama', desc:'Duas canecas gel — uma pra você, uma pra convidar.', cat:'Colecionáveis', price:79.90, img:'https://static.shopvasco.com.br/produtos/kit-2-canecas-gel-isolante-termico-400-ml-vasco-da-gama/06/BDF-1926-006/BDF-1926-006_zoom1.jpg' },
 ];
 const CATS = ['Todos', 'Camisas', 'Infantil', 'Vestuário', 'Acessórios', 'Colecionáveis'];
 let activeCat = 'Todos';
@@ -87,6 +91,17 @@ function iconFor(cat){
   return `<svg viewBox="0 0 100 100" ${stroke}><path d="M28 30 H62 V72 A10 10 0 0152 82 H38 A10 10 0 0128 72 Z"/><path d="M62 40 H72 A10 10 0 0172 60 H62"/></svg>`;
 }
 
+// Foto real quando disponível (CDN da loja real) — se a imagem falhar ao
+// carregar (link quebrado, produto saiu do catálogo real), cai pro ícone
+// desenhado como fallback, sem quebrar o card.
+function onImgError(imgEl, cat){
+  imgEl.parentElement.innerHTML = iconFor(cat);
+}
+function mediaFor(p){
+  if(!p.img) return iconFor(p.cat);
+  return `<img src="${p.img}" alt="${p.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover;" onerror="onImgError(this, '${p.cat}')">`;
+}
+
 function renderTabs(){
   document.getElementById('cat-tabs').innerHTML = CATS.map(c =>
     `<button class="cat-tab ${c===activeCat?'active':''}" onclick="setActiveCat('${c}')">${c}</button>`
@@ -98,7 +113,7 @@ function renderGrid(){
   const items = activeCat === 'Todos' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat);
   document.getElementById('product-grid').innerHTML = items.map(p => `
     <div class="product-card">
-      <div class="product-thumb">${iconFor(p.cat)}</div>
+      <div class="product-thumb">${mediaFor(p)}</div>
       <div class="product-body">
         <div class="product-cat">${p.cat}</div>
         <div class="product-name">${p.name}</div>

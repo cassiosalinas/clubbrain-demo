@@ -36,28 +36,28 @@ function corsHeaders(event) {
   };
 }
 
-// Catálogo real do ShopVasco (mesmos itens do PRODUCTS array em vasco/loja.html
-// — IDs precisam bater exatamente) — preço fica no servidor de propósito, não
-// é manipulável pelo navegador. Valores em centavos. Nike é a fornecedora real
-// de material esportivo do Vasco a partir de 2026 (pesquisado via ESPN/CNN
-// Brasil — contrato até 2032, substitui a Kappa).
+// Catálogo real do ShopVasco (shopvasco.com.br) — mesmos IDs/nomes/preços do
+// PRODUCTS array em vasco/loja.html (têm que bater exatamente). Preço fica
+// no servidor de propósito, não é manipulável pelo navegador. Valores em
+// centavos, levantados ao vivo direto nas páginas de produto reais em
+// 2026-09-16 (podem divergir um pouco do site com o tempo — promoções mudam).
 const MERCH = {
-  camisa1: { name: 'Camisa I Vasco da Gama Nike 2026', category: 'Camisas', amount: 29990 },
-  camisa2: { name: 'Camisa II Vasco da Gama Nike 2026', category: 'Camisas', amount: 29990 },
-  camisa3: { name: 'Camisa III Vasco da Gama Nike 2026', category: 'Camisas', amount: 31990 },
-  camisagoleiro: { name: 'Camisa Goleiro Vasco da Gama Nike 2026', category: 'Camisas', amount: 27990 },
-  camisatreino: { name: 'Camisa de Treino Nike Vasco', category: 'Camisas', amount: 21990 },
-  camisaretro: { name: 'Camisa Retrô Cruz de Malta', category: 'Camisas', amount: 32990 },
-  camisafeminina: { name: 'Camisa I Nike 2026 Feminina', category: 'Vestuário', amount: 29990 },
-  camisainfantil: { name: 'Camisa Infantil Nike 2026', category: 'Infantil', amount: 15990 },
-  moletom: { name: 'Moletom oficial Gigante da Colina', category: 'Vestuário', amount: 16990 },
-  jaqueta: { name: 'Jaqueta corta-vento Nike Vasco', category: 'Vestuário', amount: 24990 },
-  bone: { name: 'Boné oficial Cruzmaltino', category: 'Acessórios', amount: 8990 },
-  cachecol: { name: 'Cachecol oficial Vasco da Gama', category: 'Acessórios', amount: 4490 },
-  mochila: { name: 'Mochila Nike Vasco da Gama', category: 'Acessórios', amount: 17990 },
-  caneca: { name: 'Caneca oficial Vasco da Gama', category: 'Colecionáveis', amount: 3490 },
-  miniatura: { name: 'Miniatura de São Januário', category: 'Colecionáveis', amount: 6990 },
-  bolamini: { name: 'Mini bola oficial Vasco da Gama', category: 'Colecionáveis', amount: 5990 },
+  camisa1: { name: 'Camisa Vasco I 26/27 s/n Torcedor Nike Masculina', category: 'Camisas', amount: 39990 },
+  camisa2: { name: 'Camisa Vasco II 26/27 s/n Torcedor Nike Masculina', category: 'Camisas', amount: 39990 },
+  camisa3: { name: 'Camisa Vasco III 26/27 s/n Torcedor Nike Masculina', category: 'Camisas', amount: 39990 },
+  camisagoleiro: { name: 'Camisa Vasco III 25/26 s/n Goleiro Kappa Masculina', category: 'Camisas', amount: 34990 },
+  camisatreino: { name: 'Camisa Manga Longa Vasco 26/27 Treino Nike Masculina', category: 'Camisas', amount: 24990 },
+  camisaretro: { name: 'Camiseta Vasco RetrôMania 1974 Nº10 Masculina', category: 'Camisas', amount: 17990 },
+  camisafeminina: { name: 'Camisa Vasco II 26/27 s/n Torcedor Nike Feminina', category: 'Vestuário', amount: 39990 },
+  camisainfantil: { name: 'Camisa Infantil Vasco I 26/27 Torcedor Nike', category: 'Infantil', amount: 34990 },
+  moletom: { name: 'Moletom Vasco c/ Capuz Masculino', category: 'Vestuário', amount: 22990 },
+  jaqueta: { name: 'Jaqueta Corta-Vento Vasco c/ Capuz Masculina', category: 'Vestuário', amount: 19990 },
+  bone: { name: 'Boné Aba Curva SuperCap Vasco Cruz de Malta Snapback', category: 'Acessórios', amount: 9990 },
+  mochila: { name: 'Mochila Nike Academy Team Unissex', category: 'Acessórios', amount: 24990 },
+  caneca: { name: 'Caneca Térmica com Tampa 500ml Vasco', category: 'Colecionáveis', amount: 6990 },
+  canecagel: { name: 'Caneca Gel Isolante Térmico do Vasco 300ml', category: 'Colecionáveis', amount: 3990 },
+  copocanudo: { name: 'Copo com Canudo 550ml e Mochila Tipo Saco Vasco', category: 'Colecionáveis', amount: 4990 },
+  kitcanecas: { name: 'Kit 2 Canecas Gel Isolante Térmico 400ml Vasco da Gama', category: 'Colecionáveis', amount: 7990 },
 };
 
 // Próximos jogos reais do Vasco em São Januário (ver EVENTS_BY_CLUB.vasco no
