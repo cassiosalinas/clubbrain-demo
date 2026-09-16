@@ -204,16 +204,21 @@ exports.handler = async function (event) {
           name: seg.name,
           objectTypeId: '0-1',
           processingType: 'DYNAMIC',
+          // A API exige raiz "OR" com pelo menos um ramo aninhado "AND" —
+          // mesmo pra um filtro único (descoberto via erro 400 real, não
+          // documentado com clareza).
           filterBranch: {
-            filterBranchType: 'AND',
+            filterBranchType: 'OR',
             filterBranches: [{
               filterBranchType: 'AND',
+              filterBranches: [],
               filters: [{
                 filterType: 'PROPERTY',
                 property: seg.property,
                 operation: { operationType: 'STRING', operator: 'EQ', value: seg.value },
               }],
             }],
+            filters: [],
           },
         };
         const r = await hsFetch('/crm/v3/lists', { method: 'POST', body: JSON.stringify(body) });
