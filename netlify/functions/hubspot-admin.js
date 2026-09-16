@@ -735,11 +735,15 @@ exports.handler = async function (event) {
         return data.total || 0;
       };
 
-      const [total, socios, ...segmentTotals] = await Promise.all([
-        countBy('time_coracao', { operator: 'EQ', value: 'Vasco da Gama' }),
-        countBy('e_socio_torcedor', { operator: 'EQ', value: 'sim' }),
-        ...SEGMENT_LISTS.map(seg => countBy(seg.property, { operator: 'EQ', value: seg.value })),
-      ]);
+      // Sequencial, não Promise.all — 8 chamadas simultâneas estouraram o
+      // limite "por segundo" da conta HubSpot (erro real: "You have reached
+      // your secondly limit."), descoberto só depois de testar ao vivo.
+      const total = await countBy('time_coracao', { operator: 'EQ', value: 'Vasco da Gama' });
+      const socios = await countBy('e_socio_torcedor', { operator: 'EQ', value: 'sim' });
+      const segmentTotals = [];
+      for (const seg of SEGMENT_LISTS) {
+        segmentTotals.push(await countBy(seg.property, { operator: 'EQ', value: seg.value }));
+      }
 
       const segments = SEGMENT_LISTS.map((seg, i) => ({ name: seg.name, total: segmentTotals[i] }));
       return {
