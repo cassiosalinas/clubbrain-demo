@@ -118,6 +118,8 @@ a{ color:var(--gold); }
 }
 .fan-footer{ text-align:center; padding:28px 20px 40px; color:var(--paper-dim); font-size:12px; }
 .fan-footer a{ color:var(--paper-dim); text-decoration:underline; }
+.brand-wordmark-mini{ font-weight:800; letter-spacing:.01em; color:var(--paper-dim); }
+.brand-wordmark-mini .bw-a{ color:var(--gold); }
 
 .spinner{ width:16px; height:16px; border-radius:50%; border:2px solid rgba(11,11,12,.25); border-top-color:var(--ink); animation:spin .7s linear infinite; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
