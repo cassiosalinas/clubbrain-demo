@@ -87,6 +87,8 @@ const ROOMS = [
   {
     year: '1923',
     title: 'A virada que mudou o futebol brasileiro',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/It%C3%A1lia_e_Fausto_pelo_Vasco_em_S%C3%A3o_Janu%C3%A1rio.jpg/500px-It%C3%A1lia_e_Fausto_pelo_Vasco_em_S%C3%A3o_Janu%C3%A1rio.jpg',
+    credit: 'Itália e Fausto pelo Vasco em São Januário · Wikimedia Commons',
     icon: `<svg viewBox="0 0 100 100" fill="none" stroke="#f6f4ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="50" cy="50" r="28"/>
       <path d="M50 22 L58 36 L50 46 L42 36 Z"/>
@@ -98,10 +100,13 @@ const ROOMS = [
       'Em 1923, na sua primeira participação na elite do Campeonato Carioca, o Vasco foi <b>campeão</b> — com um time formado por jogadores negros e da classe trabalhadora, numa época de forte elitismo no futebol do Rio.',
       'A reação de boa parte dos outros clubes foi abandonar a liga. Mas o precedente estava aberto: o Vasco havia rompido, na prática, uma barreira social e racial que o futebol brasileiro carregava — um dos capítulos mais importantes da história do esporte no país.',
     ],
+    video: { id:'M7poDJDnzmo', title:'Camisas Negras 100 anos — a história do lendário time do Vasco da Gama' },
   },
   {
     year: '1927',
     title: 'São Januário, o Gigante da Colina',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Est%C3%A1dio_de_S%C3%A3o_Janu%C3%A1rio.jpg/500px-Est%C3%A1dio_de_S%C3%A3o_Janu%C3%A1rio.jpg',
+    credit: 'Estádio de São Januário · Wikimedia Commons',
     icon: `<svg viewBox="0 0 100 100" fill="none" stroke="#f6f4ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 72 Q12 28 50 28 Q88 28 88 72"/>
       <path d="M12 72 H88"/>
@@ -115,6 +120,8 @@ const ROOMS = [
   {
     year: 'Lenda',
     title: 'Roberto Dinamite, o camisa 9 eterno',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Roberto_Dinamite_Vasco_da_Gama.jpg/500px-Roberto_Dinamite_Vasco_da_Gama.jpg',
+    credit: 'Roberto Dinamite · Wikimedia Commons',
     icon: `<svg viewBox="0 0 100 100" fill="none" stroke="#f6f4ee" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
       <path d="M32 14 L16 24 L21 40 L31 35 L31 88 L69 88 L69 35 L79 40 L84 24 L68 14 L59 20 Q50 26 41 20 Z"/>
       <text x="50" y="66" font-size="26" text-anchor="middle" fill="#ffa400" stroke="none" font-family="Oswald, sans-serif" font-weight="600">9</text>
@@ -127,6 +134,8 @@ const ROOMS = [
   {
     year: 'Taças',
     title: 'A sala das conquistas',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/VavaBelliniOrlandoVasco.jpg/500px-VavaBelliniOrlandoVasco.jpg',
+    credit: 'Craques históricos do Vasco · Wikimedia Commons',
     icon: `<svg viewBox="0 0 100 100" fill="none" stroke="#f6f4ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M35 18 H65 V38 A15 15 0 01 35 38 Z"/>
       <path d="M35 22 H23 A8 8 0 0031 30 M65 22 H77 A8 8 0 0169 30"/>
@@ -152,14 +161,30 @@ function renderRoomNav(){
     </div>`).join('');
 }
 
+function onRoomImgError(imgEl, roomIndex){
+  imgEl.closest('.room-visual').innerHTML = ROOMS[roomIndex].icon;
+}
 function renderRoomStage(){
   const r = ROOMS[currentRoom];
+  const visual = r.img
+    ? `<img src="${r.img}" alt="${r.title}" loading="lazy" style="width:100%; height:100%; object-fit:cover;" onerror="onRoomImgError(this, ${currentRoom})">`
+    : r.icon;
+  const video = r.video
+    ? `<div class="room-video">
+        <div class="room-video-label">🎥 Vídeo real</div>
+        <div class="room-video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${r.video.id}" title="${r.video.title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+      </div>`
+    : '';
   document.getElementById('room-stage').innerHTML = `
-    <div class="room-visual">${r.icon}</div>
+    <div>
+      <div class="room-visual">${visual}</div>
+      ${r.credit ? `<div class="room-credit">📷 ${r.credit}</div>` : ''}
+    </div>
     <div>
       <div class="room-year">SALA ${currentRoom+1} · ${r.year}</div>
       <h2 class="room-title">${r.title}</h2>
       ${r.text.map(t => `<div class="room-text">${t}</div>`).join('')}
+      ${video}
     </div>`;
   document.getElementById('museu-progress-fill').style.width = Math.round(((currentRoom+1)/ROOMS.length)*100) + '%';
   document.getElementById('museu-progress-label').textContent = `Sala ${currentRoom+1} de ${ROOMS.length}`;

@@ -108,33 +108,55 @@ async function initFanLogin() {
 // "vantagem de sócio" visível nos três lugares, não só escondida numa
 // página. name/brand/cat/gmv vêm direto da planilha de parceiros da Minu;
 // pointsCost é a conversão local pro sistema de pontos do clube (10 pontos
-// = R$1, mesma ordem de grandeza do pontos_loyalty já usado no CRM).
+// = R$1, mesma ordem de grandeza do pontos_loyalty já usado no CRM). "icon"
+// é um desenho simples (não o logo real da marca — evita qualquer questão
+// de marca registrada) numa cor de identificação por parceiro.
 const MINU_REWARDS = [
-  { brand: 'Uber', cat: 'Transporte', name: 'Desconto de R$30 para uma viagem no app Uber', gmv: 30 },
-  { brand: 'Zé Delivery', cat: 'Alimentação', name: 'Cupom de R$50 para usar no Zé Delivery', gmv: 50 },
-  { brand: 'Outback', cat: 'Alimentação', name: 'Cartão-presente de R$100 para usar no Outback', gmv: 100 },
-  { brand: 'Netshoes', cat: 'Compras', name: 'Desconto de R$100 na loja virtual (compras acima de R$600)', gmv: 100 },
-  { brand: 'Asics', cat: 'Compras', name: 'Crédito de R$50 para compras de produtos ASICS', gmv: 50 },
-  { brand: 'Decathlon', cat: 'Compras', name: 'Cartão-presente de R$70', gmv: 70 },
-  { brand: 'Havaianas', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50 },
-  { brand: 'Xbox Cash', cat: 'Games', name: 'Cartão-presente Xbox Cash de R$50', gmv: 50 },
-  { brand: 'Sony Playstation', cat: 'Games', name: 'Cartão-presente PlayStation de R$60', gmv: 60 },
-  { brand: 'Cinemark', cat: 'Entretenimento', name: '2 Ingressos de Cinema 2D', gmv: 80 },
-  { brand: 'Deezer', cat: 'Entretenimento', name: 'Deezer Premium — Assinatura Mensal', gmv: 24 },
-  { brand: 'Petz', cat: 'Pets', name: 'Cartão-presente de R$30', gmv: 30 },
-  { brand: 'Riachuelo', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50 },
-  { brand: 'AACD', cat: 'Solidariedade', name: 'Doação para os projetos da AACD', gmv: 1 },
+  { brand: 'Uber', cat: 'Transporte', name: 'Desconto de R$30 para uma viagem no app Uber', gmv: 30, icon: 'car', color: '#1fae64' },
+  { brand: 'Zé Delivery', cat: 'Alimentação', name: 'Cupom de R$50 para usar no Zé Delivery', gmv: 50, icon: 'drink', color: '#ffd400' },
+  { brand: 'Outback', cat: 'Alimentação', name: 'Cartão-presente de R$100 para usar no Outback', gmv: 100, icon: 'fork', color: '#c0392b' },
+  { brand: 'Netshoes', cat: 'Compras', name: 'Desconto de R$100 na loja virtual (compras acima de R$600)', gmv: 100, icon: 'shoe', color: '#ff7a00' },
+  { brand: 'Asics', cat: 'Compras', name: 'Crédito de R$50 para compras de produtos ASICS', gmv: 50, icon: 'shoe', color: '#3d5a99' },
+  { brand: 'Decathlon', cat: 'Compras', name: 'Cartão-presente de R$70', gmv: 70, icon: 'dumbbell', color: '#0082c3' },
+  { brand: 'Havaianas', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50, icon: 'sandal', color: '#00a19a' },
+  { brand: 'Xbox Cash', cat: 'Games', name: 'Cartão-presente Xbox Cash de R$50', gmv: 50, icon: 'controller', color: '#107c10' },
+  { brand: 'Sony Playstation', cat: 'Games', name: 'Cartão-presente PlayStation de R$60', gmv: 60, icon: 'controller', color: '#2e6fd9' },
+  { brand: 'Cinemark', cat: 'Entretenimento', name: '2 Ingressos de Cinema 2D', gmv: 80, icon: 'film', color: '#e4002b' },
+  { brand: 'Deezer', cat: 'Entretenimento', name: 'Deezer Premium — Assinatura Mensal', gmv: 24, icon: 'music', color: '#a238ff' },
+  { brand: 'Petz', cat: 'Pets', name: 'Cartão-presente de R$30', gmv: 30, icon: 'paw', color: '#f39200' },
+  { brand: 'Riachuelo', cat: 'Compras', name: 'Cartão-presente de R$50', gmv: 50, icon: 'hanger', color: '#ee2737' },
+  { brand: 'AACD', cat: 'Solidariedade', name: 'Doação para os projetos da AACD', gmv: 1, icon: 'heart', color: '#ff5c72' },
 ];
+
+const REWARD_ICON_PATHS = {
+  car: '<path d="M20 60 L26 40 Q30 34 40 34 H60 Q70 34 74 40 L80 60"/><rect x="14" y="58" width="72" height="16" rx="4"/><circle cx="30" cy="76" r="7"/><circle cx="70" cy="76" r="7"/>',
+  drink: '<path d="M42 18 H58 V30 L66 42 V85 A6 6 0 0160 91 H40 A6 6 0 0134 85 V42 L42 30 Z"/><line x1="34" y1="55" x2="66" y2="55"/>',
+  fork: '<path d="M30 15 V85 M25 15 V35 A5 5 0 0030 40 A5 5 0 0035 35 V15"/><path d="M70 15 Q60 25 60 40 Q60 50 70 55 V85"/>',
+  shoe: '<path d="M15 70 Q15 55 30 52 L55 45 Q65 42 72 48 L82 58 Q86 62 86 68 V75 H15 Z"/><path d="M30 52 L35 65 M45 49 L50 63"/>',
+  dumbbell: '<rect x="10" y="42" width="12" height="16" rx="2"/><rect x="78" y="42" width="12" height="16" rx="2"/><line x1="22" y1="50" x2="78" y2="50" stroke-width="5"/>',
+  sandal: '<path d="M20 55 Q20 40 50 40 Q80 40 80 55 Q80 75 60 78 H30 Q20 75 20 55 Z"/><path d="M50 40 V20 M50 20 L38 30 M50 20 L62 30"/>',
+  controller: '<rect x="14" y="38" width="72" height="36" rx="16"/><circle cx="32" cy="56" r="3.5" fill="currentColor" stroke="none"/><circle cx="24" cy="56" r="3.5" fill="currentColor" stroke="none"/><circle cx="28" cy="52" r="3.5" fill="currentColor" stroke="none"/><circle cx="28" cy="60" r="3.5" fill="currentColor" stroke="none"/><circle cx="68" cy="50" r="3.5" fill="currentColor" stroke="none"/><circle cx="76" cy="58" r="3.5" fill="currentColor" stroke="none"/><circle cx="60" cy="58" r="3.5" fill="currentColor" stroke="none"/><circle cx="68" cy="66" r="3.5" fill="currentColor" stroke="none"/>',
+  film: '<rect x="18" y="25" width="64" height="50" rx="4"/><circle cx="30" cy="35" r="3" fill="currentColor" stroke="none"/><circle cx="30" cy="65" r="3" fill="currentColor" stroke="none"/><circle cx="70" cy="35" r="3" fill="currentColor" stroke="none"/><circle cx="70" cy="65" r="3" fill="currentColor" stroke="none"/><line x1="42" y1="25" x2="42" y2="75"/><line x1="58" y1="25" x2="58" y2="75"/>',
+  music: '<circle cx="30" cy="72" r="9"/><circle cx="68" cy="65" r="9"/><path d="M39 72 V25 L77 18 V65"/>',
+  paw: '<circle cx="50" cy="65" r="15"/><circle cx="26" cy="42" r="9"/><circle cx="74" cy="42" r="9"/><circle cx="37" cy="26" r="8"/><circle cx="63" cy="26" r="8"/>',
+  hanger: '<circle cx="50" cy="20" r="5"/><path d="M50 25 V33 M18 68 L50 33 L82 68 H18 Z"/>',
+  heart: '<path d="M50 82 C18 58 13 38 29 27 C40 19 50 27 50 34 C50 27 60 19 71 27 C87 38 82 58 50 82 Z"/>',
+};
+function rewardIconSvg(iconName, color){
+  const path = REWARD_ICON_PATHS[iconName] || REWARD_ICON_PATHS.heart;
+  return `<svg viewBox="0 0 100 100" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="color:${color};">${path}</svg>`;
+}
 
 // targetId é opcional — default 'reward-grid', mas dá pra ter mais de uma
 // grade na mesma página (não usado hoje, mas mantém flexível).
 function renderRewards(targetId) {
   const el = document.getElementById(targetId || 'reward-grid');
   if (!el) return;
-  el.innerHTML = MINU_REWARDS.map(r => {
+  el.innerHTML = MINU_REWARDS.map((r, i) => {
     const pts = r.gmv * 10;
     return `
     <div class="reward-card">
+      <div class="reward-icon" style="background:${r.color}1a; border-color:${r.color}44;">${rewardIconSvg(r.icon, r.color)}</div>
       <div class="reward-top">
         <span class="reward-brand">${r.brand}</span>
         <span class="reward-real-badge">🟢 catálogo real</span>
@@ -142,11 +164,43 @@ function renderRewards(targetId) {
       <div class="reward-cat">${r.cat}</div>
       <div class="reward-name">${r.name}</div>
       <div class="reward-cost">${pts.toLocaleString('pt-BR')}<small> pontos</small></div>
-      <button class="reward-redeem" onclick="resgatar('${r.brand.replace(/'/g, "\\'")}')">Resgatar</button>
+      <button class="reward-redeem" onclick="resgatar(${i})">Resgatar</button>
     </div>`;
   }).join('');
 }
 
-function resgatar(brand) {
-  alert(`"${brand}" faz parte do catálogo real da Minu, mas o resgate em si ainda é simulado nesta demo — falta o acesso à API de produção da Minu para emitir o voucher de verdade. Assim que o clube tiver esse acesso, este botão vira uma chamada real.`);
+// Resgate — gera um voucher fake (código aleatório) na hora, pra demo. Não
+// desconta pontos de verdade nem chama nenhuma API externa.
+function generateVoucherCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'MINU-';
+  for(let i = 0; i < 8; i++){
+    if(i === 4) code += '-';
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+function closeVoucherModal(){
+  document.querySelector('.voucher-overlay')?.remove();
+}
+function resgatar(i){
+  const r = MINU_REWARDS[i];
+  const code = generateVoucherCode();
+  const validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR');
+  const overlay = document.createElement('div');
+  overlay.className = 'voucher-overlay';
+  overlay.onclick = (e) => { if(e.target === overlay) closeVoucherModal(); };
+  overlay.innerHTML = `
+    <div class="voucher-modal">
+      <div class="voucher-check">✓</div>
+      <div class="voucher-title">Voucher gerado!</div>
+      <div class="reward-icon" style="width:64px; height:64px; margin:0 auto 14px; background:${r.color}1a; border-color:${r.color}44;">${rewardIconSvg(r.icon, r.color)}</div>
+      <div class="voucher-brand">${r.brand}</div>
+      <div class="voucher-reward">${r.name}</div>
+      <div class="voucher-code-label">Seu código de resgate</div>
+      <div class="voucher-code">${code}</div>
+      <div class="voucher-note">Válido até ${validUntil} · apresente esse código no app ou site do parceiro</div>
+      <button class="fan-btn" onclick="closeVoucherModal()">Fechar</button>
+    </div>`;
+  document.body.appendChild(overlay);
 }
