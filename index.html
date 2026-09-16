@@ -834,6 +834,7 @@ canvas{ max-width:100%; }
       <div class="subtabs" id="clubmgmt-subtabs">
         <div class="subtab active" data-sub="performance">Performance</div>
         <div class="subtab" data-sub="elenco">Elenco profissional</div>
+        <div class="subtab" data-sub="intel">Football Intelligence</div>
         <div class="subtab" data-sub="medico">Departamento Médico</div>
         <div class="subtab" data-sub="scouting">Scouting</div>
         <div class="subtab" data-sub="base">Categorias de base</div>
@@ -861,6 +862,16 @@ canvas{ max-width:100%; }
             <tbody id="elenco-table"></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- Sub: Football Intelligence (Player 360) -->
+      <div class="subview" id="clubmgmt-sub-intel">
+        <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(108,107,255,.08), var(--surface));">
+          <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+            A visão empresarial do futebol: em vez de só estatística de jogo, cruza o elenco com custo, contrato e valor de mercado. Clique num jogador para abrir o <b style="color:var(--text);">Player 360</b> completo. Minutos, gols, assistências, salário e prazo de contrato são estimativas ilustrativas — score, valor de marca e valor de mercado seguem a mesma base do Elenco profissional.
+          </div>
+        </div>
+        <div class="grid g-3" id="football-intel-grid"></div>
       </div>
 
       <!-- Sub: Performance & Saude -->
@@ -3918,6 +3929,74 @@ function renderElencoTable(){
       : 'Elenco oficial real, pesquisado publicamente (nomes, posições e idades). Valor de mercado em € reflete Transfermarkt quando disponível; score de performance e valor de marca são estimativas para fins de demonstração.';
   }
 }
+
+/* ---------- Football Intelligence (Player 360) — visão empresarial do elenco ----------
+   Minutos, gols, assistências, salário e prazo de contrato são derivados de forma
+   determinística (seed por clube+jogador) — ilustrativos, como o resto do app.
+   Score, valor de marca e valor de mercado reaproveitam o mesmo dado do Elenco profissional. */
+function getFootballIntelData(){
+  const squad = SQUAD_BY_CLUB[currentClubId] || SQUAD_BY_CLUB.flamengo;
+  const rows = squad[elencoGender] || squad.masc;
+  return rows.map(p=>{
+    const rnd = mulberry32(hashSeed(currentClubId + ':' + elencoGender + ':intel:' + p.name));
+    const minutesPlayed = Math.round(400 + rnd()*2000);
+    const goals = Math.round(rnd()*14);
+    const assists = Math.round(rnd()*10);
+    const contractMonths = Math.round(2 + rnd()*34);
+    const salaryAnnual = parseMarketToM(p.brand) * 1000000 * (0.6 + rnd()*0.8);
+    const costPerMinute = minutesPlayed > 0 ? salaryAnnual / minutesPlayed : 0;
+    const goalContributions = goals + assists;
+    const costPerGoalContribution = goalContributions > 0 ? salaryAnnual / goalContributions : null;
+    const contractRisk = contractMonths <= 6 ? 'Alto' : (contractMonths <= 14 ? 'Médio' : 'Baixo');
+    const contractRiskColor = contractMonths <= 6 ? red : (contractMonths <= 14 ? amber : '#22e07a');
+    const transferOpportunity = Math.max(0, Math.min(100, Math.round((p.score||70) - contractMonths*0.9 + rnd()*14)));
+    return { ...p, minutesPlayed, goals, assists, contractMonths, salaryAnnual, costPerMinute, costPerGoalContribution, contractRisk, contractRiskColor, transferOpportunity };
+  });
+}
+function renderFootballIntel(){
+  const el = document.getElementById('football-intel-grid');
+  if(!el) return;
+  const data = getFootballIntelData();
+  el.innerHTML = data.map(p=>`
+    <div class="card clickable" onclick="showPlayerIntelModal('${p.name.replace(/'/g,"\\'")}')">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px;">
+        <div>
+          <div style="font-weight:700; font-size:13.5px;">${p.name}</div>
+          <div class="hero-note">${p.pos} · ${p.age} anos</div>
+        </div>
+        <span class="tag" style="color:${p.contractRiskColor}; border-color:${p.contractRiskColor}44; background:${p.contractRiskColor}1f; white-space:nowrap;">Contrato ${p.contractRisk}</span>
+      </div>
+      <div class="grid g-2" style="gap:8px;">
+        <div><div class="hero-note">Custo/minuto</div><div class="value" style="font-size:14.5px;">R$ ${Math.round(p.costPerMinute).toLocaleString('pt-BR')}</div></div>
+        <div><div class="hero-note">Contribuições (G+A)</div><div class="value" style="font-size:14.5px;">${p.goals}+${p.assists}</div></div>
+      </div>
+      <div class="hero-note" style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">Valor de mercado ${p.market} · ver Player 360 →</div>
+    </div>`).join('');
+}
+function showPlayerIntelModal(name){
+  const p = getFootballIntelData().find(x=>x.name===name);
+  if(!p) return;
+  showModal(
+    `<h3>${p.name} <span class="hero-note" style="font-weight:400;">— ${p.pos}, ${p.age} anos</span></h3>`,
+    `<div class="grid g-2" style="margin:14px 0;">
+      <div><div class="hero-note">Score de performance</div><div class="value" style="font-size:17px;">${p.score}/100</div></div>
+      <div><div class="hero-note">Valor de mercado</div><div class="value" style="font-size:17px;">${p.market}</div></div>
+      <div><div class="hero-note">Valor de marca</div><div class="value" style="font-size:17px;">${p.brand}</div></div>
+      <div><div class="hero-note">Salário anual estimado</div><div class="value" style="font-size:17px;">${fmtCompactBRL(p.salaryAnnual)}</div></div>
+      <div><div class="hero-note">Minutos jogados (temporada)</div><div class="value" style="font-size:17px;">${p.minutesPlayed.toLocaleString('pt-BR')}</div></div>
+      <div><div class="hero-note">Gols + Assistências</div><div class="value" style="font-size:17px;">${p.goals} + ${p.assists}</div></div>
+      <div><div class="hero-note">Custo por minuto</div><div class="value" style="font-size:17px;">R$ ${Math.round(p.costPerMinute).toLocaleString('pt-BR')}</div></div>
+      <div><div class="hero-note">Custo por G+A</div><div class="value" style="font-size:17px;">${p.costPerGoalContribution ? fmtCompactBRL(p.costPerGoalContribution) : '—'}</div></div>
+      <div><div class="hero-note">Contrato — prazo restante</div><div class="value" style="font-size:17px;">${p.contractMonths} meses</div></div>
+      <div><div class="hero-note">Risco de contrato</div><div class="value" style="font-size:17px; color:${p.contractRiskColor};">${p.contractRisk}</div></div>
+    </div>
+    <div class="hero-note" style="margin-bottom:6px;">Transfer Opportunity</div>
+    <div class="progress" style="margin-bottom:4px;"><div style="width:${p.transferOpportunity}%; background:${teal};"></div></div>
+    <div class="hero-note" style="margin-bottom:14px;">${p.transferOpportunity}/100 — ${p.transferOpportunity>=70 ? 'janela de venda favorável, valor em alta' : p.transferOpportunity>=40 ? 'estável, sem pressão de mercado' : 'baixa liquidez de mercado no momento'}</div>
+    <div class="status-row"><span class="chip-avatar" style="background:${gold}; width:26px; height:26px; font-size:11px;">F</span><div style="flex:1; font-size:12.5px;"><b style="color:${gold};">FinanceBrain:</b> ${p.contractRisk === 'Alto' ? `Contrato de ${p.name} vence em ${p.contractMonths} meses — iniciar renegociação ou avaliar venda antes da perda de valor.` : `Sem urgência contratual em ${p.name} — janela de ${p.contractMonths} meses para decisão.`}</div></div>`
+  );
+}
+
 function renderBaseGrid(){
   const cats = BASE_CATEGORIES_BY_CLUB[currentClubId] || BASE_CATEGORIES_BY_CLUB.flamengo;
   document.getElementById('base-grid').innerHTML = cats.map(c=>`
@@ -3974,7 +4053,7 @@ function renderMarca(){
 function refreshClubManagementForClub(){
   if(!document.getElementById('elenco-table')) return;
   renderTeamStats(); renderElencoTable(); renderBaseGrid(); renderAtivosGrid(); renderComissaoGrid(); renderViagensTable(); renderPatrocinioTable(); renderMarca();
-  renderPerformanceTab(); renderMedicalTab(); renderScoutingTab();
+  renderPerformanceTab(); renderMedicalTab(); renderScoutingTab(); renderFootballIntel();
 }
 function buildClubManagement(){
   document.getElementById('clubmgmt-subtabs').addEventListener('click', (e)=>{
@@ -3990,6 +4069,7 @@ function buildClubManagement(){
     t.classList.add('active');
     elencoGender = t.dataset.gender;
     renderElencoTable();
+    renderFootballIntel();
   });
   refreshClubManagementForClub();
 }
