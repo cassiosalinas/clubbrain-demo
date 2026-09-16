@@ -9,8 +9,11 @@
 //
 // A chave HUBSPOT_API_KEY fica só no servidor (variável de ambiente no
 // Netlify), nunca exposta no navegador. Chame esta function com:
-//   { "action": "setup" } → cria as 35 propriedades customizadas no Contact
-//                           (idempotente — roda de novo sem duplicar)
+//   { "action": "setup" } → cria os 9 grupos de propriedade + as 35
+//                           propriedades customizadas no Contact, cada uma
+//                           no grupo certo (idempotente — roda de novo sem
+//                           duplicar; se a propriedade já existe só move ela
+//                           pro grupo certo via PATCH)
 //   { "action": "seed" }  → cria/atualiza os 15 torcedores fictícios originais
 //                           (upsert por e-mail, idempotente também)
 //   { "action": "seed_bulk", "offset": N, "limit": 100 } → cria/atualiza mais
@@ -47,11 +50,21 @@
 //                           pontos_loyalty existente) — usado pelo Museu
 //                           Virtual (vasco/virtual.html) pra recompensar
 //                           visita/engajamento de verdade no HubSpot.
+//   { "action": "redeem_reward", "email":"...", "points": 300, "reward_name":"..." }
+//                           → espelho de award_loyalty_points, mas debita
+//                           pontos_loyalty (com checagem de saldo — nunca
+//                           deixa negativo) — usado no resgate de
+//                           recompensas Minu (ShopVasco/Sócio/Museu).
 //   { "action": "create_retention_tasks" } → Ato 3 da jornada: cria 1 Tarefa
 //                           real no HubSpot (aba Tasks) por torcedor com
 //                           risco_churn=alto — ação de verdade que o time de
 //                           marketing/retenção vê e trabalha, disparada pela
 //                           Campanhas & Promoções no painel.
+//
+// fulfill_stripe_order, award_loyalty_points e redeem_reward também gravam
+// uma Nota real associada ao contato (timeline/Atividade nativa do HubSpot)
+// a cada interação — não só a propriedade ultima_acao_descricao, que guarda
+// só a mais recente.
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → HUBSPOT_API_KEY
@@ -79,6 +92,25 @@ function corsHeaders(event) {
 // discutidas: identidade, relação com o clube, comportamento/engajamento,
 // comercial/financeiro, risco/retenção, comunicação, segmentação/IA e
 // avançado (embaixador, acessibilidade, geração familiar).
+// Grupos de propriedade reais no HubSpot (aparecem como seções no painel
+// lateral do contato, na própria tela nativa do HubSpot) — um por categoria
+// discutida com o usuário, em vez de jogar as 35 propriedades customizadas
+// dentro do grupo genérico "Informações de contato" (onde ficavam
+// misturadas com campo de venda B2B tipo empresa/cargo, difícil de achar).
+// Criados pela action "setup" via POST /crm/v3/properties/contacts/groups
+// (idempotente — 409 se já existe).
+const PROPERTY_GROUPS = [
+  { name: 'torcedor_core', displayName: 'Torcedor · Visão Geral' },
+  { name: 'torcedor_identidade', displayName: 'Torcedor · Identidade & Perfil' },
+  { name: 'torcedor_relacao', displayName: 'Torcedor · Relação com o Clube' },
+  { name: 'torcedor_engajamento', displayName: 'Torcedor · Comportamento & Engajamento' },
+  { name: 'torcedor_comercial', displayName: 'Torcedor · Comercial & Financeiro' },
+  { name: 'torcedor_risco', displayName: 'Torcedor · Risco & Retenção' },
+  { name: 'torcedor_atividade', displayName: 'Torcedor · Última Atividade' },
+  { name: 'torcedor_comunicacao', displayName: 'Torcedor · Comunicação & Preferências' },
+  { name: 'torcedor_ia_avancado', displayName: 'Torcedor · IA & Avançado' },
+];
+
 const CUSTOM_PROPERTIES = [
   // -- já existia --
   // "nivel_socio" sozinho deixava ambíguo se 'basico' = sócio no nível mais
@@ -86,14 +118,14 @@ const CUSTOM_PROPERTIES = [
   // demo já tem em TIER_DB_BY_CLUB). e_socio_torcedor abaixo resolve isso
   // com um filtro direto, sem depender de interpretar o valor de nivel_socio.
   {
-    name: 'e_socio_torcedor', label: 'É sócio-torcedor?', type: 'enumeration', fieldType: 'select',
+    name: 'e_socio_torcedor', label: 'É sócio-torcedor?', type: 'enumeration', fieldType: 'select', group: 'torcedor_core',
     options: [
       { label: 'Sim', value: 'sim' },
       { label: 'Não', value: 'nao' },
     ],
   },
   {
-    name: 'nivel_socio', label: 'Nível de sócio-torcedor', type: 'enumeration', fieldType: 'select',
+    name: 'nivel_socio', label: 'Nível de sócio-torcedor', type: 'enumeration', fieldType: 'select', group: 'torcedor_core',
     options: [
       { label: 'Básico (não-sócio)', value: 'basico' },
       { label: 'Bronze', value: 'bronze' },
@@ -102,26 +134,26 @@ const CUSTOM_PROPERTIES = [
       { label: 'Platina', value: 'platina' },
     ],
   },
-  { name: 'fan_score', label: 'Fan Score (0-100)', type: 'number', fieldType: 'number' },
-  { name: 'jogador_favorito', label: 'Jogador favorito', type: 'string', fieldType: 'text' },
-  { name: 'ltv_torcedor', label: 'LTV do torcedor (R$)', type: 'number', fieldType: 'number' },
+  { name: 'fan_score', label: 'Fan Score (0-100)', type: 'number', fieldType: 'number', group: 'torcedor_core' },
+  { name: 'jogador_favorito', label: 'Jogador favorito', type: 'string', fieldType: 'text', group: 'torcedor_core' },
+  { name: 'ltv_torcedor', label: 'LTV do torcedor (R$)', type: 'number', fieldType: 'number', group: 'torcedor_core' },
   {
-    name: 'risco_churn', label: 'Risco de churn', type: 'enumeration', fieldType: 'select',
+    name: 'risco_churn', label: 'Risco de churn', type: 'enumeration', fieldType: 'select', group: 'torcedor_core',
     options: [
       { label: 'Baixo', value: 'baixo' },
       { label: 'Médio', value: 'medio' },
       { label: 'Alto', value: 'alto' },
     ],
   },
-  { name: 'propensao_upgrade', label: 'Propensão de upgrade (%)', type: 'number', fieldType: 'number' },
-  { name: 'segmento_torcedor', label: 'Segmento do torcedor', type: 'string', fieldType: 'text' },
-  { name: 'socio_desde', label: 'Sócio-torcedor desde', type: 'date', fieldType: 'date' },
-  { name: 'time_coracao', label: 'Time do coração', type: 'string', fieldType: 'text' },
+  { name: 'propensao_upgrade', label: 'Propensão de upgrade (%)', type: 'number', fieldType: 'number', group: 'torcedor_core' },
+  { name: 'segmento_torcedor', label: 'Segmento do torcedor', type: 'string', fieldType: 'text', group: 'torcedor_core' },
+  { name: 'socio_desde', label: 'Sócio-torcedor desde', type: 'date', fieldType: 'date', group: 'torcedor_core' },
+  { name: 'time_coracao', label: 'Time do coração', type: 'string', fieldType: 'text', group: 'torcedor_core' },
 
   // -- 1. Identidade & perfil --
-  { name: 'data_nascimento', label: 'Data de nascimento', type: 'date', fieldType: 'date' },
+  { name: 'data_nascimento', label: 'Data de nascimento', type: 'date', fieldType: 'date', group: 'torcedor_identidade' },
   {
-    name: 'genero', label: 'Gênero', type: 'enumeration', fieldType: 'select',
+    name: 'genero', label: 'Gênero', type: 'enumeration', fieldType: 'select', group: 'torcedor_identidade',
     options: [
       { label: 'Masculino', value: 'masculino' },
       { label: 'Feminino', value: 'feminino' },
@@ -130,7 +162,7 @@ const CUSTOM_PROPERTIES = [
     ],
   },
   {
-    name: 'fonte_aquisicao', label: 'Fonte de aquisição', type: 'enumeration', fieldType: 'select',
+    name: 'fonte_aquisicao', label: 'Fonte de aquisição', type: 'enumeration', fieldType: 'select', group: 'torcedor_identidade',
     options: [
       { label: 'App', value: 'app' },
       { label: 'Loja física', value: 'loja_fisica' },
@@ -143,7 +175,7 @@ const CUSTOM_PROPERTIES = [
 
   // -- 2. Relação com o clube --
   {
-    name: 'status_assinatura', label: 'Status da assinatura', type: 'enumeration', fieldType: 'select',
+    name: 'status_assinatura', label: 'Status da assinatura', type: 'enumeration', fieldType: 'select', group: 'torcedor_relacao',
     options: [
       { label: 'Ativo', value: 'ativo' },
       { label: 'Inadimplente', value: 'inadimplente' },
@@ -151,33 +183,48 @@ const CUSTOM_PROPERTIES = [
       { label: 'Não aplicável', value: 'nao_aplicavel' },
     ],
   },
-  { name: 'plano_mensalidade', label: 'Plano — mensalidade (R$)', type: 'number', fieldType: 'number' },
-  { name: 'torcedor_desde', label: 'Torcedor desde (independente de ser sócio)', type: 'date', fieldType: 'date' },
-  { name: 'torcida_organizada', label: 'Torcida organizada', type: 'string', fieldType: 'text' },
+  { name: 'plano_mensalidade', label: 'Plano — mensalidade (R$)', type: 'number', fieldType: 'number', group: 'torcedor_relacao' },
+  { name: 'torcedor_desde', label: 'Torcedor desde (independente de ser sócio)', type: 'date', fieldType: 'date', group: 'torcedor_relacao' },
+  { name: 'torcida_organizada', label: 'Torcida organizada', type: 'string', fieldType: 'text', group: 'torcedor_relacao' },
 
   // -- 3. Comportamento & engajamento --
-  { name: 'partidas_assistidas_temporada', label: 'Partidas assistidas na temporada', type: 'number', fieldType: 'number' },
-  { name: 'taxa_presenca', label: 'Taxa de presença (%)', type: 'number', fieldType: 'number' },
-  { name: 'setor_preferido', label: 'Setor preferido no estádio', type: 'string', fieldType: 'text' },
-  { name: 'engajamento_app', label: 'Engajamento no app (0-100)', type: 'number', fieldType: 'number' },
-  { name: 'engajamento_redes_sociais', label: 'Engajamento em redes sociais (0-100)', type: 'number', fieldType: 'number' },
+  { name: 'partidas_assistidas_temporada', label: 'Partidas assistidas na temporada', type: 'number', fieldType: 'number', group: 'torcedor_engajamento' },
+  { name: 'taxa_presenca', label: 'Taxa de presença (%)', type: 'number', fieldType: 'number', group: 'torcedor_engajamento' },
+  { name: 'setor_preferido', label: 'Setor preferido no estádio', type: 'string', fieldType: 'text', group: 'torcedor_engajamento' },
+  { name: 'engajamento_app', label: 'Engajamento no app (0-100)', type: 'number', fieldType: 'number', group: 'torcedor_engajamento' },
+  { name: 'engajamento_redes_sociais', label: 'Engajamento em redes sociais (0-100)', type: 'number', fieldType: 'number', group: 'torcedor_engajamento' },
 
   // -- 4. Comercial & financeiro --
-  { name: 'ticket_medio', label: 'Ticket médio (R$)', type: 'number', fieldType: 'number' },
-  { name: 'produto_favorito', label: 'Produto/categoria favorita', type: 'string', fieldType: 'text' },
-  { name: 'numero_compras', label: 'Número de compras', type: 'number', fieldType: 'number' },
+  { name: 'ticket_medio', label: 'Ticket médio (R$)', type: 'number', fieldType: 'number', group: 'torcedor_comercial' },
+  { name: 'produto_favorito', label: 'Produto/categoria favorita', type: 'string', fieldType: 'text', group: 'torcedor_comercial' },
+  { name: 'numero_compras', label: 'Número de compras', type: 'number', fieldType: 'number', group: 'torcedor_comercial' },
   // Pontos de loyalty valem pra sócio E não-sócio — ver Loyalty & Recompensas
   // no demo (catálogo de 800 a 15.000 pts), mesma escala usada aqui.
-  { name: 'pontos_loyalty', label: 'Pontos de loyalty acumulados', type: 'number', fieldType: 'number' },
+  { name: 'pontos_loyalty', label: 'Pontos de loyalty acumulados', type: 'number', fieldType: 'number', group: 'torcedor_comercial' },
 
   // -- 5. Risco & retenção --
-  { name: 'motivo_cancelamento', label: 'Motivo de cancelamento', type: 'string', fieldType: 'text' },
-  { name: 'data_ultima_interacao', label: 'Data da última interação/compra', type: 'date', fieldType: 'date' },
-  { name: 'sinal_alerta', label: 'Sinal de alerta', type: 'string', fieldType: 'text' },
+  { name: 'motivo_cancelamento', label: 'Motivo de cancelamento', type: 'string', fieldType: 'text', group: 'torcedor_risco' },
+  { name: 'sinal_alerta', label: 'Sinal de alerta', type: 'string', fieldType: 'text', group: 'torcedor_risco' },
+
+  // -- última atividade real (grupo próprio, é o que mais muda a cada
+  // interação e o que faz mais sentido olhar primeiro num contato) --
+  { name: 'data_ultima_interacao', label: 'Data da última interação/compra', type: 'date', fieldType: 'date', group: 'torcedor_atividade' },
+  // Frase curta descrevendo a última ação real do torcedor (ex.: "Comprou
+  // Camisa I Vasco da Gama 2026 (R$ 299,00)") — gravada por
+  // fulfill_stripe_order a cada compra no ShopVasco/Sócio Torcedor,
+  // award_loyalty_points (Museu Virtual) e redeem_reward (resgate Minu).
+  // Combinado com o lastmodifieddate/updatedAt nativos do HubSpot
+  // (atualizados automaticamente a cada PATCH), dá pra montar um feed real
+  // de "ações mais recentes" ordenando por data de modificação — ver
+  // action "stats". Cada uma dessas ações também grava uma Nota real
+  // associada ao contato (timeline nativa do HubSpot), então o histórico
+  // completo de interações fica visível lá, não só o resumo mais recente
+  // aqui.
+  { name: 'ultima_acao_descricao', label: 'Última ação (descrição)', type: 'string', fieldType: 'text', group: 'torcedor_atividade' },
 
   // -- 6. Comunicação & preferências --
   {
-    name: 'canal_preferido', label: 'Canal de comunicação preferido', type: 'enumeration', fieldType: 'select',
+    name: 'canal_preferido', label: 'Canal de comunicação preferido', type: 'enumeration', fieldType: 'select', group: 'torcedor_comunicacao',
     options: [
       { label: 'WhatsApp', value: 'whatsapp' },
       { label: 'E-mail', value: 'email' },
@@ -186,14 +233,14 @@ const CUSTOM_PROPERTIES = [
     ],
   },
   {
-    name: 'opt_in_marketing', label: 'Opt-in de marketing (LGPD)', type: 'enumeration', fieldType: 'select',
+    name: 'opt_in_marketing', label: 'Opt-in de marketing (LGPD)', type: 'enumeration', fieldType: 'select', group: 'torcedor_comunicacao',
     options: [
       { label: 'Sim', value: 'sim' },
       { label: 'Não', value: 'nao' },
     ],
   },
   {
-    name: 'frequencia_contato_desejada', label: 'Frequência de contato desejada', type: 'enumeration', fieldType: 'select',
+    name: 'frequencia_contato_desejada', label: 'Frequência de contato desejada', type: 'enumeration', fieldType: 'select', group: 'torcedor_comunicacao',
     options: [
       { label: 'Diária', value: 'diaria' },
       { label: 'Semanal', value: 'semanal' },
@@ -202,28 +249,18 @@ const CUSTOM_PROPERTIES = [
     ],
   },
 
-  // -- 7. Segmentação & IA --
-  { name: 'next_best_action', label: 'Next Best Action (sugestão da IA)', type: 'string', fieldType: 'textarea' },
-
-  // -- 8. Avançado / diferencial --
+  // -- 7. Segmentação & IA + 8. Avançado / diferencial (mesmo grupo, ambos pequenos) --
+  { name: 'next_best_action', label: 'Next Best Action (sugestão da IA)', type: 'string', fieldType: 'textarea', group: 'torcedor_ia_avancado' },
   {
-    name: 'embaixador', label: 'Torcedor embaixador', type: 'enumeration', fieldType: 'select',
+    name: 'embaixador', label: 'Torcedor embaixador', type: 'enumeration', fieldType: 'select', group: 'torcedor_ia_avancado',
     options: [
       { label: 'Sim', value: 'sim' },
       { label: 'Não', value: 'nao' },
     ],
   },
-  { name: 'indicacoes_feitas', label: 'Indicações feitas', type: 'number', fieldType: 'number' },
-  { name: 'preferencia_acessibilidade', label: 'Preferência de acessibilidade', type: 'string', fieldType: 'text' },
-  { name: 'geracao_familiar', label: 'Geração familiar de torcedor', type: 'string', fieldType: 'text' },
-  // Frase curta descrevendo a última ação real do torcedor (ex.: "Comprou
-  // Camisa I Vasco da Gama 2026 (R$ 299,00)") — gravada por
-  // fulfill_stripe_order a cada compra no ShopVasco/Sócio Torcedor.
-  // Combinado com o lastmodifieddate/updatedAt nativos do HubSpot
-  // (atualizados automaticamente a cada PATCH), dá pra montar um feed real
-  // de "ações mais recentes" ordenando por data de modificação — ver
-  // action "stats".
-  { name: 'ultima_acao_descricao', label: 'Última ação (descrição)', type: 'string', fieldType: 'text' },
+  { name: 'indicacoes_feitas', label: 'Indicações feitas', type: 'number', fieldType: 'number', group: 'torcedor_ia_avancado' },
+  { name: 'preferencia_acessibilidade', label: 'Preferência de acessibilidade', type: 'string', fieldType: 'text', group: 'torcedor_ia_avancado' },
+  { name: 'geracao_familiar', label: 'Geração familiar de torcedor', type: 'string', fieldType: 'text', group: 'torcedor_ia_avancado' },
 ];
 
 // 15 torcedores fictícios do Vasco — mesmo estilo já usado em
@@ -609,23 +646,67 @@ exports.handler = async function (event) {
     },
   });
 
+  // Grava uma Nota de verdade no contato (aparece na timeline/Atividade
+  // nativa do HubSpot, a mesma tela que quem trabalha no CRM todo dia já
+  // usa) — pra cada interação real (compra, resgate, visita) ficar como um
+  // registro próprio, em vez de só sobrescrever ultima_acao_descricao.
+  // Best-effort: se falhar, não derruba a action principal (a propriedade
+  // já foi gravada, que é o que os outros lugares do demo leem).
+  const logContactNote = async (contactId, text) => {
+    try {
+      const noteRes = await hsFetch('/crm/v3/objects/notes', {
+        method: 'POST',
+        body: JSON.stringify({ properties: { hs_timestamp: String(Date.now()), hs_note_body: text } }),
+      });
+      const noteData = await noteRes.json().catch(() => ({}));
+      if (!noteRes.ok || !noteData.id) return { ok: false };
+      await hsFetch('/crm/v4/objects/notes/' + noteData.id + '/associations/default/contacts/' + contactId, { method: 'PUT' });
+      return { ok: true, id: noteData.id };
+    } catch (e) {
+      return { ok: false };
+    }
+  };
+
   try {
     if (payload.action === 'setup') {
+      const groupResults = [];
+      for (const grp of PROPERTY_GROUPS) {
+        const gr = await hsFetch('/crm/v3/properties/contacts/groups', {
+          method: 'POST',
+          body: JSON.stringify({ name: grp.name, displayName: grp.displayName }),
+        });
+        const gdata = await gr.json().catch(() => ({}));
+        groupResults.push({ name: grp.name, status: gr.status, alreadyExists: gr.status === 409, detail: gdata.message || gdata });
+      }
+
       const results = [];
       for (const prop of CUSTOM_PROPERTIES) {
+        const groupName = prop.group || 'torcedor_core';
         const body = {
           name: prop.name,
           label: prop.label,
           type: prop.type,
           fieldType: prop.fieldType,
-          groupName: 'contactinformation',
+          groupName,
           ...(prop.options ? { options: prop.options } : {}),
         };
         const r = await hsFetch('/crm/v3/properties/contacts', { method: 'POST', body: JSON.stringify(body) });
-        const data = await r.json().catch(() => ({}));
-        results.push({ name: prop.name, status: r.status, alreadyExists: r.status === 409, detail: data.message || data });
+        if (r.status === 409) {
+          // Já existe (rodadas anteriores desta demo criaram tudo dentro de
+          // "contactinformation") — move pro grupo certo em vez de deixar
+          // pra trás, pra não precisar recriar as 500 respostas já gravadas.
+          const pr = await hsFetch('/crm/v3/properties/contacts/' + encodeURIComponent(prop.name), {
+            method: 'PATCH',
+            body: JSON.stringify({ groupName, label: prop.label }),
+          });
+          const pdata = await pr.json().catch(() => ({}));
+          results.push({ name: prop.name, status: r.status, alreadyExists: true, movedToGroup: pr.ok ? groupName : null, detail: pdata.message || pdata });
+        } else {
+          const data = await r.json().catch(() => ({}));
+          results.push({ name: prop.name, status: r.status, alreadyExists: false, group: groupName, detail: data.message || data });
+        }
       }
-      return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, results }) };
+      return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, groups: groupResults, results }) };
     }
 
     if (payload.action === 'seed') {
@@ -932,6 +1013,7 @@ exports.handler = async function (event) {
       if (!patchRes.ok) {
         return { statusCode: patchRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: patchData.message || 'Falha ao gravar pontos no HubSpot.' }) };
       }
+      if (contactData.id) await logContactNote(contactData.id, updates.ultima_acao_descricao);
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json', ...cors },
@@ -975,6 +1057,7 @@ exports.handler = async function (event) {
       if (!patchRes2.ok) {
         return { statusCode: patchRes2.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: patchData2.message || 'Falha ao debitar pontos no HubSpot.' }) };
       }
+      if (contactData2.id) await logContactNote(contactData2.id, updates2.ultima_acao_descricao);
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json', ...cors },
@@ -1054,6 +1137,7 @@ exports.handler = async function (event) {
       if (!patchRes.ok) {
         return { statusCode: patchRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: patchData.message || 'Falha ao gravar a compra no HubSpot.' }) };
       }
+      if (contactData.id) await logContactNote(contactData.id, updates.ultima_acao_descricao);
 
       return {
         statusCode: 200,
