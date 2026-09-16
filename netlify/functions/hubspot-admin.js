@@ -1,13 +1,15 @@
 // netlify/functions/hubspot-admin.js
 //
 // Setup e seed do CRM HubSpot com dado fictício, mas relevante, de
-// torcedores do Vasco — nível de sócio, Fan Score, jogador favorito, LTV,
-// risco de churn, propensão de upgrade — em vez dos campos padrão de CRM
-// de vendas (empresa, cargo) que não dizem nada sobre um torcedor.
+// torcedores do Vasco — 35 propriedades customizadas nas 8 categorias
+// discutidas com o usuário (identidade, relação com o clube, comportamento/
+// engajamento, comercial/financeiro, risco/retenção, comunicação,
+// segmentação/IA, avançado) em vez dos campos padrão de CRM de vendas
+// (empresa, cargo) que não dizem nada sobre um torcedor.
 //
 // A chave HUBSPOT_API_KEY fica só no servidor (variável de ambiente no
 // Netlify), nunca exposta no navegador. Chame esta function com:
-//   { "action": "setup" } → cria as propriedades customizadas no Contact
+//   { "action": "setup" } → cria as 35 propriedades customizadas no Contact
 //                           (idempotente — roda de novo sem duplicar)
 //   { "action": "seed" }  → cria/atualiza os 15 torcedores fictícios
 //                           (upsert por e-mail, idempotente também)
@@ -37,8 +39,12 @@ function corsHeaders(event) {
 }
 
 // Propriedades customizadas do Contact — o que de fato importa pra um
-// clube, não pra um time de vendas B2B.
+// clube, não pra um time de vendas B2B. Organizado nas 8 categorias
+// discutidas: identidade, relação com o clube, comportamento/engajamento,
+// comercial/financeiro, risco/retenção, comunicação, segmentação/IA e
+// avançado (embaixador, acessibilidade, geração familiar).
 const CUSTOM_PROPERTIES = [
+  // -- já existia --
   {
     name: 'nivel_socio', label: 'Nível de sócio-torcedor', type: 'enumeration', fieldType: 'select',
     options: [
@@ -64,42 +70,273 @@ const CUSTOM_PROPERTIES = [
   { name: 'segmento_torcedor', label: 'Segmento do torcedor', type: 'string', fieldType: 'text' },
   { name: 'socio_desde', label: 'Sócio-torcedor desde', type: 'date', fieldType: 'date' },
   { name: 'time_coracao', label: 'Time do coração', type: 'string', fieldType: 'text' },
+
+  // -- 1. Identidade & perfil --
+  { name: 'data_nascimento', label: 'Data de nascimento', type: 'date', fieldType: 'date' },
+  {
+    name: 'genero', label: 'Gênero', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'Masculino', value: 'masculino' },
+      { label: 'Feminino', value: 'feminino' },
+      { label: 'Outro', value: 'outro' },
+      { label: 'Prefere não informar', value: 'nao_informado' },
+    ],
+  },
+  {
+    name: 'fonte_aquisicao', label: 'Fonte de aquisição', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'App', value: 'app' },
+      { label: 'Loja física', value: 'loja_fisica' },
+      { label: 'Indicação', value: 'indicacao' },
+      { label: 'Campanha', value: 'campanha' },
+      { label: 'Redes sociais', value: 'redes_sociais' },
+      { label: 'Orgânico', value: 'organico' },
+    ],
+  },
+
+  // -- 2. Relação com o clube --
+  {
+    name: 'status_assinatura', label: 'Status da assinatura', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'Ativo', value: 'ativo' },
+      { label: 'Inadimplente', value: 'inadimplente' },
+      { label: 'Cancelado', value: 'cancelado' },
+      { label: 'Não aplicável', value: 'nao_aplicavel' },
+    ],
+  },
+  { name: 'plano_mensalidade', label: 'Plano — mensalidade (R$)', type: 'number', fieldType: 'number' },
+  { name: 'torcedor_desde', label: 'Torcedor desde (independente de ser sócio)', type: 'date', fieldType: 'date' },
+  { name: 'torcida_organizada', label: 'Torcida organizada', type: 'string', fieldType: 'text' },
+
+  // -- 3. Comportamento & engajamento --
+  { name: 'partidas_assistidas_temporada', label: 'Partidas assistidas na temporada', type: 'number', fieldType: 'number' },
+  { name: 'taxa_presenca', label: 'Taxa de presença (%)', type: 'number', fieldType: 'number' },
+  { name: 'setor_preferido', label: 'Setor preferido no estádio', type: 'string', fieldType: 'text' },
+  { name: 'engajamento_app', label: 'Engajamento no app (0-100)', type: 'number', fieldType: 'number' },
+  { name: 'engajamento_redes_sociais', label: 'Engajamento em redes sociais (0-100)', type: 'number', fieldType: 'number' },
+
+  // -- 4. Comercial & financeiro --
+  { name: 'ticket_medio', label: 'Ticket médio (R$)', type: 'number', fieldType: 'number' },
+  { name: 'produto_favorito', label: 'Produto/categoria favorita', type: 'string', fieldType: 'text' },
+  { name: 'numero_compras', label: 'Número de compras', type: 'number', fieldType: 'number' },
+
+  // -- 5. Risco & retenção --
+  { name: 'motivo_cancelamento', label: 'Motivo de cancelamento', type: 'string', fieldType: 'text' },
+  { name: 'data_ultima_interacao', label: 'Data da última interação/compra', type: 'date', fieldType: 'date' },
+  { name: 'sinal_alerta', label: 'Sinal de alerta', type: 'string', fieldType: 'text' },
+
+  // -- 6. Comunicação & preferências --
+  {
+    name: 'canal_preferido', label: 'Canal de comunicação preferido', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'WhatsApp', value: 'whatsapp' },
+      { label: 'E-mail', value: 'email' },
+      { label: 'Push', value: 'push' },
+      { label: 'SMS', value: 'sms' },
+    ],
+  },
+  {
+    name: 'opt_in_marketing', label: 'Opt-in de marketing (LGPD)', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'Sim', value: 'sim' },
+      { label: 'Não', value: 'nao' },
+    ],
+  },
+  {
+    name: 'frequencia_contato_desejada', label: 'Frequência de contato desejada', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'Diária', value: 'diaria' },
+      { label: 'Semanal', value: 'semanal' },
+      { label: 'Mensal', value: 'mensal' },
+      { label: 'Só em ocasiões especiais', value: 'ocasioes_especiais' },
+    ],
+  },
+
+  // -- 7. Segmentação & IA --
+  { name: 'next_best_action', label: 'Next Best Action (sugestão da IA)', type: 'string', fieldType: 'textarea' },
+
+  // -- 8. Avançado / diferencial --
+  {
+    name: 'embaixador', label: 'Torcedor embaixador', type: 'enumeration', fieldType: 'select',
+    options: [
+      { label: 'Sim', value: 'sim' },
+      { label: 'Não', value: 'nao' },
+    ],
+  },
+  { name: 'indicacoes_feitas', label: 'Indicações feitas', type: 'number', fieldType: 'number' },
+  { name: 'preferencia_acessibilidade', label: 'Preferência de acessibilidade', type: 'string', fieldType: 'text' },
+  { name: 'geracao_familiar', label: 'Geração familiar de torcedor', type: 'string', fieldType: 'text' },
 ];
 
 // 15 torcedores fictícios do Vasco — mesmo estilo já usado em
-// FANS_DB_BY_CLUB.vasco no index.html, ampliado. E-mails em domínio
-// reservado para documentação/teste (RFC 2606), nunca alcançam ninguém real.
+// FANS_DB_BY_CLUB.vasco no index.html, ampliado com as 8 categorias de
+// campo discutidas com o usuário. E-mails em domínio reservado para
+// documentação/teste (RFC 2606), nunca alcançam ninguém real.
 const TORCEDORES_VASCO = [
   { firstname:'Rafael', lastname:'Colina', email:'rafael.colina@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'platina', fan_score:81, jogador_favorito:'Philippe Coutinho', ltv_torcedor:1240, risco_churn:'baixo', propensao_upgrade:66, segmento_torcedor:'Torcedor fiel', socio_desde:'2019-03-01' },
+    nivel_socio:'platina', fan_score:81, jogador_favorito:'Philippe Coutinho', ltv_torcedor:1240, risco_churn:'baixo', propensao_upgrade:66, segmento_torcedor:'Torcedor fiel', socio_desde:'2019-03-01',
+    data_nascimento:'1988-05-14', genero:'masculino', fonte_aquisicao:'app',
+    status_assinatura:'ativo', plano_mensalidade:149.90, torcedor_desde:'2005-01-01', torcida_organizada:'Força Jovem do Vasco',
+    partidas_assistidas_temporada:14, taxa_presenca:82, setor_preferido:'Norte', engajamento_app:88, engajamento_redes_sociais:74,
+    ticket_medio:138, produto_favorito:'Camisas', numero_compras:9,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-08', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'semanal',
+    next_best_action:'Baixo risco de churn e LTV consistente — bom candidato para oferta de upgrade de plano.',
+    embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
+
   { firstname:'Fernanda', lastname:'Malta', email:'fernanda.malta@vasco-demo.example.com', city:'Niterói', state:'RJ',
-    nivel_socio:'prata', fan_score:37, jogador_favorito:'Pablo Vegetti', ltv_torcedor:260, risco_churn:'alto', propensao_upgrade:21, segmento_torcedor:'Em risco de churn', socio_desde:'2023-07-01' },
+    nivel_socio:'prata', fan_score:37, jogador_favorito:'Pablo Vegetti', ltv_torcedor:260, risco_churn:'alto', propensao_upgrade:21, segmento_torcedor:'Em risco de churn', socio_desde:'2023-07-01',
+    data_nascimento:'1995-11-02', genero:'feminino', fonte_aquisicao:'campanha',
+    status_assinatura:'inadimplente', plano_mensalidade:49.90, torcedor_desde:'2015-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:1, taxa_presenca:18, setor_preferido:'Sul', engajamento_app:22, engajamento_redes_sociais:15,
+    ticket_medio:87, produto_favorito:'Ingressos avulsos', numero_compras:3,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-07-10', sinal_alerta:'Sem compra há 68 dias; cancelou notificações',
+    canal_preferido:'email', opt_in_marketing:'nao', frequencia_contato_desejada:'ocasioes_especiais',
+    next_best_action:'Sem compras há 68 dias e cancelou notificações — alto risco de churn, recomenda-se oferta de reativação.',
+    embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
+
   { firstname:'Eduardo', lastname:'Colina', email:'eduardo.colina@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'platina', fan_score:91, jogador_favorito:'Thiago Mendes', ltv_torcedor:4680, risco_churn:'baixo', propensao_upgrade:85, segmento_torcedor:'Top torcedor', socio_desde:'2017-08-01' },
+    nivel_socio:'platina', fan_score:91, jogador_favorito:'Thiago Mendes', ltv_torcedor:4680, risco_churn:'baixo', propensao_upgrade:85, segmento_torcedor:'Top torcedor', socio_desde:'2017-08-01',
+    data_nascimento:'1975-03-20', genero:'masculino', fonte_aquisicao:'loja_fisica',
+    status_assinatura:'ativo', plano_mensalidade:149.90, torcedor_desde:'1985-01-01', torcida_organizada:'Força Jovem do Vasco',
+    partidas_assistidas_temporada:22, taxa_presenca:96, setor_preferido:'Camarotes', engajamento_app:95, engajamento_redes_sociais:90,
+    ticket_medio:134, produto_favorito:'Camarote', numero_compras:35,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-15', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'diaria',
+    next_best_action:'Sócio vitalício há 9 anos e maior LTV da base — candidato a programa de embaixadores.',
+    embaixador:'sim', indicacoes_feitas:12, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'3ª geração+' },
+
   { firstname:'Camila', lastname:'Cruzmaltina', email:'camila.cruzmaltina@vasco-demo.example.com', city:'São Gonçalo', state:'RJ',
-    nivel_socio:'ouro', fan_score:75, jogador_favorito:'Lucas Piton', ltv_torcedor:1920, risco_churn:'baixo', propensao_upgrade:65, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-02-01' },
+    nivel_socio:'ouro', fan_score:75, jogador_favorito:'Lucas Piton', ltv_torcedor:1920, risco_churn:'baixo', propensao_upgrade:65, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-02-01',
+    data_nascimento:'1992-08-09', genero:'feminino', fonte_aquisicao:'indicacao',
+    status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2010-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:16, taxa_presenca:85, setor_preferido:'Camarotes', engajamento_app:79, engajamento_redes_sociais:68,
+    ticket_medio:137, produto_favorito:'Ingressos VIP', numero_compras:14,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-10', sinal_alerta:'',
+    canal_preferido:'push', opt_in_marketing:'sim', frequencia_contato_desejada:'semanal',
+    next_best_action:'Costuma comprar camarote nos jogos importantes — boa candidata a upgrade de plano.',
+    embaixador:'nao', indicacoes_feitas:2, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
+
   { firstname:'Gustavo', lastname:'Januário', email:'gustavo.januario@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'bronze', fan_score:36, jogador_favorito:'—', ltv_torcedor:70, risco_churn:'medio', propensao_upgrade:33, segmento_torcedor:'Sócio novo', socio_desde:'2026-08-01' },
+    nivel_socio:'bronze', fan_score:36, jogador_favorito:'—', ltv_torcedor:70, risco_churn:'medio', propensao_upgrade:33, segmento_torcedor:'Sócio novo', socio_desde:'2026-08-01',
+    data_nascimento:'2003-06-25', genero:'masculino', fonte_aquisicao:'app',
+    status_assinatura:'ativo', plano_mensalidade:29.90, torcedor_desde:'2026-08-01', torcida_organizada:'',
+    partidas_assistidas_temporada:0, taxa_presenca:0, setor_preferido:'', engajamento_app:40, engajamento_redes_sociais:30,
+    ticket_medio:70, produto_favorito:'', numero_compras:1,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-08-01', sinal_alerta:'Ainda não foi ao estádio',
+    canal_preferido:'push', opt_in_marketing:'sim', frequencia_contato_desejada:'semanal',
+    next_best_action:'Sócio novo e ainda não foi ao estádio — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.',
+    embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
+
   { firstname:'Marina', lastname:'Vascaína', email:'marina.vascaina@vasco-demo.example.com', city:'Duque de Caxias', state:'RJ',
-    nivel_socio:'ouro', fan_score:69, jogador_favorito:'Carlos Cuesta', ltv_torcedor:1580, risco_churn:'baixo', propensao_upgrade:58, segmento_torcedor:'Torcedora fiel', socio_desde:'2020-05-01' },
+    nivel_socio:'ouro', fan_score:69, jogador_favorito:'Carlos Cuesta', ltv_torcedor:1580, risco_churn:'baixo', propensao_upgrade:58, segmento_torcedor:'Torcedora fiel', socio_desde:'2020-05-01',
+    data_nascimento:'1990-02-17', genero:'feminino', fonte_aquisicao:'redes_sociais',
+    status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2008-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:12, taxa_presenca:74, setor_preferido:'Oeste', engajamento_app:71, engajamento_redes_sociais:65,
+    ticket_medio:118, produto_favorito:'Camisas', numero_compras:11,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-05', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'mensal',
+    next_best_action:'Engajamento consistente e risco baixo — boa candidata a upsell de produto na loja oficial.',
+    embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
+
   { firstname:'Thiago', lastname:'Malta', email:'thiago.malta@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'bronze', fan_score:44, jogador_favorito:'Carlos Andrés Gómez', ltv_torcedor:180, risco_churn:'medio', propensao_upgrade:39, segmento_torcedor:'Sócio novo', socio_desde:'2026-05-01' },
+    nivel_socio:'bronze', fan_score:44, jogador_favorito:'Carlos Andrés Gómez', ltv_torcedor:180, risco_churn:'medio', propensao_upgrade:39, segmento_torcedor:'Sócio novo', socio_desde:'2026-05-01',
+    data_nascimento:'1999-12-01', genero:'masculino', fonte_aquisicao:'app',
+    status_assinatura:'ativo', plano_mensalidade:29.90, torcedor_desde:'2018-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:2, taxa_presenca:40, setor_preferido:'Leste', engajamento_app:48, engajamento_redes_sociais:41,
+    ticket_medio:90, produto_favorito:'Acessórios', numero_compras:2,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-08-20', sinal_alerta:'',
+    canal_preferido:'email', opt_in_marketing:'sim', frequencia_contato_desejada:'semanal',
+    next_best_action:'Sócio recente com engajamento crescente — reforçar comunicação de boas-vindas e benefícios do plano.',
+    embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
+
   { firstname:'Larissa', lastname:'Sãojanuário', email:'larissa.saojanuario@vasco-demo.example.com', city:'Nova Iguaçu', state:'RJ',
-    nivel_socio:'prata', fan_score:58, jogador_favorito:'Léo Jardim', ltv_torcedor:410, risco_churn:'baixo', propensao_upgrade:47, segmento_torcedor:'Torcedora fiel', socio_desde:'2022-11-01' },
+    nivel_socio:'prata', fan_score:58, jogador_favorito:'Léo Jardim', ltv_torcedor:410, risco_churn:'baixo', propensao_upgrade:47, segmento_torcedor:'Torcedora fiel', socio_desde:'2022-11-01',
+    data_nascimento:'1997-04-30', genero:'feminino', fonte_aquisicao:'indicacao',
+    status_assinatura:'ativo', plano_mensalidade:49.90, torcedor_desde:'2012-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:8, taxa_presenca:61, setor_preferido:'Norte', engajamento_app:60, engajamento_redes_sociais:52,
+    ticket_medio:68, produto_favorito:'Colecionáveis', numero_compras:6,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-08-30', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'mensal',
+    next_best_action:'Boa presença em jogos e engajamento estável — candidata a upgrade se receber oferta direcionada.',
+    embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
+
   { firstname:'Bruno', lastname:'Colina', email:'bruno.colina@vasco-demo.example.com', city:'São João de Meriti', state:'RJ',
-    nivel_socio:'basico', fan_score:22, jogador_favorito:'—', ltv_torcedor:0, risco_churn:'alto', propensao_upgrade:14, segmento_torcedor:'Identificado, não-sócio' },
+    nivel_socio:'basico', fan_score:22, jogador_favorito:'—', ltv_torcedor:0, risco_churn:'alto', propensao_upgrade:14, segmento_torcedor:'Identificado, não-sócio',
+    data_nascimento:'2001-09-13', genero:'masculino', fonte_aquisicao:'organico',
+    status_assinatura:'nao_aplicavel', plano_mensalidade:0, torcedor_desde:'2015-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:0, taxa_presenca:0, setor_preferido:'', engajamento_app:12, engajamento_redes_sociais:20,
+    ticket_medio:0, produto_favorito:'', numero_compras:0,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-06-01', sinal_alerta:'Identificado mas nunca virou sócio',
+    canal_preferido:'push', opt_in_marketing:'nao', frequencia_contato_desejada:'ocasioes_especiais',
+    next_best_action:'Identificado na base mas nunca converteu em sócio — enviar oferta de primeira assinatura com desconto.',
+    embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
+
   { firstname:'Patrícia', lastname:'Malta', email:'patricia.malta@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'ouro', fan_score:72, jogador_favorito:'Hugo Moura', ltv_torcedor:1340, risco_churn:'baixo', propensao_upgrade:55, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-09-01' },
+    nivel_socio:'ouro', fan_score:72, jogador_favorito:'Hugo Moura', ltv_torcedor:1340, risco_churn:'baixo', propensao_upgrade:55, segmento_torcedor:'Torcedora fiel', socio_desde:'2021-09-01',
+    data_nascimento:'1985-07-22', genero:'feminino', fonte_aquisicao:'app',
+    status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2000-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:13, taxa_presenca:78, setor_preferido:'Premium', engajamento_app:75, engajamento_redes_sociais:60,
+    ticket_medio:103, produto_favorito:'Vestuário', numero_compras:13,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-01', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'semanal',
+    next_best_action:'Engajamento e frequência estáveis — boa candidata a convite para experiência exclusiva no camarote.',
+    embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
+
   { firstname:'Felipe', lastname:'Almirante', email:'felipe.almirante@vasco-demo.example.com', city:'Niterói', state:'RJ',
-    nivel_socio:'platina', fan_score:88, jogador_favorito:'Philippe Coutinho', ltv_torcedor:3900, risco_churn:'baixo', propensao_upgrade:78, segmento_torcedor:'Top torcedor', socio_desde:'2018-04-01' },
+    nivel_socio:'platina', fan_score:88, jogador_favorito:'Philippe Coutinho', ltv_torcedor:3900, risco_churn:'baixo', propensao_upgrade:78, segmento_torcedor:'Top torcedor', socio_desde:'2018-04-01',
+    data_nascimento:'1980-01-11', genero:'masculino', fonte_aquisicao:'loja_fisica',
+    status_assinatura:'ativo', plano_mensalidade:149.90, torcedor_desde:'1990-01-01', torcida_organizada:'Força Jovem do Vasco',
+    partidas_assistidas_temporada:20, taxa_presenca:92, setor_preferido:'Camarotes', engajamento_app:90, engajamento_redes_sociais:80,
+    ticket_medio:145, produto_favorito:'Camisas', numero_compras:27,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-14', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'diaria',
+    next_best_action:'Alto engajamento e LTV elevado — candidato a programa de embaixadores e experiências VIP.',
+    embaixador:'sim', indicacoes_feitas:8, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'3ª geração+' },
+
   { firstname:'Juliana', lastname:'Cruzmaltina', email:'juliana.cruzmaltina@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'bronze', fan_score:41, jogador_favorito:'Paulo Henrique', ltv_torcedor:150, risco_churn:'alto', propensao_upgrade:19, segmento_torcedor:'Em risco de churn', socio_desde:'2024-01-01' },
+    nivel_socio:'bronze', fan_score:41, jogador_favorito:'Paulo Henrique', ltv_torcedor:150, risco_churn:'alto', propensao_upgrade:19, segmento_torcedor:'Em risco de churn', socio_desde:'2024-01-01',
+    data_nascimento:'1998-10-05', genero:'feminino', fonte_aquisicao:'campanha',
+    status_assinatura:'inadimplente', plano_mensalidade:29.90, torcedor_desde:'2019-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:1, taxa_presenca:20, setor_preferido:'Sul', engajamento_app:25, engajamento_redes_sociais:18,
+    ticket_medio:60, produto_favorito:'Acessórios', numero_compras:2,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-07-15', sinal_alerta:'Sem compra há 60+ dias',
+    canal_preferido:'email', opt_in_marketing:'nao', frequencia_contato_desejada:'ocasioes_especiais',
+    next_best_action:'Sem interação recente e pagamento em atraso — enviar oferta de reativação antes do cancelamento.',
+    embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'1ª geração' },
+
   { firstname:'Rodrigo', lastname:'Colina', email:'rodrigo.colina@vasco-demo.example.com', city:'Belford Roxo', state:'RJ',
-    nivel_socio:'prata', fan_score:63, jogador_favorito:'Lucas Freitas', ltv_torcedor:520, risco_churn:'baixo', propensao_upgrade:50, segmento_torcedor:'Torcedor fiel', socio_desde:'2022-06-01' },
+    nivel_socio:'prata', fan_score:63, jogador_favorito:'Lucas Freitas', ltv_torcedor:520, risco_churn:'baixo', propensao_upgrade:50, segmento_torcedor:'Torcedor fiel', socio_desde:'2022-06-01',
+    data_nascimento:'1993-05-28', genero:'masculino', fonte_aquisicao:'indicacao',
+    status_assinatura:'ativo', plano_mensalidade:49.90, torcedor_desde:'2005-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:9, taxa_presenca:66, setor_preferido:'Leste', engajamento_app:64, engajamento_redes_sociais:55,
+    ticket_medio:58, produto_favorito:'Camisas', numero_compras:9,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-02', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'mensal',
+    next_best_action:'Boa frequência e risco baixo — candidato a oferta de upgrade de nível no próximo ciclo.',
+    embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Nenhuma', geracao_familiar:'2ª geração' },
+
   { firstname:'Ana', lastname:'Sãojanuário', email:'ana.saojanuario@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'basico', fan_score:18, jogador_favorito:'—', ltv_torcedor:0, risco_churn:'alto', propensao_upgrade:11, segmento_torcedor:'Identificado, não-sócio' },
+    nivel_socio:'basico', fan_score:18, jogador_favorito:'—', ltv_torcedor:0, risco_churn:'alto', propensao_upgrade:11, segmento_torcedor:'Identificado, não-sócio',
+    data_nascimento:'2004-02-14', genero:'feminino', fonte_aquisicao:'redes_sociais',
+    status_assinatura:'nao_aplicavel', plano_mensalidade:0, torcedor_desde:'2016-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:0, taxa_presenca:0, setor_preferido:'', engajamento_app:9, engajamento_redes_sociais:24,
+    ticket_medio:0, produto_favorito:'', numero_compras:0,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-05-20', sinal_alerta:'Identificado mas nunca virou sócio',
+    canal_preferido:'push', opt_in_marketing:'nao', frequencia_contato_desejada:'ocasioes_especiais',
+    next_best_action:'Identificada na base mas nunca converteu em sócia — testar campanha de conversão com desconto de entrada.',
+    embaixador:'nao', indicacoes_feitas:0, preferencia_acessibilidade:'Libras', geracao_familiar:'1ª geração' },
+
   { firstname:'Diego', lastname:'Malta', email:'diego.malta@vasco-demo.example.com', city:'Rio de Janeiro', state:'RJ',
-    nivel_socio:'ouro', fan_score:70, jogador_favorito:'Pablo Vegetti', ltv_torcedor:1210, risco_churn:'baixo', propensao_upgrade:54, segmento_torcedor:'Torcedor fiel', socio_desde:'2020-10-01' },
+    nivel_socio:'ouro', fan_score:70, jogador_favorito:'Pablo Vegetti', ltv_torcedor:1210, risco_churn:'baixo', propensao_upgrade:54, segmento_torcedor:'Torcedor fiel', socio_desde:'2020-10-01',
+    data_nascimento:'1991-12-19', genero:'masculino', fonte_aquisicao:'app',
+    status_assinatura:'ativo', plano_mensalidade:89.90, torcedor_desde:'2003-01-01', torcida_organizada:'',
+    partidas_assistidas_temporada:12, taxa_presenca:76, setor_preferido:'Norte', engajamento_app:73, engajamento_redes_sociais:66,
+    ticket_medio:101, produto_favorito:'Ingressos avulsos', numero_compras:12,
+    motivo_cancelamento:'', data_ultima_interacao:'2026-09-11', sinal_alerta:'',
+    canal_preferido:'whatsapp', opt_in_marketing:'sim', frequencia_contato_desejada:'semanal',
+    next_best_action:'Perfil estável de torcedor fiel — bom candidato a campanha de fidelidade e pontos em dobro.',
+    embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Cadeira de rodas', geracao_familiar:'2ª geração' },
 ];
 
 // Listas dinâmicas (ACTIVE/DYNAMIC — o HubSpot mantém a membership em dia
@@ -187,6 +424,40 @@ exports.handler = async function (event) {
           segmento_torcedor: t.segmento_torcedor,
           ...(t.socio_desde ? { socio_desde: t.socio_desde } : {}),
           time_coracao: 'Vasco da Gama',
+          // 1. Identidade & perfil
+          data_nascimento: t.data_nascimento,
+          genero: t.genero,
+          fonte_aquisicao: t.fonte_aquisicao,
+          // 2. Relação com o clube
+          status_assinatura: t.status_assinatura,
+          plano_mensalidade: t.plano_mensalidade,
+          ...(t.torcedor_desde ? { torcedor_desde: t.torcedor_desde } : {}),
+          torcida_organizada: t.torcida_organizada,
+          // 3. Comportamento & engajamento
+          partidas_assistidas_temporada: t.partidas_assistidas_temporada,
+          taxa_presenca: t.taxa_presenca,
+          setor_preferido: t.setor_preferido,
+          engajamento_app: t.engajamento_app,
+          engajamento_redes_sociais: t.engajamento_redes_sociais,
+          // 4. Comercial & financeiro
+          ticket_medio: t.ticket_medio,
+          produto_favorito: t.produto_favorito,
+          numero_compras: t.numero_compras,
+          // 5. Risco & retenção
+          motivo_cancelamento: t.motivo_cancelamento,
+          ...(t.data_ultima_interacao ? { data_ultima_interacao: t.data_ultima_interacao } : {}),
+          sinal_alerta: t.sinal_alerta,
+          // 6. Comunicação & preferências
+          canal_preferido: t.canal_preferido,
+          opt_in_marketing: t.opt_in_marketing,
+          frequencia_contato_desejada: t.frequencia_contato_desejada,
+          // 7. Segmentação & IA
+          next_best_action: t.next_best_action,
+          // 8. Avançado / diferencial
+          embaixador: t.embaixador,
+          indicacoes_feitas: t.indicacoes_feitas,
+          preferencia_acessibilidade: t.preferencia_acessibilidade,
+          geracao_familiar: t.geracao_familiar,
         },
       }));
       const r = await hsFetch('/crm/v3/objects/contacts/batch/upsert', {
