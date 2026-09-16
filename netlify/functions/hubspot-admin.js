@@ -147,7 +147,8 @@ exports.handler = async function (event) {
           ...(prop.options ? { options: prop.options } : {}),
         };
         const r = await hsFetch('/crm/v3/properties/contacts', { method: 'POST', body: JSON.stringify(body) });
-        results.push({ name: prop.name, status: r.status, alreadyExists: r.status === 409 });
+        const data = await r.json().catch(() => ({}));
+        results.push({ name: prop.name, status: r.status, alreadyExists: r.status === 409, detail: data.message || data });
       }
       return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, results }) };
     }
