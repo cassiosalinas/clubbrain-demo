@@ -698,25 +698,25 @@ canvas{ max-width:100%; }
     <section class="view active" id="view-cockpit">
       <div class="grid g-4" style="margin-bottom:16px;">
         <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Receita consolidada</div>
+          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Receita consolidada<span id="realbadge-kpi-cockpit-receita" style="margin-left:auto;"></span></div>
           <div class="value" id="kpi-cockpit-receita">R$ 3,06M</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cockpit-revenue"></canvas></div>
           <div class="delta up" id="kpi-cockpit-receita-delta">↑ 16,4% vs. período anterior</div>
         </div>
         <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores ativos</div>
+          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores ativos<span id="realbadge-kpi-cockpit-ativos" style="margin-left:auto;"></span></div>
           <div class="value" id="kpi-cockpit-ativos">1,24M</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cockpit-fans"></canvas></div>
           <div class="delta up" id="kpi-cockpit-ativos-delta">↑ 15,2%</div>
         </div>
         <div class="card kpi">
-          <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>NPS / Sentimento</div>
+          <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span>NPS / Sentimento<span id="realbadge-kpi-cockpit-nps" style="margin-left:auto;"></span></div>
           <div class="value" id="kpi-cockpit-nps">68</div>
           <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cockpit-nps"></canvas></div>
           <div class="delta up" id="kpi-cockpit-nps-delta">↑ 4 pts</div>
         </div>
         <div class="card kpi">
-          <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg></span>Torcedores em risco de churn</div>
+          <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg></span>Torcedores em risco de churn<span id="realbadge-kpi-cockpit-churn" style="margin-left:auto;"></span></div>
           <div class="value" style="color:#ff5c72;" id="kpi-cockpit-churn">6,8%</div>
           <div class="hero-note" id="kpi-cockpit-churn-base">≈ 84 mil torcedores da base reconhecida</div>
         </div>
@@ -1399,19 +1399,19 @@ canvas{ max-width:100%; }
     <section class="view" id="view-monetization">
       <div class="grid g-4" style="margin-bottom:16px;">
         <div class="card kpi" style="background:linear-gradient(135deg, rgba(31,214,184,.10), var(--surface)); border-color:rgba(31,214,184,.3);">
-          <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.18); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>MRR total</div>
+          <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.18); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>MRR total<span id="realbadge-kpi-mon-mrr" style="margin-left:auto;"></span></div>
           <div class="value" style="color:#1fd6b8;" id="kpi-mon-mrr">R$ 450K</div><div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-mrr"></canvas></div><div class="delta up" id="kpi-mon-mrr-delta">↑ 18,6%</div>
         </div>
         <div class="card kpi">
-          <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z"/></svg></span>Sócios-torcedores</div>
+          <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z"/></svg></span>Sócios-torcedores<span id="realbadge-kpi-mon-socios" style="margin-left:auto;"></span></div>
           <div class="value" id="kpi-mon-socios">1.000</div><div class="delta up">↑ 14,2%</div>
         </div>
         <div class="card kpi">
-          <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Receita média por sócio</div>
+          <div class="label"><span class="icon-badge" style="background:rgba(31,214,184,.16); color:#1fd6b8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Receita média por sócio<span id="realbadge-kpi-mon-arpu" style="margin-left:auto;"></span></div>
           <div class="value" id="kpi-mon-arpu">R$ 450</div><div class="delta up" id="kpi-mon-arpu-delta">↑ 8,7%</div>
         </div>
         <div class="card kpi">
-          <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg></span>Churn</div>
+          <div class="label"><span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg></span>Churn<span id="realbadge-kpi-mon-churn" style="margin-left:auto;"></span></div>
           <div class="value" id="kpi-mon-churn">2,4%</div><div class="delta up" id="kpi-mon-churn-delta">↓ 0,6pp</div>
         </div>
       </div>
@@ -1561,7 +1561,7 @@ canvas{ max-width:100%; }
 
       <div class="card" style="margin-bottom:16px;">
         <div class="card-title"><h3>Nova promoção</h3></div>
-        <div class="hero-note" style="margin:-6px 0 14px;">Escolha o público (vindo do Torcedor 360), o tipo de oferta e o que ela inclui — ingresso, produto da loja ou ambos.</div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Escolha o público (vindo do Torcedor 360), o tipo de oferta e o que ela inclui — ingresso, produto da loja ou ambos. 🟢 = contagem real, lida ao vivo do HubSpot · ⚪ = ilustrativa (piloto).</div>
         <div class="grid g-4" style="margin-bottom:14px;">
           <div>
             <label class="seg-label">Nome da promoção</label>
@@ -1699,23 +1699,23 @@ canvas{ max-width:100%; }
 
         <div class="grid g-4" style="margin-bottom:16px;">
           <div class="card kpi">
-            <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores (universo total)</div>
+            <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores (universo total)<span id="realbadge-kpi-cdp-total" style="margin-left:auto;"></span></div>
             <div class="value" id="kpi-cdp-total">5,2M</div>
             <div class="hero-note">apaixonados fora do estádio, por região</div>
           </div>
           <div class="card kpi">
-            <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>Identificados (Identity Graph)</div>
+            <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>Identificados (Identity Graph)<span id="realbadge-kpi-cdp-identificados" style="margin-left:auto;"></span></div>
             <div class="value" id="kpi-cdp-identificados">1,24M</div>
             <div class="kpi-spark-wrap"><canvas class="kpi-spark" id="spark-cdp-events"></canvas></div>
             <div class="delta up">↑ 11%</div>
           </div>
           <div class="card kpi">
-            <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg></span>Perfis 360° na Ontologia</div>
+            <div class="label"><span class="icon-badge badge-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg></span>Perfis 360° na Ontologia<span id="realbadge-kpi-cdp-perfis" style="margin-left:auto;"></span></div>
             <div class="value" id="kpi-cdp-perfis">30.000</div>
             <div class="hero-note">torcedores reconhecidos individualmente</div>
           </div>
           <div class="card kpi">
-            <div class="label"><span class="icon-badge" style="background:rgba(255,180,84,.16); color:#ffb454;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Sócios-torcedores (membros)</div>
+            <div class="label"><span class="icon-badge" style="background:rgba(255,180,84,.16); color:#ffb454;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Sócios-torcedores (membros)<span id="realbadge-kpi-cdp-socios" style="margin-left:auto;"></span></div>
             <div class="value" id="kpi-cdp-socios">1.000</div>
             <div class="hero-note">convertidos em receita recorrente</div>
           </div>
@@ -2578,6 +2578,7 @@ function selectClub(id, silent){
   setText('kpi-mon-churn-delta', c.kpi.subChurnDelta);
 
   if(id === 'vasco'){ loadVascoLiveOverview(); loadHubSpotStats(); } else { hideVascoLiveNote(); hideHubSpotLiveNote(); }
+  updateVascoKpiBadges();
 
   // Módulos piloto exclusivos do Vasco (Campanhas & Promoções, Loyalty &
   // Recompensas) — updateNavVisibility() já esconde o item do menu pros
@@ -2617,6 +2618,34 @@ function buildVascoCockpitAlerts(d){
   ];
 }
 
+// Mesmo selo "● Real / ○ Simulado" da Integration Hub (isIntegrationReal),
+// só que por KPI individual — porque nem todo KPI do Cockpit/Monetização é
+// real mesmo pro Vasco (ex.: NPS e ARPU continuam extrapolados mesmo no
+// piloto). Reaproveitado por updateVascoKpiBadges() logo abaixo.
+function realBadgeHtml(isReal){
+  return isReal
+    ? '<span style="display:inline-flex; align-items:center; gap:3px; font-size:9px; font-weight:700; letter-spacing:.02em; padding:2px 7px; border-radius:20px; background:rgba(34,224,122,.16); color:#22e07a; white-space:nowrap;">● REAL</span>'
+    : '<span style="display:inline-flex; align-items:center; gap:3px; font-size:9px; font-weight:700; letter-spacing:.02em; padding:2px 7px; border-radius:20px; background:rgba(255,255,255,.06); color:var(--text-faint); white-space:nowrap;">○ SIMULADO</span>';
+}
+// Preenche os 12 selos de KPI (#realbadge-kpi-*) espalhados pelo Cockpit
+// executivo, Monetização e Torcedor 360 → Overview. Só aparecem com o Vasco
+// selecionado (nenhum badge nos outros 4 clubes — são sempre ilustrativos,
+// não há ambiguidade a esclarecer ali). Dentro do Vasco, cada KPI reflete se
+// loadVascoLiveOverview() de fato o sobrescreveu com dado real ou não.
+function updateVascoKpiBadges(){
+  const on = currentClubId === 'vasco';
+  const real = !!vascoLiveOverviewData;
+  const map = {
+    'kpi-cockpit-receita': real, 'kpi-cockpit-ativos': real, 'kpi-cockpit-nps': false, 'kpi-cockpit-churn': real,
+    'kpi-cdp-total': real, 'kpi-cdp-identificados': real, 'kpi-cdp-perfis': real, 'kpi-cdp-socios': real,
+    'kpi-mon-mrr': real, 'kpi-mon-socios': real, 'kpi-mon-arpu': false, 'kpi-mon-churn': false,
+  };
+  Object.entries(map).forEach(([id, isReal])=>{
+    const el = document.getElementById('realbadge-' + id);
+    if(el) el.innerHTML = on ? realBadgeHtml(isReal) : '';
+  });
+}
+
 // Único clube desta demo com dado ao vivo: busca os números reais do backend
 // real do MVP Vasco e substitui, só enquanto o Vasco estiver selecionado, os
 // contadores de Torcedor 360 → Overview, os 4 KPIs do Cockpit executivo, os
@@ -2652,6 +2681,7 @@ async function loadVascoLiveOverview(){
     renderCockpitAlerts(buildVascoCockpitAlerts(d));
     loadVascoRealAtRiskFans();
     if(initialized.integrations) buildIntegrations(); // MVP Vasco vira "real" na Integration Hub
+    updateVascoKpiBadges();
 
     if(note) note.innerHTML = '<span class="live-dot"></span> Dados ao vivo — backend real (Postgres + Neo4j), piloto de 500 torcedores';
   }catch(e){
@@ -2712,6 +2742,7 @@ function hideVascoLiveNote(){
   hideVascoRealAtRiskCard();
   renderCockpitAlerts(DEFAULT_STRAT_ALERTS);
   if(initialized.integrations) buildIntegrations(); // MVP Vasco volta a "simulado"
+  updateVascoKpiBadges();
 }
 
 // Só a linha "HubSpot CRM" da tabela "Fontes de dados conectadas" — não
@@ -2830,16 +2861,24 @@ function updatePromoAudienceCounts(){
   const real = (currentClubId === 'vasco' && hubspotStats) ? hubspotStats : null;
   const segTotal = name => real?.segments?.find(s=>s.name.includes(name))?.total;
 
+  VASCO_PROMO_AUDIENCES.forEach(a => { a.real = false; }); // inativos90/altapropensao nunca têm segmento real
   byId('churnrisco').count = segTotal('risco de churn') ?? VASCO_PROMO_AUDIENCES_DEFAULT.churnrisco;
+  byId('churnrisco').real = !!real;
   const platina = segTotal('Platina'), ouro = segTotal('Ouro');
   byId('platinaouro').count = (platina != null && ouro != null) ? platina + ouro : VASCO_PROMO_AUDIENCES_DEFAULT.platinaouro;
+  byId('platinaouro').real = !!real;
   byId('naosocios').count = segTotal('não-sócios') ?? VASCO_PROMO_AUDIENCES_DEFAULT.naosocios;
+  byId('naosocios').real = !!real;
   byId('todabase').count = real?.total ?? VASCO_PROMO_AUDIENCES_DEFAULT.todabase;
+  byId('todabase').real = !!real;
 
+  // <option> nativo não aceita HTML — mesmo selo real/simulado da Integration
+  // Hub, só que como prefixo de texto (🟢/⚪) já que não dá pra injetar um
+  // <span> ali dentro.
   const audEl = document.getElementById('promo-audience');
   if(audEl){
     const prevValue = audEl.value;
-    audEl.innerHTML = VASCO_PROMO_AUDIENCES.map(a=>`<option value="${a.id}">${a.label} (${a.count.toLocaleString('pt-BR')})</option>`).join('');
+    audEl.innerHTML = VASCO_PROMO_AUDIENCES.map(a=>`<option value="${a.id}">${a.real ? '🟢' : '⚪'} ${a.label} (${a.count.toLocaleString('pt-BR')})</option>`).join('');
     if(prevValue) audEl.value = prevValue;
   }
 }
