@@ -19,6 +19,13 @@
 //   { "action": "lists" } → cria 6 listas dinâmicas (segmentos) filtradas
 //                           por nível de sócio, risco de churn etc. —
 //                           precisa do escopo crm.lists.write no private app
+//   { "action": "stats" } → leitura ao vivo (Search API): total de contatos,
+//                           total de sócios-torcedores e contagem de cada um
+//                           dos 6 segmentos — é o que alimenta os números
+//                           "dado ao vivo" da Integration Hub / CDP Overview
+//                           no index.html. Só leitura, sem PII no retorno,
+//                           por isso é chamada direto do navegador (CORS
+//                           liberado pra ALLOWED_ORIGINS abaixo).
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → HUBSPOT_API_KEY
@@ -713,7 +720,43 @@ exports.handler = async function (event) {
       return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, results }) };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk" ou "lists".' }) };
+    if (payload.action === 'stats') {
+      // limit:0 já retornaria erro de validação na Search API — usamos
+      // limit:1 e ignoramos "results", só lemos o "total" da resposta.
+      const countBy = async (property, operation) => {
+        const body = {
+          filterGroups: [{ filters: [{ propertyName: property, ...operation }] }],
+          limit: 1,
+          properties: [],
+        };
+        const r = await hsFetch('/crm/v3/objects/contacts/search', { method: 'POST', body: JSON.stringify(body) });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.message || ('HTTP ' + r.status) + ' em countBy(' + property + ')');
+        return data.total || 0;
+      };
+
+      const [total, socios, ...segmentTotals] = await Promise.all([
+        countBy('time_coracao', { operator: 'EQ', value: 'Vasco da Gama' }),
+        countBy('e_socio_torcedor', { operator: 'EQ', value: 'sim' }),
+        ...SEGMENT_LISTS.map(seg => countBy(seg.property, { operator: 'EQ', value: seg.value })),
+      ]);
+
+      const segments = SEGMENT_LISTS.map((seg, i) => ({ name: seg.name, total: segmentTotals[i] }));
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({
+          ok: true,
+          total,
+          socios,
+          socioPct: total ? Math.round((socios / total) * 1000) / 10 : 0,
+          segments,
+          generatedAt: new Date().toISOString(),
+        }),
+      };
+    }
+
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists" ou "stats".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
