@@ -6218,6 +6218,7 @@ const FANS_DB_BY_CLUB = {
   vasco: [
     {
       id:'rafael', name:'Rafael Colina', initials:'RC', color1:'#1a1a1a', color2:'#3a3a3a', nivel:'platina',
+      email:'rafael.colina@vasco-demo.example.com',
       fanId:'FAN-VAS-00041', fanScore:81, jogadorFavorito:'Philippe Coutinho (camisa 10)', competicaoFavorita:'Brasileirão Série A',
       scoreDims:[['Engagement',83],['Comercial',68],['Conteúdo',77],['Matchday',74],['Gamificação',86],['Fidelidade',89]],
       aiInsight:'Rafael tem baixo risco de churn e LTV consistente — bom candidato para oferta de upgrade de plano.',
@@ -6237,6 +6238,7 @@ const FANS_DB_BY_CLUB = {
     },
     {
       id:'fernanda', name:'Fernanda Malta', initials:'FM', color1:'#3a3a3a', color2:'#1a1a1a', nivel:'prata',
+      email:'fernanda.malta@vasco-demo.example.com',
       fanId:'FAN-VAS-00087', fanScore:37, jogadorFavorito:'Pablo Vegetti', competicaoFavorita:'Brasileirão Série A',
       scoreDims:[['Engagement',30],['Comercial',35],['Conteúdo',25],['Matchday',17],['Gamificação',42],['Fidelidade',47]],
       aiInsight:'Fernanda está sem compras há 68 dias e cancelou notificações — alto risco de churn, recomenda-se oferta de reativação.',
@@ -6256,6 +6258,7 @@ const FANS_DB_BY_CLUB = {
     },
     {
       id:'eduardo', name:'Eduardo Colina', initials:'EC', color1:'#f2c94c', color2:'#1a1a1a', nivel:'platina',
+      email:'eduardo.colina@vasco-demo.example.com',
       fanId:'FAN-VAS-00019', fanScore:91, jogadorFavorito:'Thiago Mendes (capitão)', competicaoFavorita:'Brasileirão Série A',
       scoreDims:[['Engagement',92],['Comercial',77],['Conteúdo',85],['Matchday',80],['Gamificação',87],['Fidelidade',94]],
       aiInsight:'Eduardo é sócio vitalício há 9 anos e tem o maior LTV da base — candidato a programa de embaixadores.',
@@ -6275,6 +6278,7 @@ const FANS_DB_BY_CLUB = {
     },
     {
       id:'camila', name:'Camila Cruzmaltina', initials:'CC', color1:'#1a1a1a', color2:'#f2c94c', nivel:'ouro',
+      email:'camila.cruzmaltina@vasco-demo.example.com',
       fanId:'FAN-VAS-00058', fanScore:75, jogadorFavorito:'Lucas Piton', competicaoFavorita:'Brasileirão Série A',
       scoreDims:[['Engagement',73],['Comercial',79],['Conteúdo',67],['Matchday',76],['Gamificação',53],['Fidelidade',81]],
       aiInsight:'Camila costuma comprar camarote nos jogos importantes — boa candidata a upgrade de plano.',
@@ -6293,6 +6297,7 @@ const FANS_DB_BY_CLUB = {
     },
     {
       id:'gustavo', name:'Gustavo Januário', initials:'GJ', color1:'#7f88a8', color2:'#1a1a1a', nivel:'bronze',
+      email:'gustavo.januario@vasco-demo.example.com',
       fanId:'FAN-VAS-00203', fanScore:36, jogadorFavorito:'—', competicaoFavorita:'—',
       scoreDims:[['Engagement',28],['Comercial',18],['Conteúdo',22],['Matchday',9],['Gamificação',38],['Fidelidade',32]],
       aiInsight:'Gustavo é sócio novo e ainda não foi ao estádio — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.',
@@ -6850,6 +6855,59 @@ function renderCdpFan360(id){
       <div style="font-weight:700; font-size:14px; margin-bottom:4px; color:${s[2]};">${s[0]}</div>
       <div class="hero-note">${s[1]}</div>
     </div>`).join('');
+
+  // Os 5 torcedores do Vasco no explorador Fan 360 têm nome (e email) que
+  // batem com contatos de verdade semeados no HubSpot — o resto da tela
+  // continua com o dataset fictício de sempre (aiInsight, NBA, tags,
+  // segments), mas sobrepomos aqui os campos que existem de verdade lá:
+  // compras, LTV, produto favorito e a última ação real do torcedor.
+  if(currentClubId === 'vasco' && f.email){
+    applyRealFanOverlay(f);
+  }
+}
+
+async function applyRealFanOverlay(f){
+  try{
+    const r = await fetch(HUBSPOT_BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'lookup_fan', email: f.email }),
+    });
+    const d = await r.json();
+    if(!r.ok || !d.ok || !d.found) return;
+    if(cdpFan360Id !== f.id) return; // usuário já trocou de torcedor antes da resposta chegar
+
+    const badgesEl = document.getElementById('cdp360-badges');
+    if(badgesEl && !badgesEl.querySelector('.real-sync-chip')){
+      badgesEl.insertAdjacentHTML('beforeend', `<span class="demo-chip real-sync-chip" style="background:rgba(31,174,100,.16); color:#22e07a; border-color:rgba(31,174,100,.4);">🟢 Sincronizado com o HubSpot agora</span>`);
+    }
+
+    document.getElementById('cdp360-commercial').innerHTML = `
+      <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Transações</span><span class="mono" style="font-size:12.5px;">${d.numeroCompras} <span style="color:#22e07a;">· real</span></span></div>
+      <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Ticket médio</span><span class="mono" style="font-size:12.5px;">R$ ${(d.ticketMedio||0).toLocaleString('pt-BR')}</span></div>
+      <div class="list-row"><span style="flex:1; font-size:13px; color:var(--text-dim);">Receita acumulada (LTV real)</span><span class="mono" style="font-size:12.5px;">R$ ${(d.ltvTorcedor||0).toLocaleString('pt-BR')}</span></div>`;
+
+    if(d.produtoFavorito){
+      const prefRows = document.querySelectorAll('#cdp360-preferences .list-row .mono');
+      if(prefRows[2]) prefRows[2].textContent = d.produtoFavorito;
+    }
+
+    if(d.ultimaAcaoDescricao){
+      const tl = document.getElementById('cdp360-timeline');
+      if(tl && !tl.querySelector('.real-history-row')){
+        const dataFmt = d.dataUltimaInteracao
+          ? new Date(d.dataUltimaInteracao + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' })
+          : 'agora há pouco';
+        tl.insertAdjacentHTML('afterbegin', `
+          <div class="list-row real-history-row">
+            <span class="chip-avatar" style="background:#22e07a; font-size:13px;">🟢</span>
+            <div style="flex:1;"><div style="font-size:13px;">${d.ultimaAcaoDescricao}</div><div class="hero-note">${dataFmt} · gravado de verdade no HubSpot</div></div>
+          </div>`);
+      }
+    }
+  }catch(e){
+    // Overlay é best-effort — se falhar, a tela fica com o dataset fictício, sem quebrar nada.
+  }
 }
 
 function updateSegmentBuilder(){

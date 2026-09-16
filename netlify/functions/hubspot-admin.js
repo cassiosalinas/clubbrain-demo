@@ -863,7 +863,11 @@ exports.handler = async function (event) {
       if (!payload.email) {
         return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "email" obrigatório.' }) };
       }
-      const props = ['firstname', 'lastname', 'nivel_socio', 'e_socio_torcedor', 'pontos_loyalty', 'fan_score', 'time_coracao'];
+      const props = [
+        'firstname', 'lastname', 'nivel_socio', 'e_socio_torcedor', 'pontos_loyalty', 'fan_score', 'time_coracao',
+        'numero_compras', 'ltv_torcedor', 'ticket_medio', 'produto_favorito', 'risco_churn',
+        'ultima_acao_descricao', 'data_ultima_interacao',
+      ];
       const r = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email&properties=' + props.join(','));
       if (r.status === 404) {
         return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, found: false }) };
@@ -886,6 +890,13 @@ exports.handler = async function (event) {
           eSocioTorcedor: p.e_socio_torcedor,
           pontosLoyalty: Number(p.pontos_loyalty) || 0,
           fanScore: Number(p.fan_score) || 0,
+          numeroCompras: Number(p.numero_compras) || 0,
+          ltvTorcedor: Number(p.ltv_torcedor) || 0,
+          ticketMedio: Number(p.ticket_medio) || 0,
+          produtoFavorito: p.produto_favorito || '',
+          riscoChurn: p.risco_churn || '',
+          ultimaAcaoDescricao: p.ultima_acao_descricao || '',
+          dataUltimaInteracao: p.data_ultima_interacao || '',
         }),
       };
     }
