@@ -5238,6 +5238,23 @@ const TIER_DB_BY_CLUB = {
     { key:'platina', name:'Platina', color:'#b06bff', count:660, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
   ],
 };
+
+/* ---------- Vasco: placeholder por enquanto ----------
+   O Vasco só tem dado próprio nos 4 contadores de Torcedor 360 -> Overview
+   (ver loadVascoLiveOverview, que vem do backend real). Todo o resto do
+   app (elenco, patrocinadores, calendário, loja, staff etc.) ainda depende
+   de uma entrada 'vasco' em ~17 dicionários *_BY_CLUB espalhados pelo
+   arquivo — sem isso o app quebra ao tentar renderizar essas telas pro
+   Vasco. Por ora, aliased pro Botafogo-SP (clube real, cores preto/branco,
+   já tem dado completo) só pra não travar a navegação. Trocar por dado
+   real do Vasco módulo a módulo é o próximo passo, não algo pra inventar
+   agora às pressas. */
+[
+  SQUAD_BY_CLUB, TACTICAL_RADAR_BY_CLUB, SQUAD_VALUE_TREND_BY_CLUB, SCOUTING_TARGETS_BY_CLUB,
+  BASE_CATEGORIES_BY_CLUB, CLUB_ASSETS_BY_CLUB, STAFF_BY_CLUB, TRAVEL_BY_CLUB,
+  SPONSORS_BY_CLUB, BRAND_BY_CLUB, TEAM_STATS_BY_CLUB, CONTENT_BY_CLUB,
+  STADIUM_BY_CLUB, EVENTS_BY_CLUB, PRODUCTS_BY_CLUB, FANS_DB_BY_CLUB, TIER_DB_BY_CLUB,
+].forEach(dict => { if(dict && !dict.vasco && dict.botafogo !== undefined) dict.vasco = dict.botafogo; });
 /* ---------- Base de torcedores gerada (diversa: regiao, idade 12-85, poucos fora do Brasil) ----------
    Determinística (seed por clube) para nao mudar a cada reload, e nao inflar o HTML com milhares de linhas literais. */
 function mulberry32(seed){
