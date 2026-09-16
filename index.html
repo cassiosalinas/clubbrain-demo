@@ -7009,7 +7009,9 @@ function buildIntegrations(){
       const d = vascoLiveOverviewData;
       toastText = `${n.name} · ${d.total_fans.toLocaleString('pt-BR')} torcedores reais, ${d.active_memberships.toLocaleString('pt-BR')} sócios ativos · Dado ao vivo`;
     } else {
-      toastText = `${n.name} · ${n.freq} · ${real ? 'Dado ao vivo' : 'Simulado (demo) · ' + statusLabel[n.status]}`;
+      toastText = real
+        ? `${n.name} · ${n.freq} · Dado ao vivo`
+        : `${n.name} · Simulado (demo) · ${statusLabel[n.status]}`;
     }
     return `
     <g class="int-node" style="cursor:pointer;" onclick="showToast('${toastText.replace(/'/g,"\\'")}')">
