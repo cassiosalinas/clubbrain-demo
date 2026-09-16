@@ -106,12 +106,12 @@ const TORCEDORES_VASCO = [
 // sozinho conforme as propriedades do contato mudam) que dão a mesma leitura
 // de segmento que já existe em Torcedor 360 → Fans no demo.
 const SEGMENT_LISTS = [
-  { name:'Sócios Platina — Vasco', property:'nivel_socio', value:'platina' },
-  { name:'Sócios Ouro — Vasco', property:'nivel_socio', value:'ouro' },
-  { name:'Torcedores em risco de churn — Vasco', property:'risco_churn', value:'alto' },
-  { name:'Sócios novos — Vasco', property:'segmento_torcedor', value:'Sócio novo' },
-  { name:'Top torcedores — Vasco', property:'segmento_torcedor', value:'Top torcedor' },
-  { name:'Identificados, não-sócios — Vasco', property:'segmento_torcedor', value:'Identificado, não-sócio' },
+  { name:'Sócios Platina — Vasco', property:'nivel_socio', value:'platina', kind:'enum' },
+  { name:'Sócios Ouro — Vasco', property:'nivel_socio', value:'ouro', kind:'enum' },
+  { name:'Torcedores em risco de churn — Vasco', property:'risco_churn', value:'alto', kind:'enum' },
+  { name:'Sócios novos — Vasco', property:'segmento_torcedor', value:'Sócio novo', kind:'string' },
+  { name:'Top torcedores — Vasco', property:'segmento_torcedor', value:'Top torcedor', kind:'string' },
+  { name:'Identificados, não-sócios — Vasco', property:'segmento_torcedor', value:'Identificado, não-sócio', kind:'string' },
 ];
 
 exports.handler = async function (event) {
@@ -200,6 +200,12 @@ exports.handler = async function (event) {
     if (payload.action === 'lists') {
       const results = [];
       for (const seg of SEGMENT_LISTS) {
+        // Propriedades enumeration (select) e string exigem operationType e
+        // operator diferentes — descoberto pelos erros 400 reais da API,
+        // não documentado com clareza.
+        const operation = seg.kind === 'enum'
+          ? { operationType: 'ENUMERATION', operator: 'IS_ANY_OF', values: [seg.value] }
+          : { operationType: 'STRING', operator: 'IS_EQUAL_TO', value: seg.value };
         const body = {
           name: seg.name,
           objectTypeId: '0-1',
@@ -215,7 +221,7 @@ exports.handler = async function (event) {
               filters: [{
                 filterType: 'PROPERTY',
                 property: seg.property,
-                operation: { operationType: 'STRING', operator: 'EQ', value: seg.value },
+                operation,
               }],
             }],
             filters: [],
