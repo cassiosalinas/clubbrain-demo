@@ -2777,6 +2777,7 @@ async function loadHubSpotStats(){
 
     patchHubspotSourceRow();
     renderHubspotSampleTable();
+    updatePromoAudienceCounts();
     if(initialized.integrations) buildIntegrations();
 
     if(note) note.innerHTML = `<span class="live-dot"></span> Dados ao vivo — API HubSpot: ${d.total.toLocaleString('pt-BR')} contatos, ${d.socios.toLocaleString('pt-BR')} sócios-torcedores (${d.socioPct.toLocaleString('pt-BR')}%)`;
@@ -2784,6 +2785,7 @@ async function loadHubSpotStats(){
     hubspotStats = null;
     patchHubspotSourceRow();
     renderHubspotSampleTable();
+    updatePromoAudienceCounts();
     if(initialized.integrations) buildIntegrations();
     if(note) note.innerHTML = '<span class="live-dot" style="background:#ff6b5e"></span> Não foi possível carregar o HubSpot agora (' + e.message + ') — mostrando os últimos números conhecidos';
   }finally{
@@ -2796,21 +2798,49 @@ function hideHubSpotLiveNote(){
   hubspotStats = null;
   patchHubspotSourceRow();
   renderHubspotSampleTable();
+  updatePromoAudienceCounts();
   if(initialized.integrations) buildIntegrations();
 }
 
 /* ============ CAMPANHAS & PROMOÇÕES (piloto exclusivo do Vasco) ============
    Módulo novo — cruza Torcedor 360 (público), bilheteria e loja oficial numa
-   única promoção ativável. Públicos seguem a escala real do piloto (500
-   torcedores / 261 sócios); alcance e receita simulados são ilustrativos. */
+   única promoção ativável. 4 dos 6 públicos (risco de churn, Platina/Ouro,
+   não-sócios, toda a base) têm segmento real equivalente no HubSpot e são
+   atualizados ao vivo por updatePromoAudienceCounts() sempre que
+   loadHubSpotStats() resolve — os outros 2 ("inativos há 90 dias", "alta
+   propensão de compra") não têm filtro direto no HubSpot ainda, seguem
+   ilustrativos (valores abaixo). Alcance e receita simulados continuam
+   ilustrativos em todos os públicos. */
+const VASCO_PROMO_AUDIENCES_DEFAULT = { inativos90:38, altapropensao:64, churnrisco:44, platinaouro:52, naosocios:239, todabase:500 };
 const VASCO_PROMO_AUDIENCES = [
-  { id:'inativos90', label:'Sócios inativos há 90 dias', count:38 },
-  { id:'altapropensao', label:'Alta propensão de compra (loja)', count:64 },
-  { id:'churnrisco', label:'Torcedores em risco de churn', count:44 },
-  { id:'platinaouro', label:'Sócios Platina/Ouro', count:52 },
-  { id:'naosocios', label:'Identificados, ainda não-sócios', count:239 },
-  { id:'todabase', label:'Toda a base (piloto)', count:500 },
+  { id:'inativos90', label:'Sócios inativos há 90 dias', count: VASCO_PROMO_AUDIENCES_DEFAULT.inativos90 },
+  { id:'altapropensao', label:'Alta propensão de compra (loja)', count: VASCO_PROMO_AUDIENCES_DEFAULT.altapropensao },
+  { id:'churnrisco', label:'Torcedores em risco de churn', count: VASCO_PROMO_AUDIENCES_DEFAULT.churnrisco },
+  { id:'platinaouro', label:'Sócios Platina/Ouro', count: VASCO_PROMO_AUDIENCES_DEFAULT.platinaouro },
+  { id:'naosocios', label:'Identificados, ainda não-sócios', count: VASCO_PROMO_AUDIENCES_DEFAULT.naosocios },
+  { id:'todabase', label:'Toda a base (piloto)', count: VASCO_PROMO_AUDIENCES_DEFAULT.todabase },
 ];
+// Sincroniza os 4 públicos com segmento real do HubSpot (hubspotStats, só
+// quando o Vasco está selecionado) — os outros 2 mantêm o valor ilustrativo
+// padrão. Preserva a seleção atual do dropdown ao reconstruir as opções.
+function updatePromoAudienceCounts(){
+  const byId = id => VASCO_PROMO_AUDIENCES.find(a=>a.id===id);
+  const real = (currentClubId === 'vasco' && hubspotStats) ? hubspotStats : null;
+  const segTotal = name => real?.segments?.find(s=>s.name.includes(name))?.total;
+
+  byId('churnrisco').count = segTotal('risco de churn') ?? VASCO_PROMO_AUDIENCES_DEFAULT.churnrisco;
+  const platina = segTotal('Platina'), ouro = segTotal('Ouro');
+  byId('platinaouro').count = (platina != null && ouro != null) ? platina + ouro : VASCO_PROMO_AUDIENCES_DEFAULT.platinaouro;
+  byId('naosocios').count = segTotal('não-sócios') ?? VASCO_PROMO_AUDIENCES_DEFAULT.naosocios;
+  byId('todabase').count = real?.total ?? VASCO_PROMO_AUDIENCES_DEFAULT.todabase;
+
+  const audEl = document.getElementById('promo-audience');
+  if(audEl){
+    const prevValue = audEl.value;
+    audEl.innerHTML = VASCO_PROMO_AUDIENCES.map(a=>`<option value="${a.id}">${a.label} (${a.count.toLocaleString('pt-BR')})</option>`).join('');
+    if(prevValue) audEl.value = prevValue;
+  }
+}
 const VASCO_PROMO_OFFERS = [
   { id:'desconto', label:'Desconto simples', avgValue:45 },
   { id:'bundle', label:'Bundle ingresso + produto', avgValue:180 },
@@ -2826,12 +2856,8 @@ let vascoPromotionsData = [
 ];
 
 function renderVascoPromotions(){
-  const audEl = document.getElementById('promo-audience');
   const offEl = document.getElementById('promo-offer');
-  if(audEl && !audEl.dataset.filled){
-    audEl.innerHTML = VASCO_PROMO_AUDIENCES.map(a=>`<option value="${a.id}">${a.label} (${a.count})</option>`).join('');
-    audEl.dataset.filled = '1';
-  }
+  updatePromoAudienceCounts();
   if(offEl && !offEl.dataset.filled){
     offEl.innerHTML = VASCO_PROMO_OFFERS.map(o=>`<option value="${o.id}">${o.label}</option>`).join('');
     offEl.dataset.filled = '1';
