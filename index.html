@@ -113,6 +113,10 @@ a{ color:inherit; }
 .club-dropdown-item .mini-badge svg, .club-dropdown-item .mini-badge img{ width:14px; height:14px; }
 
 nav.nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
+.sidebar-mode-switch{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:3px; margin:0 0 14px; }
+.sidebar-mode-btn{ flex:1; text-align:center; padding:8px 8px; border-radius:7px; font-size:12px; font-weight:600; color:var(--text-dim); cursor:pointer; border:none; background:transparent; font-family:inherit; transition:background .15s,color .15s; }
+.sidebar-mode-btn:hover{ color:var(--text); }
+.sidebar-mode-btn.active{ background:linear-gradient(90deg, rgba(108,107,255,.9), rgba(176,107,255,.9)); color:#fff; }
 .nav-group-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); padding:16px 12px 6px; }
 .nav-item{
   display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px;
@@ -545,97 +549,102 @@ canvas{ max-width:100%; }
       <span>Powered by ClubBrain.ai</span>
     </div>
 
+    <div class="sidebar-mode-switch" id="sidebar-mode-switch">
+      <button type="button" class="sidebar-mode-btn active" data-mode="cockpit" onclick="setSidebarMode('cockpit')">🎯 Cockpit</button>
+      <button type="button" class="sidebar-mode-btn" data-mode="operacional" onclick="setSidebarMode('operacional')">⚙️ Operacional</button>
+    </div>
+
     <nav class="nav" id="nav">
-      <div class="nav-group-label">Executivo</div>
-      <div class="nav-item active" data-view="cockpit">
+      <div class="nav-group-label" data-mode="cockpit">Executivo</div>
+      <div class="nav-item active" data-view="cockpit" data-mode="cockpit">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
         Cockpit executivo
       </div>
+      <div class="nav-item" data-view="monetization" data-mode="cockpit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Receita &amp; patrocínio
+      </div>
 
-      <div class="nav-group-label">Visão do torcedor</div>
-      <div class="nav-item" data-view="overview">
+      <div class="nav-group-label" data-mode="cockpit">Inteligência</div>
+      <div class="nav-item" data-view="ontology" data-mode="cockpit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v6M12 13.5L6.8 17.2M12 13.5l5.2 3.7"/></svg>
+        Football Ontology™
+      </div>
+      <div class="nav-item" data-view="agents" data-mode="cockpit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
+        Agentes de IA
+      </div>
+
+      <div class="nav-group-label" data-mode="operacional">Visão do torcedor</div>
+      <div class="nav-item" data-view="overview" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         Visão geral
       </div>
-      <div class="nav-item" data-view="cdp">
+      <div class="nav-item" data-view="cdp" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
         Torcedor 360
       </div>
-      <div class="nav-item" data-view="audience">
+      <div class="nav-item" data-view="audience" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         Audiência
       </div>
-      <div class="nav-item" data-view="engagement">
+      <div class="nav-item" data-view="engagement" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         Comunidades
       </div>
-      <div class="nav-item" data-view="sentiment">
+      <div class="nav-item" data-view="sentiment" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         Sentimento &amp; buzz
       </div>
-      <div class="nav-item" data-view="content">
+      <div class="nav-item" data-view="content" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
         Conteúdo
       </div>
 
-      <div class="nav-group-label">Monetização</div>
-      <div class="nav-item" data-view="events">
+      <div class="nav-group-label" data-mode="operacional">Monetização</div>
+      <div class="nav-item" data-view="events" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7a2 2 0 012-2h14a2 2 0 012 2M3 7l9 6 9-6"/></svg>
         Eventos &amp; ingressos
       </div>
-      <div class="nav-item" data-view="rewards">
+      <div class="nav-item" data-view="rewards" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg>
         Gamificação
       </div>
-      <div class="nav-item" data-view="monetization">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        Receita &amp; patrocínio
-      </div>
-      <div class="nav-item" data-view="commerce">
+      <div class="nav-item" data-view="commerce" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
         Gestão de commerce
       </div>
-      <div class="nav-item vasco-only-nav" data-view="promotions" style="display:none;">
+      <div class="nav-item vasco-only-nav" data-view="promotions" data-mode="operacional" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a2 2 0 11-3.9 1"/></svg>
         Campanhas &amp; Promoções
       </div>
-      <div class="nav-item vasco-only-nav" data-view="loyalty" style="display:none;">
+      <div class="nav-item vasco-only-nav" data-view="loyalty" data-mode="operacional" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg>
         Loyalty &amp; Recompensas
       </div>
 
-      <div class="nav-group-label">Gestão do Clube</div>
-      <div class="nav-item" data-view="clubmgmt">
+      <div class="nav-group-label" data-mode="operacional">Gestão do Clube</div>
+      <div class="nav-item" data-view="clubmgmt" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg>
         Gestão do clube
       </div>
 
-      <div class="nav-group-label">Operação</div>
-      <div class="nav-item" data-view="opscenter">
+      <div class="nav-group-label" data-mode="operacional">Operação</div>
+      <div class="nav-item" data-view="opscenter" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
         Central operacional
       </div>
-      <div class="nav-item" data-view="marketing">
+      <div class="nav-item" data-view="marketing" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         Automação de marketing
       </div>
-      <div class="nav-item" data-view="ops">
+      <div class="nav-item" data-view="ops" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Saúde do sistema
       </div>
-      <div class="nav-item" data-view="integrations">
+      <div class="nav-item" data-view="integrations" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg>
         Integration Hub
-      </div>
-
-      <div class="nav-group-label">Inteligência</div>
-      <div class="nav-item" data-view="ontology">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v6M12 13.5L6.8 17.2M12 13.5l5.2 3.7"/></svg>
-        Football Ontology™
-      </div>
-      <div class="nav-item" data-view="agents">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
-        Agentes de IA
       </div>
     </nav>
 
@@ -2432,6 +2441,29 @@ const CLUB_PROFILES = {
 };
 let currentClubId = 'flamengo';
 
+// Dois modos de navegação: Cockpit (gestores — visão consolidada e estratégica)
+// e Operacional (analistas/gerentes — as ferramentas do dia a dia). Cada
+// .nav-item e .nav-group-label carrega data-mode="cockpit"|"operacional";
+// isto só filtra visibilidade, nenhum módulo muda de conteúdo por causa do modo.
+let currentSidebarMode = 'cockpit';
+function updateNavVisibility(){
+  document.querySelectorAll('.nav-item, .nav-group-label').forEach(el => {
+    const modeOk = el.dataset.mode === currentSidebarMode;
+    const clubOk = !el.classList.contains('vasco-only-nav') || currentClubId === 'vasco';
+    const baseDisplay = el.classList.contains('nav-item') ? 'flex' : 'block';
+    el.style.display = (modeOk && clubOk) ? baseDisplay : 'none';
+  });
+}
+function setSidebarMode(mode){
+  currentSidebarMode = mode;
+  document.querySelectorAll('.sidebar-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  updateNavVisibility();
+  const activeItem = document.querySelector('.nav-item.active');
+  if(activeItem && activeItem.style.display === 'none'){
+    goToView(mode === 'cockpit' ? 'cockpit' : 'cdp');
+  }
+}
+
 const CLUB_COVER_ORDER = ['vasco', 'flamengo', 'estrela', 'guarani', 'botafogo'];
 function renderClubCover(){
   document.getElementById('club-cover-grid').innerHTML = CLUB_COVER_ORDER.map((id,i)=>{
@@ -2503,11 +2535,12 @@ function selectClub(id, silent){
   if(id === 'vasco'){ loadVascoLiveOverview(); } else { hideVascoLiveNote(); }
 
   // Módulos piloto exclusivos do Vasco (Campanhas & Promoções, Loyalty &
-  // Recompensas) — escondem o item do menu pros outros clubes; se o usuário
-  // estava numa dessas telas e trocou de clube, volta pro Cockpit.
-  document.querySelectorAll('.vasco-only-nav').forEach(n => n.style.display = (id === 'vasco') ? 'flex' : 'none');
+  // Recompensas) — updateNavVisibility() já esconde o item do menu pros
+  // outros clubes (combinado com o modo Cockpit/Operacional); se o usuário
+  // estava numa dessas telas e trocou de clube, volta pro default do modo atual.
+  updateNavVisibility();
   if(id !== 'vasco' && (document.getElementById('view-promotions')?.classList.contains('active') || document.getElementById('view-loyalty')?.classList.contains('active'))){
-    goToView('cockpit');
+    goToView(currentSidebarMode === 'cockpit' ? 'cockpit' : 'cdp');
   }
   if(id === 'vasco'){ renderVascoPromotions(); renderVascoLoyalty(); }
 
