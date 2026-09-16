@@ -936,6 +936,23 @@ exports.handler = async function (event) {
       };
     }
 
+    if (payload.action === '_debug_notes') {
+      // Verificação pontual (não documentada, não usada pelo front-end) de
+      // que logContactNote está de fato criando e associando Notas reais —
+      // remover depois de confirmar.
+      const cRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email&associations=notes');
+      const cData = await cRes.json().catch(() => ({}));
+      if (!cRes.ok) return { statusCode: cRes.status, headers: cors, body: JSON.stringify({ error: cData.message }) };
+      const noteIds = ((cData.associations && cData.associations.notes && cData.associations.notes.results) || []).map(x => x.id);
+      const notes = [];
+      for (const id of noteIds) {
+        const nr = await hsFetch('/crm/v3/objects/notes/' + id + '?properties=hs_note_body,hs_timestamp');
+        const nd = await nr.json().catch(() => ({}));
+        notes.push(nd.properties || nd);
+      }
+      return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, contactId: cData.id, noteIds, notes }) };
+    }
+
     if (payload.action === 'lookup_fan') {
       // "Login" do ShopVasco/Sócio Torcedor — não é autenticação de verdade
       // (sem senha), é uma consulta real ao contato no HubSpot por e-mail,
