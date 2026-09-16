@@ -2146,7 +2146,7 @@ canvas{ max-width:100%; }
 
         <div class="card" style="margin-bottom:16px;">
           <div class="card-title"><h3>Mapa de conexões</h3></div>
-          <div class="hero-note" style="margin-bottom:14px;">Cada linha é uma integração ativa com o ClubBrain — verde sólido é saudável, âmbar tracejado precisa de atenção. Clique num sistema para ver detalhes.</div>
+          <div class="hero-note" style="margin-bottom:14px;">🟢 verde sólido + selo = dado real ao vivo do Vasco · 🟡 âmbar tracejado = precisa de atenção · ⚪ cinza tracejado = simulado (pronto pra integrar). Clique num sistema para ver detalhes.</div>
           <div id="integrations-map" style="width:100%; overflow-x:auto;"></div>
         </div>
 
@@ -2166,7 +2166,7 @@ canvas{ max-width:100%; }
         </div>
         <div class="card">
           <table>
-            <thead><tr><th>Integração</th><th>Categoria</th><th>Ativo</th><th>Chave de API</th><th>Webhook</th><th>Sincronização</th><th></th></tr></thead>
+            <thead><tr><th>Integração</th><th>Categoria</th><th>Origem</th><th>Ativo</th><th>Chave de API</th><th>Webhook</th><th>Sincronização</th><th></th></tr></thead>
             <tbody id="integrations-config"></tbody>
           </table>
         </div>
@@ -2651,6 +2651,7 @@ async function loadVascoLiveOverview(){
 
     renderCockpitAlerts(buildVascoCockpitAlerts(d));
     loadVascoRealAtRiskFans();
+    if(initialized.integrations) buildIntegrations(); // MVP Vasco vira "real" na Integration Hub
 
     if(note) note.innerHTML = '<span class="live-dot"></span> Dados ao vivo — backend real (Postgres + Neo4j), piloto de 500 torcedores';
   }catch(e){
@@ -2710,6 +2711,7 @@ function hideVascoLiveNote(){
   vascoLiveOverviewData = null;
   hideVascoRealAtRiskCard();
   renderCockpitAlerts(DEFAULT_STRAT_ALERTS);
+  if(initialized.integrations) buildIntegrations(); // MVP Vasco volta a "simulado"
 }
 
 // Só a linha "HubSpot CRM" da tabela "Fontes de dados conectadas" — não
@@ -6921,7 +6923,17 @@ function buildOps(){
 }
 
 /* ============ INTEGRATION HUB ============ */
+// "kind" marca as 2 integrações genuinamente plugadas nesta demo (HubSpot e
+// o backend do MVP Vasco) — todas as outras são ilustrativas (nunca tiveram
+// uma API de verdade por trás). isIntegrationReal() abaixo decide, em tempo
+// de render, se cada uma mostra como "real" (verde) ou "simulado" (cinza) —
+// só é real quando o Vasco está selecionado E o respectivo fetch já
+// resolveu, reaproveitando os mesmos dados já buscados por
+// loadHubSpotStats()/loadVascoLiveOverview(), sem chamada extra nenhuma.
 const INTEGRATIONS = {
+  dados: [
+    { name:'MVP Vasco (Postgres + Neo4j)', badge:'VP', color: teal, status:'active', desc:'Backend real do piloto — Identity, Torcedor 360°, alertas de churn e KPIs financeiros direto do banco real, não simulado.', sync:'há 1 min', cat:'CDP/Identity', key:'API pública (sem chave)', webhook:'—', freq:'Tempo real', kind:'mvpvasco' },
+  ],
   pagamentos: [
     { name:'Pix (Banco Central)', badge:'PIX', color:'#22e07a', status:'active', desc:'Pagamentos instantâneos de sócio-torcedor, ingressos e commerce.', sync:'há 2 min', cat:'Pagamentos', key:'pix_cert_••••••a01', webhook:'/webhooks/pix', freq:'Tempo real' },
     { name:'Stripe', badge:'ST', color:brand, status:'active', desc:'Assinaturas internacionais e pagamentos recorrentes.', sync:'há 4 min', cat:'Pagamentos', key:'sk_live_••••••3f2a', webhook:'/webhooks/stripe', freq:'Tempo real' },
@@ -6932,7 +6944,7 @@ const INTEGRATIONS = {
   commerce: [
     { name:'VTEX', badge:'VT', color:brand2, status:'active', desc:'Catálogo, preços e pedidos da loja oficial em tempo real.', sync:'há 1 min', cat:'Commerce', key:'vtex_app_••••••2c9', webhook:'/webhooks/vtex', freq:'Tempo real' },
     { name:'Ingresse', badge:'IN', color:teal, status:'active', desc:'Venda, check-in e validação de ingressos do estádio.', sync:'há 3 min', cat:'Ingressos', key:'ing_key_••••••88a', webhook:'/webhooks/ingresse', freq:'Tempo real' },
-    { name:'HubSpot CRM', badge:'HS', color:'#FF7A59', status:'active', desc:'Base real de sócios-torcedores — nível, Fan Score, jogador favorito, LTV e risco de churn como propriedades nativas do contato.', sync:'há 5 min', cat:'CRM', key:'hs_priv_app_••••••7c2', webhook:'/webhooks/hubspot', freq:'A cada 15 min' },
+    { name:'HubSpot CRM', badge:'HS', color:'#FF7A59', status:'active', desc:'Base real de sócios-torcedores — nível, Fan Score, jogador favorito, LTV e risco de churn como propriedades nativas do contato.', sync:'há 5 min', cat:'CRM', key:'hs_priv_app_••••••7c2', webhook:'/webhooks/hubspot', freq:'A cada 15 min', kind:'hubspot' },
     { name:'Zendesk', badge:'ZD', color:'#4fc9df', status:'active', desc:'Tickets e SLA de atendimento ao torcedor.', sync:'há 7 min', cat:'CRM', key:'zd_token_••••••ff2', webhook:'/webhooks/zendesk', freq:'Tempo real' },
   ],
   marketing: [
@@ -6942,10 +6954,18 @@ const INTEGRATIONS = {
     { name:'Google Analytics 4', badge:'GA', color:gold, status:'active', desc:'Tráfego, conversão e atribuição do site e app.', sync:'há 2 min', cat:'Analytics', key:'ga4_prop_••••••409', webhook:'—', freq:'Diário' },
   ],
 };
+// Só verdadeiro pras 2 integrações com "kind" quando o Vasco está
+// selecionado e o dado ao vivo já carregou — todo o resto (incluindo
+// HubSpot/MVP Vasco quando outro clube está selecionado) é simulado.
+function isIntegrationReal(it){
+  if(it.kind === 'hubspot') return currentClubId === 'vasco' && !!hubspotStats;
+  if(it.kind === 'mvpvasco') return currentClubId === 'vasco' && !!vascoLiveOverviewData;
+  return false;
+}
 function buildIntegrations(){
   const statusLabel = { active:'Conectado', warn:'Atenção', error:'Erro' };
   const statusCls = { active:'status-active', warn:'status-warn', error:'status-error' };
-  const all = [...INTEGRATIONS.pagamentos, ...INTEGRATIONS.commerce, ...INTEGRATIONS.marketing];
+  const all = [...INTEGRATIONS.dados, ...INTEGRATIONS.pagamentos, ...INTEGRATIONS.commerce, ...INTEGRATIONS.marketing];
 
   // subtab switching (liga só uma vez)
   const subtabsEl = document.getElementById('integrations-subtabs');
@@ -6968,21 +6988,35 @@ function buildIntegrations(){
   });
   const linesSvg = nodes.map(n=>{
     const warn = n.status === 'warn';
-    return `<line x1="${cx}" y1="${cy}" x2="${n.x}" y2="${n.y}" stroke="${warn?amber:'#22e07a'}" stroke-width="1.6" ${warn?'stroke-dasharray="5,4"':''} opacity="0.55"/>`;
+    const real = isIntegrationReal(n);
+    // 3 estados de linha: âmbar tracejado = precisa atenção, verde sólido
+    // brilhante = dado real ao vivo, cinza tracejado apagado = simulado.
+    const stroke = warn ? amber : (real ? '#22e07a' : '#4b5378');
+    const dash = (warn || !real) ? 'stroke-dasharray="5,4"' : '';
+    const opacity = real ? 0.85 : (warn ? 0.6 : 0.32);
+    return `<line x1="${cx}" y1="${cy}" x2="${n.x}" y2="${n.y}" stroke="${stroke}" stroke-width="${real ? 2 : 1.6}" ${dash} opacity="${opacity}"/>`;
   }).join('');
   const nodesSvg = nodes.map(n=>{
-    // Nó HubSpot mostra números reais (via loadHubSpotStats()) no toast de
-    // clique quando o Vasco está selecionado — os outros nós/clubes seguem
-    // com o texto ilustrativo padrão (nome · frequência · status).
-    const isLiveHubspot = n.name === 'HubSpot CRM' && currentClubId === 'vasco' && hubspotStats;
-    const toastText = isLiveHubspot
-      ? `${n.name} · ${hubspotStats.total.toLocaleString('pt-BR')} contatos reais (${hubspotStats.socios.toLocaleString('pt-BR')} sócios, ${hubspotStats.socioPct.toLocaleString('pt-BR')}%) · Dado ao vivo`
-      : `${n.name} · ${n.freq} · ${statusLabel[n.status]}`;
+    // HubSpot e MVP Vasco mostram números reais no toast de clique quando o
+    // Vasco está selecionado e o respectivo dado ao vivo já carregou — todo
+    // o resto (e os 2 de cima nos outros clubes) mostra o texto ilustrativo
+    // padrão (nome · frequência · status simulado).
+    const real = isIntegrationReal(n);
+    let toastText;
+    if(n.kind === 'hubspot' && real){
+      toastText = `${n.name} · ${hubspotStats.total.toLocaleString('pt-BR')} contatos reais (${hubspotStats.socios.toLocaleString('pt-BR')} sócios, ${hubspotStats.socioPct.toLocaleString('pt-BR')}%) · Dado ao vivo`;
+    } else if(n.kind === 'mvpvasco' && real){
+      const d = vascoLiveOverviewData;
+      toastText = `${n.name} · ${d.total_fans.toLocaleString('pt-BR')} torcedores reais, ${d.active_memberships.toLocaleString('pt-BR')} sócios ativos · Dado ao vivo`;
+    } else {
+      toastText = `${n.name} · ${n.freq} · ${real ? 'Dado ao vivo' : 'Simulado (demo) · ' + statusLabel[n.status]}`;
+    }
     return `
     <g class="int-node" style="cursor:pointer;" onclick="showToast('${toastText.replace(/'/g,"\\'")}')">
-      <circle cx="${n.x}" cy="${n.y}" r="26" fill="${n.color}22" stroke="${n.color}" stroke-width="1.6"/>
-      <text x="${n.x}" y="${n.y+4}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${n.color}" font-family="inherit">${n.badge}</text>
-      <text x="${n.x}" y="${n.y+42}" text-anchor="middle" font-size="10.5" fill="var(--text-dim)" font-family="inherit">${n.name.length>18 ? n.name.slice(0,16)+'…' : n.name}</text>
+      <circle cx="${n.x}" cy="${n.y}" r="26" fill="${n.color}${real ? '33' : '14'}" stroke="${n.color}" stroke-width="${real ? 2.2 : 1.4}" stroke-opacity="${real ? 1 : 0.55}"/>
+      ${real ? `<circle cx="${n.x+19}" cy="${n.y-19}" r="5.5" fill="#22e07a" stroke="var(--surface)" stroke-width="1.5"/>` : ''}
+      <text x="${n.x}" y="${n.y+4}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${n.color}" fill-opacity="${real ? 1 : 0.65}" font-family="inherit">${n.badge}</text>
+      <text x="${n.x}" y="${n.y+42}" text-anchor="middle" font-size="10.5" fill="var(--text-dim)" fill-opacity="${real ? 1 : 0.75}" font-family="inherit">${n.name.length>18 ? n.name.slice(0,16)+'…' : n.name}</text>
     </g>`;
   }).join('');
   document.getElementById('integrations-map').innerHTML = `
@@ -6998,7 +7032,9 @@ function buildIntegrations(){
     </svg>`;
 
   // --- Configurações ---
-  document.getElementById('integrations-config').innerHTML = all.map(i=>`
+  document.getElementById('integrations-config').innerHTML = all.map(i=>{
+    const real = isIntegrationReal(i);
+    return `
     <tr>
       <td class="strong">
         <div style="display:flex; align-items:center; gap:10px;">
@@ -7006,12 +7042,14 @@ function buildIntegrations(){
         </div>
       </td>
       <td><span class="tag">${i.cat}</span></td>
+      <td><span class="status-dot ${real ? 'status-active' : ''}" style="${real ? '' : 'color:var(--text-dim); background:rgba(255,255,255,.06);'}">${real ? '● Real' : '○ Simulado'}</span></td>
       <td><span class="status-dot ${statusCls[i.status]}">${statusLabel[i.status]}</span></td>
       <td class="mono">${i.key}</td>
       <td class="mono">${i.webhook}</td>
       <td>${i.freq}</td>
       <td><span class="card-foot-link" style="margin-top:0;" onclick="showToast('${i.name.replace(/'/g,"\\'")} · configuração aberta (somente leitura na demo)')">Editar</span></td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   const logs = [
     ['há 1 min','Pix (Banco Central)','Webhook de pagamento confirmado','1','<span class="status-dot status-active">OK</span>'],
