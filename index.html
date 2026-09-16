@@ -6371,7 +6371,7 @@ function buildCdp(){
     ['Ingressos & catraca (estádio)', 'Ticketing', '62.000', 'ok'],
     ['Ponto de venda físico (estádio, loja)', 'POS', '18.000', 'ok'],
     ['Museu virtual (tour no app)', 'Mobile/App', '1.400', 'ok'],
-    ['CRM legado (pré-migração)', 'Batch/CSV', '4.200', 'warn'],
+    ['HubSpot CRM', 'CRM', '4.200', 'ok'],
   ];
   document.getElementById('cdp-sources').innerHTML = sources.map(s=>`
     <tr><td class="strong">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td>
@@ -6789,7 +6789,7 @@ const INTEGRATIONS = {
   commerce: [
     { name:'VTEX', badge:'VT', color:brand2, status:'active', desc:'Catálogo, preços e pedidos da loja oficial em tempo real.', sync:'há 1 min', cat:'Commerce', key:'vtex_app_••••••2c9', webhook:'/webhooks/vtex', freq:'Tempo real' },
     { name:'Ingresse', badge:'IN', color:teal, status:'active', desc:'Venda, check-in e validação de ingressos do estádio.', sync:'há 3 min', cat:'Ingressos', key:'ing_key_••••••88a', webhook:'/webhooks/ingresse', freq:'Tempo real' },
-    { name:'Salesforce CRM', badge:'SF', color:'#00a1e0', status:'active', desc:'Histórico de relacionamento e atendimento do sócio-torcedor.', sync:'há 5 min', cat:'CRM', key:'sf_oauth_••••••1d4', webhook:'—', freq:'A cada 15 min' },
+    { name:'HubSpot CRM', badge:'HS', color:'#FF7A59', status:'active', desc:'Base real de sócios-torcedores — nível, Fan Score, jogador favorito, LTV e risco de churn como propriedades nativas do contato.', sync:'há 5 min', cat:'CRM', key:'hs_priv_app_••••••7c2', webhook:'/webhooks/hubspot', freq:'A cada 15 min' },
     { name:'Zendesk', badge:'ZD', color:'#4fc9df', status:'active', desc:'Tickets e SLA de atendimento ao torcedor.', sync:'há 7 min', cat:'CRM', key:'zd_token_••••••ff2', webhook:'/webhooks/zendesk', freq:'Tempo real' },
   ],
   marketing: [
