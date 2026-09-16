@@ -1768,6 +1768,18 @@ canvas{ max-width:100%; }
           </table>
         </div>
 
+        <div class="card" id="hubspot-sample-card" style="display:none; margin-bottom:16px;">
+          <div class="card-title">
+            <span class="icon-badge" style="background:rgba(255,122,89,.16); color:#FF7A59;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 8h8v8H8z"/></svg></span>
+            <h3>Amostra real da base HubSpot <span class="hero-note" style="font-weight:400;">— top torcedores por Fan Score</span></h3>
+          </div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Registros de verdade, lidos ao vivo do CRM HubSpot do Vasco via Search API — nomes e e-mails são fictícios (base de demonstração), mas os campos abaixo são propriedades reais do contato.</div>
+          <table>
+            <thead><tr><th>Torcedor</th><th>Cidade</th><th>Nível</th><th>Sócio</th><th>Fan Score</th><th>LTV</th><th>Risco de churn</th></tr></thead>
+            <tbody id="hubspot-sample-table"><tr><td colspan="7" class="hero-note">Carregando…</td></tr></tbody>
+          </table>
+        </div>
+
         <div class="two-col" style="margin-bottom:16px;">
           <div class="card">
             <div class="card-title"><h3>Resolução de identidade</h3></div>
@@ -2711,6 +2723,31 @@ function patchHubspotSourceRow(){
     : '4.200';
 }
 
+// Tabela de amostra real (8 contatos com maior fan_score, vindos junto no
+// mesmo { action:'stats' }) — some quando o Vasco não está selecionado ou
+// os dados ainda não chegaram/falharam.
+function renderHubspotSampleTable(){
+  const card = document.getElementById('hubspot-sample-card');
+  const tbody = document.getElementById('hubspot-sample-table');
+  if(!card || !tbody) return; // CDP Overview ainda não foi visitada nesta sessão
+  if(currentClubId !== 'vasco' || !hubspotStats || !hubspotStats.sample || !hubspotStats.sample.length){
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+  const churnColor = { alto:'#ff5c72', medio:'#ffb454', baixo:'#22e07a' };
+  tbody.innerHTML = hubspotStats.sample.map(c => `
+    <tr>
+      <td class="strong">${c.firstname} ${c.lastname}</td>
+      <td>${c.city}${c.state ? '/' + c.state : ''}</td>
+      <td><span class="tag">${c.nivel_socio}</span></td>
+      <td>${c.e_socio_torcedor === 'sim' ? 'Sim' : 'Não'}</td>
+      <td class="mono">${c.fan_score}</td>
+      <td>${fmtCompactBRL(c.ltv_torcedor)}</td>
+      <td style="color:${churnColor[c.risco_churn] || 'var(--text-dim)'}; font-weight:600;">${c.risco_churn || '—'}</td>
+    </tr>`).join('');
+}
+
 // Puxa números reais do CRM HubSpot do Vasco (ver netlify/functions/
 // hubspot-admin.js, { action:'stats' }) — só chamada quando o Vasco está
 // selecionado, único clube com conta HubSpot real. Atualiza a linha
@@ -2739,12 +2776,14 @@ async function loadHubSpotStats(){
     hubspotStats = d;
 
     patchHubspotSourceRow();
+    renderHubspotSampleTable();
     if(initialized.integrations) buildIntegrations();
 
     if(note) note.innerHTML = `<span class="live-dot"></span> Dados ao vivo — API HubSpot: ${d.total.toLocaleString('pt-BR')} contatos, ${d.socios.toLocaleString('pt-BR')} sócios-torcedores (${d.socioPct.toLocaleString('pt-BR')}%)`;
   }catch(e){
     hubspotStats = null;
     patchHubspotSourceRow();
+    renderHubspotSampleTable();
     if(initialized.integrations) buildIntegrations();
     if(note) note.innerHTML = '<span class="live-dot" style="background:#ff6b5e"></span> Não foi possível carregar o HubSpot agora (' + e.message + ') — mostrando os últimos números conhecidos';
   }finally{
@@ -2756,6 +2795,7 @@ function hideHubSpotLiveNote(){
   if(note) note.style.display = 'none';
   hubspotStats = null;
   patchHubspotSourceRow();
+  renderHubspotSampleTable();
   if(initialized.integrations) buildIntegrations();
 }
 

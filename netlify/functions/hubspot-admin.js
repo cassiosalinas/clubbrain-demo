@@ -20,12 +20,15 @@
 //                           por nível de sócio, risco de churn etc. —
 //                           precisa do escopo crm.lists.write no private app
 //   { "action": "stats" } → leitura ao vivo (Search API): total de contatos,
-//                           total de sócios-torcedores e contagem de cada um
-//                           dos 6 segmentos — é o que alimenta os números
-//                           "dado ao vivo" da Integration Hub / CDP Overview
-//                           no index.html. Só leitura, sem PII no retorno,
-//                           por isso é chamada direto do navegador (CORS
-//                           liberado pra ALLOWED_ORIGINS abaixo).
+//                           total de sócios-torcedores, contagem de cada um
+//                           dos 6 segmentos e uma amostra dos 8 com maior
+//                           fan_score (nome, cidade, nível etc.) — alimenta
+//                           os números "dado ao vivo" e a tabela de amostra
+//                           da CDP Overview no index.html. Só leitura;
+//                           chamada direto do navegador (CORS liberado pra
+//                           ALLOWED_ORIGINS abaixo) — sem risco de PII real
+//                           porque TODO contato nesta conta é fictício
+//                           (e-mails em example.com / vasco-demo.example.com).
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → HUBSPOT_API_KEY
@@ -746,6 +749,35 @@ exports.handler = async function (event) {
       }
 
       const segments = SEGMENT_LISTS.map((seg, i) => ({ name: seg.name, total: segmentTotals[i] }));
+
+      // Amostra real (não só contagem) — top 8 por fan_score, mesma chamada
+      // de Search API, só mais uma sequencial (fica dentro da mesma
+      // invocação da function, sem risco de rate limit com as de cima).
+      const sampleRes = await hsFetch('/crm/v3/objects/contacts/search', {
+        method: 'POST',
+        body: JSON.stringify({
+          filterGroups: [{ filters: [{ propertyName: 'time_coracao', operator: 'EQ', value: 'Vasco da Gama' }] }],
+          sorts: [{ propertyName: 'fan_score', direction: 'DESCENDING' }],
+          limit: 8,
+          properties: ['firstname', 'lastname', 'city', 'state', 'nivel_socio', 'e_socio_torcedor', 'fan_score', 'ltv_torcedor', 'risco_churn', 'segmento_torcedor', 'jogador_favorito'],
+        }),
+      });
+      const sampleData = await sampleRes.json().catch(() => ({}));
+      if (!sampleRes.ok) throw new Error(sampleData.message || ('HTTP ' + sampleRes.status) + ' na amostra');
+      const sample = (sampleData.results || []).map(c => ({
+        firstname: c.properties.firstname,
+        lastname: c.properties.lastname,
+        city: c.properties.city,
+        state: c.properties.state,
+        nivel_socio: c.properties.nivel_socio,
+        e_socio_torcedor: c.properties.e_socio_torcedor,
+        fan_score: Number(c.properties.fan_score) || 0,
+        ltv_torcedor: Number(c.properties.ltv_torcedor) || 0,
+        risco_churn: c.properties.risco_churn,
+        segmento_torcedor: c.properties.segmento_torcedor,
+        jogador_favorito: c.properties.jogador_favorito,
+      }));
+
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json', ...cors },
@@ -755,6 +787,7 @@ exports.handler = async function (event) {
           socios,
           socioPct: total ? Math.round((socios / total) * 1000) / 10 : 0,
           segments,
+          sample,
           generatedAt: new Date().toISOString(),
         }),
       };
