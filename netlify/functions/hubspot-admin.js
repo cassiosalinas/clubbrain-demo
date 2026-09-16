@@ -11,8 +11,11 @@
 // Netlify), nunca exposta no navegador. Chame esta function com:
 //   { "action": "setup" } → cria as 35 propriedades customizadas no Contact
 //                           (idempotente — roda de novo sem duplicar)
-//   { "action": "seed" }  → cria/atualiza os 15 torcedores fictícios
+//   { "action": "seed" }  → cria/atualiza os 15 torcedores fictícios originais
 //                           (upsert por e-mail, idempotente também)
+//   { "action": "seed_bulk", "offset": N, "limit": 100 } → cria/atualiza mais
+//                           485 torcedores gerados (500 no total, 30% sócios).
+//                           Paginado — chame com offset 0, 100, 200, 300, 400.
 //   { "action": "lists" } → cria 6 listas dinâmicas (segmentos) filtradas
 //                           por nível de sócio, risco de churn etc. —
 //                           precisa do escopo crm.lists.write no private app
@@ -357,6 +360,167 @@ const TORCEDORES_VASCO = [
     embaixador:'nao', indicacoes_feitas:1, preferencia_acessibilidade:'Cadeira de rodas', geracao_familiar:'2ª geração' },
 ];
 
+// ---------------------------------------------------------------------------
+// Geração determinística de mais 485 torcedores fictícios (500 no total com
+// os 15 acima) — mesma técnica de seed/PRNG (mulberry32 + hashSeed) já usada
+// no index.html do demo pra gerar a base de torcedores sem inflar o arquivo
+// com milhares de linhas literais. Nomes/sobrenomes brasileiros variados,
+// cidades fortemente concentradas no Rio de Janeiro (o Vasco é carioca — ver
+// CITY_WEIGHTS), e exatos 30% de sócios-torcedores no total: dos 15 originais
+// já são 13 sócios + 2 não-sócios, então destes 485 novos exatamente 137 são
+// sócios (índices 0-136) e 348 não-sócios (índices 137-484) — 13+137=150 =
+// 30% de 500.
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hashSeed(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return h >>> 0;
+}
+function pick(rnd, arr) { return arr[Math.floor(rnd() * arr.length)]; }
+function pickWeighted(rnd, entries) {
+  const total = entries.reduce((s, e) => s + e[1], 0);
+  let r = rnd() * total;
+  for (const [value, weight] of entries) {
+    if (r < weight) return value;
+    r -= weight;
+  }
+  return entries[entries.length - 1][0];
+}
+function semAcento(s) {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+const FIRST_NAMES_M = ['João','Pedro','Lucas','Gabriel','Matheus','Rafael','Bruno','Daniel','Felipe','Thiago','Rodrigo','Marcelo','Fernando','Ricardo','Eduardo','Carlos','André','Diego','Gustavo','Leonardo','Vinícius','Guilherme','Vitor','Paulo','Alexandre','Renato','Marcos','Igor','Caio','Henrique','Otávio','Márcio','Anderson','Wesley','Wagner','Sérgio'];
+const FIRST_NAMES_F = ['Maria','Ana','Juliana','Fernanda','Camila','Larissa','Patrícia','Aline','Bruna','Carla','Beatriz','Gabriela','Amanda','Vanessa','Mariana','Letícia','Renata','Priscila','Cristina','Débora','Luana','Natália','Sabrina','Tatiana','Viviane','Adriana','Simone','Rosana','Cíntia','Michele','Daniela','Elaine'];
+const LAST_NAMES = ['Silva','Santos','Oliveira','Souza','Pereira','Costa','Rodrigues','Almeida','Nascimento','Lima','Araújo','Fernandes','Carvalho','Gomes','Martins','Rocha','Ribeiro','Alves','Monteiro','Cardoso','Teixeira','Correia','Mendes','Barros','Freitas','Pinto','Moreira','Nunes','Marques','Machado','Colina','Malta','Vascaína','Almirante','Sãojanuário','Januário','Barreto','Fonseca','Andrade','Peixoto'];
+
+// Peso forte no Rio (capital + Baixada/Niterói ~87%), resto do Brasil ~13%
+// só pra dar a sensação de torcida espalhada, sem tirar o Rio do centro.
+const CITY_WEIGHTS = [
+  [{ city:'Rio de Janeiro', state:'RJ' }, 45], [{ city:'Niterói', state:'RJ' }, 8],
+  [{ city:'São Gonçalo', state:'RJ' }, 7], [{ city:'Duque de Caxias', state:'RJ' }, 6],
+  [{ city:'Nova Iguaçu', state:'RJ' }, 6], [{ city:'Belford Roxo', state:'RJ' }, 4],
+  [{ city:'São João de Meriti', state:'RJ' }, 4], [{ city:'Petrópolis', state:'RJ' }, 3],
+  [{ city:'Volta Redonda', state:'RJ' }, 2], [{ city:'Campos dos Goytacazes', state:'RJ' }, 2],
+  [{ city:'São Paulo', state:'SP' }, 3], [{ city:'Belo Horizonte', state:'MG' }, 2],
+  [{ city:'Salvador', state:'BA' }, 2], [{ city:'Brasília', state:'DF' }, 1.5],
+  [{ city:'Curitiba', state:'PR' }, 1.2], [{ city:'Recife', state:'PE' }, 1.2],
+  [{ city:'Porto Alegre', state:'RS' }, 1], [{ city:'Fortaleza', state:'CE' }, 1],
+  [{ city:'Goiânia', state:'GO' }, 0.8], [{ city:'Manaus', state:'AM' }, 0.7],
+];
+
+const JOGADORES = ['Léo Jardim','Carlos Cuesta','Lucas Freitas','Paulo Henrique','Lucas Piton','Hugo Moura','Thiago Mendes','Philippe Coutinho','Pablo Vegetti','Carlos Andrés Gómez','Belinha Dias','Vick','Layza','—'];
+const PRODUTOS = ['Camisas','Vestuário','Acessórios','Colecionáveis','Infantil','Ingressos avulsos','Ingressos VIP','Camarote'];
+const SETORES = ['Norte','Sul','Leste','Oeste','Premium','Camarotes'];
+const CANAIS = ['whatsapp','email','push','sms'];
+const FONTES = ['app','loja_fisica','indicacao','campanha','redes_sociais','organico'];
+const TORCIDAS = ['Força Jovem do Vasco','','','','',''];
+
+function gerarTorcedor(i, ehSocio) {
+  const rnd = mulberry32(hashSeed('vasco-fan-' + i));
+  const genero = rnd() < 0.52 ? 'masculino' : 'feminino';
+  const firstname = pick(rnd, genero === 'masculino' ? FIRST_NAMES_M : FIRST_NAMES_F);
+  const lastname = pick(rnd, LAST_NAMES);
+  const { city, state } = pickWeighted(rnd, CITY_WEIGHTS);
+  const email = `${semAcento(firstname)}.${semAcento(lastname)}${i}@vasco-demo.example.com`;
+
+  const nivel_socio = ehSocio
+    ? pickWeighted(rnd, [['bronze', 55], ['prata', 30], ['ouro', 12], ['platina', 3]])
+    : 'basico';
+  const fan_score = Math.round(ehSocio ? 45 + rnd() * 50 : 5 + rnd() * 35);
+  const tierMult = { basico:0, bronze:1, prata:1.8, ouro:3.2, platina:6 }[nivel_socio];
+  const ltv_torcedor = ehSocio
+    ? Math.round((80 + rnd() * 400) * tierMult)
+    : Math.round(rnd() < 0.35 ? rnd() * 150 : 0);
+  const risco_churn = pickWeighted(rnd, [['baixo', 60], ['medio', 27], ['alto', 13]]);
+  const propensao_upgrade = Math.max(5, Math.min(95, Math.round(fan_score * 0.8 + rnd() * 20 - 10)));
+
+  let segmento_torcedor;
+  if (!ehSocio) segmento_torcedor = 'Identificado, não-sócio';
+  else if (risco_churn === 'alto') segmento_torcedor = genero === 'feminino' ? 'Torcedora em risco de churn' : 'Torcedor em risco de churn';
+  else if (nivel_socio === 'platina' && fan_score > 80) segmento_torcedor = 'Top torcedor';
+  else if (rnd() < 0.15) segmento_torcedor = 'Sócio novo';
+  else segmento_torcedor = genero === 'feminino' ? 'Torcedora fiel' : 'Torcedor fiel';
+
+  const anoAtual = 2026;
+  const anosComoTorcedor = 2 + Math.floor(rnd() * 35);
+  const torcedor_desde = `${anoAtual - anosComoTorcedor}-01-01`;
+  const socioDesdeAnos = ehSocio ? Math.max(0, Math.floor(rnd() * Math.min(anosComoTorcedor, 10))) : null;
+  const socio_desde = ehSocio ? `${anoAtual - socioDesdeAnos}-0${1 + Math.floor(rnd() * 8)}-01` : null;
+
+  const nascAno = anoAtual - (16 + Math.floor(rnd() * 60));
+  const data_nascimento = `${nascAno}-${String(1 + Math.floor(rnd() * 12)).padStart(2,'0')}-${String(1 + Math.floor(rnd() * 27)).padStart(2,'0')}`;
+
+  const status_assinatura = !ehSocio ? 'nao_aplicavel' : (risco_churn === 'alto' && rnd() < 0.4 ? 'inadimplente' : 'ativo');
+  const plano_mensalidade = { basico:0, bronze:29.90, prata:49.90, ouro:89.90, platina:149.90 }[nivel_socio];
+
+  const partidas_assistidas_temporada = ehSocio ? Math.round(rnd() * fan_score / 4) : (rnd() < 0.2 ? Math.round(rnd() * 2) : 0);
+  const taxa_presenca = Math.min(100, Math.round(partidas_assistidas_temporada * (6 + rnd() * 4)));
+  const engajamento_app = Math.max(0, Math.min(100, Math.round(fan_score * 0.9 + rnd() * 15 - 5)));
+  const engajamento_redes_sociais = Math.max(0, Math.min(100, Math.round(fan_score * 0.8 + rnd() * 20 - 8)));
+
+  const numero_compras = ehSocio ? Math.round(rnd() * 20) : (rnd() < 0.3 ? Math.round(rnd() * 3) : 0);
+  const ticket_medio = numero_compras > 0 ? Math.round(40 + rnd() * 110) : 0;
+  const produto_favorito = numero_compras > 0 ? pick(rnd, PRODUTOS) : '';
+
+  const diasAtras = risco_churn === 'alto' ? 45 + Math.floor(rnd() * 60) : (risco_churn === 'medio' ? 10 + Math.floor(rnd() * 40) : Math.floor(rnd() * 20));
+  const dataRef = new Date(Date.UTC(2026, 8, 16));
+  dataRef.setUTCDate(dataRef.getUTCDate() - diasAtras);
+  const data_ultima_interacao = dataRef.toISOString().slice(0, 10);
+
+  const sinal_alerta = risco_churn === 'alto'
+    ? `Sem compra há ${diasAtras} dias`
+    : (!ehSocio && numero_compras > 0 ? 'Compra na loja mas nunca virou sócio' : '');
+
+  const opt_in_marketing = rnd() < 0.78 ? 'sim' : 'nao';
+  const frequencia_contato_desejada = pickWeighted(rnd, [['semanal',40],['mensal',35],['diaria',10],['ocasioes_especiais',15]]);
+  const jogador_favorito = fan_score > 15 ? pick(rnd, JOGADORES) : '—';
+
+  const next_best_action = !ehSocio
+    ? 'Identificado na base mas nunca converteu em sócio — enviar oferta de primeira assinatura com desconto.'
+    : risco_churn === 'alto'
+      ? 'Sinais de risco de churn — recomenda-se oferta de reativação antes do cancelamento.'
+      : segmento_torcedor === 'Sócio novo'
+        ? 'Sócio novo — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.'
+        : (nivel_socio === 'platina' || nivel_socio === 'ouro')
+          ? 'Engajamento consistente — bom candidato a experiência exclusiva ou convite para programa de embaixadores.'
+          : 'Perfil estável — candidato a oferta de upgrade de nível no próximo ciclo.';
+
+  const embaixador = (ehSocio && nivel_socio === 'platina' && fan_score > 85 && rnd() < 0.3) ? 'sim' : 'nao';
+  const indicacoes_feitas = embaixador === 'sim' ? 3 + Math.floor(rnd() * 10) : (rnd() < 0.25 ? Math.floor(rnd() * 3) : 0);
+  const preferencia_acessibilidade = rnd() < 0.04 ? pick(rnd, ['Cadeira de rodas','Libras','Audiodescrição']) : 'Nenhuma';
+  const geracao_familiar = pickWeighted(rnd, [['1ª geração',45],['2ª geração',35],['3ª geração+',20]]);
+  const pontos_loyalty = ehSocio ? Math.round(ltv_torcedor * (2 + rnd() * 3)) : Math.round(rnd() < 0.3 ? rnd() * 300 : 0);
+
+  return {
+    firstname, lastname, email, city, state,
+    nivel_socio, e_socio_torcedor: ehSocio ? 'sim' : 'nao', pontos_loyalty,
+    fan_score, jogador_favorito, ltv_torcedor, risco_churn, propensao_upgrade, segmento_torcedor,
+    ...(socio_desde ? { socio_desde } : {}),
+    time_coracao: 'Vasco da Gama',
+    data_nascimento, genero, fonte_aquisicao: pick(rnd, FONTES),
+    status_assinatura, plano_mensalidade, torcedor_desde,
+    torcida_organizada: ehSocio ? pick(rnd, TORCIDAS) : '',
+    partidas_assistidas_temporada, taxa_presenca,
+    setor_preferido: partidas_assistidas_temporada > 0 ? pick(rnd, SETORES) : '',
+    engajamento_app, engajamento_redes_sociais,
+    ticket_medio, produto_favorito, numero_compras,
+    motivo_cancelamento: '', data_ultima_interacao, sinal_alerta,
+    canal_preferido: pick(rnd, CANAIS), opt_in_marketing, frequencia_contato_desejada,
+    next_best_action,
+    embaixador, indicacoes_feitas, preferencia_acessibilidade, geracao_familiar,
+  };
+}
+
+const TORCEDORES_GERADOS = Array.from({ length: 485 }, (_, i) => gerarTorcedor(i, i < 137));
+
 // Listas dinâmicas (ACTIVE/DYNAMIC — o HubSpot mantém a membership em dia
 // sozinho conforme as propriedades do contato mudam) que dão a mesma leitura
 // de segmento que já existe em Torcedor 360 → Fans no demo.
@@ -488,6 +652,30 @@ exports.handler = async function (event) {
       return { statusCode: r.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify(data) };
     }
 
+    if (payload.action === 'seed_bulk') {
+      // Paginado (offset/limit, máx. 100 por chamada) pra não estourar o
+      // limite de lote da API do HubSpot nem o timeout da function — chame
+      // várias vezes com offset crescente até cobrir os 485 (offset:0,
+      // depois 100, 200, 300, 400 — a última leva só 85).
+      const offset = Math.max(0, Number(payload.offset) || 0);
+      const limit = Math.min(100, Number(payload.limit) || 100);
+      const slice = TORCEDORES_GERADOS.slice(offset, offset + limit);
+      if (slice.length === 0) {
+        return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, offset, returned: 0, total: TORCEDORES_GERADOS.length, message: 'Nada a processar neste offset — já passou do total.' }) };
+      }
+      const inputs = slice.map(t => ({ idProperty: 'email', id: t.email, properties: t }));
+      const r = await hsFetch('/crm/v3/objects/contacts/batch/upsert', {
+        method: 'POST',
+        body: JSON.stringify({ inputs }),
+      });
+      const data = await r.json();
+      return {
+        statusCode: r.status,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({ offset, returned: slice.length, total: TORCEDORES_GERADOS.length, nextOffset: offset + limit < TORCEDORES_GERADOS.length ? offset + limit : null, status: data.status, numAffected: (data.results || []).length, errorSample: data.status === 'COMPLETE' ? undefined : data }),
+      };
+    }
+
     if (payload.action === 'lists') {
       const results = [];
       for (const seg of SEGMENT_LISTS) {
@@ -525,7 +713,7 @@ exports.handler = async function (event) {
       return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, results }) };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed" ou "lists".' }) };
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk" ou "lists".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
