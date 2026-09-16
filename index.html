@@ -1658,6 +1658,19 @@ canvas{ max-width:100%; }
           <span class="live-dot"></span> Carregando dados ao vivo do backend real…
         </div>
 
+        <div class="card" id="vasco-real-atrisk-card" style="display:none; margin-bottom:16px;">
+          <div class="card-title">
+            <span class="icon-badge" style="background:rgba(255,92,114,.16); color:#ff5c72;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg></span>
+            <h3>Torcedores em risco de churn — piloto real</h3>
+          </div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Perfis pseudonimizados (sem nome, e-mail ou telefone em claro) vindos direto do backend real do Vasco — score de risco ≥ 0,7, Postgres + Neo4j.</div>
+          <table>
+            <thead><tr><th>Torcedor</th><th>Sócio desde</th><th>LTV</th><th>Engagement</th><th>Partidas assistidas</th><th>Risco de churn</th><th>Segmentos</th></tr></thead>
+            <tbody id="vasco-real-atrisk-table"><tr><td colspan="7" class="hero-note">Carregando…</td></tr></tbody>
+          </table>
+          <div class="hero-note" id="vasco-real-atrisk-footnote" style="margin-top:10px;"></div>
+        </div>
+
         <div class="two-col" style="margin-bottom:16px;">
           <div class="card">
             <div class="card-title"><h3>Fan Engagement</h3></div>
@@ -2510,16 +2523,65 @@ async function loadVascoLiveOverview(){
     set('kpi-mon-socios', d.active_memberships.toLocaleString('pt-BR'));
 
     renderCockpitAlerts(buildVascoCockpitAlerts(d));
+    loadVascoRealAtRiskFans();
 
     if(note) note.innerHTML = '<span class="live-dot"></span> Dados ao vivo — backend real (Postgres + Neo4j), piloto de 500 torcedores';
   }catch(e){
     if(note) note.innerHTML = '<span class="live-dot" style="background:#ff6b5e"></span> Não foi possível carregar o backend real agora (' + e.message + ') — mostrando os últimos números conhecidos';
   }
 }
+
+// Aprofunda o CDP real: Torcedor 360 → Overview já mostrava os 4 contadores
+// agregados; isto puxa perfis reais individuais (pseudonimizados) da
+// Ontologia via GET /segments/at-risk + GET /fans/{id}/360.
+async function loadVascoRealAtRiskFans(){
+  const card = document.getElementById('vasco-real-atrisk-card');
+  if(card) card.style.display = 'block';
+  const tbody = document.getElementById('vasco-real-atrisk-table');
+  const footnote = document.getElementById('vasco-real-atrisk-footnote');
+  try{
+    const segRes = await fetch(VASCO_API_BASE + '/api/v1/segments/at-risk?min_score=0.7');
+    if(!segRes.ok) throw new Error('HTTP ' + segRes.status);
+    const seg = await segRes.json();
+    const sampleIds = seg.fan_ids.slice(0, 8);
+    const profiles = await Promise.all(sampleIds.map(id =>
+      fetch(VASCO_API_BASE + '/api/v1/fans/' + id + '/360').then(r => r.ok ? r.json() : null).catch(() => null)
+    ));
+    const rows = profiles.filter(Boolean);
+    if(rows.length === 0){
+      tbody.innerHTML = '<tr><td colspan="7" class="hero-note">Nenhum perfil retornou a tempo — tente recarregar a página.</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map(p => {
+        const since = p.fan_since ? new Date(p.fan_since).toLocaleDateString('pt-BR') : '—';
+        const churnPct = p.churn_risk_score != null ? Math.round(p.churn_risk_score*100) + '%' : '—';
+        const engPct = p.engagement_score != null ? Math.round(p.engagement_score*100) + '%' : '—';
+        const segs = (p.segments && p.segments.length) ? p.segments.join(', ') : '—';
+        return `<tr>
+          <td class="mono">#${p.fan_id.slice(0,8)}</td>
+          <td>${since}</td>
+          <td>${fmtCompactBRL(p.lifetime_value)}</td>
+          <td>${engPct}</td>
+          <td>${p.matches_attended_count ?? '—'}</td>
+          <td style="color:#ff5c72; font-weight:600;">${churnPct}</td>
+          <td>${segs}</td>
+        </tr>`;
+      }).join('');
+    }
+    if(footnote) footnote.textContent = `Amostra de ${rows.length} de ${seg.fan_count.toLocaleString('pt-BR')} torcedores reais em risco (score ≥ 0,7) — GET /segments/at-risk + GET /fans/{id}/360, dado ao vivo do Vasco.`;
+  }catch(e){
+    if(tbody) tbody.innerHTML = `<tr><td colspan="7" class="hero-note">Não foi possível carregar agora (${e.message}).</td></tr>`;
+  }
+}
+function hideVascoRealAtRiskCard(){
+  const card = document.getElementById('vasco-real-atrisk-card');
+  if(card) card.style.display = 'none';
+}
+
 function hideVascoLiveNote(){
   const note = document.getElementById('vasco-live-note');
   if(note) note.style.display = 'none';
   vascoLiveOverviewData = null;
+  hideVascoRealAtRiskCard();
   renderCockpitAlerts(DEFAULT_STRAT_ALERTS);
 }
 
