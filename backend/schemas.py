@@ -38,6 +38,15 @@ class SegmentSearchResult(BaseModel):
     fan_ids: list[uuid.UUID]
 
 
+class ClubOverviewOut(BaseModel):
+    total_fans: int
+    active_memberships: int
+    monthly_recurring_revenue: float
+    merchandise_revenue_paid: float
+    sponsorship_annual_value: float
+    fans_at_risk_070: int
+
+
 class AIAskRequest(BaseModel):
     club_id: uuid.UUID
     question: str

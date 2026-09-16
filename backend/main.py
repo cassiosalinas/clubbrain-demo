@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.api.v1 import agents, ai, fans, segments
+from backend.api.v1 import agents, ai, club, fans, segments
 
 app = FastAPI(title="ClubBrain — MVP Vasco", version="0.1.0")
 
@@ -25,6 +25,7 @@ app.include_router(fans.router, prefix="/api/v1")
 app.include_router(segments.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
 app.include_router(agents.router, prefix="/api/v1")
+app.include_router(club.router, prefix="/api/v1")
 
 
 @app.get("/health")

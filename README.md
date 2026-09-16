@@ -41,12 +41,16 @@ curl "http://localhost:8000/api/v1/segments/at-risk?min_score=0.7"
 
 Docs interativas: `http://localhost:8000/docs`
 
-Demo visual (Fan Explorer — lista fãs em risco, Fan 360, pergunta à IA):
-`http://localhost:8000/demo/fan-explorer.html`. Servida pelo próprio
-backend (mesma origem) de propósito — rodando atrás do proxy de porta do
-GitHub Codespaces, um POST feito de uma origem diferente (ex. um
-`http.server` numa outra porta) tem seu preflight CORS bloqueado pelo
-proxy antes de chegar no FastAPI. Same-origin evita o problema inteiro.
+Demo visual: `http://localhost:8000/demo/` (redireciona pro Cockpit).
+Servida pelo próprio backend (mesma origem) de propósito — rodando atrás
+do proxy de porta do GitHub Codespaces, um POST feito de uma origem
+diferente (ex. um `http.server` numa outra porta) tem seu preflight CORS
+bloqueado pelo proxy antes de chegar no FastAPI. Same-origin evita o
+problema inteiro.
+
+- `cockpit.html` — KPIs do clube, fãs em risco, Fan 360, chat com os
+  agentes (Executive/Fan/Marketing/genérico)
+- `fan-explorer.html` — versão anterior, mais crua, só lista+detalhe+pergunta
 
 ## Estrutura
 
@@ -84,6 +88,9 @@ mvp-vasco/
 - `POST /api/v1/agents/{executive|fan|marketing}/ask` — mesma mecânica,
   mas cada persona só enxerga um subconjunto de tools e tem um system
   prompt focado (ver `backend/agents/personas.py`)
+- `GET /api/v1/club/overview` — métricas agregadas (MRR, receita de
+  loja, patrocínio, fãs em risco) sem passar pelo LLM — usado pelo
+  Cockpit e pela tool `get_club_overview` do agente Executive
 
 ## Status
 
