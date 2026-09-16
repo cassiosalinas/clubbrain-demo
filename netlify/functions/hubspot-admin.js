@@ -214,9 +214,10 @@ const CUSTOM_PROPERTIES = [
   // Frase curta descrevendo a última ação real do torcedor (ex.: "Comprou
   // Camisa I Vasco da Gama 2026 (R$ 299,00)") — gravada por
   // fulfill_stripe_order a cada compra no ShopVasco/Sócio Torcedor.
-  // Combinado com o hs_lastmodifieddate nativo do HubSpot (atualizado
-  // automaticamente a cada PATCH), dá pra montar um feed real de "ações mais
-  // recentes" ordenando por data de modificação — ver action "stats".
+  // Combinado com o lastmodifieddate/updatedAt nativos do HubSpot
+  // (atualizados automaticamente a cada PATCH), dá pra montar um feed real
+  // de "ações mais recentes" ordenando por data de modificação — ver
+  // action "stats".
   { name: 'ultima_acao_descricao', label: 'Última ação (descrição)', type: 'string', fieldType: 'text' },
 ];
 
@@ -805,9 +806,9 @@ exports.handler = async function (event) {
 
       // Ato 2 da "jornada do torcedor" — feed de ações reais mais recentes:
       // qualquer contato com ultima_acao_descricao preenchida (gravada por
-      // fulfill_stripe_order a cada compra real), ordenado pelo
-      // hs_lastmodifieddate nativo do HubSpot (atualizado sozinho a cada
-      // PATCH, não precisa de um campo de timestamp customizado).
+      // fulfill_stripe_order a cada compra real), ordenado por
+      // lastmodifieddate — nativo do HubSpot, atualizado sozinho a cada
+      // PATCH, não precisa de um campo de timestamp customizado.
       const activityRes = await hsFetch('/crm/v3/objects/contacts/search', {
         method: 'POST',
         body: JSON.stringify({
@@ -815,18 +816,22 @@ exports.handler = async function (event) {
             { propertyName: 'time_coracao', operator: 'EQ', value: 'Vasco da Gama' },
             { propertyName: 'ultima_acao_descricao', operator: 'HAS_PROPERTY' },
           ] }],
-          sorts: [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }],
+          sorts: [{ propertyName: 'lastmodifieddate', direction: 'DESCENDING' }],
           limit: 5,
-          properties: ['firstname', 'lastname', 'ultima_acao_descricao', 'hs_lastmodifieddate'],
+          properties: ['firstname', 'lastname', 'ultima_acao_descricao'],
         }),
       });
       const activityData = await activityRes.json().catch(() => ({}));
       if (!activityRes.ok) throw new Error(activityData.message || ('HTTP ' + activityRes.status) + ' na atividade recente');
+      // "updatedAt" (nível raiz do resultado, não em "properties") é o
+      // timestamp de modificação padrão que a Search API sempre devolve,
+      // mais confiável que tentar ler a propriedade de sistema por nome
+      // (hs_lastmodifieddate não voltou preenchido, descoberto ao vivo).
       const recentActivity = (activityData.results || []).map(c => ({
         firstname: c.properties.firstname,
         lastname: c.properties.lastname,
         description: c.properties.ultima_acao_descricao,
-        at: c.properties.hs_lastmodifieddate,
+        at: c.updatedAt,
       }));
 
       return {
