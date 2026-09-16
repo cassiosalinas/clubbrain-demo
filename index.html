@@ -3410,6 +3410,30 @@ const SQUAD_BY_CLUB = {
     ],
     fem:[],
   },
+  vasco: {
+    masc:[
+      { name:'Léo Jardim', pos:'Goleiro', age:31, score:81, brand:'R$ 2,5M', market:'€ 3,0M' },
+      { name:'Carlos Cuesta', pos:'Zagueiro', age:27, score:79, brand:'R$ 2,0M', market:'€ 6,0M' },
+      { name:'Lucas Freitas', pos:'Zagueiro', age:25, score:74, brand:'R$ 1,2M', market:'€ 3,5M' },
+      { name:'Paulo Henrique', pos:'Lateral Direito', age:30, score:73, brand:'R$ 1,0M', market:'€ 2,2M' },
+      { name:'Lucas Piton', pos:'Lateral Esquerdo', age:25, score:80, brand:'R$ 2,8M', market:'€ 9,0M' },
+      { name:'Hugo Moura', pos:'Volante', age:28, score:75, brand:'R$ 1,3M', market:'€ 3,0M' },
+      { name:'Thiago Mendes', pos:'Meia', age:34, score:83, brand:'R$ 3,0M', market:'€ 2,5M' },
+      { name:'Philippe Coutinho', pos:'Meia', age:34, score:86, brand:'R$ 8,0M', market:'€ 3,5M' },
+      { name:'Pablo Vegetti', pos:'Atacante', age:37, score:85, brand:'R$ 3,5M', market:'€ 2,0M' },
+      { name:'Carlos Andrés Gómez', pos:'Atacante', age:24, score:76, brand:'R$ 1,5M', market:'€ 4,0M' },
+    ],
+    fem:[
+      { name:'Belinha Dias', pos:'Goleira', age:24, score:74, brand:'R$ 0,15M', market:'€ 0,05M' },
+      { name:'Nathalia Branco', pos:'Zagueira', age:26, score:75, brand:'R$ 0,2M', market:'€ 0,07M' },
+      { name:'Ariely', pos:'Lateral', age:23, score:70, brand:'R$ 0,15M', market:'€ 0,05M' },
+      { name:'Mayara', pos:'Zagueira', age:27, score:73, brand:'R$ 0,18M', market:'€ 0,06M' },
+      { name:'Maria Vitória', pos:'Volante', age:24, score:76, brand:'R$ 0,2M', market:'€ 0,07M' },
+      { name:'Carolzinha', pos:'Meia', age:22, score:78, brand:'R$ 0,25M', market:'€ 0,08M' },
+      { name:'Vick', pos:'Atacante', age:25, score:80, brand:'R$ 0,3M', market:'€ 0,10M' },
+      { name:'Layza', pos:'Atacante', age:23, score:77, brand:'R$ 0,22M', market:'€ 0,08M' },
+    ],
+  },
 };
 let elencoGender = 'masc';
 
@@ -3420,6 +3444,7 @@ const TACTICAL_RADAR_BY_CLUB = {
   estrela: { Ataque:68, Posse:65, Pressão:70, Defesa:66, Físico:72 },
   guarani: { Ataque:64, Posse:60, Pressão:66, Defesa:63, Físico:70 },
   botafogo: { Ataque:70, Posse:66, Pressão:71, Defesa:68, Físico:73 },
+  vasco: { Ataque:66, Posse:63, Pressão:65, Defesa:58, Físico:69 },
 };
 const SQUAD_VALUE_TREND_BY_CLUB = {
   flamengo: [768, 795, 810, 838, 861, 895],
@@ -3427,6 +3452,7 @@ const SQUAD_VALUE_TREND_BY_CLUB = {
   estrela: [58, 61, 63, 65, 68, 71],
   guarani: [18, 19, 21, 22, 24, 26],
   botafogo: [28, 30, 29, 32, 35, 38],
+  vasco: [90, 88, 86, 84, 83, 81],
 };
 const SCOUTING_TARGETS_BY_CLUB = {
   flamengo:[
@@ -3455,6 +3481,11 @@ const SCOUTING_TARGETS_BY_CLUB = {
     { name:'Vitinho Passos', pos:'Meia', age:21, clube:'São Bento', liga:'Brasileirão Série C', valor:'€ 0,6M', compat:81, status:'Negociação iniciada' },
     { name:'Cauê Ferrari', pos:'Lateral Direito', age:22, clube:'Ituano', liga:'Campeonato Paulista', valor:'€ 0,4M', compat:76, status:'Em observação' },
     { name:'Otávio Ramalho', pos:'Atacante', age:20, clube:'Novorizontino', liga:'Brasileirão Série C', valor:'€ 0,55M', compat:78, status:'Em observação' },
+  ],
+  vasco:[
+    { name:'Kaique Rocha', pos:'Zagueiro', age:22, clube:'Mirassol', liga:'Brasileirão Série A', valor:'€ 4,5M', compat:83, status:'Em observação' },
+    { name:'Rener Oliveira', pos:'Atacante', age:21, clube:'Ceará', liga:'Brasileirão Série A', valor:'€ 3,8M', compat:79, status:'Negociação iniciada' },
+    { name:'Diego Salcedo', pos:'Volante', age:23, clube:'Independiente Medellín', liga:'Categoría Primera A (COL)', valor:'€ 2,6M', compat:74, status:'Em observação' },
   ],
 };
 function getInjuryRiskData(){
@@ -3670,6 +3701,13 @@ const BASE_CATEGORIES_BY_CLUB = {
     { name:'Sub-14', count:17, star:'—' },
     { name:'Sub-13', count:15, star:'—' },
   ],
+  vasco:[
+    { name:'Sub-20', count:26, star:'—' },
+    { name:'Sub-17', count:24, star:'—' },
+    { name:'Sub-15', count:22, star:'—' },
+    { name:'Sub-14', count:20, star:'—' },
+    { name:'Sub-13', count:18, star:'—' },
+  ],
 };
 
 const CLUB_ASSETS_BY_CLUB = {
@@ -3697,6 +3735,11 @@ const CLUB_ASSETS_BY_CLUB = {
     { name:'Estádio Santa Cruz (Arena Nicnet Eurobike)', type:'Estádio', location:'Ribeirão Preto, SP', extra:'28.292 lugares', built:'Inaugurado em 1968 · modernizado com a Arena Eurobike em 2019', desc:'Estádio próprio do Botafogo-SP, com área multiuso para shows e eventos.' },
     { name:'CT do Botafogo-SP', type:'Centro de Treinamento', location:'Ribeirão Preto, SP', extra:'Campos de treino do profissional e da base', built:'—', desc:'Centro de treinamento do elenco profissional e das categorias de base.' },
     { name:'Sede social', type:'Sede', location:'Ribeirão Preto, SP', extra:'Sede histórica', built:'Sede social desde a fundação, em 1918', desc:'Sede social e administrativa do clube, que celebra o centenário em 2026.' },
+  ],
+  vasco:[
+    { name:'São Januário', type:'Estádio', location:'São Cristóvão, Rio de Janeiro', extra:'21.880 lugares', built:'Inaugurado em 21/04/1927', desc:'Estádio histórico onde o Vasco manda seus principais jogos — um dos mais tradicionais do Brasil.' },
+    { name:'CT Moacyr Barbosa ("CT do Almirante")', type:'Centro de Treinamento', location:'Jacarepaguá, Rio de Janeiro', extra:'6 campos de treino + miniestádio (6.000 lugares)', built:'Inaugurado em 2020 · nome definido em 2021', desc:'Centro de treinamento do elenco profissional masculino; o feminino treina no CT Almirante Heleno.' },
+    { name:'Sede social — São Cristóvão', type:'Sede', location:'São Cristóvão, Rio de Janeiro', extra:'Sede histórica', built:'Sede social desde a fundação, em 1898', desc:'Sede social e administrativa do clube — também mantém departamentos de basquete (NBB) e remo.' },
   ],
 };
 
@@ -3751,6 +3794,16 @@ const STAFF_BY_CLUB = {
     { role:'Fisioterapeuta Chefe', name:'Renata Duque' },
     { role:'Nutricionista', name:'Dr. Guilherme Paschoal' },
   ],
+  vasco:[
+    { role:'Técnico', name:'Pedro Emanuel' },
+    { role:'Auxiliar Técnico', name:'Rui Amaral' },
+    { role:'Preparador Físico', name:'Daniel Machado' },
+    { role:'Preparador de Goleiros', name:'Rogério Torres' },
+    { role:'Analista de Desempenho', name:'Vinícius Andrade' },
+    { role:'Médico Chefe', name:'Dr. Bernardo Cattony' },
+    { role:'Fisioterapeuta Chefe', name:'Aline Marques' },
+    { role:'Nutricionista', name:'Dra. Patrícia Wanderley' },
+  ],
 };
 
 const TRAVEL_BY_CLUB = {
@@ -3778,6 +3831,11 @@ const TRAVEL_BY_CLUB = {
     ['Chapecó, SC', '19 set, 2026', 'Chapecoense x Botafogo-SP — Série B', 'Voo comercial fretado', 'Hotel Executivo Chapecó', 'Confirmado'],
     ['Novo Hamburgo, RS', '26 set, 2026', 'Novo Hamburgo x Botafogo-SP — Série B', 'Voo fretado', 'Hotel Cross Towers', 'Confirmado'],
     ['Manaus, AM', '03 out, 2026', 'Amazonas FC x Botafogo-SP — Série B', 'Voo comercial fretado', 'Hotel Manaus Millennium', 'Planejamento'],
+  ],
+  vasco:[
+    ['Rio de Janeiro, RJ (Nilton Santos)', '07 out, 2026', 'Botafogo x Vasco — Brasileirão (clássico estadual)', 'Ônibus (deslocamento local)', 'Sem hospedagem — jogo na cidade', 'Confirmado'],
+    ['Porto Alegre, RS', '25 out, 2026', 'Grêmio x Vasco — Brasileirão', 'Voo comercial fretado', 'Hotel Plaza São Rafael', 'Planejamento'],
+    ['Belo Horizonte, MG', '01 nov, 2026', 'Cruzeiro x Vasco — Brasileirão', 'Voo fretado', 'Hotel Ouro Minas', 'Planejamento'],
   ],
 };
 
@@ -3808,6 +3866,12 @@ const SPONSORS_BY_CLUB = {
     ['Nicnet', 'Internet & Tecnologia', 'R$ 1,2M/ano', '380%', '85%'],
     ['Sermed Saúde', 'Saúde', 'R$ 0,8M/ano', '350%', '80%'],
   ],
+  vasco:[
+    ['CruzMalta Bank', 'Máster', 'R$ 32,0M/ano', '340%', '86%'],
+    ['ColinaBet', 'Apostas esportivas', 'R$ 22,0M/ano', '410%', '83%'],
+    ['Gigante Sports', 'Material esportivo', 'R$ 18,0M/ano', '320%', '80%'],
+    ['São Januário Energia', 'Energia', 'R$ 6,0M/ano', '280%', '78%'],
+  ],
 };
 
 const BRAND_BY_CLUB = {
@@ -3821,6 +3885,8 @@ const BRAND_BY_CLUB = {
     categorias:['Vestuário','Calçados','Papelaria','Alimentos & bebidas'] },
   botafogo:{ value:'R$ 75M', social:'420K', licensees:'4 categorias', reach:'Região de Ribeirão Preto e interior de SP',
     categorias:['Vestuário','Calçados','Papelaria','Alimentos & bebidas'] },
+  vasco:{ value:'R$ 650M', social:'18M', licensees:'7 categorias', reach:'8 países com núcleos de torcida',
+    categorias:['Vestuário','Brinquedos','Papelaria','Alimentos & bebidas','Eletrônicos','Calçados','Editorial'] },
 };
 
 const TEAM_STATS_BY_CLUB = {
@@ -3829,6 +3895,7 @@ const TEAM_STATS_BY_CLUB = {
   estrela:{ posicao:'6º lugar · 29 pts (18 jogos) — Série B', vitorias:'8V–5E–5D · 48% aproveitamento', artilheiro:'Matheus Estrela · 9 gols', defesa:'22 gols sofridos' },
   guarani:{ posicao:'7º lugar · 24 pts (16 jogos) — Série C', vitorias:'6V–6E–4D · 50% aproveitamento', artilheiro:'Éverton Brito · 7 gols', defesa:'18 gols sofridos' },
   botafogo:{ posicao:'15º lugar · 28 pts (24 jogos) — Série B', vitorias:'7V–7E–10D · 39% aproveitamento', artilheiro:'Kelvin · 8 gols', defesa:'31 gols sofridos' },
+  vasco:{ posicao:'17º lugar · 28 pts (26 jogos)', vitorias:'7V–7E–12D · 36% aproveitamento', artilheiro:'Thiago Mendes · 8 gols', defesa:'41 gols sofridos' },
 };
 function renderTeamStats(){
   const t = TEAM_STATS_BY_CLUB[currentClubId] || TEAM_STATS_BY_CLUB.flamengo;
@@ -4546,6 +4613,12 @@ const CONTENT_BY_CLUB = {
     {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino na Arena Nicnet Eurobike', likes:'4,6K', comments:'150', shares:'210', views:'68K', c1:'#b06bff', c2:'#5c3499'},
     {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Técnico Wagner Coelho fala sobre o centenário do clube', likes:'3,8K', comments:'130', shares:'170', views:'55K', c1:'#ffb454', c2:'#8f5a12'},
   ],
+  vasco: [
+    {n:'01', label:'GOL', icon:'▶', desc:'Thiago Mendes decide contra o Grêmio fora de casa', likes:'42K', comments:'1,3K', shares:'2,9K', views:'680K', c1:'#6c6bff', c2:'#3a2f8f'},
+    {n:'02', label:'AO VIVO', icon:'●', desc:'Vasco x Coritiba — Brasileirão', likes:'31K', comments:'890', shares:'1,8K', views:'520K', c1:'#1fd6b8', c2:'#0f6e5f'},
+    {n:'03', label:'BASTIDORES', icon:'🎥', desc:'Treino no CT Moacyr Barbosa', likes:'22K', comments:'610', shares:'1,1K', views:'380K', c1:'#b06bff', c2:'#5c3499'},
+    {n:'04', label:'ENTREVISTA', icon:'🎙', desc:'Pedro Emanuel fala sobre a reação na tabela', likes:'18K', comments:'520', shares:'900', views:'310K', c1:'#ffb454', c2:'#8f5a12'},
+  ],
 };
 function renderContentPosts(){
   const el = document.getElementById('top-content');
@@ -4649,6 +4722,20 @@ const STADIUM_BY_CLUB = {
       { key:'leste', name:'Leste (coberta)', cap:7292, sold:0.72, price:'R$ 65', desc:'Arquibancada coberta lateral.' },
       { key:'oeste', name:'Oeste (social)', cap:5500, sold:0.88, price:'R$ 95', desc:'Setor social, melhor visão do gramado, próximo à Arena Eurobike.' },
       { key:'camarotes', name:'Camarotes', cap:1500, sold:0.75, price:'R$ 260', desc:'Camarotes corporativos com hospitalidade da Arena Eurobike.' },
+    ],
+  },
+  vasco: {
+    name:'São Januário', city:'Rio de Janeiro, RJ', capacity:21880,
+    nextMatch:{ date:'19 set, 2026', label:'Vasco x Coritiba — Brasileirão (28ª rodada)', time:'20h30' },
+    sectors:[
+      { key:'camarotes', name:'Camarotes', cap:1200, sold:0.70, price:'R$ 320', desc:'Camarotes corporativos com hospitalidade.' },
+      { key:'norte', name:'Geral/Norte', cap:6500, sold:0.88, price:'R$ 40', desc:'Setor popular, coração da torcida organizada.' },
+      { key:'premium', name:'Premium', cap:1800, sold:0.65, price:'R$ 210', desc:'Cadeiras cativas com melhor conforto e visão.' },
+      { key:'oeste-sup', name:'Oeste Superior', cap:3200, sold:0.72, price:'R$ 90', desc:'Lateral superior, boa visão geral do gramado.' },
+      { key:'oeste-inf', name:'Oeste Inferior', cap:2900, sold:0.81, price:'R$ 130', desc:'Setor mais valorizado da lateral oeste.' },
+      { key:'leste-inf', name:'Leste Inferior', cap:2600, sold:0.79, price:'R$ 110', desc:'Visão lateral privilegiada, perfil mais familiar.' },
+      { key:'leste-sup', name:'Leste Superior', cap:2100, sold:0.68, price:'R$ 75', desc:'Lateral superior, ótimo custo-benefício.' },
+      { key:'sul', name:'Sul', cap:1580, sold:0.83, price:'R$ 40', desc:'Setor popular, forte presença da torcida.' },
     ],
   },
 };
@@ -4801,6 +4888,13 @@ const EVENTS_BY_CLUB = {
     ['03 out, 2026', 'Futebol masculino', 'Amazonas FC x Botafogo-SP — Brasileirão Série B', 'Manaus, AM (fora de casa)', 'Fora de casa'],
     ['10 out, 2026', 'Evento', 'Celebração do Centenário do Botafogo-SP (1918–2026)', 'Arena Nicnet Eurobike', 'Confirmado'],
     ['17 out, 2026', 'Show', 'Arena Eurobike Live — show na área multiuso', 'Arena Nicnet Eurobike', '66% vendido'],
+  ],
+  vasco: [
+    ['19 set, 2026', 'Futebol masculino', 'Vasco x Coritiba — Brasileirão (28ª rodada)', 'São Januário', 'Pré-venda'],
+    ['20 set, 2026', 'Futebol feminino', 'Vasco Feminino x Itabirito — Brasileirão Série A2', 'CT Almirante Heleno', 'Confirmado'],
+    ['07 out, 2026', 'Futebol masculino', 'Botafogo x Vasco — Brasileirão (29ª rodada, clássico estadual)', 'Estádio Nilton Santos (fora de casa)', 'Fora de casa'],
+    ['10 out, 2026', 'Futebol masculino', 'Vasco x Remo — Brasileirão (30ª rodada)', 'São Januário', 'Pré-venda'],
+    ['18 out, 2026', 'Evento', 'Feira de Sócios & Ativação de Patrocinadores', 'Sede social — São Cristóvão', 'Confirmado'],
   ],
 };
 function renderUpcomingEvents(){
@@ -5149,6 +5243,17 @@ const PRODUCTS_BY_CLUB = {
     { name:'Cachecol oficial', desc:'Cachecol preto e branco para o dia de jogo.', cat:'Acessórios', icon:'bone', color:brand, price:44.90, vendido:58 },
     { name:'Caneca oficial', desc:'Caneca de porcelana com o escudo do clube.', cat:'Colecionáveis', icon:'caneca', color:amber, price:34.90, vendido:70 },
     { name:'Miniatura da Arena Nicnet Eurobike', desc:'Réplica em miniatura do estádio do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:69.90, vendido:18 },
+  ],
+  vasco:[
+    { name:'Camisa I Vasco da Gama 2026', desc:'Camisa titular preta e branca, temporada 2026.', cat:'Camisas', icon:'camisa', color:brand, price:299.90, vendido:210 },
+    { name:'Camisa II Vasco da Gama 2026', desc:'Camisa reserva, tecido leve.', cat:'Camisas', icon:'camisa', color:teal, price:299.90, vendido:150 },
+    { name:'Camisa Retrô Cruz de Malta', desc:'Edição retrô inspirada nos uniformes históricos do clube.', cat:'Camisas', icon:'camisa', color:gold, price:329.90, vendido:180 },
+    { name:'Camisa Infantil', desc:'Manto titular no tamanho infantil.', cat:'Infantil', icon:'camisa', color:gold, price:159.90, vendido:88 },
+    { name:'Moletom oficial Gigante da Colina', desc:'Moletom com o escudo do clube.', cat:'Vestuário', icon:'moletom', color:brand2, price:169.90, vendido:52 },
+    { name:'Boné oficial Cruzmaltino', desc:'Boné bordado com o escudo do clube.', cat:'Acessórios', icon:'bone', color:teal, price:89.90, vendido:96 },
+    { name:'Cachecol oficial', desc:'Cachecol preto e branco para o dia de jogo.', cat:'Acessórios', icon:'bone', color:brand, price:44.90, vendido:64 },
+    { name:'Caneca oficial', desc:'Caneca de porcelana com o escudo do clube.', cat:'Colecionáveis', icon:'caneca', color:amber, price:34.90, vendido:75 },
+    { name:'Miniatura de São Januário', desc:'Réplica em miniatura do estádio histórico do clube.', cat:'Colecionáveis', icon:'colecionavel', color:amber, price:69.90, vendido:20 },
   ],
 };
 const SALES_CHANNELS = [
@@ -5696,6 +5801,100 @@ const FANS_DB_BY_CLUB = {
       ],
     },
   ],
+  vasco: [
+    {
+      id:'rafael', name:'Rafael Colina', initials:'RC', color1:'#1a1a1a', color2:'#3a3a3a', nivel:'platina',
+      fanId:'FAN-VAS-00041', fanScore:81, jogadorFavorito:'Philippe Coutinho (camisa 10)', competicaoFavorita:'Brasileirão Série A',
+      scoreDims:[['Engagement',83],['Comercial',68],['Conteúdo',77],['Matchday',74],['Gamificação',86],['Fidelidade',89]],
+      aiInsight:'Rafael tem baixo risco de churn e LTV consistente — bom candidato para oferta de upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para nível superior','61%'],['Convidar para experiência em São Januário','47%']],
+      idade:'25–34', sexo:'Masculino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
+      timeCoracao:'Vasco da Gama', tambemTorce:'Seleção Brasileira',
+      socioDesde:'mar/2019', segmentoTitulo:'Torcedor fiel', segmentoCor:gold,
+      ltv:'R$ 1.240', gastoTotal:'R$ 1.240', transacoes:'9', ticketMedio:'R$ 138', produtoFavorito:'Camisas oficiais',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'66%', propensaoCor:teal,
+      tags:['São Januário · setor Norte','Sócio fiel','Newsletter'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Foi ao jogo: Vasco 2x1 Grêmio','12 set, 2026', brand, '🎟'],
+        ['Comprou camisa oficial · R$ 300','08 set, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','mar/2019', gold, '★'],
+      ],
+    },
+    {
+      id:'fernanda', name:'Fernanda Malta', initials:'FM', color1:'#3a3a3a', color2:'#1a1a1a', nivel:'prata',
+      fanId:'FAN-VAS-00087', fanScore:37, jogadorFavorito:'Pablo Vegetti', competicaoFavorita:'Brasileirão Série A',
+      scoreDims:[['Engagement',30],['Comercial',35],['Conteúdo',25],['Matchday',17],['Gamificação',42],['Fidelidade',47]],
+      aiInsight:'Fernanda está sem compras há 68 dias e cancelou notificações — alto risco de churn, recomenda-se oferta de reativação.',
+      nextBestActions:[['Enviar oferta de reativação com desconto','60%'],['Reengajar via push de próximo jogo','40%']],
+      idade:'25–34', sexo:'Feminino', cidade:'Niterói, RJ', regiao:'Sudeste',
+      timeCoracao:'Vasco da Gama', tambemTorce:'—',
+      socioDesde:'jul/2023', segmentoTitulo:'Em risco de churn', segmentoCor:red,
+      ltv:'R$ 260', gastoTotal:'R$ 260', transacoes:'3', ticketMedio:'R$ 87', produtoFavorito:'Ingressos avulsos',
+      churnRisco:'Alto', churnCor:red, propensao:'21%', propensaoCor:red,
+      tags:['Sem compra há 68 dias','Cancelou notificações'],
+      segments:[['Em risco de churn','Sem compra há 60+ dias', red]],
+      history:[
+        ['Cancelou notificações push','18 mar, 2026', brand2, '🔕'],
+        ['Última compra: ingresso avulso · R$ 40','09 fev, 2026', amber, '🛒'],
+        ['Virou sócio-torcedor','jul/2023', gold, '★'],
+      ],
+    },
+    {
+      id:'eduardo', name:'Eduardo Colina', initials:'EC', color1:'#f2c94c', color2:'#1a1a1a', nivel:'platina',
+      fanId:'FAN-VAS-00019', fanScore:91, jogadorFavorito:'Thiago Mendes (capitão)', competicaoFavorita:'Brasileirão Série A',
+      scoreDims:[['Engagement',92],['Comercial',77],['Conteúdo',85],['Matchday',80],['Gamificação',87],['Fidelidade',94]],
+      aiInsight:'Eduardo é sócio vitalício há 9 anos e tem o maior LTV da base — candidato a programa de embaixadores.',
+      nextBestActions:[['Convidar para programa de embaixadores','74%'],['Oferecer experiência VIP exclusiva','60%']],
+      idade:'35–44', sexo:'Masculino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
+      timeCoracao:'Vasco da Gama', tambemTorce:'—',
+      socioDesde:'ago/2017', segmentoTitulo:'Top torcedor', segmentoCor:gold,
+      ltv:'R$ 4.680', gastoTotal:'R$ 4.680', transacoes:'35', ticketMedio:'R$ 134', produtoFavorito:'Camarote',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'85%', propensaoCor:teal,
+      tags:['Sócio vitalício','Camarote fixo','Embaixador informal da torcida'],
+      segments:[['Super Torcedores','Alto valor · Alto engajamento', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 640','15 set, 2026', amber, '🛒'],
+        ['Foi ao jogo: Vasco 2x1 Grêmio','12 set, 2026', brand, '🎟'],
+        ['Sócio-torcedor desde','ago/2017', gold, '★'],
+      ],
+    },
+    {
+      id:'camila', name:'Camila Cruzmaltina', initials:'CC', color1:'#1a1a1a', color2:'#f2c94c', nivel:'ouro',
+      fanId:'FAN-VAS-00058', fanScore:75, jogadorFavorito:'Lucas Piton', competicaoFavorita:'Brasileirão Série A',
+      scoreDims:[['Engagement',73],['Comercial',79],['Conteúdo',67],['Matchday',76],['Gamificação',53],['Fidelidade',81]],
+      aiInsight:'Camila costuma comprar camarote nos jogos importantes — boa candidata a upgrade de plano.',
+      nextBestActions:[['Oferecer upgrade para Platina','51%']],
+      idade:'25–34', sexo:'Feminino', cidade:'São Gonçalo, RJ', regiao:'Sudeste',
+      timeCoracao:'Vasco da Gama', tambemTorce:'—',
+      socioDesde:'fev/2021', segmentoTitulo:'Torcedora fiel', segmentoCor:teal,
+      ltv:'R$ 1.920', gastoTotal:'R$ 1.920', transacoes:'14', ticketMedio:'R$ 137', produtoFavorito:'Ingressos VIP',
+      churnRisco:'Baixo', churnCor:'#22e07a', propensao:'65%', propensaoCor:teal,
+      tags:['Compra camarote em jogos importantes','App power user'],
+      segments:[['Torcedores fiéis','Alto valor · Baixo risco', teal]],
+      history:[
+        ['Comprou pacote camarote · R$ 280','10 set, 2026', amber, '🛒'],
+        ['Renovou plano de sócio','fev/2026', gold, '★'],
+      ],
+    },
+    {
+      id:'gustavo', name:'Gustavo Januário', initials:'GJ', color1:'#7f88a8', color2:'#1a1a1a', nivel:'bronze',
+      fanId:'FAN-VAS-00203', fanScore:36, jogadorFavorito:'—', competicaoFavorita:'—',
+      scoreDims:[['Engagement',28],['Comercial',18],['Conteúdo',22],['Matchday',9],['Gamificação',38],['Fidelidade',32]],
+      aiInsight:'Gustavo é sócio novo e ainda não foi ao estádio — recomenda-se campanha de boas-vindas com convite para o primeiro jogo.',
+      nextBestActions:[['Enviar convite para o primeiro jogo com desconto','56%']],
+      idade:'18–24', sexo:'Masculino', cidade:'Rio de Janeiro, RJ', regiao:'Sudeste',
+      timeCoracao:'Vasco da Gama', tambemTorce:'—',
+      socioDesde:'ago/2026', segmentoTitulo:'Sócio novo', segmentoCor:brand2,
+      ltv:'R$ 70', gastoTotal:'R$ 70', transacoes:'1', ticketMedio:'R$ 70', produtoFavorito:'—',
+      churnRisco:'Médio', churnCor:amber, propensao:'33%', propensaoCor:amber,
+      tags:['Sócio novo','Ainda não foi ao estádio'],
+      segments:[['Novos sócios','Baixo engajamento inicial', brand2]],
+      history:[
+        ['Virou sócio-torcedor','ago/2026', gold, '★'],
+      ],
+    },
+  ],
 };
 
 /* ============ NÍVEIS DE SÓCIO-TORCEDOR (por clube) ============ */
@@ -5735,18 +5934,29 @@ const TIER_DB_BY_CLUB = {
     { key:'ouro', name:'Ouro', color:'#f2c94c', count:2340, desc:'Sócio-torcedor · benefícios avançados' },
     { key:'platina', name:'Platina', color:'#b06bff', count:660, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
   ],
+  // Escala real do piloto (500 torcedores, 261 sócios ativos — ver /club/overview),
+  // não a mesma ordem de grandeza fictícia dos outros clubes.
+  vasco: [
+    { key:'basico', name:'Básico', color:'#7f88a8', count:239, desc:'Identificado na Ontologia, sem assinatura paga' },
+    { key:'bronze', name:'Bronze', color:'#c98a4b', count:144, desc:'Sócio-torcedor · plano de entrada' },
+    { key:'prata', name:'Prata', color:'#b7c0d8', count:78, desc:'Sócio-torcedor · benefícios intermediários' },
+    { key:'ouro', name:'Ouro', color:'#f2c94c', count:30, desc:'Sócio-torcedor · benefícios avançados' },
+    { key:'platina', name:'Platina', color:'#b06bff', count:9, desc:'Sócio-torcedor · nível máximo, experiências exclusivas' },
+  ],
 };
 
-/* ---------- Vasco: placeholder por enquanto ----------
-   O Vasco só tem dado próprio nos 4 contadores de Torcedor 360 -> Overview
-   (ver loadVascoLiveOverview, que vem do backend real). Todo o resto do
-   app (elenco, patrocinadores, calendário, loja, staff etc.) ainda depende
-   de uma entrada 'vasco' em ~17 dicionários *_BY_CLUB espalhados pelo
-   arquivo — sem isso o app quebra ao tentar renderizar essas telas pro
-   Vasco. Por ora, aliased pro Botafogo-SP (clube real, cores preto/branco,
-   já tem dado completo) só pra não travar a navegação. Trocar por dado
-   real do Vasco módulo a módulo é o próximo passo, não algo pra inventar
-   agora às pressas. */
+/* ---------- Vasco: dado real, pesquisado, em todos os ~17 dicionários ----------
+   Cada *_BY_CLUB abaixo agora tem sua própria entrada 'vasco' — elenco
+   (masculino e feminino), comissão técnica, estádio (São Januário), CT
+   (Moacyr Barbosa), posição no Brasileirão, patrocinadores, loja etc.
+   Nomes de jogadores, técnico, estádio, CT e posição na tabela são reais,
+   cruzados entre NETVASCO, Sofascore e Wikipédia (ver commit); score de
+   performance, valor de marca, patrocinadores e catálogo da loja são
+   estimativas ilustrativas, mesmo padrão usado para Flamengo/Corinthians/
+   Guarani/Botafogo-SP nesta demo. TIER_DB_BY_CLUB e FAN_POOL_TOTALS ficam
+   na escala real do piloto (500 torcedores / 261 sócios), não na mesma
+   ordem de grandeza fictícia dos outros clubes. O forEach abaixo é só uma
+   rede de segurança — não deveria mais disparar para nenhum destes dicts. */
 [
   SQUAD_BY_CLUB, TACTICAL_RADAR_BY_CLUB, SQUAD_VALUE_TREND_BY_CLUB, SCOUTING_TARGETS_BY_CLUB,
   BASE_CATEGORIES_BY_CLUB, CLUB_ASSETS_BY_CLUB, STAFF_BY_CLUB, TRAVEL_BY_CLUB,
@@ -5830,7 +6040,7 @@ function generateFanPool(clubId, total, sociosCount){
   }
   return pool;
 }
-const FAN_POOL_TOTALS = { flamengo:{ total:15000, socios:1000 }, corinthians:{ total:12000, socios:800 }, estrela:{ total:30000, socios:1000 }, guarani:{ total:200000, socios:40000 }, botafogo:{ total:150000, socios:20000 } };
+const FAN_POOL_TOTALS = { flamengo:{ total:15000, socios:1000 }, corinthians:{ total:12000, socios:800 }, estrela:{ total:30000, socios:1000 }, guarani:{ total:200000, socios:40000 }, botafogo:{ total:150000, socios:20000 }, vasco:{ total:500, socios:261 } };
 let FAN_POOL_CACHE = {};
 function getFanPool(){
   const key = currentClubId;
