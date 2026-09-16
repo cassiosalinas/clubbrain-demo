@@ -1569,7 +1569,7 @@ canvas{ max-width:100%; }
           </div>
           <div>
             <label class="seg-label">Público-alvo</label>
-            <select id="promo-audience" class="seg-input"></select>
+            <select id="promo-audience" class="seg-input" onchange="updateRealCampaignBox()"></select>
           </div>
           <div>
             <label class="seg-label">Tipo de oferta</label>
@@ -1622,6 +1622,16 @@ canvas{ max-width:100%; }
         <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
           <button class="pill" onclick="simulateVascoPromotion()">Simular impacto com IA</button>
           <button class="btn-primary" onclick="launchVascoPromotion()">Lançar promoção</button>
+        </div>
+        <div id="real-campaign-box" style="display:none; margin-top:14px; padding:14px 16px; border-radius:10px; background:rgba(34,224,122,.06); border:1px solid rgba(34,224,122,.25);">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:220px;">
+              <div style="font-size:11.5px; font-weight:700; color:#22e07a; text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px;">● Ação real — grava no HubSpot</div>
+              <div class="hero-note" style="margin:0;">Cria uma <b style="color:var(--text);">Tarefa de verdade</b> no HubSpot pra cada torcedor real em risco de churn (<b id="real-campaign-count" style="color:var(--text);">—</b> hoje) — aparece na aba Tasks da conta, pronta pro time de retenção trabalhar.</div>
+            </div>
+            <button class="btn-primary" id="real-campaign-btn" style="background:#22e07a; border-color:#22e07a; white-space:nowrap;" onclick="dispararCampanhaReal()">Disparar campanha real</button>
+          </div>
+          <div id="real-campaign-result" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid rgba(34,224,122,.2); font-size:12.5px;"></div>
         </div>
       </div>
 
@@ -1799,8 +1809,9 @@ canvas{ max-width:100%; }
           <div class="card-title">
             <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>
             <h3>Eventos chegando agora</h3>
+            <span class="card-foot-link" id="cdp-live-feed-refresh" style="margin:0 0 0 auto;" onclick="loadHubSpotStats()">↻ Atualizar</span>
           </div>
-          <div class="hero-note" style="margin:-6px 0 14px;">Torcedores identificados são resolvidos ao perfil na hora; eventos ainda sem match ficam anônimos até o próximo sinal (login, compra, etc.)</div>
+          <div class="hero-note" style="margin:-6px 0 14px;">Torcedores identificados são resolvidos ao perfil na hora; eventos ainda sem match ficam anônimos até o próximo sinal (login, compra, etc.) — compras reais no ShopVasco (Vasco) aparecem aqui ao vivo, marcadas "ShopVasco · real".</div>
           <div id="cdp-live-feed"></div>
         </div>
       </div>
@@ -2781,6 +2792,57 @@ function renderHubspotSampleTable(){
     </tr>`).join('');
 }
 
+// Ato 2 da "jornada do torcedor" — o mesmo feed "eventos ao vivo" da CDP
+// Overview, só que com as compras reais do ShopVasco/Sócio Torcedor (via
+// hubspotStats.recentActivity, action:'stats') aparecendo no topo de
+// verdade, não só ilustrativo. Preenche o resto da lista com os eventos
+// fictícios de sempre pra não deixar o feed vazio fora do Vasco.
+function timeAgo(iso){
+  if(!iso) return '';
+  const diffS = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if(diffS < 10) return 'agora';
+  if(diffS < 60) return diffS + 's atrás';
+  const m = Math.floor(diffS / 60);
+  if(m < 60) return m + 'min atrás';
+  const h = Math.floor(m / 60);
+  if(h < 24) return h + 'h atrás';
+  return Math.floor(h / 24) + 'd atrás';
+}
+const CDP_LIVE_EVENTS_FICTICIO = [
+  ['Rafael Souza', 'App do torcedor', 'ticket_purchase', teal, 'agora'],
+  ['(anônimo)', 'Redes sociais', 'post_engagement', '#4b5378', '3s atrás'],
+  ['Camila Alves', 'E-commerce', 'cart_checkout', brand2, '6s atrás'],
+  ['(anônimo)', 'Museu virtual', 'tour_started', '#4b5378', '9s atrás'],
+  ['Diego Farias', 'App do torcedor', 'push_opened', red, '14s atrás'],
+  ['(anônimo)', 'Ponto de venda', 'pos_purchase', '#4b5378', '19s atrás'],
+  ['Bruno Lima', 'Ingressos & catraca', 'gate_checkin', amber, '24s atrás'],
+  ['(anônimo)', 'CRM legado', 'batch_import', '#4b5378', '31s atrás'],
+];
+function renderCdpLiveFeed(){
+  const el = document.getElementById('cdp-live-feed');
+  if(!el) return; // CDP Overview ainda não foi visitada nesta sessão
+  const real = (currentClubId === 'vasco' && hubspotStats && hubspotStats.recentActivity) ? hubspotStats.recentActivity : [];
+  const realRows = real.map(a => `
+    <div class="status-row">
+      <span class="status-dotlive ok" style="background:#22e07a;"></span>
+      <div style="flex:1;">
+        <div style="font-size:12.5px;"><b>${a.firstname || ''} ${a.lastname || ''}</b> <span class="tag" style="margin-left:6px; font-size:10px; padding:2px 8px; background:rgba(34,224,122,.16); color:#22e07a;">ShopVasco · real</span></div>
+        <div class="mono" style="font-size:11.5px; color:var(--text-dim); margin-top:2px;">${a.description || ''}</div>
+      </div>
+      <span class="hero-note" style="white-space:nowrap;">${timeAgo(a.at)}</span>
+    </div>`);
+  const filler = CDP_LIVE_EVENTS_FICTICIO.slice(0, Math.max(0, 8 - realRows.length)).map(e => `
+    <div class="status-row">
+      <span class="status-dotlive ok" style="background:${e[3]};"></span>
+      <div style="flex:1;">
+        <div style="font-size:12.5px;"><b>${e[0]}</b> <span class="tag" style="margin-left:6px; font-size:10px; padding:2px 8px;">${e[1]}</span></div>
+        <div class="mono" style="font-size:11.5px; color:var(--text-dim); margin-top:2px;">evento: ${e[2]}</div>
+      </div>
+      <span class="hero-note" style="white-space:nowrap;">${e[4]}</span>
+    </div>`);
+  el.innerHTML = realRows.join('') + filler.join('');
+}
+
 // Puxa números reais do CRM HubSpot do Vasco (ver netlify/functions/
 // hubspot-admin.js, { action:'stats' }) — só chamada quando o Vasco está
 // selecionado, único clube com conta HubSpot real. Atualiza a linha
@@ -2811,6 +2873,7 @@ async function loadHubSpotStats(){
     patchHubspotSourceRow();
     renderHubspotSampleTable();
     updatePromoAudienceCounts();
+    renderCdpLiveFeed();
     if(initialized.integrations) buildIntegrations();
 
     if(note) note.innerHTML = `<span class="live-dot"></span> Dados ao vivo — API HubSpot: ${d.total.toLocaleString('pt-BR')} contatos, ${d.socios.toLocaleString('pt-BR')} sócios-torcedores (${d.socioPct.toLocaleString('pt-BR')}%)`;
@@ -2819,6 +2882,7 @@ async function loadHubSpotStats(){
     patchHubspotSourceRow();
     renderHubspotSampleTable();
     updatePromoAudienceCounts();
+    renderCdpLiveFeed();
     if(initialized.integrations) buildIntegrations();
     if(note) note.innerHTML = '<span class="live-dot" style="background:#ff6b5e"></span> Não foi possível carregar o HubSpot agora (' + e.message + ') — mostrando os últimos números conhecidos';
   }finally{
@@ -2832,6 +2896,7 @@ function hideHubSpotLiveNote(){
   patchHubspotSourceRow();
   renderHubspotSampleTable();
   updatePromoAudienceCounts();
+  renderCdpLiveFeed();
   if(initialized.integrations) buildIntegrations();
 }
 
@@ -2880,6 +2945,57 @@ function updatePromoAudienceCounts(){
     const prevValue = audEl.value;
     audEl.innerHTML = VASCO_PROMO_AUDIENCES.map(a=>`<option value="${a.id}">${a.real ? '🟢' : '⚪'} ${a.label} (${a.count.toLocaleString('pt-BR')})</option>`).join('');
     if(prevValue) audEl.value = prevValue;
+  }
+  updateRealCampaignBox();
+}
+
+// Ato 3 da "jornada do torcedor" — só mostra o box de ação real quando o
+// público selecionado é "risco de churn" E o Vasco está selecionado com
+// dado real carregado (mesmo gate de sempre: currentClubId + hubspotStats).
+function updateRealCampaignBox(){
+  const box = document.getElementById('real-campaign-box');
+  const audEl = document.getElementById('promo-audience');
+  if(!box || !audEl) return;
+  const churnrisco = VASCO_PROMO_AUDIENCES.find(a => a.id === 'churnrisco');
+  const show = audEl.value === 'churnrisco' && currentClubId === 'vasco' && hubspotStats;
+  box.style.display = show ? 'block' : 'none';
+  if(show){
+    document.getElementById('real-campaign-count').textContent = churnrisco.count.toLocaleString('pt-BR');
+    document.getElementById('real-campaign-result').style.display = 'none';
+  }
+}
+
+async function dispararCampanhaReal(){
+  const churnrisco = VASCO_PROMO_AUDIENCES.find(a => a.id === 'churnrisco');
+  const ok = confirm(`Isso vai criar ${churnrisco.count} tarefa(s) de verdade no HubSpot do Vasco (aba Tasks), uma por torcedor em risco de churn — ação real, não simulada. Confirmar?`);
+  if(!ok) return;
+
+  const btn = document.getElementById('real-campaign-btn');
+  const resultEl = document.getElementById('real-campaign-result');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Criando tarefas…';
+  resultEl.style.display = 'none';
+  try{
+    const r = await fetch(HUBSPOT_BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create_retention_tasks' }),
+    });
+    const d = await r.json();
+    if(!r.ok || !d.ok) throw new Error(d.error || 'Falha ao criar as tarefas.');
+
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `✅ <b style="color:#22e07a;">${d.created} tarefa(s) real(is) criada(s)</b> no HubSpot${d.associationWarning ? ' <span style="color:var(--text-dim);">(' + d.associationWarning + ')</span>' : ''} — verifique na conta, aba Tasks. Exemplos: ${
+      (d.contacts || []).slice(0, 3).map(c => `${c.firstname} ${c.lastname}`).join(', ')
+    }${d.contacts && d.contacts.length > 3 ? '…' : ''}`;
+    showToast(`${d.created} tarefas reais criadas no HubSpot`, '#22e07a');
+  }catch(e){
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `<span style="color:#ff8c85;">Erro: ${e.message}</span>`;
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
   }
 }
 const VASCO_PROMO_OFFERS = [
@@ -6580,25 +6696,7 @@ function buildCdp(){
     options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:gridOpt, ticks:{callback:v=>(v/1000)+'K'}} } }
   });
 
-  const liveEvents = [
-    ['Rafael Souza', 'App do torcedor', 'ticket_purchase', teal, 'agora'],
-    ['(anônimo)', 'Redes sociais', 'post_engagement', '#4b5378', '3s atrás'],
-    ['Camila Alves', 'E-commerce', 'cart_checkout', brand2, '6s atrás'],
-    ['(anônimo)', 'Museu virtual', 'tour_started', '#4b5378', '9s atrás'],
-    ['Diego Farias', 'App do torcedor', 'push_opened', red, '14s atrás'],
-    ['(anônimo)', 'Ponto de venda', 'pos_purchase', '#4b5378', '19s atrás'],
-    ['Bruno Lima', 'Ingressos & catraca', 'gate_checkin', amber, '24s atrás'],
-    ['(anônimo)', 'CRM legado', 'batch_import', '#4b5378', '31s atrás'],
-  ];
-  document.getElementById('cdp-live-feed').innerHTML = liveEvents.map(e=>`
-    <div class="status-row">
-      <span class="status-dotlive ok" style="background:${e[3]};"></span>
-      <div style="flex:1;">
-        <div style="font-size:12.5px;"><b>${e[0]}</b> <span class="tag" style="margin-left:6px; font-size:10px; padding:2px 8px;">${e[1]}</span></div>
-        <div class="mono" style="font-size:11.5px; color:var(--text-dim); margin-top:2px;">evento: ${e[2]}</div>
-      </div>
-      <span class="hero-note" style="white-space:nowrap;">${e[4]}</span>
-    </div>`).join('');
+  renderCdpLiveFeed();
 
   // --- Fans (níveis + amostra + busca) ---
   renderCrmTiers();

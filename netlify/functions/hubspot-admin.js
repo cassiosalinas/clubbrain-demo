@@ -39,7 +39,14 @@
 //                           contato do HubSpot (numero_compras, LTV, partidas
 //                           assistidas etc., dependendo do produto) — fecha o
 //                           ciclo real da Loja do Vasco / Sócio Torcedor.
+//                           Também grava "ultima_acao_descricao", que o
+//                           "stats" abaixo usa pro feed de atividade real.
 //                           Precisa de STRIPE_SECRET_KEY também.
+//   { "action": "create_retention_tasks" } → Ato 3 da jornada: cria 1 Tarefa
+//                           real no HubSpot (aba Tasks) por torcedor com
+//                           risco_churn=alto — ação de verdade que o time de
+//                           marketing/retenção vê e trabalha, disparada pela
+//                           Campanhas & Promoções no painel.
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → HUBSPOT_API_KEY
@@ -204,6 +211,13 @@ const CUSTOM_PROPERTIES = [
   { name: 'indicacoes_feitas', label: 'Indicações feitas', type: 'number', fieldType: 'number' },
   { name: 'preferencia_acessibilidade', label: 'Preferência de acessibilidade', type: 'string', fieldType: 'text' },
   { name: 'geracao_familiar', label: 'Geração familiar de torcedor', type: 'string', fieldType: 'text' },
+  // Frase curta descrevendo a última ação real do torcedor (ex.: "Comprou
+  // Camisa I Vasco da Gama 2026 (R$ 299,00)") — gravada por
+  // fulfill_stripe_order a cada compra no ShopVasco/Sócio Torcedor.
+  // Combinado com o hs_lastmodifieddate nativo do HubSpot (atualizado
+  // automaticamente a cada PATCH), dá pra montar um feed real de "ações mais
+  // recentes" ordenando por data de modificação — ver action "stats".
+  { name: 'ultima_acao_descricao', label: 'Última ação (descrição)', type: 'string', fieldType: 'text' },
 ];
 
 // 15 torcedores fictícios do Vasco — mesmo estilo já usado em
@@ -789,6 +803,32 @@ exports.handler = async function (event) {
         jogador_favorito: c.properties.jogador_favorito,
       }));
 
+      // Ato 2 da "jornada do torcedor" — feed de ações reais mais recentes:
+      // qualquer contato com ultima_acao_descricao preenchida (gravada por
+      // fulfill_stripe_order a cada compra real), ordenado pelo
+      // hs_lastmodifieddate nativo do HubSpot (atualizado sozinho a cada
+      // PATCH, não precisa de um campo de timestamp customizado).
+      const activityRes = await hsFetch('/crm/v3/objects/contacts/search', {
+        method: 'POST',
+        body: JSON.stringify({
+          filterGroups: [{ filters: [
+            { propertyName: 'time_coracao', operator: 'EQ', value: 'Vasco da Gama' },
+            { propertyName: 'ultima_acao_descricao', operator: 'HAS_PROPERTY' },
+          ] }],
+          sorts: [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }],
+          limit: 5,
+          properties: ['firstname', 'lastname', 'ultima_acao_descricao', 'hs_lastmodifieddate'],
+        }),
+      });
+      const activityData = await activityRes.json().catch(() => ({}));
+      if (!activityRes.ok) throw new Error(activityData.message || ('HTTP ' + activityRes.status) + ' na atividade recente');
+      const recentActivity = (activityData.results || []).map(c => ({
+        firstname: c.properties.firstname,
+        lastname: c.properties.lastname,
+        description: c.properties.ultima_acao_descricao,
+        at: c.properties.hs_lastmodifieddate,
+      }));
+
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json', ...cors },
@@ -799,6 +839,7 @@ exports.handler = async function (event) {
           socioPct: total ? Math.round((socios / total) * 1000) / 10 : 0,
           segments,
           sample,
+          recentActivity,
           generatedAt: new Date().toISOString(),
         }),
       };
@@ -887,6 +928,7 @@ exports.handler = async function (event) {
         data_ultima_interacao: new Date().toISOString().slice(0, 10),
         sinal_alerta: '',
       };
+      const amountBRL = 'R$ ' + numAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
       if (kind === 'produto') {
         const priorCompras = Number(before.numero_compras) || 0;
         const priorTicket = Number(before.ticket_medio) || 0;
@@ -894,10 +936,12 @@ exports.handler = async function (event) {
         updates.ticket_medio = Math.round((priorTicket * priorCompras + numAmount) / (priorCompras + 1));
         if (md.category) updates.produto_favorito = md.category;
         updates.engajamento_app = Math.min(100, (Number(before.engajamento_app) || 0) + 3);
+        updates.ultima_acao_descricao = 'Comprou ' + (md.item_name || 'um produto') + ' (' + amountBRL + ') no ShopVasco';
       } else {
         updates.partidas_assistidas_temporada = (Number(before.partidas_assistidas_temporada) || 0) + 1;
         updates.taxa_presenca = Math.min(100, (Number(before.taxa_presenca) || 0) + 6);
         updates.fan_score = Math.min(100, (Number(before.fan_score) || 0) + 2);
+        updates.ultima_acao_descricao = 'Garantiu ingresso: ' + (md.item_name || 'jogo do Vasco') + ' (' + amountBRL + ')';
       }
 
       const patchRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(fanEmail) + '?idProperty=email', {
@@ -926,7 +970,77 @@ exports.handler = async function (event) {
       };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan" ou "fulfill_stripe_order".' }) };
+    if (payload.action === 'create_retention_tasks') {
+      // Ato 3 da "jornada do torcedor" — o gerente de marketing vê o
+      // segmento de risco de churn e dispara uma ação real: 1 Tarefa de
+      // verdade por torcedor no HubSpot (aba Tasks da conta), não só um
+      // número numa tela. Usa os batch endpoints do HubSpot pra criar e
+      // associar tudo em 2 chamadas, independente de quantos torcedores.
+      const searchRes = await hsFetch('/crm/v3/objects/contacts/search', {
+        method: 'POST',
+        body: JSON.stringify({
+          filterGroups: [{ filters: [
+            { propertyName: 'time_coracao', operator: 'EQ', value: 'Vasco da Gama' },
+            { propertyName: 'risco_churn', operator: 'EQ', value: 'alto' },
+          ] }],
+          properties: ['firstname', 'lastname', 'email', 'nivel_socio', 'fan_score', 'ltv_torcedor'],
+          limit: 100,
+        }),
+      });
+      const searchData = await searchRes.json().catch(() => ({}));
+      if (!searchRes.ok) {
+        return { statusCode: searchRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: searchData.message || 'Falha ao buscar torcedores em risco de churn.' }) };
+      }
+      const contacts = searchData.results || [];
+      if (contacts.length === 0) {
+        return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, created: 0, message: 'Nenhum torcedor em risco de churn encontrado agora — segmento vazio.' }) };
+      }
+
+      const dueTs = Date.now() + 3 * 24 * 60 * 60 * 1000; // vence em 3 dias
+      const taskInputs = contacts.map(c => ({
+        properties: {
+          hs_task_subject: 'Reter torcedor: ' + (c.properties.firstname || '') + ' ' + (c.properties.lastname || ''),
+          hs_task_body: `Sinalizado com risco de churn alto (Fan Score ${c.properties.fan_score || '—'}, nível ${c.properties.nivel_socio || '—'}, LTV R$ ${c.properties.ltv_torcedor || 0}). Ação sugerida: contato personalizado ou oferta de reativação — disparado pela Campanhas & Promoções do painel Virtual Fans.`,
+          hs_task_status: 'NOT_STARTED',
+          hs_task_priority: 'HIGH',
+          hs_task_type: 'TODO',
+          hs_timestamp: String(dueTs),
+        },
+      }));
+      const createRes = await hsFetch('/crm/v3/objects/tasks/batch/create', {
+        method: 'POST',
+        body: JSON.stringify({ inputs: taskInputs }),
+      });
+      const createData = await createRes.json().catch(() => ({}));
+      if (!createRes.ok) {
+        return { statusCode: createRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: createData.message || 'Falha ao criar tarefas no HubSpot.' }) };
+      }
+      const taskResults = createData.results || [];
+
+      const assocInputs = taskResults.map((t, i) => ({ from: { id: t.id }, to: { id: contacts[i].id } }));
+      const assocRes = await hsFetch('/crm/v4/associations/tasks/contacts/batch/create-default', {
+        method: 'POST',
+        body: JSON.stringify({ inputs: assocInputs }),
+      });
+      const assocData = await assocRes.json().catch(() => ({}));
+      // Falha de associação não desfaz as tarefas já criadas — reporta como
+      // aviso, não erro fatal, já que a tarefa em si já existe de verdade.
+      const assocOk = assocRes.ok;
+
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({
+          ok: true,
+          created: taskResults.length,
+          associated: assocOk ? taskResults.length : 0,
+          associationWarning: assocOk ? undefined : (assocData.message || 'Tarefas criadas, mas a associação ao contato falhou.'),
+          contacts: contacts.map(c => ({ firstname: c.properties.firstname, lastname: c.properties.lastname, fanScore: Number(c.properties.fan_score) || 0 })),
+        }),
+      };
+    }
+
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan", "fulfill_stripe_order" ou "create_retention_tasks".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
