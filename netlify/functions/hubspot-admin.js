@@ -11,6 +11,9 @@
 //                           (idempotente — roda de novo sem duplicar)
 //   { "action": "seed" }  → cria/atualiza os 15 torcedores fictícios
 //                           (upsert por e-mail, idempotente também)
+//   { "action": "lists" } → cria 6 listas dinâmicas (segmentos) filtradas
+//                           por nível de sócio, risco de churn etc. —
+//                           precisa do escopo crm.lists.write no private app
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → HUBSPOT_API_KEY
@@ -99,6 +102,18 @@ const TORCEDORES_VASCO = [
     nivel_socio:'ouro', fan_score:70, jogador_favorito:'Pablo Vegetti', ltv_torcedor:1210, risco_churn:'baixo', propensao_upgrade:54, segmento_torcedor:'Torcedor fiel', socio_desde:'2020-10-01' },
 ];
 
+// Listas dinâmicas (ACTIVE/DYNAMIC — o HubSpot mantém a membership em dia
+// sozinho conforme as propriedades do contato mudam) que dão a mesma leitura
+// de segmento que já existe em Torcedor 360 → Fans no demo.
+const SEGMENT_LISTS = [
+  { name:'Sócios Platina — Vasco', property:'nivel_socio', value:'platina' },
+  { name:'Sócios Ouro — Vasco', property:'nivel_socio', value:'ouro' },
+  { name:'Torcedores em risco de churn — Vasco', property:'risco_churn', value:'alto' },
+  { name:'Sócios novos — Vasco', property:'segmento_torcedor', value:'Sócio novo' },
+  { name:'Top torcedores — Vasco', property:'segmento_torcedor', value:'Top torcedor' },
+  { name:'Identificados, não-sócios — Vasco', property:'segmento_torcedor', value:'Identificado, não-sócio' },
+];
+
 exports.handler = async function (event) {
   const cors = corsHeaders(event);
 
@@ -182,7 +197,33 @@ exports.handler = async function (event) {
       return { statusCode: r.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify(data) };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup" ou "seed".' }) };
+    if (payload.action === 'lists') {
+      const results = [];
+      for (const seg of SEGMENT_LISTS) {
+        const body = {
+          name: seg.name,
+          objectTypeId: '0-1',
+          processingType: 'DYNAMIC',
+          filterBranch: {
+            filterBranchType: 'AND',
+            filterBranches: [{
+              filterBranchType: 'AND',
+              filters: [{
+                filterType: 'PROPERTY',
+                property: seg.property,
+                operation: { operationType: 'STRING', operator: 'EQ', value: seg.value },
+              }],
+            }],
+          },
+        };
+        const r = await hsFetch('/crm/v3/lists', { method: 'POST', body: JSON.stringify(body) });
+        const data = await r.json().catch(() => ({}));
+        results.push({ name: seg.name, status: r.status, alreadyExists: r.status === 409, detail: data.message || data.list?.listId || data });
+      }
+      return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, results }) };
+    }
+
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed" ou "lists".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
