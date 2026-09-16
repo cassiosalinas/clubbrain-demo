@@ -2226,8 +2226,14 @@ canvas{ max-width:100%; }
     if (user === 'admin' && pass === 'VirtualFans00') {
       screen.style.display = 'none';
       errorEl.style.display = 'none';
-      renderClubCover();
-      document.getElementById('club-cover-screen').style.display = 'flex';
+      // Acessou /vasco/os direto (a "porta" do Vasco) — pula a tela de
+      // escolha de clube e já entra direto no Vasco selecionado.
+      if(window.location.pathname === '/vasco/os'){
+        chooseClubFromCover('vasco');
+      } else {
+        renderClubCover();
+        document.getElementById('club-cover-screen').style.display = 'flex';
+      }
     } else {
       errorEl.style.display = 'block';
     }
@@ -2541,6 +2547,17 @@ function selectClub(id, silent){
   const c = CLUB_PROFILES[id];
   if(!c) return;
   currentClubId = id;
+
+  // Mantém a URL coerente com o clube ativo — /vasco/os é a "porta" oficial
+  // do Vasco dentro da mesma família de URLs do ShopVasco/Sócio Torcedor/
+  // Museu Virtual. Só troca a barra de endereço (history.pushState), nunca
+  // recarrega a página — o login desta demo é proposital-mente não
+  // persistente (pede sempre), então um reload aqui derrubaria a sessão.
+  if(window.history && window.location.pathname !== '/vasco/os' && id === 'vasco'){
+    history.pushState({}, '', '/vasco/os');
+  } else if(window.history && window.location.pathname === '/vasco/os' && id !== 'vasco'){
+    history.pushState({}, '', '/');
+  }
 
   document.getElementById('topbar-club-badge').style.background = c.badgeBg;
   document.getElementById('topbar-club-badge').innerHTML = c.crest;
