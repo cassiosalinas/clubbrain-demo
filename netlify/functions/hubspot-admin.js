@@ -29,6 +29,10 @@
 //                           ALLOWED_ORIGINS abaixo) — sem risco de PII real
 //                           porque TODO contato nesta conta é fictício
 //                           (e-mails em example.com / vasco-demo.example.com).
+//   { "action": "lookup_fan", "email": "..." } → "login" do ShopVasco/Sócio
+//                           Torcedor (sem senha) — consulta real ao contato
+//                           por e-mail, devolve nome/nível de sócio/pontos
+//                           pra saudar o torcedor e aplicar o preço certo.
 //   { "action": "fulfill_stripe_order", "session_id": "cs_test_..." } →
 //                           confirma o pagamento de verdade no Stripe (ver
 //                           stripe-checkout.js) e grava a mudança real no
@@ -800,6 +804,41 @@ exports.handler = async function (event) {
       };
     }
 
+    if (payload.action === 'lookup_fan') {
+      // "Login" do ShopVasco/Sócio Torcedor — não é autenticação de verdade
+      // (sem senha), é uma consulta real ao contato no HubSpot por e-mail,
+      // usada pra saudar o torcedor pelo nome e aplicar o preço/desconto
+      // certo por nível de sócio. Sem PII real: todo contato é fictício.
+      if (!payload.email) {
+        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "email" obrigatório.' }) };
+      }
+      const props = ['firstname', 'lastname', 'nivel_socio', 'e_socio_torcedor', 'pontos_loyalty', 'fan_score', 'time_coracao'];
+      const r = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email&properties=' + props.join(','));
+      if (r.status === 404) {
+        return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, found: false }) };
+      }
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        return { statusCode: r.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: data.message || 'Falha ao consultar o HubSpot.' }) };
+      }
+      const p = data.properties || {};
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({
+          ok: true,
+          found: true,
+          email: payload.email,
+          firstname: p.firstname,
+          lastname: p.lastname,
+          nivelSocio: p.nivel_socio,
+          eSocioTorcedor: p.e_socio_torcedor,
+          pontosLoyalty: Number(p.pontos_loyalty) || 0,
+          fanScore: Number(p.fan_score) || 0,
+        }),
+      };
+    }
+
     if (payload.action === 'fulfill_stripe_order') {
       // Fecha o ciclo real da "jornada do torcedor": confirma o pagamento de
       // verdade no Stripe (modo teste) e grava a mudança de verdade no
@@ -824,11 +863,16 @@ exports.handler = async function (event) {
         return { statusCode: 402, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: 'Pagamento ainda não confirmado (status: ' + session.payment_status + ').' }) };
       }
 
-      const fanEmail = session.metadata && session.metadata.fan_email;
-      const product = session.metadata && session.metadata.product;
-      if (!fanEmail || !product) {
-        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Sessão do Stripe sem metadata de torcedor/produto.' }) };
+      const md = session.metadata || {};
+      const fanEmail = md.fan_email;
+      const kind = md.kind; // 'produto' | 'ingresso'
+      if (!fanEmail || !kind) {
+        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Sessão do Stripe sem metadata de torcedor/item.' }) };
       }
+      // amount_total é a fonte da verdade (centavos, valor de fato cobrado —
+      // pro ingresso já reflete o desconto por nível de sócio aplicado em
+      // stripe-checkout.js), não o que veio no metadata.
+      const numAmount = (Number(session.amount_total) || 0) / 100;
 
       const props = ['firstname', 'lastname', 'numero_compras', 'ticket_medio', 'produto_favorito', 'ltv_torcedor', 'partidas_assistidas_temporada', 'taxa_presenca', 'engajamento_app', 'fan_score', 'sinal_alerta', 'data_ultima_interacao'];
       const contactRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(fanEmail) + '?idProperty=email&properties=' + props.join(','));
@@ -837,19 +881,18 @@ exports.handler = async function (event) {
         return { statusCode: contactRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: contactData.message || 'Torcedor não encontrado no HubSpot: ' + fanEmail }) };
       }
       const before = contactData.properties || {};
-      const numAmount = product === 'camisa' ? 299 : 80;
 
       const updates = {
         ltv_torcedor: (Number(before.ltv_torcedor) || 0) + numAmount,
         data_ultima_interacao: new Date().toISOString().slice(0, 10),
         sinal_alerta: '',
       };
-      if (product === 'camisa') {
+      if (kind === 'produto') {
         const priorCompras = Number(before.numero_compras) || 0;
         const priorTicket = Number(before.ticket_medio) || 0;
         updates.numero_compras = priorCompras + 1;
         updates.ticket_medio = Math.round((priorTicket * priorCompras + numAmount) / (priorCompras + 1));
-        updates.produto_favorito = 'Camisas';
+        if (md.category) updates.produto_favorito = md.category;
         updates.engajamento_app = Math.min(100, (Number(before.engajamento_app) || 0) + 3);
       } else {
         updates.partidas_assistidas_temporada = (Number(before.partidas_assistidas_temporada) || 0) + 1;
@@ -873,7 +916,9 @@ exports.handler = async function (event) {
           ok: true,
           fanEmail,
           fanName: (before.firstname || '') + ' ' + (before.lastname || ''),
-          product,
+          kind,
+          itemName: md.item_name || '',
+          tier: md.tier || '',
           amount: numAmount,
           before,
           after: patchData.properties || updates,
@@ -881,7 +926,7 @@ exports.handler = async function (event) {
       };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats" ou "fulfill_stripe_order".' }) };
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan" ou "fulfill_stripe_order".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }

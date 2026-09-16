@@ -10,3 +10,18 @@
   from = "/api/chat"
   to = "/.netlify/functions/chat"
   status = 200
+
+# URLs limpas da jornada do torcedor (ShopVasco / Sócio Torcedor) — servem
+# os arquivos .html reais de dentro de vasco/ sem expor a extensão.
+[[redirects]]
+  from = "/vasco/loja"
+  to = "/vasco/loja.html"
+  status = 200
+[[redirects]]
+  from = "/vasco/socio"
+  to = "/vasco/socio.html"
+  status = 200
+[[redirects]]
+  from = "/vasco/sucesso"
+  to = "/vasco/sucesso.html"
+  status = 200

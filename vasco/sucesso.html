@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Compra confirmada</title>
-<link rel="stylesheet" href="assets/fan-site.css">
+<link rel="stylesheet" href="/assets/fan-site.css">
 <style>
   .diff-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
   .diff-row:last-child{ border-bottom:none; }
@@ -46,7 +46,7 @@
       <div id="diff-rows"></div>
     </div>
 
-    <a href="loja.html" class="fan-btn ghost" style="margin-bottom:10px;">Voltar à Loja do Vasco</a>
+    <a href="/vasco/loja" class="fan-btn ghost" style="margin-bottom:10px;">Voltar ao ShopVasco</a>
   </div>
 
   <div id="state-err" class="fan-card center" style="display:none;">
@@ -55,7 +55,7 @@
     </div>
     <h2 style="font-size:20px; margin-bottom:8px;">Algo não deu certo</h2>
     <div class="fan-desc center" id="err-msg" style="margin:0 auto 20px;"></div>
-    <a href="loja.html" class="fan-btn ghost">Voltar à loja</a>
+    <a href="/vasco/loja" class="fan-btn ghost">Voltar à loja</a>
   </div>
 
 </div>
@@ -85,7 +85,6 @@ function fmtVal(key, v){
 async function confirmar(){
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
-  const produto = params.get('produto');
   if(!sessionId){
     document.getElementById('state-loading').style.display = 'none';
     document.getElementById('state-err').style.display = 'block';
@@ -103,8 +102,8 @@ async function confirmar(){
 
     document.getElementById('state-loading').style.display = 'none';
     document.getElementById('state-ok').style.display = 'block';
-    const label = produto === 'ingresso' ? 'seu ingresso' : 'sua camisa';
-    document.getElementById('ok-sub').textContent = `${(d.fanName || '').trim() || d.fanEmail} acabou de garantir ${label} — e isso já está gravado de verdade no HubSpot do clube.`;
+    const quem = (d.fanName || '').trim() || d.fanEmail;
+    document.getElementById('ok-sub').textContent = `${quem} acabou de garantir ${d.itemName || 'sua compra'} — e isso já está gravado de verdade no HubSpot do clube.`;
 
     const keys = Object.keys(d.after).filter(k => FIELD_LABELS[k] && d.before[k] !== d.after[k]);
     const rowsHtml = keys.map(k => `

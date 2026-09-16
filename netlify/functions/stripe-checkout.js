@@ -1,19 +1,23 @@
 // netlify/functions/stripe-checkout.js
 //
 // Cria uma sessão real de checkout do Stripe (modo teste — sk_test_..., sem
-// dinheiro real envolvido) para os dois produtos do storytelling "jornada do
-// torcedor": camisa (Loja do Vasco) e ingresso (Área do Sócio Torcedor).
-// Devolve a URL hospedada pelo próprio Stripe pra onde o navegador redireciona
-// — checkout de verdade, cadeado de verdade, cartão de teste (4242 4242 4242
-// 4242, qualquer validade futura/CVC).
+// dinheiro real envolvido) para o catálogo do ShopVasco (9 produtos reais do
+// clube) e para os ingressos dos próximos jogos reais em São Januário — com
+// o preço do ingresso decidido pelo NÍVEL DE SÓCIO de verdade, consultado no
+// HubSpot no servidor (nunca confiado do navegador). Devolve a URL hospedada
+// pelo próprio Stripe pra onde o navegador redireciona — checkout de
+// verdade, cadeado de verdade, cartão de teste (4242 4242 4242 4242,
+// qualquer validade futura/CVC).
 //
-// A chave STRIPE_SECRET_KEY fica só no servidor (variável de ambiente no
-// Netlify), nunca exposta no navegador. Chame esta function com:
-//   { "product": "camisa" | "ingresso", "fanEmail": "rafael.colina@vasco-demo.example.com" }
+// Chame esta function com:
+//   { "type": "produto", "id": "camisa1", "fanEmail": "..." }
+//   { "type": "ingresso", "id": "vascocoritiba", "fanEmail": "..." }
 //
 // Configuração necessária no painel do Netlify:
 //   Site settings → Environment variables → STRIPE_SECRET_KEY
 //   (chave secreta de teste do Stripe, Developers → API keys, sk_test_...)
+//   HUBSPOT_API_KEY também é usada aqui (só leitura) pra decidir o preço do
+//   ingresso pelo nível de sócio real do torcedor.
 
 const ALLOWED_ORIGINS = [
   'https://clubbrain.ai',
@@ -32,11 +36,49 @@ function corsHeaders(event) {
   };
 }
 
-// Preço fica no servidor de propósito — não dá pra manipular pelo navegador.
-const PRODUCTS = {
-  camisa: { name: 'Camisa Vasco da Gama 2026 — Edição 125 anos', amount: 29900 },
-  ingresso: { name: 'Ingresso — Vasco x Flamengo, Setor Norte (São Januário)', amount: 8000 },
+// Catálogo real do ShopVasco (mesmos 9 itens do PRODUCTS_BY_CLUB.vasco no
+// index.html) — preço fica no servidor de propósito, não é manipulável pelo
+// navegador. Valores em centavos.
+const MERCH = {
+  camisa1: { name: 'Camisa I Vasco da Gama 2026', category: 'Camisas', amount: 29990 },
+  camisa2: { name: 'Camisa II Vasco da Gama 2026', category: 'Camisas', amount: 29990 },
+  camisaretro: { name: 'Camisa Retrô Cruz de Malta', category: 'Camisas', amount: 32990 },
+  camisainfantil: { name: 'Camisa Infantil Vasco da Gama', category: 'Infantil', amount: 15990 },
+  moletom: { name: 'Moletom oficial Gigante da Colina', category: 'Vestuário', amount: 16990 },
+  bone: { name: 'Boné oficial Cruzmaltino', category: 'Acessórios', amount: 8990 },
+  cachecol: { name: 'Cachecol oficial Vasco da Gama', category: 'Acessórios', amount: 4490 },
+  caneca: { name: 'Caneca oficial Vasco da Gama', category: 'Colecionáveis', amount: 3490 },
+  miniatura: { name: 'Miniatura de São Januário', category: 'Colecionáveis', amount: 6990 },
 };
+
+// Próximos jogos reais do Vasco em São Januário (ver EVENTS_BY_CLUB.vasco no
+// index.html — mesma pesquisa). Setor Norte, preço-base de não-sócio.
+const MATCHES = {
+  vascocoritiba: { name: 'Vasco x Coritiba — Brasileirão (28ª rodada)', date: '19 set 2026' },
+  vascoremo: { name: 'Vasco x Remo — Brasileirão (30ª rodada)', date: '10 out 2026' },
+};
+
+// Preço do ingresso Setor Norte por nível de sócio real (em centavos) — é
+// isso que o programa de sócio-torcedor faz de verdade: quem paga mais de
+// mensalidade paga menos no ingresso.
+const TIER_TICKET_PRICE = { basico: 8000, bronze: 6500, prata: 5000, ouro: 3000, platina: 1500 };
+
+async function lookupTier(fanEmail) {
+  const hubspotKey = process.env.HUBSPOT_API_KEY;
+  if (!hubspotKey || !fanEmail) return 'basico';
+  try {
+    const r = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/' + encodeURIComponent(fanEmail) + '?idProperty=email&properties=nivel_socio,e_socio_torcedor', {
+      headers: { Authorization: 'Bearer ' + hubspotKey },
+    });
+    if (!r.ok) return 'basico';
+    const data = await r.json();
+    const p = data.properties || {};
+    if (p.e_socio_torcedor === 'sim' && TIER_TICKET_PRICE[p.nivel_socio]) return p.nivel_socio;
+    return 'basico';
+  } catch (e) {
+    return 'basico';
+  }
+}
 
 // Stripe espera application/x-www-form-urlencoded com notação de colchetes
 // pra objetos/arrays aninhados (ex.: line_items[0][price_data][currency]) —
@@ -86,27 +128,48 @@ exports.handler = async function (event) {
     return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'JSON inválido no corpo da requisição.' }) };
   }
 
-  const product = PRODUCTS[payload.product];
-  if (!product) {
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "product" deve ser "camisa" ou "ingresso".' }) };
-  }
   if (!payload.fanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.fanEmail)) {
     return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "fanEmail" obrigatório e precisa ser um e-mail válido.' }) };
   }
 
+  let productName, amount, category, matchDate, tier;
+  if (payload.type === 'produto') {
+    const item = MERCH[payload.id];
+    if (!item) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Produto inválido.' }) };
+    productName = item.name;
+    amount = item.amount;
+    category = item.category;
+  } else if (payload.type === 'ingresso') {
+    const match = MATCHES[payload.id];
+    if (!match) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Jogo inválido.' }) };
+    tier = await lookupTier(payload.fanEmail);
+    amount = TIER_TICKET_PRICE[tier];
+    productName = match.name + ' — Setor Norte, São Januário (' + match.date + ')';
+    matchDate = match.date;
+  } else {
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "type" deve ser "produto" ou "ingresso".' }) };
+  }
+
   const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || 'https://demo.clubbrain.ai';
-  const cancelPage = payload.product === 'ingresso' ? 'socio.html' : 'loja.html';
+  const cancelPage = payload.type === 'ingresso' ? '/vasco/socio' : '/vasco/loja';
 
   const body = toFormBody({
     mode: 'payment',
     line_items: [{
-      price_data: { currency: 'brl', product_data: { name: product.name }, unit_amount: product.amount },
+      price_data: { currency: 'brl', product_data: { name: productName }, unit_amount: amount },
       quantity: 1,
     }],
-    success_url: origin + '/sucesso.html?session_id={CHECKOUT_SESSION_ID}&produto=' + payload.product,
-    cancel_url: origin + '/' + cancelPage,
+    success_url: origin + '/vasco/sucesso?session_id={CHECKOUT_SESSION_ID}',
+    cancel_url: origin + cancelPage,
     customer_email: payload.fanEmail,
-    metadata: { fan_email: payload.fanEmail, product: payload.product },
+    metadata: {
+      fan_email: payload.fanEmail,
+      kind: payload.type,
+      item_id: payload.id,
+      item_name: productName,
+      category: category || '',
+      tier: tier || '',
+    },
   });
 
   try {
@@ -122,7 +185,7 @@ exports.handler = async function (event) {
     if (!r.ok) {
       return { statusCode: r.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: (data.error && data.error.message) || 'Erro ao criar sessão no Stripe.' }) };
     }
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, url: data.url }) };
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ ok: true, url: data.url, tier: tier || null, amount }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do Stripe: ' + err.message }) };
   }
