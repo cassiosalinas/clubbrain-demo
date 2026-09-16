@@ -227,3 +227,75 @@ a{ color:var(--gold); }
 }
 .match-btn:disabled{ opacity:.55; cursor:default; }
 .match-badge{ font-size:10px; font-weight:700; text-transform:uppercase; padding:3px 8px; border-radius:20px; background:rgba(31,174,100,.16); color:#5fd98a; }
+
+/* ---- Museu Virtual ---- */
+.room-nav{ display:flex; gap:6px; margin-bottom:24px; overflow-x:auto; padding-bottom:4px; }
+.room-dot{
+  flex:none; display:flex; align-items:center; gap:8px;
+  padding:8px 14px 8px 8px; border-radius:24px; border:1px solid var(--line);
+  background:var(--ink-soft); cursor:pointer; white-space:nowrap;
+}
+.room-dot .num{
+  width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+  background:rgba(255,255,255,.08); color:var(--paper-dim);
+}
+.room-dot .label{ font-size:11.5px; color:var(--paper-dim); }
+.room-dot.visited .num{ background:rgba(34,224,122,.18); color:#5fd98a; }
+.room-dot.active{ border-color:var(--gold); background:rgba(255,164,0,.08); }
+.room-dot.active .num{ background:var(--gold); color:var(--ink); }
+.room-dot.active .label{ color:var(--paper); }
+
+.room-stage{
+  display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;
+  background:var(--ink-soft); border:1px solid var(--line); border-radius:20px;
+  padding:32px; margin-bottom:20px; box-shadow:var(--shadow);
+}
+@media (max-width:720px){ .room-stage{ grid-template-columns:1fr; padding:22px; } }
+.room-visual{
+  aspect-ratio:1/1; border-radius:16px; position:relative; overflow:hidden;
+  background:radial-gradient(circle at 30% 20%, rgba(255,164,0,.10), var(--ink) 70%);
+  border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+}
+.room-visual svg{ width:56%; height:56%; }
+.room-year{
+  font-family:'Oswald',sans-serif; font-size:13px; font-weight:700; color:var(--gold);
+  letter-spacing:.08em; margin-bottom:10px;
+}
+.room-title{ font-size:clamp(22px,3vw,30px); margin-bottom:14px; line-height:1.1; }
+.room-text{ color:var(--paper-dim); font-size:14px; line-height:1.65; margin-bottom:12px; }
+.room-text:last-child{ margin-bottom:0; }
+.room-text b{ color:var(--paper); }
+.room-footnav{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:36px; }
+.room-footnav .fan-btn{ width:auto; padding:12px 22px; }
+.room-footnav .fan-btn.ghost:disabled{ opacity:.3; }
+
+.museu-progress{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.museu-progress-bar{ flex:1; height:6px; border-radius:4px; background:rgba(255,255,255,.08); overflow:hidden; }
+.museu-progress-bar > div{ height:100%; background:var(--gold); border-radius:4px; transition:width .3s ease; }
+.museu-progress-label{ font-size:11.5px; color:var(--paper-dim); white-space:nowrap; }
+
+/* ---- Catálogo de recompensas Minu (real, resgate simulado) ---- */
+.reward-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:760px){ .reward-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:480px){ .reward-grid{ grid-template-columns:1fr; } }
+.reward-card{
+  background:var(--ink-soft); border:1px solid var(--line); border-radius:14px;
+  padding:16px; display:flex; flex-direction:column; gap:10px;
+}
+.reward-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.reward-brand{ font-family:'Oswald',sans-serif; font-size:13px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:.03em; }
+.reward-real-badge{
+  font-size:9px; font-weight:700; letter-spacing:.03em; padding:2px 7px; border-radius:20px;
+  background:rgba(34,224,122,.16); color:#5fd98a; white-space:nowrap;
+}
+.reward-name{ font-size:13.5px; line-height:1.35; min-height:36px; }
+.reward-cat{ font-size:10.5px; color:var(--paper-dim); }
+.reward-cost{ font-family:'Oswald',sans-serif; font-size:18px; color:var(--gold); margin-top:auto; }
+.reward-cost small{ font-family:'Inter',sans-serif; font-size:11px; color:var(--paper-dim); font-weight:500; }
+.reward-redeem{
+  width:100%; padding:9px; border:1px solid rgba(255,255,255,.16); border-radius:9px; cursor:pointer;
+  background:transparent; color:var(--paper-dim); font-family:'Oswald',sans-serif; font-weight:600; font-size:11.5px;
+  text-transform:uppercase; letter-spacing:.03em;
+}
+.reward-redeem:hover{ border-color:var(--paper-dim); color:var(--paper); }

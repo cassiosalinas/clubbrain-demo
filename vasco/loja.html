@@ -16,6 +16,7 @@
   <div class="fan-nav">
     <a href="/vasco/loja" class="active">ShopVasco</a>
     <a href="/vasco/socio">Sócio Torcedor</a>
+    <a href="/vasco/virtual">Museu Virtual</a>
   </div>
   <div class="badge">Checkout Stripe · ambiente de teste</div>
 </div>
@@ -40,16 +41,27 @@
 
 <script src="/assets/fan-site.js"></script>
 <script>
+// Nike é a fornecedora oficial de material esportivo do Vasco a partir de
+// 2026 (contrato até 2032, anunciado em 2026 — substitui a Kappa) — pesquisado
+// via ESPN/CNN Brasil/vasco.com.br. Camisa titular 2026: preta, com a faixa
+// diagonal branca reinterpretada com grafismos inspirados no movimento da água.
 const PRODUCTS = [
-  { id:'camisa1', name:'Camisa I Vasco da Gama 2026', desc:'Camisa titular preta e branca, temporada 2026.', cat:'Camisas', price:299.90 },
-  { id:'camisa2', name:'Camisa II Vasco da Gama 2026', desc:'Camisa reserva, tecido leve.', cat:'Camisas', price:299.90 },
-  { id:'camisaretro', name:'Camisa Retrô Cruz de Malta', desc:'Edição retrô inspirada nos uniformes históricos.', cat:'Camisas', price:329.90 },
-  { id:'camisainfantil', name:'Camisa Infantil', desc:'Manto titular no tamanho infantil.', cat:'Infantil', price:159.90 },
+  { id:'camisa1', name:'Camisa I Vasco da Gama Nike 2026', desc:'Camisa titular Nike, preta com a faixa diagonal branca reinterpretada — estreia da parceria com a Nike.', cat:'Camisas', price:299.90 },
+  { id:'camisa2', name:'Camisa II Vasco da Gama Nike 2026', desc:'Segundo uniforme Nike, tecido leve Dri-FIT.', cat:'Camisas', price:299.90 },
+  { id:'camisa3', name:'Camisa III Vasco da Gama Nike 2026', desc:'Terceiro uniforme, edição alternativa da estreia com a Nike.', cat:'Camisas', price:319.90 },
+  { id:'camisagoleiro', name:'Camisa Goleiro Vasco da Gama Nike 2026', desc:'Camisa oficial da linha goleiro, cores exclusivas.', cat:'Camisas', price:279.90 },
+  { id:'camisatreino', name:'Camisa de Treino Nike Vasco', desc:'Usada nos treinos pela comissão técnica — tecido leve de aquecimento.', cat:'Camisas', price:219.90 },
+  { id:'camisaretro', name:'Camisa Retrô Cruz de Malta', desc:'Edição retrô inspirada nos uniformes históricos do clube.', cat:'Camisas', price:329.90 },
+  { id:'camisafeminina', name:'Camisa I Nike 2026 Feminina', desc:'Corte feminino do manto titular Nike 2026.', cat:'Vestuário', price:299.90 },
+  { id:'camisainfantil', name:'Camisa Infantil Nike 2026', desc:'Manto titular Nike no tamanho infantil.', cat:'Infantil', price:159.90 },
   { id:'moletom', name:'Moletom oficial Gigante da Colina', desc:'Moletom com o escudo do clube.', cat:'Vestuário', price:169.90 },
+  { id:'jaqueta', name:'Jaqueta corta-vento Nike Vasco', desc:'Linha de viagem Nike — leve, resistente ao vento.', cat:'Vestuário', price:249.90 },
   { id:'bone', name:'Boné oficial Cruzmaltino', desc:'Boné bordado com o escudo do clube.', cat:'Acessórios', price:89.90 },
   { id:'cachecol', name:'Cachecol oficial', desc:'Preto e branco para o dia de jogo.', cat:'Acessórios', price:44.90 },
+  { id:'mochila', name:'Mochila Nike Vasco da Gama', desc:'Linha de viagem Nike, compartimento para chuteiras.', cat:'Acessórios', price:179.90 },
   { id:'caneca', name:'Caneca oficial', desc:'Porcelana com o escudo do clube.', cat:'Colecionáveis', price:34.90 },
-  { id:'miniatura', name:'Miniatura de São Januário', desc:'Réplica em miniatura do estádio histórico.', cat:'Colecionáveis', price:69.90 },
+  { id:'miniatura', name:'Miniatura de São Januário', desc:'Réplica em miniatura do estádio histórico — "Gigante da Colina", inaugurado em 1927.', cat:'Colecionáveis', price:69.90 },
+  { id:'bolamini', name:'Mini bola oficial Vasco da Gama', desc:'Bola de decoração com o escudo do clube.', cat:'Colecionáveis', price:59.90 },
 ];
 const CATS = ['Todos', 'Camisas', 'Infantil', 'Vestuário', 'Acessórios', 'Colecionáveis'];
 let activeCat = 'Todos';

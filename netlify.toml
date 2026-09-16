@@ -25,3 +25,7 @@
   from = "/vasco/sucesso"
   to = "/vasco/sucesso.html"
   status = 200
+[[redirects]]
+  from = "/vasco/virtual"
+  to = "/vasco/virtual.html"
+  status = 200

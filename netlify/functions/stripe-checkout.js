@@ -36,19 +36,28 @@ function corsHeaders(event) {
   };
 }
 
-// Catálogo real do ShopVasco (mesmos 9 itens do PRODUCTS_BY_CLUB.vasco no
-// index.html) — preço fica no servidor de propósito, não é manipulável pelo
-// navegador. Valores em centavos.
+// Catálogo real do ShopVasco (mesmos itens do PRODUCTS array em vasco/loja.html
+// — IDs precisam bater exatamente) — preço fica no servidor de propósito, não
+// é manipulável pelo navegador. Valores em centavos. Nike é a fornecedora real
+// de material esportivo do Vasco a partir de 2026 (pesquisado via ESPN/CNN
+// Brasil — contrato até 2032, substitui a Kappa).
 const MERCH = {
-  camisa1: { name: 'Camisa I Vasco da Gama 2026', category: 'Camisas', amount: 29990 },
-  camisa2: { name: 'Camisa II Vasco da Gama 2026', category: 'Camisas', amount: 29990 },
+  camisa1: { name: 'Camisa I Vasco da Gama Nike 2026', category: 'Camisas', amount: 29990 },
+  camisa2: { name: 'Camisa II Vasco da Gama Nike 2026', category: 'Camisas', amount: 29990 },
+  camisa3: { name: 'Camisa III Vasco da Gama Nike 2026', category: 'Camisas', amount: 31990 },
+  camisagoleiro: { name: 'Camisa Goleiro Vasco da Gama Nike 2026', category: 'Camisas', amount: 27990 },
+  camisatreino: { name: 'Camisa de Treino Nike Vasco', category: 'Camisas', amount: 21990 },
   camisaretro: { name: 'Camisa Retrô Cruz de Malta', category: 'Camisas', amount: 32990 },
-  camisainfantil: { name: 'Camisa Infantil Vasco da Gama', category: 'Infantil', amount: 15990 },
+  camisafeminina: { name: 'Camisa I Nike 2026 Feminina', category: 'Vestuário', amount: 29990 },
+  camisainfantil: { name: 'Camisa Infantil Nike 2026', category: 'Infantil', amount: 15990 },
   moletom: { name: 'Moletom oficial Gigante da Colina', category: 'Vestuário', amount: 16990 },
+  jaqueta: { name: 'Jaqueta corta-vento Nike Vasco', category: 'Vestuário', amount: 24990 },
   bone: { name: 'Boné oficial Cruzmaltino', category: 'Acessórios', amount: 8990 },
   cachecol: { name: 'Cachecol oficial Vasco da Gama', category: 'Acessórios', amount: 4490 },
+  mochila: { name: 'Mochila Nike Vasco da Gama', category: 'Acessórios', amount: 17990 },
   caneca: { name: 'Caneca oficial Vasco da Gama', category: 'Colecionáveis', amount: 3490 },
   miniatura: { name: 'Miniatura de São Januário', category: 'Colecionáveis', amount: 6990 },
+  bolamini: { name: 'Mini bola oficial Vasco da Gama', category: 'Colecionáveis', amount: 5990 },
 };
 
 // Próximos jogos reais do Vasco em São Januário (ver EVENTS_BY_CLUB.vasco no

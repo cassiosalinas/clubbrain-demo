@@ -42,6 +42,11 @@
 //                           Também grava "ultima_acao_descricao", que o
 //                           "stats" abaixo usa pro feed de atividade real.
 //                           Precisa de STRIPE_SECRET_KEY também.
+//   { "action": "award_loyalty_points", "email":"...", "points": 50, "reason":"..." }
+//                           → grava pontos reais de fidelidade (soma ao
+//                           pontos_loyalty existente) — usado pelo Museu
+//                           Virtual (vasco/virtual.html) pra recompensar
+//                           visita/engajamento de verdade no HubSpot.
 //   { "action": "create_retention_tasks" } → Ato 3 da jornada: cria 1 Tarefa
 //                           real no HubSpot (aba Tasks) por torcedor com
 //                           risco_churn=alto — ação de verdade que o time de
@@ -885,6 +890,44 @@ exports.handler = async function (event) {
       };
     }
 
+    if (payload.action === 'award_loyalty_points') {
+      // Museu Virtual (Ato 1 estendido) — recompensa real de pontos por
+      // engajamento (visitar uma sala, completar a visita), gravada de
+      // verdade no HubSpot. Reaproveita ultima_acao_descricao, então
+      // também aparece no feed "Eventos chegando agora" (Ato 2).
+      if (!payload.email || !Number.isFinite(Number(payload.points)) || Number(payload.points) <= 0) {
+        return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campos "email" e "points" (> 0) são obrigatórios.' }) };
+      }
+      const points = Math.round(Number(payload.points));
+      const reason = (payload.reason || 'Engajamento no Museu Virtual').slice(0, 200);
+
+      const contactRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email&properties=firstname,lastname,pontos_loyalty,engajamento_app');
+      const contactData = await contactRes.json().catch(() => ({}));
+      if (!contactRes.ok) {
+        return { statusCode: contactRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: contactData.message || 'Torcedor não encontrado no HubSpot: ' + payload.email }) };
+      }
+      const before = contactData.properties || {};
+      const updates = {
+        pontos_loyalty: (Number(before.pontos_loyalty) || 0) + points,
+        engajamento_app: Math.min(100, (Number(before.engajamento_app) || 0) + 2),
+        ultima_acao_descricao: reason + ' (+' + points + ' pontos)',
+        data_ultima_interacao: new Date().toISOString().slice(0, 10),
+      };
+      const patchRes = await hsFetch('/crm/v3/objects/contacts/' + encodeURIComponent(payload.email) + '?idProperty=email', {
+        method: 'PATCH',
+        body: JSON.stringify({ properties: updates }),
+      });
+      const patchData = await patchRes.json().catch(() => ({}));
+      if (!patchRes.ok) {
+        return { statusCode: patchRes.status, headers: { 'Content-Type': 'application/json', ...cors }, body: JSON.stringify({ error: patchData.message || 'Falha ao gravar pontos no HubSpot.' }) };
+      }
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', ...cors },
+        body: JSON.stringify({ ok: true, email: payload.email, pointsAwarded: points, newTotal: (patchData.properties || updates).pontos_loyalty }),
+      };
+    }
+
     if (payload.action === 'fulfill_stripe_order') {
       // Fecha o ciclo real da "jornada do torcedor": confirma o pagamento de
       // verdade no Stripe (modo teste) e grava a mudança de verdade no
@@ -1058,7 +1101,7 @@ exports.handler = async function (event) {
       };
     }
 
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan", "fulfill_stripe_order" ou "create_retention_tasks".' }) };
+    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Campo "action" deve ser "setup", "seed", "seed_bulk", "lists", "stats", "lookup_fan", "award_loyalty_points", "fulfill_stripe_order" ou "create_retention_tasks".' }) };
   } catch (err) {
     return { statusCode: 502, headers: cors, body: JSON.stringify({ error: 'Falha ao chamar a API do HubSpot: ' + err.message }) };
   }
