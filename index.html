@@ -1813,7 +1813,8 @@ canvas{ max-width:100%; }
           <div class="card-title">
             <span class="icon-badge" style="background:rgba(34,224,122,.18); color:#22e07a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg></span>
             <h3>Eventos chegando agora</h3>
-            <span class="card-foot-link" id="cdp-live-feed-refresh" style="margin:0 0 0 auto;" onclick="loadHubSpotStats()">↻ Atualizar</span>
+            <span class="hero-note" id="cdp-live-feed-auto-badge" style="display:none; margin:0 10px 0 auto; color:#22e07a; white-space:nowrap;"><span class="live-dot" style="background:#22e07a;"></span> Ao vivo · atualiza a cada 20s</span>
+            <span class="card-foot-link" id="cdp-live-feed-refresh" style="margin:0 0 0 0;" onclick="loadHubSpotStats()">↻ Atualizar</span>
           </div>
           <div class="hero-note" style="margin:-6px 0 14px;">Torcedores identificados são resolvidos ao perfil na hora; eventos ainda sem match ficam anônimos até o próximo sinal (login, compra, etc.) — compras reais no ShopVasco (Vasco) aparecem aqui ao vivo, marcadas "ShopVasco · real".</div>
           <div id="cdp-live-feed"></div>
@@ -2244,6 +2245,7 @@ canvas{ max-width:100%; }
   });
 })();
 function logoutDemo(){
+  stopHubspotAutoRefresh();
   const screen = document.getElementById('login-screen');
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
@@ -2609,7 +2611,7 @@ function selectClub(id, silent){
   setText('kpi-mon-churn', c.kpi.subChurn);
   setText('kpi-mon-churn-delta', c.kpi.subChurnDelta);
 
-  if(id === 'vasco'){ loadVascoLiveOverview(); loadHubSpotStats(); } else { hideVascoLiveNote(); hideHubSpotLiveNote(); }
+  if(id === 'vasco'){ loadVascoLiveOverview(); loadHubSpotStats(); startHubspotAutoRefresh(); } else { hideVascoLiveNote(); hideHubSpotLiveNote(); stopHubspotAutoRefresh(); }
   updateVascoKpiBadges();
 
   // Módulos piloto exclusivos do Vasco (Campanhas & Promoções, Loyalty &
@@ -2910,6 +2912,30 @@ async function loadHubSpotStats(){
     hubspotStatsLoading = false;
   }
 }
+// Auto-refresh do "Eventos chegando agora" + números ao vivo — só roda com
+// o Vasco selecionado (único clube com HubSpot real) e só enquanto a aba
+// está visível (evita gastar o rate limit do HubSpot com a aba em segundo
+// plano). 20s é rápido o bastante pra sentir "ao vivo" numa demo com duas
+// telas abertas, sem martelar a API — loadHubSpotStats já se protege contra
+// chamada concorrente (hubspotStatsLoading).
+let hubspotAutoRefreshTimer = null;
+function startHubspotAutoRefresh(){
+  stopHubspotAutoRefresh();
+  hubspotAutoRefreshTimer = setInterval(() => {
+    if(currentClubId === 'vasco' && document.visibilityState === 'visible') loadHubSpotStats();
+  }, 20000);
+  const badge = document.getElementById('cdp-live-feed-auto-badge');
+  if(badge) badge.style.display = 'inline-flex';
+}
+function stopHubspotAutoRefresh(){
+  if(hubspotAutoRefreshTimer){ clearInterval(hubspotAutoRefreshTimer); hubspotAutoRefreshTimer = null; }
+  const badge = document.getElementById('cdp-live-feed-auto-badge');
+  if(badge) badge.style.display = 'none';
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible' && currentClubId === 'vasco') loadHubSpotStats();
+});
+
 function hideHubSpotLiveNote(){
   const note = document.getElementById('hubspot-live-note');
   if(note) note.style.display = 'none';
