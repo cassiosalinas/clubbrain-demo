@@ -595,6 +595,10 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
         Gestão de commerce
       </div>
+      <div class="nav-item vasco-only-nav" data-view="promotions" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a2 2 0 11-3.9 1"/></svg>
+        Campanhas &amp; Promoções
+      </div>
 
       <div class="nav-group-label">Gestão do Clube</div>
       <div class="nav-item" data-view="clubmgmt">
@@ -1504,6 +1508,108 @@ canvas{ max-width:100%; }
       </div>
     </section>
 
+    <!-- ================= CAMPANHAS & PROMOÇÕES (piloto exclusivo do Vasco) ================= -->
+    <section class="view" id="view-promotions">
+      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(176,107,255,.08), var(--surface)); border-color:rgba(176,107,255,.25);">
+        <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
+          Módulo novo, piloto exclusivo do <b style="color:var(--text);">Vasco da Gama</b>: em vez de segmentar torcedores num lugar, gerenciar ingresso em outro e a loja num terceiro, aqui a promoção cruza os três — <b style="color:var(--text);">Torcedor 360, bilheteria e loja oficial</b> — numa única oferta ativável. Os públicos abaixo seguem a escala real do piloto (500 torcedores, 261 sócios); alcance e receita simulados são <b style="color:var(--text);">ilustrativos</b>.
+        </div>
+      </div>
+
+      <div class="grid g-4" style="margin-bottom:16px;">
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge" style="background:rgba(176,107,255,.16); color:#b06bff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a2 2 0 11-3.9 1"/></svg></span>Promoções ativas</div>
+          <div class="value" id="promo-kpi-ativas">3</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>Torcedores impactados</div>
+          <div class="value" id="promo-kpi-alcancados">170</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge" style="color:#1fd6b8; background:rgba(31,214,184,.16);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>Receita gerada (piloto)</div>
+          <div class="value" id="promo-kpi-receita" style="color:#1fd6b8;">R$ 17,3K</div>
+        </div>
+        <div class="card kpi">
+          <div class="label"><span class="icon-badge badge-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span>Taxa média de conversão</div>
+          <div class="value" id="promo-kpi-taxa">14,6%</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><h3>Nova promoção</h3></div>
+        <div class="hero-note" style="margin:-6px 0 14px;">Escolha o público (vindo do Torcedor 360), o tipo de oferta e o que ela inclui — ingresso, produto da loja ou ambos.</div>
+        <div class="grid g-4" style="margin-bottom:14px;">
+          <div>
+            <label class="seg-label">Nome da promoção</label>
+            <input type="text" id="promo-name" class="seg-input" placeholder="Ex: Volta aos treinos — sócios inativos">
+          </div>
+          <div>
+            <label class="seg-label">Público-alvo</label>
+            <select id="promo-audience" class="seg-input"></select>
+          </div>
+          <div>
+            <label class="seg-label">Tipo de oferta</label>
+            <select id="promo-offer" class="seg-input"></select>
+          </div>
+          <div>
+            <label class="seg-label">Vinculada a</label>
+            <select id="promo-linked" class="seg-input">
+              <option value="Próximo jogo em casa (São Januário)">Próximo jogo em casa (São Januário)</option>
+              <option value="Camisa oficial 2026">Camisa oficial 2026</option>
+              <option value="Loja oficial — catálogo geral">Loja oficial — catálogo geral</option>
+              <option value="Plano de sócio-torcedor">Plano de sócio-torcedor</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid g-4" style="margin-bottom:14px;">
+          <div>
+            <label class="seg-label">Desconto (%)</label>
+            <input type="number" id="promo-discount" class="seg-input" value="15" min="0" max="60" oninput="document.getElementById('promo-discount-out').textContent = this.value + '%'">
+          </div>
+          <div>
+            <label class="seg-label">Canal</label>
+            <select id="promo-channel" class="seg-input">
+              <option value="Push app">Push app</option>
+              <option value="E-mail">E-mail</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Todos os canais">Todos os canais</option>
+            </select>
+          </div>
+          <div>
+            <label class="seg-label">Validade</label>
+            <select id="promo-validity" class="seg-input">
+              <option value="7">7 dias</option>
+              <option value="14" selected>14 dias</option>
+              <option value="30">30 dias</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:flex-end;">
+            <div class="hero-note">Desconto selecionado: <b id="promo-discount-out" style="color:var(--text);">15%</b></div>
+          </div>
+        </div>
+        <div id="promo-sim-result" style="display:none; padding:14px; border-radius:10px; background:var(--surface-2); border:1px solid var(--border); margin-bottom:14px;">
+          <div class="grid g-3" style="margin-bottom:10px;">
+            <div><div class="hero-note">Alcance estimado</div><div class="value" id="promo-sim-reach" style="font-size:20px;">—</div></div>
+            <div><div class="hero-note">Receita projetada</div><div class="value" id="promo-sim-revenue" style="font-size:20px; color:#1fd6b8;">—</div></div>
+            <div><div class="hero-note">Conversão esperada</div><div class="value" id="promo-sim-conv" style="font-size:20px;">—</div></div>
+          </div>
+          <div style="font-size:12.5px; color:var(--text-dim); padding-top:10px; border-top:1px solid var(--border);">💡 <b style="color:var(--text);">FinanceBrain:</b> <span id="promo-sim-note"></span></div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+          <button class="pill" onclick="simulateVascoPromotion()">Simular impacto com IA</button>
+          <button class="btn-primary" onclick="launchVascoPromotion()">Lançar promoção</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><h3>Promoções do Vasco</h3></div>
+        <table>
+          <thead><tr><th>Promoção</th><th>Público</th><th>Oferta</th><th>Canal</th><th>Status</th><th>Impactados</th><th>Receita</th></tr></thead>
+          <tbody id="promotions-table"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- ================= CDP (Camada 2 — Fan Data Platform) ================= -->
     <section class="view" id="view-cdp">
       <div class="subtabs" id="cdp-subtabs">
@@ -2048,6 +2154,7 @@ const titles = {
   rewards: ["Gamificação", "Pontos, missões e recompensas da torcida"],
   monetization: ["Receita & patrocínio", "Assinaturas, conversão e ROI de patrocinadores"],
   commerce: ["Gestão de commerce", "Integração com a loja oficial (Camada 1) — catálogo, preços e vendas em tempo real, alimentando a Ontologia do Clube"],
+  promotions: ["Campanhas & Promoções", "Piloto exclusivo do Vasco — construtor de promoções cruzando segmentação, ingressos, loja oficial e eventos num lugar só"],
   marketing: ["Automação de marketing", "Jornadas e campanhas ativas por canal, e o construtor de segmentação (Audiences) de torcedores"],
   ops: ["Saúde do sistema", "Monitoramento de infraestrutura e APIs em tempo real"],
   integrations: ["Integration Hub", "Métodos de pagamento, APIs e soluções de terceiros conectadas ao ClubBrain — status, volume e sincronização em tempo real"],
@@ -2334,6 +2441,14 @@ function selectClub(id, silent){
 
   if(id === 'vasco'){ loadVascoLiveOverview(); } else { hideVascoLiveNote(); }
 
+  // Campanhas & Promoções — piloto exclusivo do Vasco, esconde o item do menu
+  // pros outros clubes; se o usuário estava nessa tela e trocou de clube, volta pro Cockpit.
+  document.querySelectorAll('.vasco-only-nav').forEach(n => n.style.display = (id === 'vasco') ? 'flex' : 'none');
+  if(id !== 'vasco' && document.getElementById('view-promotions')?.classList.contains('active')){
+    goToView('cockpit');
+  }
+  if(id === 'vasco') renderVascoPromotions();
+
   refreshCdpForClub();
   refreshEventsForClub();
   if(document.getElementById('ontology-grid')) buildOntology();
@@ -2408,6 +2523,115 @@ function hideVascoLiveNote(){
   renderCockpitAlerts(DEFAULT_STRAT_ALERTS);
 }
 
+/* ============ CAMPANHAS & PROMOÇÕES (piloto exclusivo do Vasco) ============
+   Módulo novo — cruza Torcedor 360 (público), bilheteria e loja oficial numa
+   única promoção ativável. Públicos seguem a escala real do piloto (500
+   torcedores / 261 sócios); alcance e receita simulados são ilustrativos. */
+const VASCO_PROMO_AUDIENCES = [
+  { id:'inativos90', label:'Sócios inativos há 90 dias', count:38 },
+  { id:'altapropensao', label:'Alta propensão de compra (loja)', count:64 },
+  { id:'churnrisco', label:'Torcedores em risco de churn', count:44 },
+  { id:'platinaouro', label:'Sócios Platina/Ouro', count:52 },
+  { id:'naosocios', label:'Identificados, ainda não-sócios', count:239 },
+  { id:'todabase', label:'Toda a base (piloto)', count:500 },
+];
+const VASCO_PROMO_OFFERS = [
+  { id:'desconto', label:'Desconto simples', avgValue:45 },
+  { id:'bundle', label:'Bundle ingresso + produto', avgValue:180 },
+  { id:'presale', label:'Pré-venda exclusiva', avgValue:220 },
+  { id:'frete', label:'Frete grátis na loja', avgValue:65 },
+];
+const VASCO_PROMO_CHANNEL_REACH = { 'Push app':0.72, 'E-mail':0.45, 'WhatsApp':0.61, 'Todos os canais':0.83 };
+
+let vascoPromotionsData = [
+  { name:'Volta aos treinos — sócios inativos', audience:'Sócios inativos há 90 dias', offer:'Desconto simples · 15%', channel:'Push app + E-mail', status:'Ativa', reached:34, revenue:2800 },
+  { name:'Vasco × Flamengo — pré-venda VIP', audience:'Sócios Platina/Ouro', offer:'Pré-venda exclusiva', channel:'App', status:'Ativa', reached:47, revenue:9600 },
+  { name:'Camisa retrô 125 anos — bundle', audience:'Alta propensão de compra', offer:'Bundle ingresso + produto · 20%', channel:'WhatsApp', status:'Encerrada', reached:58, revenue:4100 },
+];
+
+function renderVascoPromotions(){
+  const audEl = document.getElementById('promo-audience');
+  const offEl = document.getElementById('promo-offer');
+  if(audEl && !audEl.dataset.filled){
+    audEl.innerHTML = VASCO_PROMO_AUDIENCES.map(a=>`<option value="${a.id}">${a.label} (${a.count})</option>`).join('');
+    audEl.dataset.filled = '1';
+  }
+  if(offEl && !offEl.dataset.filled){
+    offEl.innerHTML = VASCO_PROMO_OFFERS.map(o=>`<option value="${o.id}">${o.label}</option>`).join('');
+    offEl.dataset.filled = '1';
+  }
+  document.getElementById('promo-sim-result').style.display = 'none';
+  renderPromotionsTable();
+}
+
+function renderPromotionsTable(){
+  const tbody = document.getElementById('promotions-table');
+  if(!tbody) return;
+  tbody.innerHTML = vascoPromotionsData.map(p=>`
+    <tr>
+      <td>${p.name}</td>
+      <td>${p.audience}</td>
+      <td>${p.offer}</td>
+      <td>${p.channel}</td>
+      <td><span class="tag" style="color:${p.status==='Ativa' ? '#22e07a' : 'var(--text-dim)'};">${p.status}</span></td>
+      <td>${p.reached.toLocaleString('pt-BR')}</td>
+      <td>${fmtCompactBRL(p.revenue)}</td>
+    </tr>`).join('');
+
+  const kpiAtivas = document.getElementById('promo-kpi-ativas');
+  const kpiAlcancados = document.getElementById('promo-kpi-alcancados');
+  const kpiReceita = document.getElementById('promo-kpi-receita');
+  const kpiTaxa = document.getElementById('promo-kpi-taxa');
+  if(kpiAtivas) kpiAtivas.textContent = vascoPromotionsData.filter(p=>p.status==='Ativa').length;
+  if(kpiAlcancados) kpiAlcancados.textContent = vascoPromotionsData.reduce((s,p)=>s+p.reached,0).toLocaleString('pt-BR');
+  if(kpiReceita) kpiReceita.textContent = fmtCompactBRL(vascoPromotionsData.reduce((s,p)=>s+p.revenue,0));
+  const totalAudience = vascoPromotionsData.length * 500;
+  if(kpiTaxa) kpiTaxa.textContent = (vascoPromotionsData.reduce((s,p)=>s+p.reached,0) / (totalAudience||1) * 100).toLocaleString('pt-BR',{maximumFractionDigits:1}) + '%';
+}
+
+function currentPromoInputs(){
+  const audience = VASCO_PROMO_AUDIENCES.find(a=>a.id === document.getElementById('promo-audience').value) || VASCO_PROMO_AUDIENCES[0];
+  const offer = VASCO_PROMO_OFFERS.find(o=>o.id === document.getElementById('promo-offer').value) || VASCO_PROMO_OFFERS[0];
+  const channel = document.getElementById('promo-channel').value;
+  const discount = Number(document.getElementById('promo-discount').value) || 0;
+  const name = document.getElementById('promo-name').value.trim() || `${offer.label} — ${audience.label}`;
+  const reachMult = VASCO_PROMO_CHANNEL_REACH[channel] || 0.6;
+  const reach = Math.min(audience.count, Math.round(audience.count * reachMult * (1 + discount/200)));
+  const revenue = Math.round(reach * offer.avgValue * (1 - discount/100*0.6));
+  return { audience, offer, channel, discount, name, reach, revenue };
+}
+
+function simulateVascoPromotion(){
+  const p = currentPromoInputs();
+  document.getElementById('promo-sim-reach').textContent = `${p.reach.toLocaleString('pt-BR')} de ${p.audience.count.toLocaleString('pt-BR')}`;
+  document.getElementById('promo-sim-revenue').textContent = fmtCompactBRL(p.revenue);
+  document.getElementById('promo-sim-conv').textContent = (p.reach/p.audience.count*100).toLocaleString('pt-BR',{maximumFractionDigits:1}) + '%';
+  const note = p.discount >= 25
+    ? `${p.discount}% de desconto amplia o alcance, mas reduz bastante a receita por torcedor — considere algo entre 12-18% para este público.`
+    : p.discount <= 5
+      ? `Desconto baixo preserva a receita por torcedor, mas o alcance estimado é modesto — bom para público já engajado, não para reativação.`
+      : `Faixa equilibrada entre alcance e receita para "${p.audience.label}" — dentro do padrão do piloto.`;
+  document.getElementById('promo-sim-note').textContent = note;
+  document.getElementById('promo-sim-result').style.display = 'block';
+}
+
+function launchVascoPromotion(){
+  const p = currentPromoInputs();
+  vascoPromotionsData = [{
+    name: p.name,
+    audience: p.audience.label,
+    offer: `${p.offer.label} · ${p.discount}%`,
+    channel: p.channel,
+    status: 'Ativa',
+    reached: p.reach,
+    revenue: p.revenue,
+  }, ...vascoPromotionsData];
+  renderPromotionsTable();
+  document.getElementById('promo-sim-result').style.display = 'none';
+  document.getElementById('promo-name').value = '';
+  showToast(`Promoção lançada: ${p.reach.toLocaleString('pt-BR')} torcedores impactados`, '#b06bff');
+}
+
 function refreshCdpForClub(){
   cdpFan360Id = 'rafael';
   crmTierFilter = null;
@@ -2463,6 +2687,7 @@ function initChartsFor(key){
   if(key==='rewards') buildRewards();
   if(key==='monetization') buildMonetization();
   if(key==='commerce') buildCommerce();
+  if(key==='promotions') renderVascoPromotions();
   if(key==='marketing') buildMarketing();
   if(key==='ops') buildOps();
   if(key==='integrations') buildIntegrations();
