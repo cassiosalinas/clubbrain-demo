@@ -1017,8 +1017,12 @@ exports.handler = async function (event) {
       }
       const taskResults = createData.results || [];
 
+      // Usa os IDs numéricos de tipo de objeto (0-27 = Task, 0-1 = Contact)
+      // em vez dos aliases em texto ("tasks"/"contacts") — o alias em texto
+      // devolveu 404 nesse sub-recurso de associação, descoberto testando
+      // ao vivo (a Search API aceita o alias normalmente, esse endpoint não).
       const assocInputs = taskResults.map((t, i) => ({ from: { id: t.id }, to: { id: contacts[i].id } }));
-      const assocRes = await hsFetch('/crm/v4/associations/tasks/contacts/batch/create-default', {
+      const assocRes = await hsFetch('/crm/v4/associations/0-27/0-1/batch/create-default', {
         method: 'POST',
         body: JSON.stringify({ inputs: assocInputs }),
       });
@@ -1026,6 +1030,7 @@ exports.handler = async function (event) {
       // Falha de associação não desfaz as tarefas já criadas — reporta como
       // aviso, não erro fatal, já que a tarefa em si já existe de verdade.
       const assocOk = assocRes.ok;
+      if (!assocOk) console.log('assoc error', assocRes.status, JSON.stringify(assocData));
 
       return {
         statusCode: 200,
@@ -1034,7 +1039,7 @@ exports.handler = async function (event) {
           ok: true,
           created: taskResults.length,
           associated: assocOk ? taskResults.length : 0,
-          associationWarning: assocOk ? undefined : (assocData.message || 'Tarefas criadas, mas a associação ao contato falhou.'),
+          associationWarning: assocOk ? undefined : ('Tarefas criadas, associação falhou (HTTP ' + assocRes.status + '): ' + (assocData.message || JSON.stringify(assocData))),
           contacts: contacts.map(c => ({ firstname: c.properties.firstname, lastname: c.properties.lastname, fanScore: Number(c.properties.fan_score) || 0 })),
         }),
       };
