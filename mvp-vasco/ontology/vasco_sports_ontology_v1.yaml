@@ -1,0 +1,402 @@
+# Vasco Sports Ontology v1
+#
+# Especificacao conceitual do ClubBrain para o MVP Vasco.
+# 26 objetos e seus relacionamentos, organizados em 6 dominios:
+# Core, Sport, FanIntelligence, Commercial, Commerce, Media.
+#
+# Convencoes:
+# - Todo objeto tem um campo `id` (UUID) como chave primaria logica.
+# - Campos marcados `[confirmar]` dependem de acesso real aos sistemas do
+#   clube (CRM, ticketing, ERP) e NAO devem ser preenchidos com dados
+#   inventados no dataset ficticio — deixar nulos/mockados de forma
+#   explicita ate a integracao real.
+# - Dados pessoais (nome completo, CPF, e-mail, telefone) sao sempre
+#   hasheados/pseudonimizados desde o dia 1, mesmo no dataset ficticio.
+# - Esta e a modelagem pragmatica do Alpha. Revisao formal OntoUML/UFO
+#   fica para a v2 (ver CLAUDE.md, principio "nao pode ser quebrado").
+
+version: "1.0"
+club_pilot: "Vasco da Gama"
+multi_tenant: false
+
+domains:
+
+  # ---------------------------------------------------------------------
+  # CORE — identidade organizacional e de pessoas
+  # ---------------------------------------------------------------------
+  Core:
+    description: >
+      Entidades fundacionais: o clube em si, pessoas fisicas e seus papeis
+      (torcedor, funcionario), e o vinculo comercial de socio-torcedor.
+    objects:
+
+      - name: Club
+        description: O clube piloto (Vasco da Gama). Singleton no MVP.
+        fields:
+          id: uuid
+          name: string
+          short_name: string
+          founded_year: int
+          stadium_id: "ref(Venue) [confirmar]"
+          primary_color: string
+          crest_url: string
+
+      - name: Person
+        description: >
+          Identidade base de qualquer pessoa fisica conhecida pelo clube
+          (torcedor, funcionario, ou ambos). Resolvida entre sistemas pela
+          camada de Identity Graph (Postgres) antes de virar no do grafo.
+        fields:
+          id: uuid
+          full_name_hash: string   # nunca nome em claro
+          email_hash: string
+          phone_hash: string
+          cpf_hash: "string [confirmar]"   # so existe com dado real do clube
+          birth_date: date
+          city: string
+          state: string
+          country: string
+          created_at: datetime
+          source_systems: "list<string> [confirmar]"  # ex: CRM, Ticketing
+
+      - name: Fan
+        description: >
+          Papel de Person como torcedor. 1:1 com Person quando a pessoa
+          interage com o clube como torcedor.
+        fields:
+          id: uuid
+          person_id: ref(Person)
+          fan_since: date
+          favorite_player_id: "ref(Player) [confirmar]"
+          lifetime_value: decimal
+          acquisition_channel: "string [confirmar]"
+
+      - name: Employee
+        description: Papel de Person como funcionario/colaborador do clube.
+        fields:
+          id: uuid
+          person_id: ref(Person)
+          department: "string [confirmar]"
+          role_title: "string [confirmar]"
+          hired_at: "date [confirmar]"
+
+      - name: Membership
+        description: >
+          Plano de socio-torcedor vinculado a um Fan. Objeto central para
+          risco de churn e receita recorrente.
+        fields:
+          id: uuid
+          fan_id: ref(Fan)
+          plan_name: string
+          status: "enum(active, cancelled, expired, suspended)"
+          monthly_value: decimal
+          started_at: date
+          renews_at: date
+          cancelled_at: "date | null"
+
+    relations:
+      - { from: Fan, to: Person, type: IS_A, cardinality: "1:1" }
+      - { from: Employee, to: Person, type: IS_A, cardinality: "1:1" }
+      - { from: Fan, to: Membership, type: HAS_MEMBERSHIP, cardinality: "1:N" }
+      - { from: Employee, to: Club, type: EMPLOYED_BY, cardinality: "N:1" }
+
+  # ---------------------------------------------------------------------
+  # SPORT — o produto esportivo em si
+  # ---------------------------------------------------------------------
+  Sport:
+    description: >
+      Estrutura esportiva: elenco, partidas, competicoes e temporadas.
+    objects:
+
+      - name: Team
+        description: >
+          Elenco/equipe do clube (permite multiplas categorias: profissional,
+          feminino, base — mesmo com 1 clube piloto).
+        fields:
+          id: uuid
+          club_id: ref(Club)
+          name: string
+          category: "enum(pro_men, pro_women, base) [confirmar]"
+
+      - name: Player
+        description: Atleta vinculado a um Team.
+        fields:
+          id: uuid
+          team_id: ref(Team)
+          full_name: string
+          position: string
+          shirt_number: int
+          birth_date: "date [confirmar]"
+          nationality: "string [confirmar]"
+
+      - name: Competition
+        description: Torneio ou campeonato (ex. Brasileirao, Copa do Brasil).
+        fields:
+          id: uuid
+          name: string
+          tier: "string [confirmar]"
+          governing_body: "string [confirmar]"
+
+      - name: Season
+        description: Edicao anual de uma Competition.
+        fields:
+          id: uuid
+          competition_id: ref(Competition)
+          year: int
+          start_date: date
+          end_date: date
+
+      - name: Venue
+        description: Estadio/local de partida.
+        fields:
+          id: uuid
+          name: string
+          city: string
+          capacity: int
+
+      - name: Match
+        description: Partida individual, unidade central de eventos esportivos.
+        fields:
+          id: uuid
+          season_id: ref(Season)
+          home_team_id: ref(Team)
+          away_team_id: "ref(Team) [confirmar]"   # adversario pode ser externo
+          venue_id: ref(Venue)
+          scheduled_at: datetime
+          status: "enum(scheduled, live, finished, postponed)"
+          home_score: "int | null"
+          away_score: "int | null"
+
+    relations:
+      - { from: Player, to: Team, type: PLAYS_FOR, cardinality: "N:1" }
+      - { from: Team, to: Club, type: PART_OF, cardinality: "N:1" }
+      - { from: Season, to: Competition, type: EDITION_OF, cardinality: "N:1" }
+      - { from: Match, to: Season, type: PART_OF, cardinality: "N:1" }
+      - { from: Match, to: Venue, type: HELD_AT, cardinality: "N:1" }
+      - { from: Match, to: Team, type: HOME_TEAM, cardinality: "N:1" }
+      - { from: Match, to: Team, type: AWAY_TEAM, cardinality: "N:1" }
+      - { from: Fan, to: Player, type: FAVORITE_PLAYER, cardinality: "N:1" }
+
+  # ---------------------------------------------------------------------
+  # FAN INTELLIGENCE — camada analitica sobre o torcedor
+  # ---------------------------------------------------------------------
+  FanIntelligence:
+    description: >
+      Objetos derivados/analiticos que alimentam os agentes de IA
+      (Executive, Fan, Marketing). Muitos sao calculados, nao capturados
+      diretamente de um sistema fonte.
+    objects:
+
+      - name: FanProfile
+        description: >
+          Visao 360 agregada e materializada de um Fan (para performance de
+          leitura). Recalculada periodicamente a partir do grafo.
+        fields:
+          id: uuid
+          fan_id: ref(Fan)
+          engagement_score: float
+          total_spend: decimal
+          matches_attended_count: int
+          last_interaction_at: datetime
+          updated_at: datetime
+
+      - name: FanSegment
+        description: >
+          Segmento de torcedores usado por campanhas de marketing (ex.
+          "socios em risco de churn", "torcedores de alto valor").
+        fields:
+          id: uuid
+          name: string
+          definition_rule: string   # descricao legivel da regra de inclusao
+          created_by_agent: "string | null"
+
+      - name: EngagementEvent
+        description: >
+          Evento atomico de interacao do torcedor (abriu app, curtiu post,
+          comprou ingresso, respondeu pesquisa). Log append-only.
+        fields:
+          id: uuid
+          fan_id: ref(Fan)
+          event_type: string
+          occurred_at: datetime
+          channel: "string [confirmar]"
+          metadata_json: "json [confirmar]"
+
+      - name: ChurnRisk
+        description: >
+          Score de risco de cancelamento de Membership, calculado pela
+          camada de Intelligence. Nao e fonte de verdade transacional.
+        fields:
+          id: uuid
+          fan_id: ref(Fan)
+          membership_id: ref(Membership)
+          risk_score: float   # 0.0 - 1.0
+          reason_codes: list<string>
+          calculated_at: datetime
+
+      - name: FanSurvey
+        description: Pesquisa de satisfacao/NPS respondida pelo torcedor.
+        fields:
+          id: uuid
+          fan_id: ref(Fan)
+          survey_type: "enum(nps, csat, custom)"
+          score: int
+          comment: "string | null"
+          answered_at: datetime
+
+    relations:
+      - { from: FanProfile, to: Fan, type: PROFILE_OF, cardinality: "1:1" }
+      - { from: Fan, to: FanSegment, type: BELONGS_TO_SEGMENT, cardinality: "N:N" }
+      - { from: EngagementEvent, to: Fan, type: PERFORMED_BY, cardinality: "N:1" }
+      - { from: ChurnRisk, to: Membership, type: RISK_OF, cardinality: "N:1" }
+      - { from: FanSurvey, to: Fan, type: ANSWERED_BY, cardinality: "N:1" }
+
+  # ---------------------------------------------------------------------
+  # COMMERCIAL — patrocinio e receita B2B
+  # ---------------------------------------------------------------------
+  Commercial:
+    description: Relacionamento comercial do clube com patrocinadores.
+    objects:
+
+      - name: Sponsor
+        description: Empresa patrocinadora.
+        fields:
+          id: uuid
+          name: string
+          industry: "string [confirmar]"
+          tier: "enum(master, official, supporter) [confirmar]"
+
+      - name: SponsorshipContract
+        description: Contrato de patrocinio vigente.
+        fields:
+          id: uuid
+          sponsor_id: ref(Sponsor)
+          club_id: ref(Club)
+          annual_value: "decimal [confirmar]"
+          starts_at: date
+          ends_at: date
+          assets_included: "list<string> [confirmar]"  # ex: manga, placa, naming
+
+      - name: SponsorActivation
+        description: >
+          Acao concreta de ativacao de marca (ex. post patrocinado,
+          experiencia em jogo) vinculada a um contrato.
+        fields:
+          id: uuid
+          contract_id: ref(SponsorshipContract)
+          match_id: "ref(Match) | null"
+          activation_type: string
+          occurred_at: datetime
+          estimated_reach: "int [confirmar]"
+
+    relations:
+      - { from: SponsorshipContract, to: Sponsor, type: CONTRACT_OF, cardinality: "N:1" }
+      - { from: SponsorshipContract, to: Club, type: SPONSORS, cardinality: "N:1" }
+      - { from: SponsorActivation, to: SponsorshipContract, type: ACTIVATES, cardinality: "N:1" }
+      - { from: SponsorActivation, to: Match, type: DURING, cardinality: "N:1" }
+
+  # ---------------------------------------------------------------------
+  # COMMERCE — e-commerce (VTEX) e bilheteria
+  # ---------------------------------------------------------------------
+  Commerce:
+    description: Transacoes comerciais diretas com o torcedor.
+    objects:
+
+      - name: Product
+        description: Item de loja oficial (camisa, acessorio).
+        fields:
+          id: uuid
+          sku: string
+          name: string
+          category: string
+          price: decimal
+          vtex_product_id: "string [confirmar]"
+
+      - name: Order
+        description: Pedido de compra (loja oficial ou ingresso).
+        fields:
+          id: uuid
+          fan_id: ref(Fan)
+          order_type: "enum(merchandise, ticket)"
+          total_value: decimal
+          status: "enum(pending, paid, cancelled, refunded)"
+          placed_at: datetime
+
+      - name: OrderItem
+        description: Linha de item dentro de um Order.
+        fields:
+          id: uuid
+          order_id: ref(Order)
+          product_id: "ref(Product) | null"   # null quando order_type=ticket
+          quantity: int
+          unit_price: decimal
+
+      - name: Ticket
+        description: Ingresso emitido para uma Match, vinculado a um OrderItem.
+        fields:
+          id: uuid
+          order_item_id: ref(OrderItem)
+          fan_id: ref(Fan)
+          match_id: ref(Match)
+          sector: "string [confirmar]"
+          seat: "string [confirmar]"
+          checked_in_at: "datetime | null"
+
+    relations:
+      - { from: Order, to: Fan, type: PLACED_BY, cardinality: "N:1" }
+      - { from: OrderItem, to: Order, type: LINE_OF, cardinality: "N:1" }
+      - { from: OrderItem, to: Product, type: FOR_PRODUCT, cardinality: "N:1" }
+      - { from: Ticket, to: OrderItem, type: ISSUED_FROM, cardinality: "1:1" }
+      - { from: Ticket, to: Match, type: ADMITS_TO, cardinality: "N:1" }
+      - { from: Ticket, to: Fan, type: HELD_BY, cardinality: "N:1" }
+
+  # ---------------------------------------------------------------------
+  # MEDIA — conteudo e audiencia digital
+  # ---------------------------------------------------------------------
+  Media:
+    description: Conteudo publicado pelo clube e consumo pelo torcedor.
+    objects:
+
+      - name: SocialAccount
+        description: Conta oficial do clube em uma rede social.
+        fields:
+          id: uuid
+          platform: "enum(instagram, tiktok, x, youtube, whatsapp)"
+          handle: string
+          followers_count: "int [confirmar]"
+
+      - name: MediaContent
+        description: Peca de conteudo publicada (post, video, story).
+        fields:
+          id: uuid
+          account_id: ref(SocialAccount)
+          content_type: "enum(post, video, story, live)"
+          published_at: datetime
+          related_match_id: "ref(Match) | null"
+          external_url: "string [confirmar]"
+
+      - name: MediaConsumption
+        description: >
+          Interacao de um Fan com um MediaContent (view, like, comment,
+          share). Volume alto — candidato a agregacao no FanProfile.
+        fields:
+          id: uuid
+          content_id: ref(MediaContent)
+          fan_id: "ref(Fan) | null"   # null quando anonimo/nao identificado
+          interaction_type: "enum(view, like, comment, share)"
+          occurred_at: datetime
+
+    relations:
+      - { from: MediaContent, to: SocialAccount, type: PUBLISHED_ON, cardinality: "N:1" }
+      - { from: MediaContent, to: Match, type: ABOUT, cardinality: "N:1" }
+      - { from: MediaConsumption, to: MediaContent, type: INTERACTION_WITH, cardinality: "N:1" }
+      - { from: MediaConsumption, to: Fan, type: BY_FAN, cardinality: "N:1" }
+
+# ---------------------------------------------------------------------
+# Objeto count check: Club, Person, Fan, Employee, Membership (5) +
+# Team, Player, Competition, Season, Venue, Match (6) +
+# FanProfile, FanSegment, EngagementEvent, ChurnRisk, FanSurvey (5) +
+# Sponsor, SponsorshipContract, SponsorActivation (3) +
+# Product, Order, OrderItem, Ticket (4) +
+# SocialAccount, MediaContent, MediaConsumption (3)
+# = 26 objetos

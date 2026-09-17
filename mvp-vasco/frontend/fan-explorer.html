@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ClubBrain Vasco — Fan Explorer (demo funcional)</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #0b1311;
+    --surface-2: #0d1814;
+    --line: rgba(140, 220, 190, 0.13);
+    --text: #eefaf5;
+    --text-2: #a9c4bb;
+    --text-3: #708b82;
+    --accent: #5fe06b;
+    --accent-ink: #04190d;
+    --grad: linear-gradient(115deg, #6fe86a 0%, #2bdcae 52%, #14cfe0 100%);
+    --risk-hi: #ff6b5e;
+    --risk-mid: #f5b13d;
+    --risk-lo: #5fe06b;
+    --radius: 16px;
+    --radius-sm: 10px;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); min-height: 100vh; padding: 28px 20px 80px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header.top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 12px var(--accent); }
+  .brand small { display: block; font-weight: 500; color: var(--text-3); font-size: 0.7rem; letter-spacing: .06em; text-transform: uppercase; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 20px; }
+  .config { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 260px; }
+  .field label { font-size: 0.7rem; letter-spacing: .05em; text-transform: uppercase; color: var(--text-3); }
+  .field input, .field select { background: var(--surface-2); border: 1px solid var(--line); color: var(--text); border-radius: var(--radius-sm); padding: 10px 12px; font-size: .88rem; font-family: inherit; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+  .status-pill { font-size: .76rem; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--line); color: var(--text-3); white-space: nowrap; }
+  .status-pill.ok { color: var(--risk-lo); border-color: var(--risk-lo); }
+  .status-pill.err { color: var(--risk-hi); border-color: var(--risk-hi); }
+  button { font-family: inherit; font-weight: 600; font-size: .84rem; cursor: pointer; border-radius: var(--radius-sm); border: 1px solid var(--line); padding: 10px 16px; background: var(--surface-2); color: var(--text); }
+  button:hover { filter: brightness(1.15); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.primary { background: var(--grad); color: var(--accent-ink); border: none; }
+  h2 { font-size: .95rem; letter-spacing: .02em; margin: 0 0 14px; color: var(--text-2); }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th { text-align: left; color: var(--text-3); font-weight: 500; font-size: .72rem; text-transform: uppercase; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 8px; border-bottom: 1px solid var(--line); color: var(--text-2); }
+  tr.fanrow { cursor: pointer; }
+  tr.fanrow:hover td { color: var(--text); background: var(--surface-2); }
+  .risk { font-weight: 700; }
+  .risk.hi { color: var(--risk-hi); }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+  .kpi { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; }
+  .kpi .label { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 6px; }
+  .kpi .value { font-size: 1.3rem; font-weight: 700; }
+  .segs span { display: inline-block; background: var(--surface-2); border: 1px solid var(--line); border-radius: 20px; padding: 4px 10px; font-size: .74rem; margin: 2px 4px 2px 0; color: var(--accent); }
+  textarea { width: 100%; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); border-radius: var(--radius-sm); padding: 10px 12px; font-size: .88rem; font-family: inherit; resize: vertical; min-height: 60px; }
+  .answer { margin-top: 12px; padding: 14px; background: var(--surface-2); border-radius: var(--radius-sm); border: 1px solid var(--line); font-size: .88rem; color: var(--text-2); white-space: pre-wrap; }
+  .muted { color: var(--text-3); font-size: .8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>ClubBrain Vasco<small>Fan Explorer — demo funcional</small></div>
+    </div>
+    <span>
+      <a href="cockpit.html" style="font-size:.8rem; margin-right:16px">← Cockpit</a>
+      <span id="statusPill" class="status-pill">desconectado</span>
+    </span>
+  </header>
+
+  <div class="card">
+    <div class="config">
+      <div class="field">
+        <label>Backend base URL</label>
+        <input id="baseUrl" placeholder="https://xxxxx-8000.app.github.dev (URL forwarded do Codespace)" />
+      </div>
+      <button class="primary" onclick="testConnection()">Conectar</button>
+    </div>
+    <p class="muted" style="margin: 10px 0 0">
+      Se esta página foi aberta em <code>/demo/fan-explorer.html</code> do próprio backend, o campo já
+      vem preenchido (mesma origem — evita problemas de CORS/proxy). Só troque se estiver apontando
+      para outro backend.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Fãs em risco de churn</h2>
+    <div class="config" style="margin-bottom: 14px">
+      <div class="field" style="max-width: 160px; min-width: 120px">
+        <label>Risco mínimo</label>
+        <input id="minScore" type="number" step="0.05" min="0" max="1" value="0.7" />
+      </div>
+      <button onclick="loadAtRisk()">Buscar segmento</button>
+      <span id="segMeta" class="muted"></span>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Fan ID</th><th></th></tr></thead>
+      <tbody id="fanTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="fan360Card" style="display: none">
+    <h2>Fan 360</h2>
+    <div class="kpis" id="fan360Kpis"></div>
+    <div style="margin-top: 14px">
+      <div class="muted" style="margin-bottom: 6px">Segmentos</div>
+      <div class="segs" id="fan360Segs"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Perguntar à IA (GraphRAG)</h2>
+    <div class="config" style="margin-bottom: 12px">
+      <div class="field" style="max-width: 220px; min-width: 180px">
+        <label>Agente</label>
+        <select id="agentSelect">
+          <option value="">Genérico (/ai/ask)</option>
+          <option value="executive">Executive</option>
+          <option value="fan">Fan (atendimento)</option>
+          <option value="marketing">Marketing</option>
+        </select>
+      </div>
+    </div>
+    <textarea id="aiQuestion" placeholder="Ex: Quantos torcedores estão em risco de cancelar o plano?"></textarea>
+    <div style="margin-top: 10px">
+      <button class="primary" onclick="askAI()">Perguntar</button>
+    </div>
+    <div id="aiAnswer" class="answer" style="display: none"></div>
+  </div>
+</div>
+
+<script>
+// Same-origin deploy (served by FastAPI at /demo/): prefill with the
+// current origin so there's nothing to paste.
+if (location.pathname.startsWith('/demo/')) {
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('baseUrl').value = location.origin;
+  });
+}
+
+function baseUrl() { return document.getElementById('baseUrl').value.trim().replace(/\/$/, ''); }
+
+// credentials: 'include' is required when the backend runs behind GitHub
+// Codespaces' port-forwarding proxy (a private forwarded port needs the
+// GitHub auth cookie on cross-origin requests, otherwise the proxy itself
+// returns 503 before the request ever reaches FastAPI). Harmless for a
+// plain localhost/production backend.
+function apiFetch(path, opts) {
+  return fetch(baseUrl() + path, { credentials: 'include', ...opts });
+}
+
+async function testConnection() {
+  const pill = document.getElementById('statusPill');
+  pill.className = 'status-pill';
+  pill.textContent = 'conectando...';
+  try {
+    const r = await apiFetch('/health');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    pill.className = 'status-pill ok';
+    pill.textContent = 'conectado';
+  } catch (e) {
+    pill.className = 'status-pill err';
+    pill.textContent = 'erro: ' + e.message;
+  }
+}
+
+async function loadAtRisk() {
+  const minScore = document.getElementById('minScore').value || '0.7';
+  const meta = document.getElementById('segMeta');
+  const tbody = document.getElementById('fanTableBody');
+  tbody.innerHTML = '';
+  meta.textContent = 'carregando...';
+  try {
+    const r = await apiFetch('/api/v1/segments/at-risk?min_score=' + minScore);
+    const data = await r.json();
+    meta.textContent = data.fan_count + ' fã(s) — regra: ' + data.definition_rule;
+    data.fan_ids.forEach((id, i) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fanrow';
+      tr.onclick = () => loadFan360(id);
+      tr.innerHTML = `<td>${i + 1}</td><td>${id}</td><td>ver 360 &rarr;</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    meta.textContent = 'erro: ' + e.message;
+  }
+}
+
+async function loadFan360(fanId) {
+  const card = document.getElementById('fan360Card');
+  const kpis = document.getElementById('fan360Kpis');
+  const segs = document.getElementById('fan360Segs');
+  card.style.display = 'block';
+  kpis.innerHTML = '<div class="muted">carregando...</div>';
+  segs.innerHTML = '';
+  try {
+    const r = await apiFetch('/api/v1/fans/' + fanId + '/360');
+    const f = await r.json();
+    const riskClass = (f.churn_risk_score || 0) >= 0.7 ? 'hi' : '';
+    kpis.innerHTML = `
+      <div class="kpi"><div class="label">Fan since</div><div class="value">${f.fan_since || '—'}</div></div>
+      <div class="kpi"><div class="label">Lifetime value</div><div class="value">R$ ${f.lifetime_value.toFixed(2)}</div></div>
+      <div class="kpi"><div class="label">Engagement</div><div class="value">${f.engagement_score ?? '—'}</div></div>
+      <div class="kpi"><div class="label">Jogos assistidos</div><div class="value">${f.matches_attended_count ?? '—'}</div></div>
+      <div class="kpi"><div class="label">Churn risk</div><div class="value risk ${riskClass}">${f.churn_risk_score ?? '—'}</div></div>
+      <div class="kpi"><div class="label">Memberships</div><div class="value">${f.memberships.length}</div></div>
+    `;
+    segs.innerHTML = f.segments.length
+      ? f.segments.map(s => `<span>${s}</span>`).join('')
+      : '<span class="muted">nenhum segmento</span>';
+  } catch (e) {
+    kpis.innerHTML = '<div class="muted">erro: ' + e.message + '</div>';
+  }
+}
+
+async function askAI() {
+  const q = document.getElementById('aiQuestion').value.trim();
+  const agent = document.getElementById('agentSelect').value;
+  const answerBox = document.getElementById('aiAnswer');
+  if (!q) return;
+  answerBox.style.display = 'block';
+  answerBox.textContent = 'pensando...';
+  const path = agent ? `/api/v1/agents/${agent}/ask` : '/api/v1/ai/ask';
+  try {
+    const r = await apiFetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ club_id: '00000000-0000-0000-0000-000000000000', question: q })
+    });
+    const data = await r.json();
+    answerBox.textContent = data.answer;
+  } catch (e) {
+    answerBox.textContent = 'erro: ' + e.message;
+  }
+}
+</script>
+</body>
+</html>
