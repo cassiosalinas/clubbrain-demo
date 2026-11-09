@@ -2325,6 +2325,9 @@ canvas{ max-width:100%; }
 /* ============ LOGIN (cosmético — só front-end, sem backend real) ============ */
 /* Pede login sempre, em toda visita/recarregamento — não fica lembrado. */
 (function(){
+  // Endereço de entrada guardado ANTES do selectClub inicial (que reescreve a
+  // URL para "/"): é ele que diz se a pessoa veio por /vasco/os ou /band/os.
+  window.ENTRY_PATH = window.ENTRY_PATH || window.location.pathname;
   const screen = document.getElementById('login-screen');
   document.getElementById('login-form').addEventListener('submit', function(e){
     e.preventDefault();
@@ -2336,9 +2339,9 @@ canvas{ max-width:100%; }
       errorEl.style.display = 'none';
       // Acessou /vasco/os direto (a "porta" do Vasco) — pula a tela de
       // escolha de clube e já entra direto no Vasco selecionado.
-      if(window.location.pathname === '/vasco/os'){
+      if(window.ENTRY_PATH === '/vasco/os'){
         chooseClubFromCover('vasco');
-      } else if(window.location.pathname === '/band/os'){
+      } else if(window.ENTRY_PATH === '/band/os'){
         chooseClubFromCover('band');
       } else {
         renderClubCover();
@@ -2721,7 +2724,8 @@ function selectClub(id, silent){
   // recarrega a página — o login desta demo é proposital-mente não
   // persistente (pede sempre), então um reload aqui derrubaria a sessão.
   const clubPath = { vasco:'/vasco/os', band:'/band/os' }[id] || '/';
-  if(window.history && window.location.pathname !== clubPath){
+  const loginOpen = document.getElementById('login-screen') && document.getElementById('login-screen').style.display !== 'none';
+  if(window.history && !loginOpen && window.location.pathname !== clubPath){
     history.pushState({}, '', clubPath);
   }
 
