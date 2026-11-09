@@ -2376,6 +2376,7 @@ canvas{ max-width:100%; }
 })();
 function logoutDemo(){
   stopHubspotAutoRefresh();
+  if(window.BandAI) BandAI.reset();
   clearBandRole();
   const screen = document.getElementById('login-screen');
   document.getElementById('login-user').value = '';
@@ -2439,6 +2440,8 @@ function toggleDateRange(){
   showToast(dateRangeToggled ? 'Mostrando período: mês anterior' : 'Mostrando período: mês atual');
 }
 function toggleGlobalChat(force){
+  // Na Band, o agente fica fixo na coluna da direita (band/assets/band-ai-panel.js).
+  if(currentClubId === 'band' && window.BandAI && force !== false){ BandAI.focus(); return; }
   const panel = document.getElementById('global-chat-panel');
   const backdrop = document.getElementById('global-chat-backdrop');
   const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
@@ -2586,6 +2589,7 @@ function showBandPage(item){
   const tmp = document.createElement('div'); tmp.innerHTML = item.dataset.title;
   document.getElementById('view-title').textContent = tmp.textContent;
   document.getElementById('view-subtitle').textContent = item.dataset.sub;
+  if(window.BandAI) BandAI.onScreen(tmp.textContent, item.dataset.band);
 }
 document.getElementById('nav').addEventListener('click', (e) => {
   const item = e.target.closest('.band-only-nav.nav-item');
@@ -2783,6 +2787,7 @@ function updateNavVisibility(){
     const baseDisplay = el.classList.contains('nav-item') ? 'flex' : 'block';
     el.style.display = (modeOk && clubOk) ? baseDisplay : 'none';
   });
+  if(window.BandAI) BandAI.sync();
 }
 function setSidebarMode(mode){
   currentSidebarMode = mode;
@@ -7617,5 +7622,6 @@ selectClub(currentClubId, true);
 </script>
 
 
+<script src="/band/assets/band-ai-panel.js"></script>
 </body>
 </html>
