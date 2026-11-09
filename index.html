@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Intelligence Hub</title>
+<title>Torcedor 360 · Fan Platform</title>
+<script>if(location.pathname.indexOf('/band')===0)document.title='Intelligence Hub';</script>
 <script>
 /*!
  * Chart.js v4.4.4
@@ -162,6 +163,7 @@ nav.nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
 .view.band-view{ padding:0; }
 .band-frame{ width:100%; height:calc(100vh - var(--tbh, 78px)); height:calc(100dvh - var(--tbh, 78px)); border:0; display:block; background:#090c18; }
 /* Band: topo compacto e responsivo (o agente ocupa a coluna da direita) */
+body.bai-on #global-chat-trigger{ display:none; }
 body.bai-on .topbar h1{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 body.bai-on .topbar .subtitle{ display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
 body.bai-on .topbar > div:nth-of-type(2){ min-width:0; flex:1; }
@@ -392,7 +394,7 @@ canvas{ max-width:100%; }
 .login-field input:focus{ outline:none; border-color:var(--brand); }
 #login-error{ display:none; color:#ff8ea0; font-size:12px; margin:-4px 0 14px; text-align:left; }
 #login-screen{overflow-y:auto;padding:20px 0}
-.login-access{margin-top:20px;text-align:left;border:1px solid var(--border);border-radius:12px;padding:12px;background:rgba(255,255,255,.02)}
+.login-access{margin-top:16px;text-align:left;border:1px solid var(--border);border-radius:12px;padding:12px;background:rgba(255,255,255,.02)}
 .login-access .la-h{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
 .login-access .la-h span{font-weight:500;font-size:11px;color:var(--text-faint)}
 .la-grid{display:grid;gap:6px}
@@ -563,14 +565,23 @@ canvas{ max-width:100%; }
       <div id="login-error">Usuário ou senha incorretos.</div>
       <button type="submit" class="btn-primary" style="width:100%; padding:12px; font-size:13.5px;">Entrar</button>
     </form>
-    <div class="login-access">
-      <div class="la-h">Acessos da demo Band <span>clique para preencher</span></div>
+    <div class="login-access" data-club="band">
+      <div class="la-h">Acessos · Grupo Bandeirantes <span>clique para preencher</span></div>
       <div class="la-grid">
         <button type="button" class="la-row" data-u="CEO" data-p="Band"><b>CEO</b><span>Diretoria executiva</span><code>CEO · Band</code></button>
         <button type="button" class="la-row" data-u="OPE" data-p="Band"><b>OPE</b><span>Operações e produção</span><code>OPE · Band</code></button>
         <button type="button" class="la-row" data-u="MKT" data-p="Band"><b>MKT</b><span>Marketing e CRM</span><code>MKT · Band</code></button>
         <button type="button" class="la-row" data-u="IT" data-p="Band"><b>IT</b><span>TI, integrações e dados</span><code>IT · Band</code></button>
         <button type="button" class="la-row fan" data-u="Fan" data-p="Band"><b>Fan</b><span>Site do Fã: games, interações, loja</span><code>Fan · Band</code></button>
+      </div>
+    </div>
+    <div class="login-access" data-club="vasco">
+      <div class="la-h">Acessos · Vasco da Gama <span>clique para preencher</span></div>
+      <div class="la-grid">
+        <button type="button" class="la-row" data-u="CEO" data-p="Vasco"><b>CEO</b><span>Diretoria executiva</span><code>CEO · Vasco</code></button>
+        <button type="button" class="la-row" data-u="OPE" data-p="Vasco"><b>OPE</b><span>Operações, eventos e commerce</span><code>OPE · Vasco</code></button>
+        <button type="button" class="la-row" data-u="MKT" data-p="Vasco"><b>MKT</b><span>Marketing, CRM e campanhas</span><code>MKT · Vasco</code></button>
+        <button type="button" class="la-row" data-u="IT" data-p="Vasco"><b>IT</b><span>TI, integrações e dados</span><code>IT · Vasco</code></button>
       </div>
     </div>
     <div class="login-hint">Ambiente de demonstração — acesso restrito</div>
@@ -816,6 +827,9 @@ canvas{ max-width:100%; }
       </div>
       <div class="topbar-actions">
         <div class="live-chip"><span class="live-dot"></span> Dados simulados · demo</div>
+        <div class="pill" id="global-chat-trigger" onclick="toggleGlobalChat()" style="background:linear-gradient(135deg, rgba(34,224,122,.16), rgba(31,214,184,.10)); border-color:rgba(34,224,122,.35); color:#4fe0c4; font-weight:600;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Falar com um agente
+        </div>
         <div class="pill" id="date-range-pill" onclick="toggleDateRange()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> <span id="date-range-text">12 mai – 12 jun, 2026</span></div>
         <div class="pill" style="position:relative; padding:9px 11px;" onclick="toggleNotifications(event)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -2357,6 +2371,12 @@ canvas{ max-width:100%; }
   // URL para "/"): é ele que diz se a pessoa veio por /vasco/os ou /band/os.
   window.ENTRY_PATH = window.ENTRY_PATH || window.location.pathname;
   const screen = document.getElementById('login-screen');
+  // Lista de acessos: em /band/os só a Band, em /vasco/os só o Vasco; na raiz, os dois.
+  document.querySelectorAll('.login-access').forEach(box => {
+    const p = window.ENTRY_PATH || location.pathname;
+    const only = p.indexOf('/band') === 0 ? 'band' : p.indexOf('/vasco') === 0 ? 'vasco' : null;
+    if(only && box.dataset.club !== only) box.style.display = 'none';
+  });
   // Lista de acessos da demo: clicar preenche usuário e senha.
   document.querySelectorAll('.la-row').forEach(b => b.addEventListener('click', () => {
     document.getElementById('login-user').value = b.dataset.u;
@@ -2376,11 +2396,13 @@ canvas{ max-width:100%; }
       window.location.href = '/band/fan';
       return;
     }
-    const bandRole = BAND_ROLE_LOGINS[user.toLowerCase()];
-    if (bandRole && pass.toLowerCase() === 'band') {
+    // Perfis por papel (CEO, OPE, MKT, IT): a senha define o tenant — Band ou Vasco.
+    const roleId = BAND_ROLE_LOGINS[user.toLowerCase()];
+    const roleClub = { band:'band', vasco:'vasco' }[pass.toLowerCase()];
+    if (roleId && roleClub) {
       screen.style.display = 'none';
       errorEl.style.display = 'none';
-      enterBandRole(bandRole);
+      enterClubRole(roleClub, roleId);
       return;
     }
     if (user === 'admin' && pass === 'VirtualFans00') {
@@ -2468,7 +2490,7 @@ function toggleDateRange(){
   showToast(dateRangeToggled ? 'Mostrando período: mês anterior' : 'Mostrando período: mês atual');
 }
 function toggleGlobalChat(force){
-  // Na Band, o agente fica fixo na coluna da direita (band/assets/band-ai-panel.js).
+  // Na Band, o agente fica fixo na coluna da direita (band/assets/band-ai-panel.js); nos clubes, abre este chat.
   if(currentClubId === 'band' && window.BandAI && force !== false){ BandAI.focus(); return; }
   const panel = document.getElementById('global-chat-panel');
   const backdrop = document.getElementById('global-chat-backdrop');
@@ -2558,11 +2580,25 @@ const BAND_ROLES = {
   it:{ name:'Tecnologia', role:'TI · Integrações, dados e segurança', av:'TI', home:['Início de TI','Conectores, sincronização, modelo de dados e LGPD'],
     groups:[['Integrações',['pv:hub','os:saude','pv:erp']],['Dados e governança',['pv:schema','pv:consent','pv:onto']],['Inteligência',['os:agentes','pv:analytics']]] }
 };
+// Vasco: mesmos papéis, com as páginas que o painel do Vasco já tinha
+// (data-view). Conectores, integrações e saúde do sistema ficam com TI.
+const VASCO_ROLES = {
+  ceo:{ name:'Diretoria executiva', role:'CEO · Vasco da Gama', av:'CEO',
+    groups:[['Executivo',['cockpit','monetization','overview']],['Inteligência',['ontology','agents']],['Gestão do Clube',['clubmgmt']]] },
+  op:{ name:'Operações', role:'Operações · Vasco da Gama', av:'OP',
+    groups:[['Operação',['opscenter','events','clubmgmt']],['Engajamento',['engagement','content','rewards','loyalty']],['Commerce',['commerce']]] },
+  mkt:{ name:'Marketing', role:'Marketing · Vasco da Gama', av:'MKT',
+    groups:[['Visão do torcedor',['cdp','audience','engagement','sentiment']],['Ativação',['marketing','promotions','loyalty','rewards','content']],['Receita',['commerce','monetization']]] },
+  it:{ name:'Tecnologia', role:'TI · Vasco da Gama', av:'TI',
+    groups:[['Integrações',['integrations','ops']],['Dados',['cdp','ontology']],['Inteligência',['agents']]] }
+};
+const CLUB_ROLES = { band: BAND_ROLES, vasco: VASCO_ROLES };
 const ROLE_HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>';
 const ROLE_PAGE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>';
 let SIDEBAR_FOOT_DEFAULT = null;
-function buildRoleNav(roleId){
+function buildRoleNav(roleId, club){
   document.querySelectorAll('.role-nav').forEach(el => el.remove());
+  if(club && club !== 'band') return buildClubRoleNav(club, roleId);
   const r = BAND_ROLES[roleId], nav = document.getElementById('nav');
   const esc = t => String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   const item = (key, title, sub, icon) => `<div class="nav-item band-only-nav role-nav" data-view="band" data-band="${key}" data-title="${esc(title)}" data-sub="${esc(sub)}" data-mode="role">${icon}${esc(title)}</div>`;
@@ -2578,9 +2614,43 @@ function buildRoleNav(roleId){
   });
   nav.insertAdjacentHTML('afterbegin', html);
 }
+function buildClubRoleNav(club, roleId){
+  const r = CLUB_ROLES[club][roleId], nav = document.getElementById('nav');
+  const frag = document.createElement('div');
+  frag.insertAdjacentHTML('beforeend', `<div class="nav-group-label role-nav" data-mode="role">${r.name}</div>`);
+  r.groups.forEach(([label, views]) => {
+    frag.insertAdjacentHTML('beforeend', `<div class="nav-group-label role-nav" data-mode="role">${label}</div>`);
+    views.forEach(v => {
+      const src = document.querySelector(`.nav-item:not(.band-only-nav):not(.role-nav)[data-view="${v}"]`);
+      if(!src) return;
+      const el = src.cloneNode(true);
+      el.classList.remove('active', 'vasco-only-nav'); el.classList.add('role-nav');
+      el.dataset.mode = 'role'; el.removeAttribute('style');
+      frag.appendChild(el);
+    });
+  });
+  nav.prepend(...frag.childNodes);
+}
+function enterClubRole(club, roleId){
+  if(club === 'band') return enterBandRole(roleId);
+  const r = CLUB_ROLES[club][roleId];
+  window.BAND_ROLE = null; window.ROLE_CLUB = club; window.CLUB_ROLE = roleId;
+  buildRoleNav(roleId, club);
+  setRoleFoot(r);
+  chooseClubFromCover(club);
+  document.getElementById('topbar-club-sub').textContent = 'Perfil: ' + r.name;
+  goToDefaultView('role');
+}
+function setRoleFoot(r){
+  const foot = document.querySelector('.sidebar-foot');
+  if(SIDEBAR_FOOT_DEFAULT === null) SIDEBAR_FOOT_DEFAULT = [foot.querySelector('.avatar-round').textContent, foot.querySelector('.name').textContent, foot.querySelector('.role').textContent];
+  foot.querySelector('.avatar-round').textContent = r.av;
+  foot.querySelector('.name').textContent = r.name;
+  foot.querySelector('.role').textContent = r.role;
+}
 function enterBandRole(roleId){
   const r = BAND_ROLES[roleId];
-  window.BAND_ROLE = roleId;
+  window.BAND_ROLE = roleId; window.ROLE_CLUB = 'band'; window.CLUB_ROLE = roleId;
   buildRoleNav(roleId);
   const foot = document.querySelector('.sidebar-foot');
   if(SIDEBAR_FOOT_DEFAULT === null) SIDEBAR_FOOT_DEFAULT = [foot.querySelector('.avatar-round').textContent, foot.querySelector('.name').textContent, foot.querySelector('.role').textContent];
@@ -2594,8 +2664,8 @@ function enterBandRole(roleId){
   goToDefaultView('role');
 }
 function clearBandRole(){
-  if(!window.BAND_ROLE) return;
-  window.BAND_ROLE = null;
+  if(!window.ROLE_CLUB) return;
+  window.BAND_ROLE = null; window.ROLE_CLUB = null; window.CLUB_ROLE = null;
   document.querySelectorAll('.role-nav').forEach(el => el.remove());
   const foot = document.querySelector('.sidebar-foot');
   if(SIDEBAR_FOOT_DEFAULT){ foot.querySelector('.avatar-round').textContent = SIDEBAR_FOOT_DEFAULT[0]; foot.querySelector('.name').textContent = SIDEBAR_FOOT_DEFAULT[1]; foot.querySelector('.role').textContent = SIDEBAR_FOOT_DEFAULT[2]; }
@@ -2803,7 +2873,7 @@ let currentClubId = 'flamengo';
 // isto só filtra visibilidade, nenhum módulo muda de conteúdo por causa do modo.
 let currentSidebarMode = 'cockpit';
 function updateNavVisibility(){
-  const roleOn = !!(window.BAND_ROLE && currentClubId === 'band');
+  const roleOn = !!(window.ROLE_CLUB && currentClubId === window.ROLE_CLUB);
   document.getElementById('sidebar-mode-switch').style.display = roleOn ? 'none' : '';
   document.querySelectorAll('.nav-item, .nav-group-label').forEach(el => {
     // Login por papel (CEO, OPE, MKT, IT): só o menu montado para o papel.
@@ -2833,7 +2903,7 @@ function setSidebarMode(mode){
 
 // Primeira página de cada modo; para a Band, o primeiro item visível do menu dela.
 function goToDefaultView(mode){
-  if(currentClubId === 'band' && window.BAND_ROLE){
+  if(window.ROLE_CLUB && currentClubId === window.ROLE_CLUB){
     const home = document.querySelector('.role-nav.nav-item');
     if(home) home.click();
     return;
@@ -2866,7 +2936,8 @@ function chooseClubFromCover(id){
 function selectClub(id, silent){
   const c = CLUB_PROFILES[id];
   if(!c) return;
-  if(window.BAND_ROLE && id !== 'band') return;
+  document.title = id === 'band' ? 'Intelligence Hub' : 'Torcedor 360 · Fan Platform';
+  if(window.ROLE_CLUB && id !== window.ROLE_CLUB) return;
   currentClubId = id;
 
   // Mantém a URL coerente com o clube ativo — /vasco/os é a "porta" oficial
