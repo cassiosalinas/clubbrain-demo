@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Fans Band · Demo Pré-Jogo + História Viva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#060a14;--panel:#0d1424;--panel2:#111b30;--line:#1c2944;--txt:#e9edf6;--mut:#8592ad;
+  --gold:#f5b82e;--gold2:#ffd76a;--vf:#ff6a1a;--blue:#2f6bff;--ok:#22c55e;--bad:#ef4444;
+  --cor:#f1f1f1;--pal:#1fa35a;--spfc:#e53935;--san:#9aa6bd;--out:#8b6cff;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,textarea,select{font:inherit;color:var(--txt)}
+.disp{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.02em;text-transform:uppercase}
+.mut{color:var(--mut)}
+.gold{color:var(--gold)}
+.hide{display:none!important}
+
+/* ===== TELÃO ===== */
+#telao{display:grid;grid-template-rows:auto 1fr;height:100vh;min-height:640px;
+  background:radial-gradient(1200px 500px at 70% -10%,rgba(47,107,255,.18),transparent 60%),radial-gradient(900px 400px at 0% 110%,rgba(245,184,46,.10),transparent 60%),var(--bg)}
+.top{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(6,10,20,.7);backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--vf),#ff9a3d);display:grid;place-items:center;font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;color:#160800}
+.brand b{font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.04em}
+.brand b span{color:var(--gold)}
+.brand small{display:block;font-size:11px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+.tabs{display:flex;gap:4px;margin-left:18px;background:var(--panel);padding:4px;border-radius:12px;border:1px solid var(--line)}
+.tab{padding:8px 14px;border-radius:9px;font-weight:600;color:var(--mut);white-space:nowrap}
+.tab.on{background:var(--panel2);color:var(--txt);box-shadow:inset 0 0 0 1px var(--line)}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--bad);margin-right:6px;animation:pulse 1.2s infinite}
+.sp{flex:1}
+.ctl{display:flex;align-items:center;gap:8px}
+.sel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.btn{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-weight:600}
+.btn:hover{border-color:#2c3d63}
+.btn.pri{background:linear-gradient(135deg,var(--gold),#f39c12);color:#1a1200;border:0}
+.btn.sm{padding:6px 10px;font-size:12px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{padding:7px 10px;font-size:12px;font-weight:600;color:var(--mut)}
+.seg button.on{background:var(--panel2);color:var(--gold)}
+.body{display:grid;grid-template-columns:1fr 360px;gap:16px;padding:16px 20px;min-height:0}
+.main{min-height:0;overflow:auto;padding-right:4px}
+.view{display:none;gap:16px}
+.view.on{display:grid}
+.card{background:linear-gradient(180deg,var(--panel),#0b1120);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card h3{font:700 15px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .tag{margin-left:auto}
+.tag{font:600 10px Inter;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:#1a2540;color:var(--mut)}
+.tag.live{background:rgba(239,68,68,.15);color:#ff7b7b}
+.tag.sim{background:rgba(139,108,255,.15);color:#b7a6ff}
+.tag.gold{background:rgba(245,184,46,.15);color:var(--gold)}
+.g-live{grid-template-columns:330px 1fr;grid-template-rows:auto auto 1fr}
+.tv{grid-row:span 3;display:flex;flex-direction:column;gap:14px}
+.screen{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/10;background:
+ linear-gradient(180deg,rgba(0,0,0,.0),rgba(0,0,0,.65)),
+ repeating-linear-gradient(90deg,#0f5132 0 34px,#11603b 34px 68px);border:1px solid #23406b}
+.screen .pitch{position:absolute;inset:14% 10%;border:2px solid rgba(255,255,255,.35);border-radius:4px}
+.screen .pitch:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px solid rgba(255,255,255,.35)}
+.screen .pitch:before{content:"";position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1;border:2px solid rgba(255,255,255,.35);border-radius:50%;transform:translate(-50%,-50%)}
+.onair{position:absolute;left:10px;top:10px;display:flex;gap:6px;align-items:center}
+.onair .tag{background:#d61f1f;color:#fff}
+.lower{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(90deg,#0b2a7a,#1645c4 60%,rgba(22,69,196,.0));}
+.lower b{font:800 20px "Barlow Condensed","Arial Narrow",sans-serif;display:block;letter-spacing:.03em}
+.lower span{font-size:11px;opacity:.85}
+.qrbox{display:flex;gap:12px;align-items:center}
+#qr{background:#fff;padding:8px;border-radius:10px;width:132px;height:132px;flex:none}
+#qr img,#qr canvas{width:116px!important;height:116px!important}
+.qrbox p{font-size:13px;line-height:1.35}
+.qrbox p b{font:800 20px "Barlow Condensed","Arial Narrow",sans-serif;display:block;color:var(--gold);letter-spacing:.03em}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font:800 34px "Barlow Condensed","Arial Narrow",sans-serif;line-height:1.05;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11px;color:var(--mut)}
+.kpi.hl{border-color:rgba(245,184,46,.5);box-shadow:0 0 0 1px rgba(245,184,46,.15),0 10px 30px -10px rgba(245,184,46,.25)}
+.kpi.hl .v{color:var(--gold)}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:110px 1fr 70px;align-items:center;gap:10px}
+.bar .n{font-weight:700}
+.bar .t{height:26px;background:#0a1020;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.bar .f{height:100%;border-radius:7px;transition:width .6s cubic-bezier(.2,.8,.2,1);min-width:2px}
+.bar .p{text-align:right;font:700 18px "Barlow Condensed","Arial Narrow",sans-serif;font-variant-numeric:tabular-nums}
+.bar.lead .n:after{content:" ▲";color:var(--gold);font-size:11px}
+.feed{display:flex;flex-direction:column;gap:6px;overflow:auto;max-height:100%}
+.fi{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:#0a1122;border:1px solid transparent;animation:in .35s ease}
+.fi.real{border-color:rgba(245,184,46,.55);background:linear-gradient(90deg,rgba(245,184,46,.12),#0a1122)}
+.fi .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0b0f1a}
+.fi .tx{font-size:13px;line-height:1.3}
+.fi .tx small{display:block;color:var(--mut);font-size:11px}
+.fi .pt{font:700 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold)}
+.feedcard{display:flex;flex-direction:column;min-height:260px}
+.feedcard .feed{flex:1;max-height:420px}
+
+/* intel */
+.g-intel{grid-template-columns:300px 1fr}
+.fanlist{display:flex;flex-direction:column;gap:6px;max-height:560px;overflow:auto}
+.fanrow{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;text-align:left;border:1px solid transparent}
+.fanrow:hover{background:#0f1830}
+.fanrow.on{border-color:var(--gold);background:rgba(245,184,46,.08)}
+.fanrow .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0b0f1a;flex:none}
+.fanrow .nm{font-weight:600}
+.fanrow small{display:block;color:var(--mut);font-size:11px}
+.f360{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.prof{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.prof .av{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;color:#0b0f1a}
+.prof b{font:800 26px "Barlow Condensed","Arial Narrow",sans-serif;display:block;letter-spacing:.02em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 9px;border-radius:999px;background:#16213a;font-size:12px;font-weight:600;border:1px solid var(--line)}
+.chip.g{background:rgba(245,184,46,.12);color:var(--gold);border-color:rgba(245,184,46,.35)}
+.meter{margin-top:10px}
+.meter .row{display:grid;grid-template-columns:150px 1fr 40px;gap:8px;align-items:center;font-size:12px;margin:6px 0}
+.meter .t{height:8px;background:#0a1020;border-radius:6px;overflow:hidden}
+.meter .f{height:100%;background:linear-gradient(90deg,var(--vf),var(--gold));transition:width .5s}
+.tl{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow:auto;font-size:12px}
+.tl div{display:flex;gap:8px}
+.tl code{color:var(--gold);font-size:11px;font-family:ui-monospace,monospace;flex:none}
+#onto{width:100%;height:240px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid #141f36}
+td.num{font-variant-numeric:tabular-nums;text-align:right}
+th.num{text-align:right}
+
+/* agente */
+.g-agent{grid-template-columns:1fr 320px}
+.chat{display:flex;flex-direction:column;height:calc(100vh - 140px);min-height:480px}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px}
+.m{max-width:86%;padding:12px 14px;border-radius:14px;line-height:1.5;font-size:14px}
+.m.u{align-self:flex-end;background:#1a2a4d;border:1px solid #27407a}
+.m.a{align-self:flex-start;background:#0b1326;border:1px solid var(--line)}
+.m.a .who{font:700 12px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.m ul{margin:6px 0 6px 18px}
+.m p{margin:4px 0}
+.ask{display:flex;gap:8px;margin-top:10px}
+.ask input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.sugs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sug{padding:8px 12px;border-radius:999px;background:#121c33;border:1px solid var(--line);font-size:12px;text-align:left}
+.sug:hover{border-color:var(--gold)}
+.copis{display:flex;flex-direction:column;gap:8px}
+.copi{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1326;text-align:left}
+.copi.on{border-color:var(--gold);background:rgba(245,184,46,.08)}
+.copi b{display:block;font-weight:700}
+.copi small{color:var(--mut)}
+
+/* negocio */
+.g-biz{grid-template-columns:1.2fr 1fr}
+.inv td:first-child b{display:block}
+.inv td:first-child small{color:var(--mut)}
+.inv input[type=range]{width:110px;accent-color:var(--gold)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.split .s{border-radius:12px;padding:14px;border:1px solid var(--line);background:#0b1326}
+.split .s .v{font:800 34px "Barlow Condensed","Arial Narrow",sans-serif}
+.split .s.b{border-color:rgba(47,107,255,.6)}
+.split .s.vf{border-color:rgba(255,106,26,.6)}
+.big{font:800 46px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);line-height:1}
+.note{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.4}
+.rng{display:grid;grid-template-columns:1fr 120px 60px;gap:10px;align-items:center;margin:8px 0;font-size:13px}
+.rng input{accent-color:var(--gold)}
+
+/* lateral celular */
+.side{min-height:0;display:flex;flex-direction:column;gap:10px;align-items:center}
+.side .lbl{align-self:stretch;display:flex;align-items:center;justify-content:space-between}
+.phone{width:340px;height:min(700px,calc(100vh - 150px));border-radius:42px;padding:12px;background:#020409;border:1px solid #2a3654;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #0e1424;position:relative}
+.phone .scr{height:100%;border-radius:32px;overflow:hidden;position:relative}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:110px;height:24px;background:#020409;border-radius:0 0 14px 14px;z-index:5}
+
+/* ===== APP CELULAR ===== */
+.app{height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,#0a1430,#060a14 45%);position:relative;overflow:hidden}
+.app .hd{padding:34px 16px 12px;display:flex;align-items:center;gap:10px}
+.app .hd .lg{font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.06em}
+.app .hd .lg span{color:var(--gold)}
+.app .hd .xp{margin-left:auto;font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);background:rgba(245,184,46,.12);padding:4px 10px;border-radius:999px}
+.app .ct{flex:1;overflow:auto;padding:0 16px 20px}
+.app h2{font:800 30px "Barlow Condensed","Arial Narrow",sans-serif;line-height:1;letter-spacing:.01em;text-transform:uppercase;margin:6px 0 8px}
+.app h2 span{color:var(--gold)}
+.app p.lead{color:#b9c3d8;font-size:13px;line-height:1.45;margin-bottom:14px}
+.field{display:block;margin:10px 0}
+.field span{font-size:12px;color:var(--mut);display:block;margin-bottom:6px}
+.field input{width:100%;background:#0c1530;border:1px solid #23345c;border-radius:12px;padding:12px}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tm{padding:12px 10px;border-radius:12px;border:1px solid #23345c;background:#0c1530;font-weight:700;display:flex;align-items:center;gap:8px}
+.tm i{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.3)}
+.tm.on{border-color:var(--gold);background:rgba(245,184,46,.12)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.4;color:#c6cfe0;margin:10px 0;text-align:left}
+.chk input{margin-top:2px;accent-color:var(--gold);width:16px;height:16px;flex:none}
+.cta{width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--gold),#f39c12);color:#1a1200;font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-top:10px}
+.cta:disabled{opacity:.4}
+.cta.ghost{background:#111c36;color:var(--txt);border:1px solid #23345c}
+.pass{border-radius:18px;padding:14px;background:linear-gradient(135deg,#142a66,#0b1638);border:1px solid #2a4aa0;position:relative;overflow:hidden;margin-bottom:12px}
+.pass:after{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(245,184,46,.35),transparent 70%)}
+.pass .r1{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#aab8dc}
+.pass b{font:800 26px "Barlow Condensed","Arial Narrow",sans-serif;display:block;margin-top:6px}
+.pass .lvl{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;color:#c6d0ea}
+.pass .pb{height:8px;background:rgba(255,255,255,.12);border-radius:6px;margin-top:6px;overflow:hidden}
+.pass .pb i{display:block;height:100%;background:linear-gradient(90deg,var(--vf),var(--gold));transition:width .6s}
+.live{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#0d1733;border:1px solid #23345c;margin-bottom:12px}
+.live .tag{background:#d61f1f;color:#fff}
+.live b{font-weight:700;font-size:13px}
+.live small{display:block;color:var(--mut);font-size:11px}
+.ms{display:flex;flex-direction:column;gap:8px}
+.mi{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:#0c1530;border:1px solid #1d2c50;text-align:left;width:100%}
+.mi .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#16234a;font-size:18px;flex:none}
+.mi b{font-weight:700;font-size:14px;display:block}
+.mi small{color:var(--mut);font-size:11px}
+.mi .st{margin-left:auto;font:800 14px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);white-space:nowrap}
+.mi.done{opacity:.6}
+.mi.done .st{color:var(--ok)}
+.mi.lock .st{color:var(--mut)}
+.opts{display:grid;gap:8px}
+.opts.g2{grid-template-columns:1fr 1fr}
+.op{padding:14px 12px;border-radius:14px;background:#0c1530;border:1px solid #23345c;font-weight:700;text-align:left;position:relative;overflow:hidden}
+.op .fill{position:absolute;inset:0;width:0;background:rgba(245,184,46,.14);transition:width .6s}
+.op span{position:relative}
+.op .pc{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold)}
+.op.right{border-color:var(--ok);background:rgba(34,197,94,.12)}
+.op.wrong{border-color:var(--bad);background:rgba(239,68,68,.12)}
+.op.me{border-color:var(--gold)}
+.timer{height:6px;border-radius:6px;background:#16234a;overflow:hidden;margin:6px 0 14px}
+.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--vf));width:100%}
+.qmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.expl{margin-top:12px;padding:12px;border-radius:12px;background:#0d1733;border:1px solid #23345c;font-size:13px;line-height:1.45}
+textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #23345c;border-radius:12px;padding:12px;resize:none}
+.hist{margin-top:12px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#1b1406,#0c1530);border:1px solid rgba(245,184,46,.45);font-size:13px;line-height:1.5}
+.hist .who{font:800 13px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;display:flex;gap:6px;align-items:center}
+.acv{margin-top:10px;border-radius:12px;aspect-ratio:16/8;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 4px),linear-gradient(135deg,#2a2a2a,#0e0e0e);display:grid;place-items:center;color:#bbb;font-size:12px;text-align:center;border:1px solid #333}
+.coupon{border-radius:18px;padding:18px;background:linear-gradient(135deg,#ff7a1a,#f5b82e);color:#1a0d00;position:relative;overflow:hidden}
+.coupon small{font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+.coupon b{font:800 30px "Barlow Condensed","Arial Narrow",sans-serif;display:block;line-height:1;margin:6px 0}
+.coupon .code{margin-top:12px;padding:10px;border-radius:10px;border:2px dashed rgba(26,13,0,.5);font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;text-align:center;letter-spacing:.2em}
+.back{font-size:12px;color:var(--mut);padding:4px 0;margin-bottom:6px}
+.rk{margin-top:14px}
+.rk .bar{grid-template-columns:86px 1fr 46px;gap:8px}
+.rk .bar .t{height:16px}
+.rk .bar .p{font-size:14px}
+.toast{position:absolute;left:50%;top:70px;transform:translateX(-50%) translateY(-20px);opacity:0;background:var(--gold);color:#1a1200;font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;padding:8px 16px;border-radius:999px;transition:.35s;z-index:20;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{font-size:10px;color:#5d6a86;text-align:center;padding:8px 0 0}
+
+/* full phone page */
+#celular{height:100vh}
+#celular .app{max-width:520px;margin:0 auto}
+
+/* roteiro */
+.ov{position:fixed;inset:0;background:rgba(3,6,14,.78);backdrop-filter:blur(6px);z-index:50;display:grid;place-items:center}
+.ov .box{width:min(860px,92vw);max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}
+.ov h2{font:800 34px "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.act{padding:14px;border-radius:12px;background:#0b1326;border:1px solid var(--line);font-size:13px;line-height:1.45}
+.act b{font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);display:block;text-transform:uppercase;letter-spacing:.04em}
+.act i{color:var(--mut);font-style:normal;font-size:12px;display:block;margin-top:6px}
+
+@keyframes pulse{50%{opacity:.35}}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (max-width:1280px){.body{grid-template-columns:1fr}.side{display:none}.g-live{grid-template-columns:1fr}.tv{grid-row:auto}}
+</style>
+</head>
+<body>
+
+<!-- ================= TELÃO ================= -->
+<div id="telao" class="hide">
+  <div class="top">
+    <div class="brand"><div class="mark">VF</div><div><b>VIRTUAL FANS <span>BAND</span></b><small>powered by ClubBrain.ai · demo conceitual</small></div></div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-v="live"><span class="dot"></span>Ao vivo</button>
+      <button class="tab" data-v="intel">Inteligência</button>
+      <button class="tab" data-v="agent">Agente IA</button>
+      <button class="tab" data-v="biz">Negócio</button>
+    </div>
+    <div class="sp"></div>
+    <div class="ctl">
+      <select id="tenant" class="sel" title="Propriedade (template multi-tenant)"></select>
+      <div class="seg" id="simseg" title="Plateia simulada">
+        <button data-s="0">Plateia: off</button><button data-s="1" class="on">baixa</button><button data-s="2">alta</button>
+      </div>
+      <button class="btn" id="bRot">Roteiro</button>
+      <button class="btn" id="bReset">Reiniciar</button>
+    </div>
+  </div>
+  <div class="body">
+    <div class="main">
+      <!-- AO VIVO -->
+      <section class="view on g-live" id="v-live">
+        <div class="tv">
+          <div class="card">
+            <h3>Na TV agora <span class="tag live">no ar</span></h3>
+            <div class="screen">
+              <div class="pitch"></div>
+              <div class="onair"><span class="tag">AO VIVO</span><span class="tag" id="tvSlot" style="background:rgba(0,0,0,.5);color:#fff"></span></div>
+              <div class="lower"><b id="tvProg"></b><span id="tvHost"></span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Entre no jogo <span class="tag gold">QR na tela</span></h3>
+            <div class="qrbox"><div id="qr"></div><p><b id="qrCall">Aponte a câmera</b><span id="qrSub">e jogue o pré-jogo com a gente. Pontos, ranking das torcidas e recompensas.</span></p></div>
+            <p class="note" id="qrNote">Na demo: use o celular simulado ao lado, ou abra este link em outra janela.</p>
+          </div>
+          <div class="card">
+            <h3>Pergunta no ar</h3>
+            <div id="tvQ" style="font:800 24px 'Barlow Condensed','Arial Narrow',sans-serif;line-height:1.1;text-transform:uppercase"></div>
+            <div class="bars" id="palpBars" style="margin-top:12px"></div>
+          </div>
+        </div>
+        <div class="kpis">
+          <div class="kpi hl"><div class="l">Na sala, ao vivo</div><div class="v" id="kReal">0</div><div class="s">pessoas reais jogando agora</div></div>
+          <div class="kpi"><div class="l">Participantes (projeção)</div><div class="v" id="kProj">0</div><div class="s">audiência participante ilustrativa</div></div>
+          <div class="kpi"><div class="l">Perfis com consentimento</div><div class="v" id="kId">0</div><div class="s" id="kIdS">LGPD · opt-in registrado</div></div>
+          <div class="kpi"><div class="l">Interações</div><div class="v" id="kInt">0</div><div class="s" id="kIntS">eventos na sessão</div></div>
+        </div>
+        <div class="two">
+          <div class="card"><h3 id="rankTitle">Disputa das torcidas <span class="tag live">tempo real</span></h3><div class="bars" id="rank"></div>
+            <p class="note" id="rankNote">Pontos somados por torcida nesta sessão (palpites, quiz, memórias).</p></div>
+          <div class="card feedcard"><h3>Eventos ClubBrain <span class="tag">stream</span></h3><div class="feed" id="feed"></div></div>
+        </div>
+      </section>
+
+      <!-- INTELIGÊNCIA -->
+      <section class="view g-intel" id="v-intel">
+        <div class="card"><h3>Torcedores identificados <span class="tag gold" id="fanCount">0</span></h3><div class="fanlist" id="fanlist"></div></div>
+        <div style="display:grid;gap:16px;min-width:0">
+          <div class="f360">
+            <div class="card" id="f360"></div>
+            <div class="card"><h3>Football + Media Ontology <span class="tag">grafo</span></h3><svg id="onto" viewBox="0 -10 520 270"></svg></div>
+          </div>
+          <div class="card"><h3>Segmentos acionáveis <span class="tag">agregados · sem dado pessoal</span></h3>
+            <table><thead><tr><th>Segmento</th><th class="num">Sessão</th><th class="num">Projeção</th><th class="num">Propensão</th><th>Marca sugerida</th></tr></thead><tbody id="segs"></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENTE -->
+      <section class="view g-agent" id="v-agent">
+        <div class="card chat">
+          <h3>ClubBrain AI · <span id="copiName" style="color:var(--gold)">Sponsor Activation Copilot</span> <span class="tag" id="aiState">IA</span></h3>
+          <div class="msgs" id="msgs"></div>
+          <div class="sugs" id="sugs"></div>
+          <form class="ask" id="askF"><input id="askI" placeholder="Pergunte sobre a audiência, segmentos, patrocínio..." autocomplete="off"><button class="btn pri">Perguntar</button></form>
+        </div>
+        <div class="card"><h3>Copilotos</h3>
+          <div class="copis" id="copis"></div>
+          <p class="note">O agente lê os eventos desta sessão, os segmentos agregados e um catálogo de marcas fictícias. Não acessa dados pessoais individuais para fins comerciais.</p>
+        </div>
+      </section>
+
+      <!-- NEGÓCIO -->
+      <section class="view g-biz" id="v-biz">
+        <div class="card"><h3>Inventário novo criado <span class="tag gold">não redistribui o existente</span></h3>
+          <table class="inv"><thead><tr><th>Produto comercial</th><th class="num">Qtd/mês</th><th class="num">Preço unit.</th><th class="num">Receita</th></tr></thead><tbody id="inv"></tbody></table>
+          <p class="note">Valores ilustrativos e não contratuais, para discussão. Preços e volumes a validar com o comercial da Band.</p>
+        </div>
+        <div class="card"><h3>Resultado compartilhado · 50/50</h3>
+          <div class="mut" style="font-size:12px">Receita bruta incremental / mês</div>
+          <div class="big" id="bGross">R$ 0</div>
+          <div class="rng"><span>Tributos e deduções elegíveis</span><input type="range" id="ded" min="0" max="35" value="15"><b id="dedV">15%</b></div>
+          <div class="rng"><span>Custo de recompensas (VF)</span><input type="range" id="rew" min="0" max="20" value="6"><b id="rewV">6%</b></div>
+          <div class="mut" style="font-size:12px;margin-top:6px">Resultado líquido distribuível</div>
+          <div class="big" id="bNet" style="font-size:38px">R$ 0</div>
+          <div class="split">
+            <div class="s b"><div class="mut" style="font-size:12px">Grupo Bandeirantes · 50%</div><div class="v" id="bBand">R$ 0</div></div>
+            <div class="s vf"><div class="mut" style="font-size:12px">Virtual Fans · 50%</div><div class="v" id="bVF">R$ 0</div></div>
+          </div>
+          <div class="mut" style="font-size:12px;margin-top:14px">Projeção 12 meses (Band)</div>
+          <div class="big" id="bYear" style="font-size:32px;color:#8fb0ff">R$ 0</div>
+          <p class="note">Modelo da proposta executiva: divisão sobre o resultado líquido distribuível, faturamento pela VF, conta exclusiva e auditoria bilateral. Tratamento tributário a validar.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- CELULAR SIMULADO -->
+    <aside class="side">
+      <div class="lbl"><span class="tag gold">Celular do torcedor · simulado</span><button class="btn sm" id="bNewFan">Novo torcedor</button></div>
+      <div class="phone"><div class="notch"></div><div class="scr" id="simPhone"></div></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ================= CELULAR (página) ================= -->
+<div id="celular" class="hide"></div>
+
+<!-- ================= ROTEIRO ================= -->
+<div class="ov hide" id="rot"><div class="box">
+  <div style="display:flex;align-items:center"><h2>Roteiro · <span class="gold">12 minutos</span></h2><div class="sp"></div><button class="btn" id="rotX">Fechar</button></div>
+  <p class="mut" style="margin-top:6px">"A Band pode não ter os 90 minutos. Pode ter tudo o que acontece antes deles, e 70 anos de história."</p>
+  <div class="acts">
+    <div class="act"><b>1 · A TV convoca</b>Aba Ao vivo. Jogo Aberto no ar com o QR Code. Peça para os executivos escanearem, ou jogue no celular simulado.<i>Para Johnny e Denis: a TV gera atenção.</i></div>
+    <div class="act"><b>2 · O torcedor entra</b>Band Pass com consentimento LGPD explícito. Escolhe o time e já aparece no telão em dourado.<i>Para Lilian: consentimento na origem, complementar à Vibra.</i></div>
+    <div class="act"><b>3 · Joga o pré-jogo</b>Palpite do Derby, quiz História do Clássico e "E você, onde estava?", com resposta do AI Historian.<i>A História Viva como motor de recorrência.</i></div>
+    <div class="act"><b>4 · Disputa ao vivo</b>Ranking das torcidas mexendo no telão. Recompensa do patrocinador desbloqueada no celular.<i>Momento WOW: a sala vê a si mesma.</i></div>
+    <div class="act"><b>5 · A inteligência aparece</b>Aba Inteligência: Fan 360, ontologia e segmentos agregados. Clique em quem acabou de jogar.<i>Da audiência anônima ao conhecimento do fã.</i></div>
+    <div class="act"><b>6 · O agente vende, e é produto</b>Aba Agente: "Que patrocínio cabe para quem acabou de jogar?". Aba Negócio: inventário novo e 50/50. Troque a propriedade no seletor: Donos da Bola, Gincana.<i>Não é projeto sob medida: é template multi-tenant.</i></div>
+  </div>
+</div></div>
+
+<script src="../claude-shim.js"></script>
+<script>
+/* ======================= CONFIG ======================= */
+const APP_URL = "";
+const TEAMS = {
+  Corinthians:{c:"var(--cor)",hex:"#f1f1f1"}, Palmeiras:{c:"var(--pal)",hex:"#1fa35a"},
+  "São Paulo":{c:"var(--spfc)",hex:"#e53935"}, Santos:{c:"var(--san)",hex:"#9aa6bd"}, Outros:{c:"var(--out)",hex:"#8b6cff"}
+};
+const SPONSORS = [
+  {id:"pulso",name:"Pulso Energy",cat:"Bebida energética",fit:"Estrategistas e jovens 18–34 que palpitam",reward:"Combo Pulso Derby grátis",code:"PULSO-DERBY"},
+  {id:"atl",name:"Atlântica Seguros",cat:"Seguros",fit:"Nostálgicos que compartilham memórias",reward:"1º mês do seguro-viagem para o jogo fora",code:"ATL-MEMORIA"},
+  {id:"brasa",name:"Brasa Burger",cat:"Delivery",fit:"Pré-jogo em casa, horário de almoço",reward:"30% no combo do clássico",code:"BRASA-30"},
+  {id:"rota",name:"Rota Bank",cat:"Banco digital",fit:"Torcidas engajadas, cashback por torcida",reward:"R$ 20 de cashback na 1ª compra",code:"ROTA-TORCIDA"}
+];
+const TENANTS = {
+  derby:{
+    label:"Jogo Aberto · Pré-Jogo do Derby", program:"Jogo Aberto", host:"com Renata Fan · Band e Bandplay", slot:"SEG–SEX · 11H",
+    tvTitle:"Pré-Jogo · Corinthians × Palmeiras", call:"Jogue o Pré-Jogo do Derby",
+    palpite:{q:"Qual vai ser o placar do Derby?",opts:["Corinthians vence","Empate","Palmeiras vence"],short:["Timão","Empate","Verdão"]},
+    quizTitle:"Quiz · História do Clássico",
+    quiz:[
+      {q:"Em que ano foi disputado o primeiro Derby paulista?",o:["1910","1917","1923","1942"],a:1,e:"Em 6 de maio de 1917. O então Palestra Itália venceu por 3 a 0."},
+      {q:"Com que nome o Palmeiras disputou os primeiros Derbies?",o:["Parque Antárctica FC","Palestra Itália","Italiano Paulista","Sociedade Paulista"],a:1,e:"O clube se chamou Palestra Itália até 1942, quando passou a se chamar Palmeiras."},
+      {q:"Na semifinal da Libertadores de 2000, quem defendeu o pênalti de Marcelinho Carioca?",o:["Dida","Velloso","Marcos","Sérgio"],a:2,e:"Marcos defendeu a cobrança e o Palmeiras avançou nos pênaltis. Dida estava no gol do Corinthians."}
+    ],
+    memTitle:"E você, onde estava?", memQ:"Qual Derby você nunca esqueceu?",
+    moments:["Libertadores 2000 · pênaltis","Final do Paulista de 1993","Um Derby no estádio com a família","Outro momento"],
+    sponsor:"pulso"
+  },
+  neto:{
+    label:"Os Donos da Bola · Desafio do Craque", program:"Os Donos da Bola", host:"com Craque Neto · TV 12h50 + rádio Bandeirantes 18h", slot:"SEG–SEX · 12H50",
+    tvTitle:"Desafio do Craque", call:"Concorda com o Neto?",
+    palpite:{q:"\"Um craque decide um clássico sozinho.\" Você concorda?",opts:["Concordo","Discordo","Depende do time"],short:["Concordo","Discordo","Depende"]},
+    quizTitle:"Quiz · Memória do Craque",
+    quiz:[
+      {q:"Em que ano o Corinthians conquistou seu primeiro Campeonato Brasileiro, com Neto em campo?",o:["1977","1990","1998","1999"],a:1,e:"O primeiro título brasileiro do Corinthians veio em 1990, com Neto como grande referência do time."},
+      {q:"Em que ano o gol de Basílio encerrou o jejum de títulos do Corinthians?",o:["1974","1977","1982","1988"],a:1,e:"Em 1977, contra a Ponte Preta, na final do Paulista."},
+      {q:"Em que ano o Corinthians foi fundado?",o:["1902","1910","1914","1930"],a:1,e:"Em 1º de setembro de 1910, no bairro do Bom Retiro, em São Paulo."}
+    ],
+    memTitle:"Lance que você viu", memQ:"Qual craque decidiu um jogo na sua frente?",
+    moments:["Um gol de falta inesquecível","Uma final no estádio","Um jogo na TV com a família","Outro momento"],
+    sponsor:"brasa"
+  },
+  gincana:{
+    label:"Show do Esporte · Gincana das Torcidas", program:"Show do Esporte", host:"Domingo · Band", slot:"DOMINGO · 12H",
+    tvTitle:"Gincana das Torcidas", call:"Some pontos para sua torcida",
+    palpite:{q:"Qual causa a sua torcida vai abraçar nesta rodada?",opts:["Combate à fome","Meio ambiente","Educação"],short:["Fome","Ambiente","Educação"]},
+    quizTitle:"Quiz · História da Seleção",
+    quiz:[
+      {q:"Em que ano o Brasil conquistou sua primeira Copa do Mundo?",o:["1950","1958","1962","1970"],a:1,e:"Em 1958, na Suécia."},
+      {q:"Contra quem o Brasil decidiu o tetra nos pênaltis, em 1994?",o:["Alemanha","Argentina","Itália","Holanda"],a:2,e:"A final de 1994 contra a Itália terminou 0 a 0 e foi decidida nos pênaltis."},
+      {q:"Em que ano veio o pentacampeonato mundial?",o:["1998","2002","2006","1994"],a:1,e:"Em 2002, na Copa da Coreia do Sul e do Japão."}
+    ],
+    memTitle:"E você, onde estava?", memQ:"Onde você estava num título da Seleção?",
+    moments:["Penta 2002","Tetra 1994","Uma Copa com a família","Outro momento"],
+    sponsor:"rota"
+  }
+};
+const LEVELS=[[0,"Torcedor"],[300,"Arquibancada"],[650,"Camarote"],[1000,"Lenda"]];
+const REWARD_AT=400;
+const NAMES=["Ana","Bruno","Carla","Diego","Eduarda","Felipe","Gabriela","Henrique","Isabela","João","Karina","Lucas","Mariana","Nicolas","Olívia","Pedro","Rafaela","Samuel","Tainá","Vitor","Yasmin","Thiago","Letícia","Caio","Beatriz","Rodrigo","Juliana","Marcos","Fernanda","Gustavo"];
+const SURN=["S.","M.","O.","R.","L.","C.","P.","A.","F.","B."];
+
+/* ======================= UTIL ======================= */
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const fmt=n=>Math.round(n).toLocaleString("pt-BR");
+const brl=n=>"R$ "+Math.round(n).toLocaleString("pt-BR");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ini=n=>String(n||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+const teamHex=t=>(TEAMS[t]||TEAMS.Outros).hex;
+const level=xp=>{let l=LEVELS[0];for(const L of LEVELS) if(xp>=L[0]) l=L;const i=LEVELS.indexOf(l);const nx=LEVELS[i+1];return {name:l[1],next:nx?nx[0]:null,pct:nx?Math.min(100,(xp-l[0])/(nx[0]-l[0])*100):100,nextName:nx?nx[1]:null}};
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const T=()=>TENANTS[S.tenant];
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ======================= STATE (agregador) ======================= */
+const S={tenant:"derby",fans:new Map(),feed:[],events:0,selected:null,baseProj:128450};
+function resetState(){S.fans=new Map();S.feed=[];S.events=0;S.selected=null}
+
+/* ======================= BUS (tempo real) ======================= */
+const BUS={seen:new Set(),fns:[],bc:null,room:null,
+  init(){
+    try{this.bc=new BroadcastChannel("vfband-demo");this.bc.onmessage=e=>this.recv(e.data)}catch(e){}
+    try{ if(window.claude&&claude.use){ claude.use("room").then(r=>{ if(!r) return; this.room=r;
+      r.on("evt",(a,b)=>{const d=(a&&a.id)?a:(a&&a.data&&a.data.id?a.data:(b&&b.id?b:null)); if(d) this.recv(d)}); }).catch(()=>{}) } }catch(e){}
+  },
+  on(f){this.fns.push(f)},
+  send(m){m.id=m.id||uid();m.ts=m.ts||Date.now();this.recv(m);
+    try{this.bc&&this.bc.postMessage(m)}catch(e){}
+    if(!m.sim){try{this.room&&this.room.emit("evt",m)}catch(e){}}
+  },
+  recv(m){if(!m||!m.id||this.seen.has(m.id))return;this.seen.add(m.id);for(const f of this.fns){try{f(m)}catch(e){console.error(e)}}}
+};
+
+function apply(m){
+  if(m.kind==="tenant"){ if(TENANTS[m.tenant]&&S.tenant!==m.tenant){S.tenant=m.tenant;resetState();onTenant()} return }
+  if(m.kind==="reset"){resetState();onReset();return}
+  if(m.kind!=="evt") return;
+  if(m.tenant&&m.tenant!==S.tenant) return;
+  const f=m.fan; if(!f) return;
+  let x=S.fans.get(f.id);
+  if(!x){x={id:f.id,name:f.name,team:f.team,mkt:!!f.mkt,sim:!!f.sim,xp:0,palpite:null,quiz:[],memory:null,reward:false,tl:[],first:m.ts};S.fans.set(f.id,x)}
+  x.name=f.name;x.team=f.team;x.mkt=!!f.mkt;x.xp=f.xp||x.xp;x.last=m.ts;
+  const p=m.p||{};
+  if(m.type==="palpite") x.palpite=p.choice;
+  if(m.type==="quiz") x.quiz[p.i]={ok:p.ok};
+  if(m.type==="memory") x.memory={moment:p.moment,text:p.text};
+  if(m.type==="reward") x.reward=true;
+  x.tl.unshift({t:m.ts,type:m.type,txt:evtText(m)});
+  S.events++;
+  S.feed.unshift({m,real:!x.sim}); if(S.feed.length>60) S.feed.length=60;
+  if(!x.sim) S.selected=x.id; else if(!S.selected) S.selected=x.id;
+  onData(m);
+}
+function evtText(m){const p=m.p||{},t=T();
+  switch(m.type){
+    case "join": return `entrou no Band Pass · torce para ${m.fan.team}${m.fan.mkt?" · aceitou ofertas":""}`;
+    case "palpite": return `palpite: ${t.palpite.opts[p.choice]||"-"}`;
+    case "quiz": return `quiz ${p.i+1}/3: ${p.ok?"acertou":"errou"}`;
+    case "memory": return `memória enviada: ${p.moment}`;
+    case "reward": return `desbloqueou recompensa ${sp().name}`;
+  } return m.type}
+const sp=()=>SPONSORS.find(s=>s.id===T().sponsor);
+
+/* ======================= AGREGADOS ======================= */
+function agg(){
+  const fans=[...S.fans.values()];
+  const real=fans.filter(f=>!f.sim);
+  const teams={};Object.keys(TEAMS).forEach(k=>teams[k]=0);
+  const teamFans={};Object.keys(TEAMS).forEach(k=>teamFans[k]=0);
+  const palp=[0,0,0];
+  fans.forEach(f=>{const k=TEAMS[f.team]?f.team:"Outros";teams[k]+=f.xp;teamFans[k]++; if(f.palpite!=null) palp[f.palpite]++});
+  const proj=S.baseProj+fans.filter(f=>f.sim).length*37+real.length;
+  const consent=fans.filter(f=>f.mkt).length;
+  const segs=[
+    {k:"Estrategistas do clássico",d:"fizeram palpite",n:fans.filter(f=>f.palpite!=null).length,prop:.62,brand:"pulso"},
+    {k:"Memória afetiva",d:"compartilharam memória",n:fans.filter(f=>f.memory).length,prop:.71,brand:"atl"},
+    {k:"Experts em história",d:"2+ acertos no quiz",n:fans.filter(f=>f.quiz.filter(q=>q&&q.ok).length>=2).length,prop:.54,brand:"rota"},
+    {k:"Abertos a marcas",d:"opt-in de ofertas",n:consent,prop:.78,brand:"brasa"},
+    {k:"Resgataram recompensa",d:"conversão patrocinada",n:fans.filter(f=>f.reward).length,prop:.83,brand:T().sponsor}
+  ];
+  const total=Math.max(1,fans.length);
+  segs.forEach(s=>s.proj=Math.round(s.n/total*proj*(fans.length?1:0)));
+  return {fans,real,teams,teamFans,palp,proj,consent,segs,total:fans.length};
+}
+
+/* ======================= TELÃO RENDER ======================= */
+let rq=false; function onData(){ if(rq) return; rq=true; requestAnimationFrame(()=>{rq=false;renderTelao()}) }
+function renderTelao(){
+  if($("#telao").classList.contains("hide")) return;
+  const a=agg(),t=T();
+  $("#kReal").textContent=fmt(a.real.length);
+  $("#kProj").textContent=fmt(a.proj);
+  $("#kId").textContent=fmt(a.consent?Math.round(a.consent/Math.max(1,a.total)*a.proj*.34):0);
+  $("#kIdS").textContent=`${a.consent} opt-ins na sessão · projeção`;
+  $("#kInt").textContent=fmt(S.events);
+  $("#kIntS").textContent=a.total?`${(S.events/a.total).toFixed(1)} por torcedor`:"eventos na sessão";
+  // ranking
+  const tot=Object.values(a.teams).reduce((x,y)=>x+y,0)||1;
+  const order=Object.keys(TEAMS).sort((x,y)=>a.teams[y]-a.teams[x]);
+  $("#rank").innerHTML=order.map((k,i)=>`<div class="bar ${i===0&&a.teams[k]>0?"lead":""}"><div class="n">${k}</div><div class="t"><div class="f" style="width:${a.teams[k]/tot*100}%;background:${TEAMS[k].c}"></div></div><div class="p">${fmt(a.teams[k])}</div></div>`).join("");
+  // palpites
+  const pt=a.palp.reduce((x,y)=>x+y,0)||1;
+  $("#palpBars").innerHTML=t.palpite.opts.map((o,i)=>`<div class="bar" style="grid-template-columns:120px 1fr 48px"><div class="n" style="font-size:12px">${esc(o)}</div><div class="t" style="height:18px"><div class="f" style="width:${a.palp[i]/pt*100}%;background:linear-gradient(90deg,var(--vf),var(--gold))"></div></div><div class="p" style="font-size:15px">${Math.round(a.palp[i]/pt*100)}%</div></div>`).join("");
+  // feed
+  $("#feed").innerHTML=S.feed.slice(0,30).map(({m,real})=>{const pts=m.p&&m.p.pts?`+${m.p.pts}`:"";return `<div class="fi ${real?"real":""}"><div class="av" style="background:${teamHex(m.fan.team)}">${esc(ini(m.fan.name))}</div><div class="tx"><b>${esc(m.fan.name)}</b> ${esc(evtText(m))}<small>${real?"<span class='gold'>● AO VIVO NA SALA</span> · ":""}${m.type} · ${new Date(m.ts).toLocaleTimeString("pt-BR")}</small></div><div class="pt">${pts}</div></div>`}).join("")||`<p class="mut">Aguardando o primeiro torcedor...</p>`;
+  // intel
+  renderIntel(a);
+  renderBiz(a);
+}
+function fanDNA(f){
+  const tags=[f.team];
+  if(f.palpite!=null) tags.push("Estrategista");
+  if(f.memory) tags.push("Memória afetiva");
+  const ok=f.quiz.filter(q=>q&&q.ok).length; if(ok>=2) tags.push("Expert em história");
+  if(f.mkt) tags.push("Aberto a marcas");
+  if(f.reward) tags.push("Converteu recompensa");
+  const scores={
+    "Afinidade com o programa":Math.min(100,30+f.tl.length*12),
+    "Propensão a patrocínio":Math.min(100,(f.mkt?45:10)+(f.reward?35:0)+(f.palpite!=null?10:0)),
+    "Nostalgia / acervo":Math.min(100,(f.memory?60:5)+ok*12),
+    "Chance de voltar":Math.min(100,25+f.xp/12)
+  };
+  let brand=SPONSORS.find(s=>s.id===T().sponsor);
+  if(f.memory) brand=SPONSORS[1]; else if(ok>=2) brand=SPONSORS[3];
+  return {tags,scores,brand,ok};
+}
+function renderIntel(a){
+  const fans=[...a.fans].sort((x,y)=>(x.sim-y.sim)||(y.last-x.last));
+  $("#fanCount").textContent=a.total;
+  $("#fanlist").innerHTML=fans.slice(0,40).map(f=>`<button class="fanrow ${S.selected===f.id?"on":""}" data-id="${f.id}"><div class="av" style="background:${teamHex(f.team)}">${esc(ini(f.name))}</div><div><div class="nm">${esc(f.name)} ${!f.sim?"<span class='tag gold'>sala</span>":""}</div><small>${esc(f.team)} · ${fmt(f.xp)} XP · ${level(f.xp).name}</small></div></button>`).join("")||`<p class="mut">Ninguém ainda.</p>`;
+  const f=S.fans.get(S.selected);
+  if(!f){$("#f360").innerHTML=`<h3>Fan 360</h3><p class="mut">Selecione um torcedor.</p>`;drawOnto(null);}
+  else{
+    const d=fanDNA(f),lv=level(f.xp);
+    $("#f360").innerHTML=`<h3>Fan 360 · Fan DNA <span class="tag ${f.sim?"sim":"gold"}">${f.sim?"simulado":"ao vivo"}</span></h3>
+      <div class="prof"><div class="av" style="background:${teamHex(f.team)}">${esc(ini(f.name))}</div><div><b>${esc(f.name)}</b><span class="mut">${esc(f.team)} · ${lv.name} · ${fmt(f.xp)} XP</span></div></div>
+      <div class="chips">${d.tags.map((t,i)=>`<span class="chip ${i?"g":""}">${esc(t)}</span>`).join("")}</div>
+      <div class="meter">${Object.entries(d.scores).map(([k,v])=>`<div class="row"><span>${k}</span><div class="t"><div class="f" style="width:${v}%"></div></div><b>${Math.round(v)}</b></div>`).join("")}</div>
+      <div style="margin-top:10px;font-size:12px" class="mut">Próxima melhor ação: <b class="gold">${esc(d.brand.name)}</b> · ${esc(d.brand.reward)}${f.mkt?"":" (sem opt-in: só comunicação do programa)"}</div>
+      <div class="tl" style="margin-top:10px">${f.tl.slice(0,8).map(e=>`<div><code>${new Date(e.t).toLocaleTimeString("pt-BR")}</code><span>${esc(e.txt)}</span></div>`).join("")}</div>`;
+    drawOnto(f,d);
+  }
+  $("#segs").innerHTML=a.segs.map(s=>{const b=SPONSORS.find(x=>x.id===s.brand);return `<tr><td><b>${s.k}</b><br><small class="mut">${s.d}</small></td><td class="num">${fmt(s.n)}</td><td class="num">${fmt(s.proj)}</td><td class="num">${Math.round(s.prop*100)}%</td><td>${esc(b.name)}<br><small class="mut">${esc(b.cat)}</small></td></tr>`}).join("");
+}
+function drawOnto(f,d){
+  const t=T();
+  const nodes=[
+    {x:60,y:120,l:"Torcedor",v:f?f.name:"—",c:"#f5b82e"},
+    {x:170,y:45,l:"Clube",v:f?f.team:"—",c:f?teamHex(f.team):"#556"},
+    {x:300,y:40,l:"Programa",v:t.program,c:"#2f6bff"},
+    {x:420,y:110,l:"Momento",v:f&&f.memory?f.memory.moment:(f&&d&&d.ok?"Quiz História":"—"),c:"#c084fc"},
+    {x:290,y:200,l:"Patrocinador",v:d?d.brand.name:"—",c:"#ff6a1a"},
+    {x:150,y:200,l:"Segmento",v:d?(d.tags[1]||"Novo fã"):"—",c:"#22c55e"}
+  ];
+  const edges=[[0,1,"torce_por"],[0,2,"assiste"],[2,3,"conta"],[0,3,"lembra_de"],[0,5,"pertence_a"],[5,4,"propensão"],[4,2,"patrocina"]];
+  $("#onto").innerHTML=`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="#34466e"/></marker></defs>`+
+    edges.map(([a,b,l])=>{const A=nodes[a],B=nodes[b];return `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#34466e" stroke-width="1.5" marker-end="url(#ar)"/><text x="${(A.x+B.x)/2}" y="${(A.y+B.y)/2-4}" fill="#6f7d9c" font-size="9" text-anchor="middle" font-family="ui-monospace,monospace">${l}</text>`}).join("")+
+    nodes.map(n=>`<g><circle cx="${n.x}" cy="${n.y}" r="31" fill="#0b1326" stroke="${n.c}" stroke-width="2.5"/><text x="${n.x}" y="${n.y-1}" text-anchor="middle" fill="${n.c}" font-size="8" font-weight="700" font-family="Inter">${n.l.toUpperCase()}</text><text x="${n.x}" y="${n.y+45}" text-anchor="middle" fill="#e9edf6" font-size="11" font-weight="600" font-family="Inter">${esc(String(n.v).slice(0,26))}</text></g>`).join("");
+}
+/* ---- negócio ---- */
+const INV=[
+  {id:"master",k:"Cota master do Pré-Jogo",d:"naming do ranking das torcidas + QR na tela",q:1,max:3,p:120000},
+  {id:"quiz",k:"Quiz patrocinado",d:"por episódio, com marca na pergunta e no prêmio",q:20,max:40,p:8000},
+  {id:"seg",k:"Ativação de segmento",d:"campanha para segmento com opt-in (agregado)",q:2,max:8,p:25000},
+  {id:"rew",k:"Recompensas patrocinadas (CPA)",d:"por resgate de cupom",q:12000,max:60000,p:3.5,step:1000},
+  {id:"hist",k:"História Viva · cota acervo",d:"série/hub de memórias patrocinado",q:1,max:4,p:60000}
+];
+function renderBiz(){
+  if(!$("#inv").dataset.ok){
+    $("#inv").innerHTML=INV.map(r=>`<tr><td><b>${r.k}</b><small>${r.d}</small></td><td class="num"><input type="range" min="0" max="${r.max}" step="${r.step||1}" value="${r.q}" data-inv="${r.id}"><div id="q-${r.id}">${fmt(r.q)}</div></td><td class="num">${r.p<100?"R$ "+r.p.toFixed(2).replace(".",","):brl(r.p)}</td><td class="num" id="r-${r.id}"></td></tr>`).join("");
+    $("#inv").dataset.ok=1;
+    $("#inv").addEventListener("input",e=>{const id=e.target.dataset.inv;if(!id)return;INV.find(r=>r.id===id).q=+e.target.value;renderBiz()});
+  }
+  let gross=0;INV.forEach(r=>{const v=r.q*r.p;gross+=v;$("#q-"+r.id).textContent=fmt(r.q);$("#r-"+r.id).textContent=brl(v)});
+  const ded=+$("#ded").value/100,rew=+$("#rew").value/100;
+  $("#dedV").textContent=Math.round(ded*100)+"%";$("#rewV").textContent=Math.round(rew*100)+"%";
+  const net=gross*(1-ded-rew);
+  $("#bGross").textContent=brl(gross);$("#bNet").textContent=brl(net);$("#bBand").textContent=brl(net/2);$("#bVF").textContent=brl(net/2);$("#bYear").textContent=brl(net/2*12);
+}
+["ded","rew"].forEach(id=>document.addEventListener("input",e=>{if(e.target.id===id)renderBiz()}));
+function bizSummary(){let g=0;INV.forEach(r=>g+=r.q*r.p);const ded=+$("#ded").value/100,rew=+$("#rew").value/100;const net=g*(1-ded-rew);return {itens:INV.map(r=>({produto:r.k,qtd:r.q,preco:r.p,receita:r.q*r.p})),bruto:g,deducoes:ded,recompensas:rew,liquido:net,band:net/2,vf:net/2}}
+
+/* ======================= PHONE APP (componente) ======================= */
+function PhoneApp(root,opts){
+  const key=opts.key;
+  let fan=ls.get(key)||null; // {id,name,team,mkt,xp,done:{},quizI,quizOk}
+  let screen=fan&&fan.tenant===S.tenant?"home":"onboard";
+  if(fan&&fan.tenant!==S.tenant) fan=null;
+  let qState=null,timerH=null;
+  const save=()=>{if(fan) ls.set(key,fan)};
+  const fanSnap=()=>({id:fan.id,name:fan.name,team:fan.team,mkt:fan.mkt,xp:fan.xp,sim:false});
+  const emit=(type,p)=>BUS.send({kind:"evt",type,tenant:S.tenant,fan:fanSnap(),p});
+  const toast=txt=>{const el=root.querySelector(".toast");if(!el)return;el.textContent=txt;el.classList.add("on");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("on"),1400)};
+  const add=(pts,label)=>{fan.xp+=pts;save();toast(`+${pts} ${label||"pontos"}`)};
+  function hd(){return `<div class="hd"><div class="mark" style="width:30px;height:30px;font-size:14px;border-radius:8px">VF</div><div class="lg">VIRTUAL FANS <span>BAND</span></div>${fan?`<div class="xp">${fmt(fan.xp)} XP</div>`:""}</div>`}
+  function render(){
+    const t=T();let h="";
+    if(screen==="onboard"){
+      const sel=root._team||"";
+      h=`<div class="ct"><div class="live"><span class="tag">AO VIVO</span><div><b>${esc(t.program)}</b><small>${esc(t.tvTitle)}</small></div></div>
+      <h2>Seu <span>Band Pass</span></h2><p class="lead">Jogue durante o programa, some pontos para sua torcida e desbloqueie recompensas dos patrocinadores.</p>
+      <label class="field"><span>Como quer aparecer no ranking?</span><input id="nm" maxlength="22" placeholder="Seu apelido" value="${esc(root._nm||"")}"></label>
+      <div class="field"><span>Seu time do coração</span><div class="teams">${Object.keys(TEAMS).map(k=>`<button class="tm ${sel===k?"on":""}" data-team="${k}"><i style="background:${TEAMS[k].hex}"></i>${k}</button>`).join("")}</div></div>
+      <label class="chk"><input type="checkbox" id="c1" ${root._c1?"checked":""}><span>Li e aceito os termos de uso e a política de privacidade. Meus dados de participação serão usados para pontuação, ranking e melhoria da experiência <b>(obrigatório)</b>.</span></label>
+      <label class="chk"><input type="checkbox" id="c2" ${root._c2?"checked":""}><span>Quero receber ofertas e benefícios dos patrocinadores do programa <b>(opcional, +50 XP)</b>.</span></label>
+      <button class="cta" id="go" ${(sel&&root._c1&&(root._nm||"").trim())?"":"disabled"}>Entrar no jogo</button>
+      <div class="foot">Demo conceitual Virtual Fans · dados de teste · LGPD: consentimento registrado com data e finalidade</div></div>`;
+    }
+    else if(screen==="home"){
+      const lv=level(fan.xp),d=fan.done,a=agg();
+      const quizDone=d.quiz, can=fan.xp>=REWARD_AT;
+      const order=Object.keys(TEAMS).sort((x,y)=>a.teams[y]-a.teams[x]);const tot=Object.values(a.teams).reduce((x,y)=>x+y,0)||1;
+      h=`<div class="ct">
+      <div class="pass"><div class="r1"><span>Band Pass</span><span>${esc(fan.team)}</span></div><b>${esc(fan.name)}</b>
+        <div class="lvl"><span>${lv.name}</span><span>${lv.next?`${fmt(lv.next-fan.xp)} XP para ${lv.nextName}`:"nível máximo"}</span></div><div class="pb"><i style="width:${lv.pct}%"></i></div></div>
+      <div class="live"><span class="tag">AO VIVO</span><div><b>${esc(t.program)}</b><small>${esc(t.host)}</small></div></div>
+      <div class="ms">
+        ${mi("palpite","🎯","Palpite",t.palpite.q,d.palpite?"feito":"+100")}
+        ${mi("quiz","🧠",t.quizTitle,"3 perguntas · bônus por velocidade",quizDone?`${fan.quizOk}/3`:"até +540")}
+        ${mi("memoria","📼",t.memTitle,t.memQ,d.memory?"enviada":"+200")}
+        <button class="mi ${d.reward?"done":(can?"":"lock")}" data-go="reward"><div class="ic">🎁</div><div><b>Recompensa ${esc(sp().name)}</b><small>${can?esc(sp().reward):`desbloqueia com ${REWARD_AT} XP`}</small></div><div class="st">${d.reward?"resgatada":(can?"abrir":"🔒")}</div></button>
+      </div>
+      <div class="rk"><div class="mut" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Disputa das torcidas · ao vivo</div><div class="bars">${order.slice(0,4).map(k=>`<div class="bar"><div class="n" style="font-size:12px${k===fan.team?";color:var(--gold)":""}">${k}</div><div class="t"><div class="f" style="width:${a.teams[k]/tot*100}%;background:${TEAMS[k].c}"></div></div><div class="p">${Math.round(a.teams[k]/tot*100)}%</div></div>`).join("")}</div></div>
+      <div class="foot">Marcas de patrocinadores fictícias · demo</div></div>`;
+    }
+    else if(screen==="palpite"){
+      const a=agg(),pt=a.palp.reduce((x,y)=>x+y,0)||1,mine=fan.palp;
+      h=`<div class="ct"><button class="back" data-go="home">‹ voltar</button><h2>${esc(t.palpite.q)}</h2><p class="lead">${mine!=null?"Seu palpite está registrado. Veja como a audiência está votando:":"Escolha uma opção. Vale 100 XP para você e para sua torcida."}</p>
+      <div class="opts">${t.palpite.opts.map((o,i)=>`<button class="op ${mine===i?"me":""}" data-pal="${i}" ${mine!=null?"disabled":""}><div class="fill" style="width:${mine!=null?a.palp[i]/pt*100:0}%"></div><span>${esc(o)}</span>${mine!=null?`<span class="pc">${Math.round(a.palp[i]/pt*100)}%</span>`:""}</button>`).join("")}</div>
+      ${mine!=null?`<button class="cta ghost" data-go="home">Próxima missão</button>`:""}</div>`;
+    }
+    else if(screen==="quiz"){
+      const q=t.quiz[qState.i];
+      h=`<div class="ct"><button class="back" data-go="home">‹ sair</button><div class="qmeta"><span>${esc(t.quizTitle)}</span><span>${qState.i+1}/3</span></div><div class="timer"><i id="tmr"></i></div>
+      <h2 style="font-size:24px">${esc(q.q)}</h2>
+      <div class="opts" style="margin-top:12px">${q.o.map((o,i)=>{let c="";if(qState.ans!=null){if(i===q.a)c="right";else if(i===qState.ans)c="wrong"}return `<button class="op ${c}" data-ans="${i}" ${qState.ans!=null?"disabled":""}><span>${esc(o)}</span></button>`}).join("")}</div>
+      ${qState.ans!=null?`<div class="expl">${qState.ans===q.a?"✅ ":"❌ "}${esc(q.e)}</div><button class="cta" data-qn="1">${qState.i<2?"Próxima pergunta":"Ver resultado"}</button>`:""}</div>`;
+    }
+    else if(screen==="memoria"){
+      const m=root._mom??null;
+      h=`<div class="ct"><button class="back" data-go="home">‹ voltar</button><h2>${esc(t.memTitle)}</h2><p class="lead">${esc(t.memQ)} Sua história pode entrar no hub <b>Band História Viva</b>.</p>
+      ${fan.memResp?``:`<div class="opts g2">${t.moments.map((o,i)=>`<button class="op ${m===i?"me":""}" data-mom="${i}" style="font-size:12px;padding:12px 10px"><span>${esc(o)}</span></button>`).join("")}</div>
+      <textarea class="mem" id="mt" placeholder="Conte em uma ou duas frases: onde você estava, com quem, o que sentiu..." style="margin-top:10px">${esc(root._mt||"")}</textarea>
+      <button class="cta" id="msend" ${m==null?"disabled":""}>Enviar memória</button>`}
+      ${fan.memResp!=null?`<div class="hist"><div class="who">✦ AI Historian · Band História Viva</div><div id="hresp">${fan.memResp?esc(fan.memResp):"Consultando o acervo..."}</div>
+        <div class="acv">▶ Trecho do acervo Band<br><small>(vídeo a licenciar · placeholder da demo)</small></div></div>
+        <button class="cta ghost" data-go="home">Voltar às missões</button>`:""}</div>`;
+    }
+    else if(screen==="reward"){
+      const s=sp();
+      h=`<div class="ct"><button class="back" data-go="home">‹ voltar</button><h2>Recompensa <span>liberada</span></h2><p class="lead">Você chegou a ${REWARD_AT} XP. Benefício oferecido pelo patrocinador do programa.</p>
+      <div class="coupon"><small>${esc(s.name)} · ${esc(s.cat)}</small><b>${esc(s.reward)}</b><div>Válido durante a rodada · 1 por Band Pass</div><div class="code">${esc(s.code)}-${esc(fan.id.slice(0,4).toUpperCase())}</div></div>
+      <p class="foot" style="margin-top:10px">Marca fictícia · voucher emitido via Minu (integração simulada).</p>
+      <button class="cta ghost" data-go="home">Voltar</button></div>`;
+    }
+    root.innerHTML=`<div class="app">${hd()}${h}<div class="toast"></div></div>`;
+    if(screen==="quiz"&&qState.ans==null) startTimer();
+  }
+  function mi(go,ic,b,s,st){const done=(go==="palpite"&&fan.done.palpite)||(go==="quiz"&&fan.done.quiz)||(go==="memoria"&&fan.done.memory);return `<button class="mi ${done?"done":""}" data-go="${go}"><div class="ic">${ic}</div><div><b>${esc(b)}</b><small>${esc(s)}</small></div><div class="st">${esc(st)}</div></button>`}
+  function startTimer(){clearInterval(timerH);qState.t0=Date.now();const el=root.querySelector("#tmr");timerH=setInterval(()=>{const r=Math.max(0,1-(Date.now()-qState.t0)/15000);if(el)el.style.width=(r*100)+"%";if(r<=0){clearInterval(timerH);answer(-1)}},100)}
+  function answer(i){if(qState.ans!=null)return;clearInterval(timerH);const q=T().quiz[qState.i];const ok=i===q.a;qState.ans=i;const sec=(Date.now()-qState.t0)/1000;const pts=ok?150+Math.max(0,Math.round(30*(1-sec/15))):0;
+    if(ok){fan.quizOk=(fan.quizOk||0)+1;add(pts,"acerto")}else save();emit("quiz",{i:qState.i,ok,pts});render()}
+  async function historian(moment,text){
+    const t=T();const fb={0:"",1:"",2:"",3:""};
+    const fallback=`Que memória, ${fan.name}! "${moment}" é exatamente o tipo de momento que o acervo da Band guarda. Sua lembrança entra agora na linha do tempo do ${t.program}, ao lado das imagens daquele dia. Quer ver o trecho e descobrir quem mais estava lá?`;
+    let out=null;
+    try{const s=await (window.claude&&claude.use?claude.use("sample"):null);
+      if(s){const r=await s(`Você é o AI Historian da plataforma Virtual Fans Band (Band História Viva). Um torcedor do ${fan.team} compartilhou uma memória no programa ${t.program}.
+Momento escolhido: ${moment}
+Relato do torcedor: ${text||"(sem texto)"}
+Responda em português do Brasil, em 2 a 3 frases curtas, calorosas e no tom de um narrador esportivo. Chame o torcedor de ${fan.name}. Relacione o relato ao momento histórico usando apenas fatos amplamente conhecidos; se não tiver certeza de um detalhe (placar, data, nome), não o cite. Termine convidando-o a ver o trecho do acervo da Band. Não use emojis nem markdown.`,{modelTier:"quick",cache:false,onText:({text})=>{const el=root.querySelector("#hresp");if(el)el.textContent=text}});
+        out=(r&&r.text||"").trim()}
+    }catch(e){}
+    return out||fallback;
+  }
+  root.addEventListener("click",async e=>{
+    const b=e.target.closest("button,[data-team]");if(!b)return;
+    if(b.dataset.team){root._team=b.dataset.team;render();return}
+    if(b.id==="go"){root._nm=root.querySelector("#nm").value.trim();if(!root._nm||!root._team||!root._c1)return;
+      fan={id:uid(),name:root._nm,team:root._team,mkt:!!root._c2,xp:0,done:{},tenant:S.tenant};save();
+      emit("join",{pts:root._c2?50:0});if(root._c2)add(50,"opt-in");screen="home";render();return}
+    if(b.dataset.go){const g=b.dataset.go;
+      if(g==="quiz"){if(fan.done.quiz){toast(`Quiz feito: ${fan.quizOk||0}/3`);return}qState={i:0,ans:null};fan.quizOk=0}
+      if(g==="reward"){if(fan.xp<REWARD_AT){toast(`Faltam ${REWARD_AT-fan.xp} XP`);return} if(!fan.done.reward){fan.done.reward=true;save();emit("reward",{pts:0})}}
+      clearInterval(timerH);screen=g;render();return}
+    if(b.dataset.pal!=null){if(fan.palp!=null)return;fan.palp=+b.dataset.pal;fan.done.palpite=true;add(100,"palpite");emit("palpite",{choice:fan.palp,pts:100});render();return}
+    if(b.dataset.ans!=null){answer(+b.dataset.ans);return}
+    if(b.dataset.qn){if(qState.i<2){qState={i:qState.i+1,ans:null};render()}else{fan.done.quiz=true;save();screen="home";render();toast(`Quiz: ${fan.quizOk}/3 acertos`)}return}
+    if(b.dataset.mom!=null){root._mt=(root.querySelector("#mt")||{}).value||root._mt;root._mom=+b.dataset.mom;render();return}
+    if(b.id==="msend"){const t=T();const moment=t.moments[root._mom];const text=(root.querySelector("#mt").value||"").trim().slice(0,400);
+      fan.done.memory=true;fan.memResp="";add(200,"memória");emit("memory",{moment,text,pts:200});render();
+      const r=await historian(moment,text);fan.memResp=r;save();if(screen==="memoria")render();return}
+  });
+  root.addEventListener("input",e=>{if(e.target.id==="nm"){root._nm=e.target.value;const g=root.querySelector("#go");if(g)g.disabled=!(root._team&&root._c1&&root._nm.trim())}
+    if(e.target.id==="mt")root._mt=e.target.value});
+  root.addEventListener("change",e=>{if(e.target.id==="c1"||e.target.id==="c2"){root["_"+e.target.id]=e.target.checked;const g=root.querySelector("#go");if(g)g.disabled=!(root._team&&root._c1&&(root._nm||"").trim())}});
+  let rt=0,rp=null;const soft=()=>{if(!(screen==="home"||screen==="palpite"))return;const now=Date.now();if(now-rt>1200){rt=now;render()}else if(!rp){rp=setTimeout(()=>{rp=null;rt=Date.now();if(screen==="home"||screen==="palpite")render()},1200)}};
+  return {render:soft,
+    hard:()=>{render()},
+    newFan:()=>{ls.del(key);fan=null;root._team=root._nm=root._c1=root._c2=root._mom=root._mt=undefined;screen="onboard";render()},
+    tenant:()=>{ls.del(key);fan=null;root._mom=root._mt=undefined;screen="onboard";render()}};
+}
+
+/* ======================= PLATEIA SIMULADA ======================= */
+const SIM={level:1,h:null,bots:[]};
+function simTick(){
+  if(!SIM.level) return;
+  const t=T();
+  // novos bots
+  const spawn=SIM.level===2?0.75:0.35;
+  if(Math.random()<spawn||SIM.bots.length<4){
+    const r=Math.random();const team=r<.3?"Corinthians":r<.57?"Palmeiras":r<.75?"São Paulo":r<.85?"Santos":"Outros";
+    const b={id:"b"+uid(),name:rand(NAMES)+" "+rand(SURN),team,mkt:Math.random()<.46,xp:0,sim:true,step:0,palp:null};
+    if(b.mkt)b.xp+=50;SIM.bots.push(b);simEmit(b,"join",{pts:b.mkt?50:0});
+  }
+  // ações
+  const acts=SIM.level===2?3:1;
+  for(let k=0;k<acts;k++){
+    const b=rand(SIM.bots);if(!b||b.step>5) continue;
+    if(b.step===0){const w=b.team==="Corinthians"?[.55,.25,.2]:b.team==="Palmeiras"?[.18,.24,.58]:[.36,.3,.34];const r=Math.random();const c=r<w[0]?0:r<w[0]+w[1]?1:2;b.xp+=100;simEmit(b,"palpite",{choice:c,pts:100})}
+    else if(b.step<=3){const ok=Math.random()<.62;const pts=ok?150+Math.round(Math.random()*30):0;b.xp+=pts;simEmit(b,"quiz",{i:b.step-1,ok,pts})}
+    else if(b.step===4){if(Math.random()<.4){b.xp+=200;simEmit(b,"memory",{moment:rand(t.moments.slice(0,3)),text:"",pts:200})}}
+    else if(b.step===5){if(b.xp>=REWARD_AT&&Math.random()<.6)simEmit(b,"reward",{pts:0})}
+    b.step++;
+  }
+  if(SIM.bots.length>220) SIM.bots.splice(0,40);
+}
+function simEmit(b,type,p){BUS.send({kind:"evt",type,tenant:S.tenant,sim:true,fan:{id:b.id,name:b.name,team:b.team,mkt:b.mkt,xp:b.xp,sim:true},p})}
+function setSim(l){SIM.level=l;clearInterval(SIM.h);if(l)SIM.h=setInterval(simTick,l===2?600:1500);document.querySelectorAll("#simseg button").forEach(x=>x.classList.toggle("on",+x.dataset.s===l))}
+
+/* ======================= AGENTE ======================= */
+const COPIS=[
+  {id:"sponsor",n:"Sponsor Activation Copilot",d:"desenha ativações e mede resultado",sugs:["Que patrocínio cabe para quem acabou de jogar?","Quantos torcedores de cada time participaram e que marcas poderiam ativá-los?","Monte uma campanha para quem compartilhou memórias."]},
+  {id:"exec",n:"Executive Copilot",d:"resume indicadores e próximos passos",sugs:["Resuma esta sessão em 4 pontos para o Johnny.","Qual o resultado 50/50 com o inventário atual e o que falta validar?","Quais riscos de LGPD e como esta arquitetura os trata?"]},
+  {id:"mkt",n:"Marketing Copilot",d:"recomenda e orquestra campanhas",sugs:["Que conteúdo do acervo devemos levar ao ar amanhã para trazer essa audiência de volta?","Crie 3 notificações para reengajar quem não terminou o quiz."]},
+  {id:"match",n:"Matchday Copilot",d:"apoia a operação ao vivo",sugs:["Qual pergunta devemos colocar no ar agora para aumentar a participação?","Qual torcida está menos engajada e como provocar no ar?"]}
+];
+let COPI=COPIS[0];const CHAT=[];
+function renderCopis(){
+  $("#copis").innerHTML=COPIS.map(c=>`<button class="copi ${c===COPI?"on":""}" data-c="${c.id}"><b>${c.n}</b><small>${c.d}</small></button>`).join("");
+  $("#copiName").textContent=COPI.n;
+  $("#sugs").innerHTML=COPI.sugs.map(s=>`<button class="sug">${esc(s)}</button>`).join("");
+}
+function md(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").split(/\n/).map(l=>/^\s*[-•]\s+/.test(l)?`<li>${l.replace(/^\s*[-•]\s+/,"")}</li>`:(l.trim()?`<p>${l}</p>`:"")).join("").replace(/(<li>.*?<\/li>)+/g,m=>`<ul>${m}</ul>`)}
+function renderChat(){$("#msgs").innerHTML=CHAT.map(m=>m.r==="u"?`<div class="m u">${esc(m.t)}</div>`:`<div class="m a"><div class="who">${esc(m.c||COPI.n)}</div>${md(m.t||"…")}</div>`).join("")||`<div class="m a"><div class="who">ClubBrain AI</div><p>Estou lendo os eventos desta sessão em tempo real. Pergunte sobre torcidas, segmentos, patrocinadores ou o resultado do negócio.</p></div>`;$("#msgs").scrollTop=1e9}
+function ctx(){
+  const a=agg(),t=T();
+  return {propriedade:t.label,programa:t.program,pergunta_no_ar:t.palpite.q,
+    sessao:{torcedores_total:a.total,pessoas_reais_na_sala:a.real.map(f=>({nome:f.name,time:f.team,xp:f.xp,palpite:f.palpite!=null?t.palpite.opts[f.palpite]:null,acertos_quiz:f.quiz.filter(q=>q&&q.ok).length,memoria:f.memory?f.memory.moment:null,opt_in_marcas:f.mkt})),
+      pontos_por_torcida:a.teams,torcedores_por_time:a.teamFans,palpites:Object.fromEntries(t.palpite.opts.map((o,i)=>[o,a.palp[i]])),eventos:S.events,opt_ins:a.consent},
+    projecao_ilustrativa:{participantes:a.proj},
+    segmentos:a.segs.map(s=>({segmento:s.k,criterio:s.d,sessao:s.n,projecao:s.proj,propensao:s.prop,marca_sugerida:SPONSORS.find(x=>x.id===s.brand).name})),
+    catalogo_marcas_ficticias:SPONSORS.map(s=>({marca:s.name,categoria:s.cat,fit:s.fit,recompensa:s.reward})),
+    negocio:bizSummary(),
+    regras:["Divisão 50% Band / 50% Virtual Fans sobre o resultado líquido distribuível; faturamento pela VF; conta exclusiva; auditoria bilateral.","Nunca vender dados pessoais: só segmentos agregados de quem deu opt-in.","Valores são ilustrativos, não contratuais.","A VF complementa a Vibra Digital e o Bandplay; não os substitui."]};
+}
+function fallbackAnswer(q){
+  const a=agg(),c=ctx();const top=Object.entries(a.teamFans).sort((x,y)=>y[1]-x[1]).filter(x=>x[1]>0);
+  const s=c.negocio;
+  return `**Leitura da sessão (modo offline)**
+- ${a.total} torcedores jogaram (${a.real.length} na sala), ${S.events} interações, ${a.consent} opt-ins para marcas.
+- Torcidas: ${top.map(([k,v])=>`${k} ${v}`).join(", ")||"aguardando dados"}.
+- Melhor segmento agora: **${a.segs.sort((x,y)=>y.n*y.prop-x.n*x.prop)[0].k}**, com ativação sugerida de ${SPONSORS[0].name}.
+- Inventário atual: ${brl(s.bruto)}/mês brutos e ${brl(s.band)} para a Band (50%).
+Próximo passo: lançar o quiz patrocinado no próximo bloco e oferecer o cupom só a quem deu opt-in.`;
+}
+async function ask(q){
+  if(!q.trim())return;CHAT.push({r:"u",t:q});const msg={r:"a",t:"",c:COPI.n};CHAT.push(msg);renderChat();
+  let s=null;try{s=await (window.claude&&claude.use?claude.use("sample"):null)}catch(e){}
+  if(!s){msg.t=fallbackAnswer(q);$("#aiState").textContent="offline";renderChat();return}
+  $("#aiState").textContent="pensando…";
+  const hist=CHAT.slice(0,-1).slice(-5).map(m=>({role:m.r==="u"?"user":"assistant",content:m.t||"-"}));
+  const sys=`Você é o ${COPI.n} da ClubBrain.ai, operando a plataforma Virtual Fans Band (parceria Grupo Bandeirantes × Virtual Fans). Seu papel: ${COPI.d}.
+Público: executivos da Band numa reunião ao vivo. Responda em português do Brasil, direto e executivo: no máximo 170 palavras, com 3 a 5 tópicos curtos iniciados por "- " e uma linha final começando com "Próximo passo:". Use **negrito** só para números-chave. Cite nomes de pessoas reais da sala quando ajudar a mostrar que os dados são ao vivo. Use apenas os dados do contexto; deixe claro quando algo é projeção ilustrativa. Respeite as regras do contexto.
+CONTEXTO AO VIVO (JSON):
+${JSON.stringify(ctx())}`;
+  const msgs=[{role:"user",content:sys+"\n\nOk?"},{role:"assistant",content:"Entendido. Pronto para responder com base no contexto ao vivo."},...hist.slice(0,-1),{role:"user",content:q}];
+  try{const r=await s(msgs,{modelTier:"default",cache:false,onText:({text})=>{msg.t=text;renderChat()}});msg.t=(r&&r.text)||msg.t;$("#aiState").textContent="IA ao vivo"}
+  catch(e){msg.t=(e&&e.code==="not_granted"?"":"")+fallbackAnswer(q);$("#aiState").textContent=e&&e.code?e.code:"offline"}
+  renderChat();
+}
+
+/* ======================= BOOT ======================= */
+let simPhone=null,realPhone=null;
+function onTenant(){const t=T();$("#tenant").value=S.tenant;$("#tvProg").textContent=t.tvTitle;$("#tvHost").textContent=t.program+" · "+t.host;$("#tvSlot").textContent=t.slot;$("#tvQ").textContent=t.palpite.q;$("#qrCall").textContent=t.call;
+  SIM.bots=[];simPhone&&simPhone.tenant();realPhone&&realPhone.tenant();renderTelao()}
+function onReset(){SIM.bots=[];simPhone&&simPhone.newFan();realPhone&&realPhone.newFan();CHAT.length=0;renderChat&&$("#msgs")&&renderChat();renderTelao()}
+BUS.on(apply);
+BUS.on(m=>{if(m.kind==="evt"){simPhone&&simPhone.render();realPhone&&realPhone.render()}});
+
+function route(){
+  const h=(location.hash||"").slice(1);
+  const mode=h==="celular"||(!h&&window.innerWidth<700)?"celular":"telao";
+  $("#telao").classList.toggle("hide",mode!=="telao");$("#celular").classList.toggle("hide",mode!=="celular");
+  if(mode==="celular"){if(!realPhone){realPhone=PhoneApp($("#celular"),{key:"vfband-real"});realPhone.hard()}setSim(0)}
+  else{bootTelao()}
+}
+let telaoOk=false;
+function bootTelao(){
+  if(telaoOk){renderTelao();return}telaoOk=true;
+  $("#tenant").innerHTML=Object.entries(TENANTS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("");
+  $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));renderTelao()});
+  $("#tenant").addEventListener("change",e=>BUS.send({kind:"tenant",tenant:e.target.value}));
+  $("#simseg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setSim(+b.dataset.s)});
+  $("#bReset").addEventListener("click",()=>BUS.send({kind:"reset"}));
+  $("#bRot").addEventListener("click",()=>$("#rot").classList.remove("hide"));
+  $("#rotX").addEventListener("click",()=>$("#rot").classList.add("hide"));
+  $("#rot").addEventListener("click",e=>{if(e.target.id==="rot")$("#rot").classList.add("hide")});
+  $("#bNewFan").addEventListener("click",()=>simPhone.newFan());
+  $("#fanlist").addEventListener("click",e=>{const b=e.target.closest(".fanrow");if(!b)return;S.selected=b.dataset.id;renderTelao()});
+  $("#copis").addEventListener("click",e=>{const b=e.target.closest(".copi");if(!b)return;COPI=COPIS.find(c=>c.id===b.dataset.c);renderCopis()});
+  $("#sugs").addEventListener("click",e=>{const b=e.target.closest(".sug");if(b)ask(b.textContent)});
+  $("#askF").addEventListener("submit",e=>{e.preventDefault();const v=$("#askI").value;$("#askI").value="";ask(v)});
+  simPhone=PhoneApp($("#simPhone"),{key:"vfband-sim"});simPhone.hard();
+  // QR
+  const url=(APP_URL.startsWith("http")?APP_URL:location.href.split("#")[0])+"#celular";
+  try{new QRCode($("#qr"),{text:url,width:116,height:116,colorDark:"#060a14",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}catch(e){$("#qr").innerHTML=`<div style="color:#000;font-size:11px;padding:6px">QR indisponível</div>`}
+  renderCopis();renderChat();onTenant();setSim(1);
+}
+window.addEventListener("hashchange",route);
+BUS.init();
+route();
+</script>
+</body>
+</html>

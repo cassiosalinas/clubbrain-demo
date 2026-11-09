@@ -158,6 +158,9 @@ nav.nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
 
 .view{ display:none; padding: 24px 28px 60px; }
 .view.active{ display:block; animation: fadein .25s ease; }
+/* Band: páginas servidas por /band/apps/ dentro do painel */
+.view.band-view{ padding:0; }
+.band-frame{ width:100%; height:calc(100vh - 78px); border:0; display:block; background:#090c18; }
 @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
 
 /* ---------- Grid / cards ---------- */
@@ -541,7 +544,7 @@ canvas{ max-width:100%; }
 
 <div id="club-cover-screen">
   <div class="club-cover-title">Escolha um clube para explorar</div>
-  <div class="club-cover-sub">Dados de demonstração — reais para Flamengo, Guarani e Botafogo-SP, fictícios para o Estrela FC</div>
+  <div class="club-cover-sub">Dados de demonstração — reais para Flamengo, Guarani e Botafogo-SP, fictícios para o Estrela FC · Grupo Bandeirantes: piloto de mídia com dados simulados</div>
   <div class="club-cover-grid" id="club-cover-grid"></div>
 </div>
 
@@ -649,6 +652,103 @@ canvas{ max-width:100%; }
       <div class="nav-item" data-view="integrations" data-mode="operacional">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg>
         Integration Hub
+      </div>
+    
+      <!-- ===== Grupo Bandeirantes (tenant de mídia) — itens visíveis só com a Band selecionada ===== -->
+      <div class="nav-group-label band-only-nav" data-mode="cockpit" style="display:none;">Band · Executivo</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:cockpit" data-title="Cockpit executivo" data-sub="Receita incremental, audiência participante, patrocínio e benefícios num painel só" data-mode="cockpit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Cockpit executivo
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:receita" data-title="Receita &amp; inventário" data-sub="Receitas elegíveis, funil de participação e ROI dos patrocinadores" data-mode="cockpit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Receita &amp; inventário
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:governanca" data-title="Governança &amp; 50/50" data-sub="Comitê executivo, registro de iniciativas, demonstrativo mensal e auditoria bilateral" data-mode="cockpit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7h14M5 7l-3 7h6l-3-7zM19 7l-3 7h6l-3-7z"/></svg>
+        Governança &amp; 50/50
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:analytics" data-title="Analytics ao vivo" data-sub="O que está acontecendo agora em todos os programas, canais e games" data-mode="cockpit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+        Analytics ao vivo
+      </div>
+      <div class="nav-group-label band-only-nav" data-mode="cockpit" style="display:none;">Band · Inteligência</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:onto" data-title="Media Ontology Studio" data-sub="Bastidores: o grafo que conecta fãs, programas, jogos, marcas e dinheiro" data-mode="cockpit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v6M12 13.5L6.8 17.2M12 13.5l5.2 3.7"/></svg>
+        Media Ontology Studio
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:agentes" data-title="Agentes de IA" data-sub="O orquestrador que transforma a Media Ontology em decisão" data-mode="cockpit" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
+        Agentes de IA
+      </div>
+      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Experiência do fã</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:pres" data-title="Demo ao vivo" data-sub="App do fã e backoffice lado a lado, ligados pelo mesmo fluxo de eventos" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M10 8l5 3-5 3z"/></svg>
+        Demo ao vivo
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:fan" data-title="App do fã" data-sub="Band Pass: programas, jogos em Phaser, Minu e privacidade" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+        App do fã
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:programas" data-title="Programas &amp; grade" data-sub="Grade 2026 da TV aberta, BandSports, rádio e YouTube, com fase do roadmap" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
+        Programas &amp; grade
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:aovivo" data-title="Interações ao vivo" data-sub="Crie a pergunta, solte no ar e acompanhe os votos com o QR na tela" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8"/></svg>
+        Interações ao vivo
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:acervo" data-title="História Viva · acervo" data-sub="A memória esportiva da Band como produto" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M17 8h4M3 16h4M17 16h4"/></svg>
+        História Viva · acervo
+      </div>
+      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Dados dos fãs</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:cdp" data-title="CDP · Perfis" data-sub="Um perfil único por fã (Band Pass), unificando TV, rádio, YouTube, Bandplay e app" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
+        CDP · Perfis
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:schema" data-title="Modelo de dados" data-sub="Os dados que a Band deve coletar, por quê, com qual base legal, e o que não coletar" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>
+        Modelo de dados
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:segments" data-title="Segmentos" data-sub="Públicos dinâmicos, recalculados a cada evento, prontos para ativar" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Segmentos
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:consent" data-title="Consentimento · LGPD" data-sub="Prova de consentimento, preferências por canal e pedidos dos titulares" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+        Consentimento · LGPD
+      </div>
+      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Ativação e receita</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:marketing" data-title="Marketing" data-sub="Jornadas automáticas, audiências sincronizadas e disparos, ligados ao CDP" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        Marketing
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:rewards" data-title="Recompensas · Minu" data-sub="Resgates de XP, custo e patrocínio das recompensas" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1s6 1 6 1zM12 8c2-4 6-4 6-1s-6 1-6 1z"/></svg>
+        Recompensas · Minu
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:inventario" data-title="Inventário comercial" data-sub="O inventário novo que a parceria cria: cotas, quadros patrocinados e ativações" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8"/></svg>
+        Inventário comercial
+      </div>
+      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Operação</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:hub" data-title="Integration Hub" data-sub="Sistemas da Band e de terceiros conectados: status, mapeamento e sincronização" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L12.5 19.5"/></svg>
+        Integration Hub
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="pv:erp" data-title="ERP &amp; financeiro" data-sub="Pedidos, notas, contas a receber e a pagar e a conciliação 50/50, para qualquer ERP" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4zM4 9h16M9 9v11"/></svg>
+        ERP &amp; financeiro
+      </div>
+      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Demos de propriedade</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="hv:" data-title="Pré-Jogo &amp; História Viva" data-sub="Demo da primeira propriedade: Pré-Jogo do Derby com AI Historian" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7 7 .6-5.3 4.7L18.4 22 12 18l-6.4 4 1.7-7.7L2 9.6 9 9z"/></svg>
+        Pré-Jogo &amp; História Viva
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="p3:" data-title="Playverse · 3 programas" data-sub="Fan Arena, Desafio do Craque e MasterChef Challenge ao mesmo tempo" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7 7 .6-5.3 4.7L18.4 22 12 18l-6.4 4 1.7-7.7L2 9.6 9 9z"/></svg>
+        Playverse · 3 programas
       </div>
     </nav>
 
@@ -769,6 +869,9 @@ canvas{ max-width:100%; }
     </section>
 
     <!-- ================= AGENTS (Camada 4) ================= -->
+    <!-- Band: as páginas do tenant de mídia rodam em /band/apps/ (iframes criados sob demanda, um por app, para manter o estado) -->
+    <section class="view band-view" id="view-band"><div id="band-frames"></div></section>
+
     <section class="view" id="view-agents">
       <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(108,107,255,.10), var(--surface)); border-color:rgba(108,107,255,.3);">
         <div class="hero-note" style="font-size:13px; color:var(--text-dim); line-height:1.6;">
@@ -2222,6 +2325,9 @@ canvas{ max-width:100%; }
 /* ============ LOGIN (cosmético — só front-end, sem backend real) ============ */
 /* Pede login sempre, em toda visita/recarregamento — não fica lembrado. */
 (function(){
+  // Endereço de entrada guardado ANTES do selectClub inicial (que reescreve a
+  // URL para "/"): é ele que diz se a pessoa veio por /vasco/os ou /band/os.
+  window.ENTRY_PATH = window.ENTRY_PATH || window.location.pathname;
   const screen = document.getElementById('login-screen');
   document.getElementById('login-form').addEventListener('submit', function(e){
     e.preventDefault();
@@ -2233,8 +2339,10 @@ canvas{ max-width:100%; }
       errorEl.style.display = 'none';
       // Acessou /vasco/os direto (a "porta" do Vasco) — pula a tela de
       // escolha de clube e já entra direto no Vasco selecionado.
-      if(window.location.pathname === '/vasco/os'){
+      if(window.ENTRY_PATH === '/vasco/os'){
         chooseClubFromCover('vasco');
+      } else if(window.ENTRY_PATH === '/band/os'){
+        chooseClubFromCover('band');
       } else {
         renderClubCover();
         document.getElementById('club-cover-screen').style.display = 'flex';
@@ -2257,6 +2365,7 @@ function logoutDemo(){
 
 /* ============ NAV & VIEW SWITCH ============ */
 const titles = {
+  band: ['Band Playverse', 'Grupo Bandeirantes × Virtual Fans'],
   cockpit: ["Cockpit executivo", "Bilheteria, patrocínio, sócio-torcedor e e-commerce, num painel só — para o CEO"],
   agents: ["Agentes de IA", "Camada 4 — o orquestrador que transforma a Ontologia em decisão"],
   ontology: ["Football Ontology™", "Camada 3 — o grafo de conhecimento que conecta torcedor, jogo, jogador, treino, saúde, contrato, patrocínio e ativos num modelo único"],
@@ -2357,6 +2466,30 @@ function toggleMobileSidebar(force){
   sidebar.classList.toggle('open', open);
   backdrop.classList.toggle('open', open);
 }
+
+/* ============ BAND · páginas do tenant de mídia ============ */
+const BAND_APPS = { os:'/band/apps/os/?embed=1', pv:'/band/apps/playverse/?embed=1', hv:'/band/apps/historia-viva/', p3:'/band/apps/playverse-3/' };
+function showBandPage(item){
+  const [app, page] = item.dataset.band.split(':');
+  const host = document.getElementById('band-frames');
+  let fr = host.querySelector(`iframe[data-app="${app}"]`);
+  if(!fr){
+    fr = document.createElement('iframe');
+    fr.className = 'band-frame'; fr.dataset.app = app; fr.setAttribute('allow', 'clipboard-write');
+    fr.src = BAND_APPS[app] + (page ? '#' + page : '');
+    host.appendChild(fr);
+  } else if(page){
+    try { fr.contentWindow.location.hash = page; } catch(e){ fr.src = BAND_APPS[app] + '#' + page; }
+  }
+  host.querySelectorAll('iframe').forEach(f => f.style.display = f === fr ? 'block' : 'none');
+  const tmp = document.createElement('div'); tmp.innerHTML = item.dataset.title;
+  document.getElementById('view-title').textContent = tmp.textContent;
+  document.getElementById('view-subtitle').textContent = item.dataset.sub;
+}
+document.getElementById('nav').addEventListener('click', (e) => {
+  const item = e.target.closest('.band-only-nav.nav-item');
+  if(item) showBandPage(item);
+});
 
 /* ============ CHART.JS DEFAULTS ============ */
 Chart.defaults.color = '#9198b3';
@@ -2507,6 +2640,24 @@ const CLUB_PROFILES = {
     ai:'Club de Regatas Vasco da Gama ("Cruzmaltino", "Gigante da Colina"), fundado em 21/08/1898, Rio de Janeiro, RJ. Estádio São Januário, capacidade de 21.880 lugares. Cores oficiais preto e branco, escudo com a cruz de Malta. Os quatro números de Torcedor 360 → Overview deste clube (universo total, Identity Graph, perfis na Ontologia, sócios-torcedores) NÃO são estimativa — vêm ao vivo do backend real do MVP Vasco (Postgres + Neo4j), com um piloto de 500 torcedores fictícios pseudonimizados. É por isso que os números são muito menores que os dos outros clubes desta demo: aqui é a prova de que o pipeline Dado → Ontologia → Inteligência funciona ponta a ponta, não uma estimativa de mercado.',
   },
 };
+// Grupo Bandeirantes: primeiro tenant de MÍDIA (não é clube). As páginas
+// dele são as demos em /band/apps/ (Band Playverse, BandBrain OS e demos de
+// propriedade), embutidas no painel; números simulados para a proposta.
+CLUB_PROFILES.band = {
+  name:'Grupo Bandeirantes', sub:'Piloto Band Playverse 2026/27', ribbon:'Novo · Mídia',
+  crest:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11.2" fill="#fff"/><text x="12" y="14.6" font-size="6.4" font-weight="800" text-anchor="middle" fill="#0a2a8a" font-family="Arial, sans-serif">BAND</text></svg>', badgeBg:'transparent',
+  kpi:{
+    receita:'R$ 2,31M', receitaDelta:'projeção 6 meses pós-MVP',
+    ativos:'128,4K', ativosDelta:'Band Pass · audiência participante',
+    nps:'61', npsDelta:'↑ 4 pts',
+    churn:'11,4%', churnBase:'≈ 14,6 mil participantes sem interação há 14+ dias',
+    cdpTotal:'2,4M', cdpIdentificados:'128,4K', cdpPerfis:'43.820', cdpSocios:'128,4K',
+    engajamento:'72%', engajamentoDelta:'interagiram 2+ vezes',
+    novos:'3,4K', novosDelta:'↑ 12%', interacoes:'1,24M', interacoesDelta:'eventos/dia no pico', recorrentes:'58%', recorrentesDelta:'↑ 6%',
+    mrr:'R$ 432K', mrrDelta:'inventário novo · simulado', arpu:'R$ 3,40', arpuDelta:'por participante', subChurn:'11,4%', subChurnDelta:'—',
+  },
+  ai:'Grupo Bandeirantes (Band), emissora de TV aberta, BandSports, rádios Bandeirantes e BandNews FM, Bandplay e canais no YouTube. NÃO é um clube de futebol. Projeto Band Playverse: parceria Band × Virtual Fans (ClubBrain.ai) para transformar audiência em participação, relacionamento e receita incremental, com divisão 50/50 sobre o resultado líquido distribuível (faturamento pela VF, conta exclusiva, auditoria bilateral). MVP em 90 dias com Jogo Aberto (Renata Fan, seg a sex 11h) e Os Donos da Bola (Craque Neto, TV 12h50 e rádio Bandeirantes 18h). Fase 2: Apito Final (seg 22h30), Show do Esporte, Stock Car (exclusiva na Band), Fórmula Indy, Esporte em Debate (rádio 21h). Band Esporte Clube (sábados, Kalinka Schutel) como piloto de games. Band Pass: 128,4 mil participantes (projeção), 43.820 com opt-in de marketing, engajamento 72%, NPS 61, risco de evasão 11,4%. Receita incremental projetada em 6 meses: R$ 2,31M (patrocínio digital e cotas 41%, gamificação patrocinada 22%, benefícios 15%, inteligência comercial 12%, premium 10%). Recompensas via Minu (integração a contratar). Dados do fã com LGPD: nunca vender dado pessoal, só segmentos agregados. Integração com a Vibra Digital (data lake da Band) a validar. Todos os números são simulados para a proposta.',
+};
 let currentClubId = 'flamengo';
 
 // Dois modos de navegação: Cockpit (gestores — visão consolidada e estratégica)
@@ -2517,7 +2668,10 @@ let currentSidebarMode = 'cockpit';
 function updateNavVisibility(){
   document.querySelectorAll('.nav-item, .nav-group-label').forEach(el => {
     const modeOk = el.dataset.mode === currentSidebarMode;
-    const clubOk = !el.classList.contains('vasco-only-nav') || currentClubId === 'vasco';
+    // Band é um tenant de mídia: com ela selecionada o menu mostra só as
+    // páginas da Band (band-only-nav); com qualquer clube, essas ficam ocultas.
+    const isBand = el.classList.contains('band-only-nav');
+    const clubOk = currentClubId === 'band' ? isBand : (!isBand && (!el.classList.contains('vasco-only-nav') || currentClubId === 'vasco'));
     const baseDisplay = el.classList.contains('nav-item') ? 'flex' : 'block';
     el.style.display = (modeOk && clubOk) ? baseDisplay : 'none';
   });
@@ -2528,17 +2682,27 @@ function setSidebarMode(mode){
   updateNavVisibility();
   const activeItem = document.querySelector('.nav-item.active');
   if(activeItem && activeItem.style.display === 'none'){
-    goToView(mode === 'cockpit' ? 'cockpit' : 'cdp');
+    goToDefaultView(mode);
   }
 }
 
-const CLUB_COVER_ORDER = ['vasco', 'flamengo', 'estrela', 'guarani', 'botafogo'];
+// Primeira página de cada modo; para a Band, o primeiro item visível do menu dela.
+function goToDefaultView(mode){
+  if(currentClubId === 'band'){
+    const first = document.querySelector(`.band-only-nav.nav-item[data-mode="${mode}"]`);
+    if(first) first.click();
+    return;
+  }
+  goToView(mode === 'cockpit' ? 'cockpit' : 'cdp');
+}
+const CLUB_COVER_ORDER = ['vasco', 'band', 'flamengo', 'estrela', 'guarani', 'botafogo'];
 function renderClubCover(){
   document.getElementById('club-cover-grid').innerHTML = CLUB_COVER_ORDER.map((id,i)=>{
     const c = CLUB_PROFILES[id];
-    const featured = i === 0;
+    const ribbon = c.ribbon || (i === 0 ? 'Em destaque' : '');
+    const featured = !!ribbon;
     return `<div class="club-cover-card${featured ? ' featured' : ''}" onclick="chooseClubFromCover('${id}')">
-      ${featured ? '<div class="club-cover-ribbon">Em destaque</div>' : ''}
+      ${ribbon ? `<div class="club-cover-ribbon">${ribbon}</div>` : ''}
       <div class="club-cover-badge" style="background:${c.badgeBg};">${c.crest}</div>
       <div class="club-cover-name">${c.name}</div>
       <div class="club-cover-sub2">${c.sub}</div>
@@ -2559,10 +2723,10 @@ function selectClub(id, silent){
   // Museu Virtual. Só troca a barra de endereço (history.pushState), nunca
   // recarrega a página — o login desta demo é proposital-mente não
   // persistente (pede sempre), então um reload aqui derrubaria a sessão.
-  if(window.history && window.location.pathname !== '/vasco/os' && id === 'vasco'){
-    history.pushState({}, '', '/vasco/os');
-  } else if(window.history && window.location.pathname === '/vasco/os' && id !== 'vasco'){
-    history.pushState({}, '', '/');
+  const clubPath = { vasco:'/vasco/os', band:'/band/os' }[id] || '/';
+  const loginOpen = document.getElementById('login-screen') && document.getElementById('login-screen').style.display !== 'none';
+  if(window.history && !loginOpen && window.location.pathname !== clubPath){
+    history.pushState({}, '', clubPath);
   }
 
   document.getElementById('topbar-club-badge').style.background = c.badgeBg;
@@ -2619,6 +2783,8 @@ function selectClub(id, silent){
   // outros clubes (combinado com o modo Cockpit/Operacional); se o usuário
   // estava numa dessas telas e trocou de clube, volta pro default do modo atual.
   updateNavVisibility();
+  const activeNav = document.querySelector('.nav-item.active');
+  if(id === 'band' || (activeNav && activeNav.classList.contains('band-only-nav'))) goToDefaultView(currentSidebarMode);
   if(id !== 'vasco' && (document.getElementById('view-promotions')?.classList.contains('active') || document.getElementById('view-loyalty')?.classList.contains('active'))){
     goToView(currentSidebarMode === 'cockpit' ? 'cockpit' : 'cdp');
   }
@@ -4583,6 +4749,7 @@ Responda como esse agente, com base nesses dados. Se a pergunta tocar mais de um
 
 function buildClubAiContext(){
   if(currentClubId === 'estrela') return '';
+  if(currentClubId === 'band') return `ATENÇÃO: Nesta conversa o tenant selecionado é o GRUPO BANDEIRANTES, uma emissora (não um clube). Ignore TODOS os dados de clube de futebol do Estrela FC abaixo (elenco, estádio, bilheteria, sócio-torcedor, loja) e responda sobre a Band com estes dados:\n${CLUB_PROFILES.band.ai}\n`;
   const c = CLUB_PROFILES[currentClubId];
   const tierDb = getTierDb();
   const fansDb = getFansDb();
@@ -6495,6 +6662,11 @@ function getFanPool(){
   }
   return FAN_POOL_CACHE[key];
 }
+// A Band é tenant de mídia e não usa as telas de clube (elenco, estádio,
+// loja...), que ficam ocultas no menu dela. Algumas funções compartilhadas
+// ainda leem essas tabelas ao trocar de tenant; apontamos para a base
+// fictícia do Estrela FC só para evitar erro, sem exibir esses dados.
+[SQUAD_BY_CLUB, BASE_CATEGORIES_BY_CLUB, CLUB_ASSETS_BY_CLUB, STAFF_BY_CLUB, TRAVEL_BY_CLUB, SPONSORS_BY_CLUB, BRAND_BY_CLUB, TEAM_STATS_BY_CLUB, CONTENT_BY_CLUB, STADIUM_BY_CLUB, EVENTS_BY_CLUB, PRODUCTS_BY_CLUB, FANS_DB_BY_CLUB, TIER_DB_BY_CLUB].forEach(m => { if(m && !m.band && m.estrela) m.band = m.estrela; });
 function getFansDb(){ return FANS_DB_BY_CLUB[currentClubId] || FANS_DB_BY_CLUB.flamengo; }
 function getTierDb(){ return TIER_DB_BY_CLUB[currentClubId] || TIER_DB_BY_CLUB.flamengo; }
 function getTierExtra(){

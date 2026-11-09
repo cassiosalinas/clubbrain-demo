@@ -26,6 +26,23 @@ Para rodar o backend, veja `mvp-vasco/README.md` (precisa de Docker).
 direto pelas Netlify Functions, sem passar pelo backend. Ligar as duas e o
 trabalho que fecha a camada 7 do `mvp-vasco/CLAUDE.md`.
 
+## Grupo Bandeirantes (tenant de mídia)
+
+A Band entra na tela de escolha como **"Grupo Bandeirantes · Novo · Mídia"** e
+tem a própria porta, `/band/os` (mesmo padrão de `/vasco/os`). Com a Band
+selecionada, o menu mostra só as páginas dela, nos modos Cockpit e Operacional:
+
+| Pasta | O que é |
+|---|---|
+| `band/apps/playverse/` | Band Playverse: app do fã (programas, jogos em Phaser, Minu, LGPD) + backoffice (analytics, CDP, segmentos, marketing, Integration Hub, ERP, Media Ontology) |
+| `band/apps/os/` | BandBrain OS: cockpit executivo, receita e inventário, programas e grade, governança 50/50 |
+| `band/apps/historia-viva/` | Demo da propriedade Pré-Jogo + História Viva |
+| `band/apps/playverse-3/` | Demo dos 3 programas simultâneos (Fan Arena, Desafio do Craque, MasterChef) |
+| `band/apps/claude-shim.js` | Liga a IA das demos à function `/api/chat` (mesma `ANTHROPIC_API_KEY`) |
+
+As páginas abrem embutidas no painel (`?embed=1` + `#pagina`). Todos os números
+da Band são simulados; Minu e Vibra aparecem como integrações a validar.
+
 ## O que tem aqui
 
 ```

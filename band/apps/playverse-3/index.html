@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Band Playverse · Virtual Fans + ClubBrain.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+
+:root{
+  --bg:#060a14;--panel:#0d1424;--panel2:#111b30;--line:#1c2944;--txt:#e9edf6;--mut:#8592ad;
+  --gold:#f5b82e;--gold2:#ffd76a;--vf:#ff6a1a;--blue:#2f6bff;--ok:#22c55e;--bad:#ef4444;
+  --cor:#f1f1f1;--pal:#1fa35a;--spfc:#e53935;--san:#9aa6bd;--out:#8b6cff;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,textarea,select{font:inherit;color:var(--txt)}
+.disp{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.02em;text-transform:uppercase}
+.mut{color:var(--mut)}
+.gold{color:var(--gold)}
+.hide{display:none!important}
+
+/* ===== TELÃO ===== */
+#telao{display:grid;grid-template-rows:auto 1fr;height:100vh;min-height:640px;
+  background:radial-gradient(1200px 500px at 70% -10%,rgba(47,107,255,.18),transparent 60%),radial-gradient(900px 400px at 0% 110%,rgba(245,184,46,.10),transparent 60%),var(--bg)}
+.top{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(6,10,20,.7);backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--vf),#ff9a3d);display:grid;place-items:center;font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;color:#160800}
+.brand b{font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.04em}
+.brand b span{color:var(--gold)}
+.brand small{display:block;font-size:11px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+.tabs{display:flex;gap:4px;margin-left:18px;background:var(--panel);padding:4px;border-radius:12px;border:1px solid var(--line)}
+.tab{padding:8px 14px;border-radius:9px;font-weight:600;color:var(--mut);white-space:nowrap}
+.tab.on{background:var(--panel2);color:var(--txt);box-shadow:inset 0 0 0 1px var(--line)}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--bad);margin-right:6px;animation:pulse 1.2s infinite}
+.sp{flex:1}
+.ctl{display:flex;align-items:center;gap:8px}
+.sel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.btn{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-weight:600}
+.btn:hover{border-color:#2c3d63}
+.btn.pri{background:linear-gradient(135deg,var(--gold),#f39c12);color:#1a1200;border:0}
+.btn.sm{padding:6px 10px;font-size:12px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{padding:7px 10px;font-size:12px;font-weight:600;color:var(--mut)}
+.seg button.on{background:var(--panel2);color:var(--gold)}
+.body{display:grid;grid-template-columns:1fr 360px;gap:16px;padding:16px 20px;min-height:0}
+.main{min-height:0;overflow:auto;padding-right:4px}
+.view{display:none;gap:16px}
+.view.on{display:grid}
+.card{background:linear-gradient(180deg,var(--panel),#0b1120);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card h3{font:700 15px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .tag{margin-left:auto}
+.tag{font:600 10px Inter;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:#1a2540;color:var(--mut)}
+.tag.live{background:rgba(239,68,68,.15);color:#ff7b7b}
+.tag.sim{background:rgba(139,108,255,.15);color:#b7a6ff}
+.tag.gold{background:rgba(245,184,46,.15);color:var(--gold)}
+.g-live{grid-template-columns:330px 1fr;grid-template-rows:auto auto 1fr}
+.tv{grid-row:span 3;display:flex;flex-direction:column;gap:14px}
+.screen{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/10;background:
+ linear-gradient(180deg,rgba(0,0,0,.0),rgba(0,0,0,.65)),
+ repeating-linear-gradient(90deg,#0f5132 0 34px,#11603b 34px 68px);border:1px solid #23406b}
+.screen .pitch{position:absolute;inset:14% 10%;border:2px solid rgba(255,255,255,.35);border-radius:4px}
+.screen .pitch:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px solid rgba(255,255,255,.35)}
+.screen .pitch:before{content:"";position:absolute;left:50%;top:50%;width:22%;aspect-ratio:1;border:2px solid rgba(255,255,255,.35);border-radius:50%;transform:translate(-50%,-50%)}
+.onair{position:absolute;left:10px;top:10px;display:flex;gap:6px;align-items:center}
+.onair .tag{background:#d61f1f;color:#fff}
+.lower{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(90deg,#0b2a7a,#1645c4 60%,rgba(22,69,196,.0));}
+.lower b{font:800 20px "Barlow Condensed","Arial Narrow",sans-serif;display:block;letter-spacing:.03em}
+.lower span{font-size:11px;opacity:.85}
+.qrbox{display:flex;gap:12px;align-items:center}
+#qr{background:#fff;padding:8px;border-radius:10px;width:132px;height:132px;flex:none}
+#qr img,#qr canvas{width:116px!important;height:116px!important}
+.qrbox p{font-size:13px;line-height:1.35}
+.qrbox p b{font:800 20px "Barlow Condensed","Arial Narrow",sans-serif;display:block;color:var(--gold);letter-spacing:.03em}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font:800 34px "Barlow Condensed","Arial Narrow",sans-serif;line-height:1.05;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11px;color:var(--mut)}
+.kpi.hl{border-color:rgba(245,184,46,.5);box-shadow:0 0 0 1px rgba(245,184,46,.15),0 10px 30px -10px rgba(245,184,46,.25)}
+.kpi.hl .v{color:var(--gold)}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:110px 1fr 70px;align-items:center;gap:10px}
+.bar .n{font-weight:700}
+.bar .t{height:26px;background:#0a1020;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.bar .f{height:100%;border-radius:7px;transition:width .6s cubic-bezier(.2,.8,.2,1);min-width:2px}
+.bar .p{text-align:right;font:700 18px "Barlow Condensed","Arial Narrow",sans-serif;font-variant-numeric:tabular-nums}
+.bar.lead .n:after{content:" ▲";color:var(--gold);font-size:11px}
+.feed{display:flex;flex-direction:column;gap:6px;overflow:auto;max-height:100%}
+.fi{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:#0a1122;border:1px solid transparent;animation:in .35s ease}
+.fi.real{border-color:rgba(245,184,46,.55);background:linear-gradient(90deg,rgba(245,184,46,.12),#0a1122)}
+.fi .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0b0f1a}
+.fi .tx{font-size:13px;line-height:1.3}
+.fi .tx small{display:block;color:var(--mut);font-size:11px}
+.fi .pt{font:700 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold)}
+.feedcard{display:flex;flex-direction:column;min-height:260px}
+.feedcard .feed{flex:1;max-height:420px}
+
+/* intel */
+.g-intel{grid-template-columns:300px 1fr}
+.fanlist{display:flex;flex-direction:column;gap:6px;max-height:560px;overflow:auto}
+.fanrow{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;text-align:left;border:1px solid transparent}
+.fanrow:hover{background:#0f1830}
+.fanrow.on{border-color:var(--gold);background:rgba(245,184,46,.08)}
+.fanrow .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0b0f1a;flex:none}
+.fanrow .nm{font-weight:600}
+.fanrow small{display:block;color:var(--mut);font-size:11px}
+.f360{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.prof{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.prof .av{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;color:#0b0f1a}
+.prof b{font:800 26px "Barlow Condensed","Arial Narrow",sans-serif;display:block;letter-spacing:.02em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 9px;border-radius:999px;background:#16213a;font-size:12px;font-weight:600;border:1px solid var(--line)}
+.chip.g{background:rgba(245,184,46,.12);color:var(--gold);border-color:rgba(245,184,46,.35)}
+.meter{margin-top:10px}
+.meter .row{display:grid;grid-template-columns:150px 1fr 40px;gap:8px;align-items:center;font-size:12px;margin:6px 0}
+.meter .t{height:8px;background:#0a1020;border-radius:6px;overflow:hidden}
+.meter .f{height:100%;background:linear-gradient(90deg,var(--vf),var(--gold));transition:width .5s}
+.tl{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow:auto;font-size:12px}
+.tl div{display:flex;gap:8px}
+.tl code{color:var(--gold);font-size:11px;font-family:ui-monospace,monospace;flex:none}
+#onto{width:100%;height:240px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid #141f36}
+td.num{font-variant-numeric:tabular-nums;text-align:right}
+th.num{text-align:right}
+
+/* agente */
+.g-agent{grid-template-columns:1fr 320px}
+.chat{display:flex;flex-direction:column;height:calc(100vh - 140px);min-height:480px}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px}
+.m{max-width:86%;padding:12px 14px;border-radius:14px;line-height:1.5;font-size:14px}
+.m.u{align-self:flex-end;background:#1a2a4d;border:1px solid #27407a}
+.m.a{align-self:flex-start;background:#0b1326;border:1px solid var(--line)}
+.m.a .who{font:700 12px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.m ul{margin:6px 0 6px 18px}
+.m p{margin:4px 0}
+.ask{display:flex;gap:8px;margin-top:10px}
+.ask input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.sugs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sug{padding:8px 12px;border-radius:999px;background:#121c33;border:1px solid var(--line);font-size:12px;text-align:left}
+.sug:hover{border-color:var(--gold)}
+.copis{display:flex;flex-direction:column;gap:8px}
+.copi{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1326;text-align:left}
+.copi.on{border-color:var(--gold);background:rgba(245,184,46,.08)}
+.copi b{display:block;font-weight:700}
+.copi small{color:var(--mut)}
+
+/* negocio */
+.g-biz{grid-template-columns:1.2fr 1fr}
+.inv td:first-child b{display:block}
+.inv td:first-child small{color:var(--mut)}
+.inv input[type=range]{width:110px;accent-color:var(--gold)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.split .s{border-radius:12px;padding:14px;border:1px solid var(--line);background:#0b1326}
+.split .s .v{font:800 34px "Barlow Condensed","Arial Narrow",sans-serif}
+.split .s.b{border-color:rgba(47,107,255,.6)}
+.split .s.vf{border-color:rgba(255,106,26,.6)}
+.big{font:800 46px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);line-height:1}
+.note{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.4}
+.rng{display:grid;grid-template-columns:1fr 120px 60px;gap:10px;align-items:center;margin:8px 0;font-size:13px}
+.rng input{accent-color:var(--gold)}
+
+/* lateral celular */
+.side{min-height:0;display:flex;flex-direction:column;gap:10px;align-items:center}
+.side .lbl{align-self:stretch;display:flex;align-items:center;justify-content:space-between}
+.phone{width:340px;height:min(700px,calc(100vh - 150px));border-radius:42px;padding:12px;background:#020409;border:1px solid #2a3654;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),inset 0 0 0 2px #0e1424;position:relative}
+.phone .scr{height:100%;border-radius:32px;overflow:hidden;position:relative}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:110px;height:24px;background:#020409;border-radius:0 0 14px 14px;z-index:5}
+
+/* ===== APP CELULAR ===== */
+.app{height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,#0a1430,#060a14 45%);position:relative;overflow:hidden}
+.app .hd{padding:34px 16px 12px;display:flex;align-items:center;gap:10px}
+.app .hd .lg{font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.06em}
+.app .hd .lg span{color:var(--gold)}
+.app .hd .xp{margin-left:auto;font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);background:rgba(245,184,46,.12);padding:4px 10px;border-radius:999px}
+.app .ct{flex:1;overflow:auto;padding:0 16px 20px}
+.app h2{font:800 30px "Barlow Condensed","Arial Narrow",sans-serif;line-height:1;letter-spacing:.01em;text-transform:uppercase;margin:6px 0 8px}
+.app h2 span{color:var(--gold)}
+.app p.lead{color:#b9c3d8;font-size:13px;line-height:1.45;margin-bottom:14px}
+.field{display:block;margin:10px 0}
+.field span{font-size:12px;color:var(--mut);display:block;margin-bottom:6px}
+.field input{width:100%;background:#0c1530;border:1px solid #23345c;border-radius:12px;padding:12px}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tm{padding:12px 10px;border-radius:12px;border:1px solid #23345c;background:#0c1530;font-weight:700;display:flex;align-items:center;gap:8px}
+.tm i{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.3)}
+.tm.on{border-color:var(--gold);background:rgba(245,184,46,.12)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.4;color:#c6cfe0;margin:10px 0;text-align:left}
+.chk input{margin-top:2px;accent-color:var(--gold);width:16px;height:16px;flex:none}
+.cta{width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--gold),#f39c12);color:#1a1200;font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-top:10px}
+.cta:disabled{opacity:.4}
+.cta.ghost{background:#111c36;color:var(--txt);border:1px solid #23345c}
+.pass{border-radius:18px;padding:14px;background:linear-gradient(135deg,#142a66,#0b1638);border:1px solid #2a4aa0;position:relative;overflow:hidden;margin-bottom:12px}
+.pass:after{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(245,184,46,.35),transparent 70%)}
+.pass .r1{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#aab8dc}
+.pass b{font:800 26px "Barlow Condensed","Arial Narrow",sans-serif;display:block;margin-top:6px}
+.pass .lvl{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;color:#c6d0ea}
+.pass .pb{height:8px;background:rgba(255,255,255,.12);border-radius:6px;margin-top:6px;overflow:hidden}
+.pass .pb i{display:block;height:100%;background:linear-gradient(90deg,var(--vf),var(--gold));transition:width .6s}
+.live{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#0d1733;border:1px solid #23345c;margin-bottom:12px}
+.live .tag{background:#d61f1f;color:#fff}
+.live b{font-weight:700;font-size:13px}
+.live small{display:block;color:var(--mut);font-size:11px}
+.ms{display:flex;flex-direction:column;gap:8px}
+.mi{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:#0c1530;border:1px solid #1d2c50;text-align:left;width:100%}
+.mi .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#16234a;font-size:18px;flex:none}
+.mi b{font-weight:700;font-size:14px;display:block}
+.mi small{color:var(--mut);font-size:11px}
+.mi .st{margin-left:auto;font:800 14px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);white-space:nowrap}
+.mi.done{opacity:.6}
+.mi.done .st{color:var(--ok)}
+.mi.lock .st{color:var(--mut)}
+.opts{display:grid;gap:8px}
+.opts.g2{grid-template-columns:1fr 1fr}
+.op{padding:14px 12px;border-radius:14px;background:#0c1530;border:1px solid #23345c;font-weight:700;text-align:left;position:relative;overflow:hidden}
+.op .fill{position:absolute;inset:0;width:0;background:rgba(245,184,46,.14);transition:width .6s}
+.op span{position:relative}
+.op .pc{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold)}
+.op.right{border-color:var(--ok);background:rgba(34,197,94,.12)}
+.op.wrong{border-color:var(--bad);background:rgba(239,68,68,.12)}
+.op.me{border-color:var(--gold)}
+.timer{height:6px;border-radius:6px;background:#16234a;overflow:hidden;margin:6px 0 14px}
+.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--vf));width:100%}
+.qmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.expl{margin-top:12px;padding:12px;border-radius:12px;background:#0d1733;border:1px solid #23345c;font-size:13px;line-height:1.45}
+textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #23345c;border-radius:12px;padding:12px;resize:none}
+.hist{margin-top:12px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#1b1406,#0c1530);border:1px solid rgba(245,184,46,.45);font-size:13px;line-height:1.5}
+.hist .who{font:800 13px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;display:flex;gap:6px;align-items:center}
+.acv{margin-top:10px;border-radius:12px;aspect-ratio:16/8;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 4px),linear-gradient(135deg,#2a2a2a,#0e0e0e);display:grid;place-items:center;color:#bbb;font-size:12px;text-align:center;border:1px solid #333}
+.coupon{border-radius:18px;padding:18px;background:linear-gradient(135deg,#ff7a1a,#f5b82e);color:#1a0d00;position:relative;overflow:hidden}
+.coupon small{font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+.coupon b{font:800 30px "Barlow Condensed","Arial Narrow",sans-serif;display:block;line-height:1;margin:6px 0}
+.coupon .code{margin-top:12px;padding:10px;border-radius:10px;border:2px dashed rgba(26,13,0,.5);font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;text-align:center;letter-spacing:.2em}
+.back{font-size:12px;color:var(--mut);padding:4px 0;margin-bottom:6px}
+.rk{margin-top:14px}
+.rk .bar{grid-template-columns:86px 1fr 46px;gap:8px}
+.rk .bar .t{height:16px}
+.rk .bar .p{font-size:14px}
+.toast{position:absolute;left:50%;top:70px;transform:translateX(-50%) translateY(-20px);opacity:0;background:var(--gold);color:#1a1200;font:800 22px "Barlow Condensed","Arial Narrow",sans-serif;padding:8px 16px;border-radius:999px;transition:.35s;z-index:20;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{font-size:10px;color:#5d6a86;text-align:center;padding:8px 0 0}
+
+/* full phone page */
+#celular{height:100vh}
+#celular .app{max-width:520px;margin:0 auto}
+
+/* roteiro */
+.ov{position:fixed;inset:0;background:rgba(3,6,14,.78);backdrop-filter:blur(6px);z-index:50;display:grid;place-items:center}
+.ov .box{width:min(860px,92vw);max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}
+.ov h2{font:800 34px "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.act{padding:14px;border-radius:12px;background:#0b1326;border:1px solid var(--line);font-size:13px;line-height:1.45}
+.act b{font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);display:block;text-transform:uppercase;letter-spacing:.04em}
+.act i{color:var(--mut);font-style:normal;font-size:12px;display:block;margin-top:6px}
+
+@keyframes pulse{50%{opacity:.35}}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (max-width:1280px){.body{grid-template-columns:1fr}.side{display:none}.g-live{grid-template-columns:1fr}.tv{grid-row:auto}}
+
+/* ===== Playverse extras ===== */
+.kpis5{display:grid;grid-template-columns:repeat(4,1fr) 230px;gap:12px}
+.qrmini{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
+.qrmini #qr{width:92px;height:92px;padding:6px}
+.qrmini #qr img,.qrmini #qr canvas{width:80px!important;height:80px!important}
+.qrmini p{font-size:11px;line-height:1.35;color:var(--mut)}
+.qrmini p b{display:block;font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);text-transform:uppercase}
+.progs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pc{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.pc .ph{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.pc .ph .tag.live{background:#d61f1f;color:#fff}
+.pc .ph b{font:800 20px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.03em;text-transform:uppercase;display:block;line-height:1}
+.pc .ph small{color:var(--mut);font-size:11px}
+.pc .pb{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1}
+.pc.arena .ph{background:linear-gradient(90deg,rgba(47,107,255,.35),transparent)}
+.pc.craque .ph{background:linear-gradient(90deg,rgba(255,106,26,.35),transparent)}
+.pc.chef .ph{background:linear-gradient(90deg,rgba(214,31,31,.35),transparent)}
+.mini-h{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.gauge{position:relative;height:120px;display:grid;place-items:end center}
+.gauge svg{width:220px;height:120px}
+.gauge .gv{position:absolute;bottom:4px;left:0;right:0;text-align:center}
+.gauge .gv b{font:800 40px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);line-height:1}
+.gauge .gv small{display:block;font-size:11px;color:var(--mut)}
+.recipe{padding:10px 12px;border-radius:12px;background:#140b0b;border:1px solid rgba(239,68,68,.35);font-size:12px;line-height:1.4}
+.recipe b{color:#ffb3a8;font-size:13px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.rkp{display:flex;flex-direction:column;gap:6px}
+.rkp .r{display:grid;grid-template-columns:22px 30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:#0a1122}
+.rkp .r.real{background:linear-gradient(90deg,rgba(245,184,46,.14),#0a1122);box-shadow:inset 0 0 0 1px rgba(245,184,46,.45)}
+.rkp .pos{font:800 16px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--mut)}
+.rkp .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;color:#0b0f1a}
+.rkp .md{font-size:13px;letter-spacing:1px}
+.rkp .xp{font:700 15px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold)}
+.matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mx{padding:12px;border-radius:12px;background:#0b1326;border:1px solid var(--line)}
+.mx .v{font:800 30px "Barlow Condensed","Arial Narrow",sans-serif}
+.mx small{color:var(--mut);font-size:11px;display:block}
+.mx.hl{border-color:rgba(245,184,46,.55)}
+.mx.hl .v{color:var(--gold)}
+.g-camp{grid-template-columns:1.25fr 1fr}
+.form-row{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;margin:8px 0}
+.form-row label{font-size:12px;color:var(--mut)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:#0b1326;font-size:12px;font-weight:600}
+.pill.on{border-color:var(--gold);color:var(--gold);background:rgba(245,184,46,.08)}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.res .kpi .v{font-size:28px}
+.aicamp{margin-top:12px;padding:12px;border-radius:12px;background:#0b1326;border:1px dashed #2c3d63;font-size:13px;line-height:1.5;min-height:60px}
+/* phone extras */
+.hub{display:flex;flex-direction:column;gap:10px}
+.pcard{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;border:1px solid #23345c;text-align:left;width:100%;position:relative;overflow:hidden}
+.pcard .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none}
+.pcard b{display:block;font:800 18px "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em}
+.pcard small{color:#b4bfd6;font-size:11px;display:block}
+.pcard .st{margin-left:auto;font:800 13px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);text-align:right;white-space:nowrap}
+.pcard.arena{background:linear-gradient(120deg,#123072,#0b1638)}
+.pcard.arena .ic{background:#1d47b8}
+.pcard.craque{background:linear-gradient(120deg,#5a2408,#1a1020)}
+.pcard.craque .ic{background:#c4510f}
+.pcard.chef{background:linear-gradient(120deg,#5b0f14,#170c12)}
+.pcard.chef .ic{background:#a3151d}
+.medals{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.medal{font-size:11px;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#c6d0ea}
+.medal.on{background:rgba(245,184,46,.2);color:var(--gold)}
+.ingr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ing{padding:10px 6px;border-radius:12px;background:#0c1530;border:1px solid #23345c;text-align:center;font-size:11px;font-weight:600}
+.ing span{display:block;font-size:24px;margin-bottom:2px}
+.ing.on{border-color:var(--gold);background:rgba(245,184,46,.12)}
+.ing:disabled{opacity:.35}
+.lance{padding:12px;border-radius:12px;background:#0d1733;border:1px solid #23345c;font-size:13px;line-height:1.45;margin-bottom:10px}
+.lance b{color:var(--gold)}
+.meterbar{height:10px;border-radius:6px;background:#16234a;overflow:hidden;display:flex;margin-top:8px}
+.meterbar i{display:block;height:100%}
+.legend{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:4px}
+.score{font:800 56px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--gold);line-height:1}
+@media (max-width:1280px){.progs,.three{grid-template-columns:1fr}.kpis5{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="telao" class="hide">
+  <div class="top">
+    <div class="brand"><div class="mark">VF</div><div><b>BAND <span>PLAYVERSE</span></b><small>Virtual Fans + ClubBrain.ai · demo conceitual</small></div></div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-v="live"><span class="dot"></span>Ao vivo</button>
+      <button class="tab" data-v="intel">Inteligência</button>
+      <button class="tab" data-v="agent">Band AI</button>
+      <button class="tab" data-v="camp">Campanhas e receita</button>
+    </div>
+    <div class="sp"></div>
+    <div class="ctl">
+      <div class="seg" id="simseg"><button data-s="0">Plateia: off</button><button data-s="1" class="on">baixa</button><button data-s="2">alta</button></div>
+      <button class="btn" id="bRot">Roteiro</button>
+      <button class="btn" id="bReset">Reiniciar</button>
+    </div>
+  </div>
+  <div class="body">
+    <div class="main">
+      <!-- AO VIVO -->
+      <section class="view on" id="v-live">
+        <div class="kpis5">
+          <div class="kpi hl"><div class="l">Participantes</div><div class="v" id="kPart">0</div><div class="s" id="kPartS">nos 3 programas</div></div>
+          <div class="kpi"><div class="l">Taxa de engajamento</div><div class="v" id="kEng">0%</div><div class="s">interagiram 2+ vezes</div></div>
+          <div class="kpi"><div class="l">Perfis identificados</div><div class="v" id="kId">0</div><div class="s" id="kIdS">com consentimento</div></div>
+          <div class="kpi"><div class="l">Receita potencial</div><div class="v" id="kRev">R$ 0</div><div class="s">estimada · ilustrativa</div></div>
+          <div class="qrmini"><div id="qr"></div><p><b>Entre no Playverse</b>Aponte a câmera. Um Band Pass para os 3 programas.</p></div>
+        </div>
+        <div class="progs">
+          <div class="card pc arena"><div class="ph"><span class="tag live">ao vivo</span><div><b>Band Fan Arena</b><small>Jogo Aberto · Renata Fan</small></div></div>
+            <div class="pb">
+              <div><div class="mini-h">Quem vence o próximo clássico?</div><div class="bars" id="arPal"></div></div>
+              <div><div class="mini-h">VAR da audiência · <span id="varQ" class="gold"></span></div><div class="bars" id="arVar"></div></div>
+              <div><div class="mini-h">Escalação dos sonhos · mais votados</div><div class="chips" id="arEsc"></div></div>
+            </div></div>
+          <div class="card pc craque"><div class="ph"><span class="tag live">ao vivo</span><div><b>Desafio do Craque</b><small>Os Donos da Bola · Craque Neto</small></div></div>
+            <div class="pb">
+              <div><div class="mini-h">Placar de concordância com o Neto</div><div class="gauge"><svg viewBox="0 0 220 120" id="gsvg"></svg><div class="gv"><b id="gVal">0%</b><small id="gSub">concordam</small></div></div></div>
+              <div><div class="mini-h" id="ntQ">Provocação no ar</div><div class="meterbar" id="ntBar"></div><div class="legend"><span>Concordo</span><span>Depende</span><span>Discordo</span></div></div>
+              <div><div class="mini-h">Duelo de torcidas · quem canta mais alto?</div><div class="bars" id="ntTor"></div></div>
+            </div></div>
+          <div class="card pc chef"><div class="ph"><span class="tag live">ao vivo</span><div><b>MasterChef Challenge</b><small>Caixa misteriosa virtual · IA do Chef</small></div></div>
+            <div class="pb">
+              <div><div class="mini-h">A estrela da caixa misteriosa</div><div class="bars" id="chStar"></div></div>
+              <div><div class="mini-h">Ingredientes mais escolhidos</div><div class="chips" id="chIng"></div></div>
+              <div><div class="mini-h">Última criação avaliada pela IA</div><div id="chLast" class="recipe">Aguardando o primeiro chef...</div></div>
+            </div></div>
+        </div>
+        <div class="three" style="margin-top:16px">
+          <div class="card"><h3>Audiência por time <span class="tag">base + sessão</span></h3><div class="bars" id="aud"></div><p class="note">Base histórica fictícia + participantes desta sessão.</p></div>
+          <div class="card"><h3>Ranking Playverse <span class="tag gold">Band Pass</span></h3><div class="rkp" id="rkp"></div></div>
+          <div class="card feedcard"><h3>Eventos ClubBrain <span class="tag">stream</span></h3><div class="feed" id="feed"></div></div>
+        </div>
+      </section>
+
+      <!-- INTELIGÊNCIA -->
+      <section class="view g-intel" id="v-intel">
+        <div class="card"><h3>Fan 360 · perfis <span class="tag gold" id="fanCount">0</span></h3><div class="fanlist" id="fanlist"></div></div>
+        <div style="display:grid;gap:16px;min-width:0">
+          <div class="card"><h3>Cruzamento entre programas <span class="tag gold">um Band Pass, três universos</span></h3><div class="matrix" id="matrix"></div></div>
+          <div class="card" id="f360"></div>
+          <div class="card"><h3>Segmentos acionáveis <span class="tag">agregados · sem dado pessoal</span></h3>
+            <table><thead><tr><th>Segmento</th><th class="num">Sessão</th><th class="num">Projeção</th><th class="num">Propensão</th><th>Marca sugerida</th></tr></thead><tbody id="segs"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- AGENTE -->
+      <section class="view g-agent" id="v-agent">
+        <div class="card chat">
+          <h3>Band AI · <span id="copiName" style="color:var(--gold)"></span> <span class="tag" id="aiState">IA</span></h3>
+          <div class="msgs" id="msgs"></div>
+          <div class="sugs" id="sugs"></div>
+          <form class="ask" id="askF"><input id="askI" placeholder="Pergunte sobre os 3 programas, perfis, patrocínios..." autocomplete="off"><button class="btn pri">Perguntar</button></form>
+        </div>
+        <div class="card"><h3>Copilotos ClubBrain</h3><div class="copis" id="copis"></div>
+          <p class="note">A Band AI lê os eventos dos três programas nesta sessão, os segmentos agregados e um catálogo de marcas fictícias.</p></div>
+      </section>
+
+      <!-- CAMPANHAS -->
+      <section class="view g-camp" id="v-camp">
+        <div class="card"><h3>Simulador de campanha <span class="tag gold">ClubBrain Campaigns</span></h3>
+          <div class="form-row"><label>Segmento</label><div class="pills" id="cSeg"></div></div>
+          <div class="form-row"><label>Patrocinador</label><div class="pills" id="cSpo"></div></div>
+          <div class="form-row"><label>Mecânica</label><div class="pills" id="cMec"></div></div>
+          <div class="form-row"><label>Canais</label><div class="pills" id="cCh"></div></div>
+          <div class="res">
+            <div class="kpi"><div class="l">Alcance qualificado</div><div class="v" id="rAlc">0</div><div class="s">perfis com opt-in</div></div>
+            <div class="kpi"><div class="l">Conversões</div><div class="v" id="rConv">0</div><div class="s" id="rConvS"></div></div>
+            <div class="kpi hl"><div class="l">Receita da campanha</div><div class="v" id="rRev">R$ 0</div><div class="s" id="rRevS"></div></div>
+          </div>
+          <button class="btn pri" id="bGen" style="margin-top:12px">Gerar campanha com IA</button>
+          <div class="aicamp" id="aiCamp"><span class="mut">Escolha segmento, patrocinador e mecânica, e peça à IA a proposta da campanha.</span></div>
+          <p class="note">Benchmarks ilustrativos: CPM de mídia digital, CPA por resgate e taxas de conversão hipotéticas, para discussão.</p>
+        </div>
+        <div class="card"><h3>Simulador financeiro · 50/50</h3>
+          <div class="rng"><span>Receita incremental recebida</span><input type="range" id="fRec" min="50000" max="1000000" step="10000" value="200000"><b id="fRecV"></b></div>
+          <div class="rng"><span>Tributos e deduções elegíveis</span><input type="range" id="fTax" min="0" max="100000" step="1000" value="30000"><b id="fTaxV"></b></div>
+          <button class="btn sm" id="bUseCamp" style="margin:6px 0">Usar receita da campanha simulada</button>
+          <div class="mut" style="font-size:12px;margin-top:8px">Resultado líquido distribuível</div>
+          <div class="big" id="fNet">R$ 0</div>
+          <div class="split">
+            <div class="s b"><div class="mut" style="font-size:12px">Grupo Bandeirantes · 50%</div><div class="v" id="fBand">R$ 0</div></div>
+            <div class="s vf"><div class="mut" style="font-size:12px">Virtual Fans · 50%</div><div class="v" id="fVF">R$ 0</div></div>
+          </div>
+          <p class="note">Valores ilustrativos e não contratuais; tributação e deduções dependem de validação jurídica e contábil. Faturamento pela VF, conta exclusiva da operação e auditoria bilateral, conforme a proposta executiva.</p>
+        </div>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="lbl"><span class="tag gold">Celular · simulado</span><button class="btn sm" id="bNewFan">Novo participante</button></div>
+      <div class="phone"><div class="notch"></div><div class="scr" id="simPhone"></div></div>
+    </aside>
+  </div>
+</div>
+
+<div id="celular" class="hide"></div>
+
+<div class="ov hide" id="rot"><div class="box">
+  <div style="display:flex;align-items:center"><h2>O grande momento · <span class="gold">12 minutos</span></h2><div class="sp"></div><button class="btn" id="rotX">Fechar</button></div>
+  <p class="mut" style="margin-top:6px">Três programas, três experiências de gamificação, uma única plataforma de inteligência de audiência.</p>
+  <div class="acts">
+    <div class="act"><b>1 · Três celulares</b>Três participantes entram pelo QR. Um joga a Fan Arena da Renata, outro responde ao Neto e outro abre a caixa misteriosa do MasterChef.<i>No celular simulado: troque com "Novo participante".</i></div>
+    <div class="act"><b>2 · O telão reage</b>Votos do clássico, VAR da audiência, placar de concordância com o Neto e ingredientes mais escolhidos, tudo em tempo real.<i>Momento WOW: a sala vê os próprios votos.</i></div>
+    <div class="act"><b>3 · A IA do Chef</b>Quem abriu a caixa recebe a avaliação e uma receita personalizada criada pela IA, que aparece também no telão.<i>A gamificação vira dado de preferência culinária.</i></div>
+    <div class="act"><b>4 · Band Pass</b>Medalhas e XP valem nos três programas. Quem joga em todos vira "Explorador Playverse" e desbloqueia o prêmio master.<i>Fidelidade entre programas.</i></div>
+    <div class="act"><b>5 · Inteligência</b>Aba Inteligência: cruzamento entre programas (quem gosta de futebol e cozinha), Fan 360 e segmentos.<i>Audiência anônima vira comunidade identificada.</i></div>
+    <div class="act"><b>6 · A pergunta final</b>Band AI: "Quais são as oportunidades de patrocínio para os perfis que acabaram de interagir nos três programas?". Depois, Campanhas e receita: simular e dividir 50/50.<i>Não é um quiz. É um motor de inteligência comercial.</i></div>
+  </div>
+</div></div>
+
+<script src="../claude-shim.js"></script>
+<script>
+const APP_URL="";
+const TEAMS={Corinthians:{c:"var(--cor)",hex:"#f1f1f1",base:18000},Palmeiras:{c:"var(--pal)",hex:"#1fa35a",base:13500},"São Paulo":{c:"var(--spfc)",hex:"#e53935",base:11200},Santos:{c:"var(--san)",hex:"#9aa6bd",base:7600},Outros:{c:"var(--out)",hex:"#8b6cff",base:18500}};
+const SPONSORS=[
+ {id:"pulso",name:"Pulso Energy",cat:"Bebida energética",fit:"palpiteiros e jovens torcedores",reward:"Combo Pulso do Clássico grátis",code:"PULSO-ARENA"},
+ {id:"brasa",name:"Brasa Burger",cat:"Delivery",fit:"debate na hora do almoço",reward:"30% no combo do Desafio do Craque",code:"BRASA-NETO"},
+ {id:"vila",name:"Mercado Vila",cat:"Supermercado",fit:"chefs amadores e caixa misteriosa",reward:"R$ 30 em ingredientes da caixa misteriosa",code:"VILA-CHEF"},
+ {id:"rota",name:"Rota Bank",cat:"Banco digital",fit:"exploradores multi-programa",reward:"R$ 50 de cashback Explorador Playverse",code:"ROTA-PLAY"},
+ {id:"atl",name:"Atlântica Seguros",cat:"Seguros",fit:"público maduro e nostálgico",reward:"1º mês do seguro residencial",code:"ATL-PASS"}
+];
+const PROGS={
+ arena:{name:"Band Fan Arena",program:"Jogo Aberto",host:"Renata Fan",ic:"⚽",sponsor:"pulso",tag:"O torcedor vira comentarista"},
+ craque:{name:"Desafio do Craque",program:"Os Donos da Bola",host:"Craque Neto · TV 12h50 + rádio 18h",ic:"🔥",sponsor:"brasa",tag:"Concorde ou desafie o Neto"},
+ chef:{name:"MasterChef Challenge",program:"MasterChef",host:"Band",ic:"👨‍🍳",sponsor:"vila",tag:"Caixa misteriosa virtual"}
+};
+const ARENA={
+ pal:{q:"Quem vence o próximo clássico?",o:["São Paulo","Empate","Corinthians"]},
+ quiz:[
+  {q:"Como é conhecido o clássico São Paulo × Corinthians?",o:["Derby","Majestoso","Choque-Rei","San-São"],a:1,e:"São Paulo × Corinthians é o Majestoso. Derby é Corinthians × Palmeiras; Choque-Rei, Palmeiras × São Paulo."},
+  {q:"Em que ano foi inaugurado o estádio do Morumbi?",o:["1950","1960","1970","1982"],a:1,e:"O Morumbi foi inaugurado em 1960."},
+  {q:"Qual clube venceu o primeiro Mundial de Clubes da FIFA, em 2000?",o:["São Paulo","Vasco","Corinthians","Palmeiras"],a:2,e:"O Corinthians venceu o Vasco na final, no Maracanã."}
+ ],
+ legends:["Rogério Ceni","Raí","Kaká","Careca","Sócrates","Rivellino","Marcelinho Carioca","Neto"],
+ forms:["4-3-3","4-4-2","3-5-2"],
+ var:{q:"Lance polêmico",txt:"Aos 38 do 2º tempo, o atacante invade a área, o zagueiro chega atrasado e toca no tornozelo. O atacante cai. O árbitro manda seguir. <b>Qual a sua decisão?</b>",o:["Pênalti","Segue o jogo","Simulação · amarelo"],ref:"Leitura ilustrativa do comentarista de arbitragem: contato claro e atrasado no tornozelo. Pênalti."}
+};
+const NETO={ops:["Um grande craque decide um campeonato sozinho.","Time que joga por uma bola não merece ser campeão.","Clássico se ganha na raça, não na tática."],o:["Concordo","Depende do time","Discordo"],tor:"Qual torcida canta mais alto no clássico?"};
+const CHEF={star:{q:"Qual ingrediente seria a estrela da sua caixa misteriosa?",o:["Camarão","Cogumelos","Chocolate"]},
+ ings:[["🦐","Camarão"],["🍄","Cogumelos"],["🍫","Chocolate amargo"],["🥭","Manga"],["🌶️","Pimenta dedo-de-moça"],["🧀","Queijo coalho"],["🥔","Mandioca"],["🍋","Limão-siciliano"],["🌰","Castanha-do-pará"]],
+ tecs:["Grelhar","Assar","Confitar","Cru / ceviche"]};
+const MINU_CAT=[["📱","Recarga de celular",10],["🚗","Crédito de corrida por app",15],["🍔","Vale-delivery · Brasa Burger",20],["🎬","Ingresso de cinema",25],["🎧","1 mês de streaming de música",22],["🎮","Crédito em games",10]];const XP_PER_REAL=100;
+const MEDALS=[["comentarista","🎙️","Comentarista"],["memoria","📼","Memória do Majestoso"],["polemico","🔥","Polêmico"],["chef","🍳","Chef Amador"],["explorador","🌐","Explorador Playverse"]];
+const LEVELS=[[0,"Espectador"],[300,"Fã"],[700,"Superfã"],[1200,"Lenda Band"]];
+const REWARD_AT=300;
+const NAMES=["Ana","Bruno","Carla","Diego","Eduarda","Felipe","Gabriela","Henrique","Isabela","João","Karina","Lucas","Mariana","Nicolas","Olívia","Pedro","Rafaela","Samuel","Tainá","Vitor","Yasmin","Thiago","Letícia","Caio","Beatriz","Rodrigo","Juliana","Marcos","Fernanda","Gustavo","Helena","Otávio"];
+const SURN=["S.","M.","O.","R.","L.","C.","P.","A.","F.","B."];
+const BASE={part:128450,eng:.72,id:43820,rev:186000};
+
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const fmt=n=>Math.round(n).toLocaleString("pt-BR");
+const brl=n=>"R$ "+Math.round(n).toLocaleString("pt-BR");
+const brlk=n=>n>=1e6?"R$ "+(n/1e6).toFixed(2).replace(".",",")+" mi":"R$ "+Math.round(n/1000).toLocaleString("pt-BR")+" mil";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ini=n=>String(n||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+const teamHex=t=>(TEAMS[t]||TEAMS.Outros).hex;
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const level=xp=>{let i=0;LEVELS.forEach((L,j)=>{if(xp>=L[0])i=j});const nx=LEVELS[i+1];return{name:LEVELS[i][1],next:nx?nx[0]:null,nextName:nx?nx[1]:null,pct:nx?Math.min(100,(xp-LEVELS[i][0])/(nx[0]-LEVELS[i][0])*100):100}};
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const spo=id=>SPONSORS.find(s=>s.id===id);
+
+/* ===== estado agregado ===== */
+const S={fans:new Map(),feed:[],events:0,selected:null,lastRecipe:null};
+function resetState(){S.fans=new Map();S.feed=[];S.events=0;S.selected=null;S.lastRecipe=null}
+function blankFan(f,ts){return{id:f.id,name:f.name,team:f.team,mkt:!!f.mkt,sim:!!f.sim,xp:0,progs:{},pal:null,quiz:[],esc:null,vr:null,ops:[],tor:null,star:null,caixa:null,recipe:null,rewards:{},medals:[],tl:[],first:ts,last:ts}}
+const BUS={seen:new Set(),fns:[],bc:null,room:null,
+ init(){try{this.bc=new BroadcastChannel("band-playverse");this.bc.onmessage=e=>this.recv(e.data)}catch(e){}
+  try{if(window.claude&&claude.use){claude.use("room").then(r=>{if(!r)return;this.room=r;r.on("evt",(a,b)=>{const d=(a&&a.id)?a:(a&&a.data&&a.data.id?a.data:(b&&b.id?b:null));if(d)this.recv(d)})}).catch(()=>{})}}catch(e){}},
+ on(f){this.fns.push(f)},
+ send(m){m.id=m.id||uid();m.ts=m.ts||Date.now();this.recv(m);try{this.bc&&this.bc.postMessage(m)}catch(e){}if(!m.sim){try{this.room&&this.room.emit("evt",m)}catch(e){}}},
+ recv(m){if(!m||!m.id||this.seen.has(m.id))return;this.seen.add(m.id);for(const f of this.fns){try{f(m)}catch(e){console.error(e)}}}};
+
+function apply(m){
+ if(m.kind==="reset"){resetState();onReset();return}
+ if(m.kind!=="evt"||!m.fan)return;
+ const f=m.fan;let x=S.fans.get(f.id);if(!x){x=blankFan(f,m.ts);S.fans.set(f.id,x)}
+ x.name=f.name;x.team=f.team;x.mkt=!!f.mkt;x.xp=f.xp||x.xp;x.last=m.ts;if(f.medals)x.medals=f.medals;
+ const p=m.p||{};if(m.prog)x.progs[m.prog]=(x.progs[m.prog]||0)+1;
+ switch(m.type){
+  case"pal":x.pal=p.c;break;case"quiz":x.quiz[p.i]={ok:p.ok};break;case"esc":x.esc={form:p.form,picks:p.picks};break;case"var":x.vr=p.c;break;
+  case"op":x.ops[p.i]=p.c;break;case"tor":x.tor=p.c;break;case"star":x.star=p.c;break;
+  case"caixa":x.caixa={ings:p.ings,tec:p.tec};break;case"recipe":x.recipe=p;S.lastRecipe={...p,name:x.name,team:x.team,real:!x.sim};break;
+  case"reward":x.rewards[p.sp]=true;break;
+ }
+ x.tl.unshift({t:m.ts,txt:evtText(m)});S.events++;
+ S.feed.unshift({m,real:!x.sim});if(S.feed.length>60)S.feed.length=60;
+ if(!x.sim)S.selected=x.id;else if(!S.selected)S.selected=x.id;
+ onData();
+}
+function evtText(m){const p=m.p||{};switch(m.type){
+ case"join":return`entrou no Band Pass · ${m.fan.team}${m.fan.mkt?" · opt-in de ofertas":""}`;
+ case"pal":return`Fan Arena · palpite: ${ARENA.pal.o[p.c]}`;
+ case"quiz":return`Fan Arena · quiz ${p.i+1}/3 ${p.ok?"✓":"✗"}`;
+ case"esc":return`Fan Arena · escalou ${p.form} com ${p.picks.join(", ")}`;
+ case"var":return`Fan Arena · VAR: ${ARENA.var.o[p.c]}`;
+ case"op":return`Desafio do Craque · ${NETO.o[p.c].toLowerCase()} com o Neto (${p.i+1}/3)`;
+ case"tor":return`Desafio do Craque · voto de torcida: ${p.c}`;
+ case"star":return`MasterChef · estrela: ${CHEF.star.o[p.c]}`;
+ case"caixa":return`MasterChef · caixa: ${p.ings.join(" + ")} (${p.tec})`;
+ case"recipe":return`MasterChef · IA avaliou "${p.prato}" nota ${p.nota}`;
+ case"reward":return`resgatou recompensa ${spo(p.sp).name}`;
+ case"medal":return`conquistou medalha ${p.label}`;
+ case"minu":return`trocou ${fmt(p.xp)} XP na Minu: ${p.item}`;
+}return m.type}
+
+/* ===== agregados ===== */
+function agg(){
+ const fans=[...S.fans.values()],real=fans.filter(f=>!f.sim),n=fans.length;
+ const cnt=(arr,len)=>{const r=Array(len).fill(0);arr.forEach(v=>{if(v!=null)r[v]++});return r};
+ const palC=cnt(fans.map(f=>f.pal),3),varC=cnt(fans.map(f=>f.vr),3),starC=cnt(fans.map(f=>f.star),3);
+ const opC=[0,0,0],opLast=[0,0,0];fans.forEach(f=>f.ops.forEach((c,i)=>{if(c!=null){opC[c]++;if(i===f.ops.length-1)opLast[c]++}}));
+ const torC={};Object.keys(TEAMS).forEach(k=>torC[k]=0);fans.forEach(f=>{if(f.tor)torC[f.tor]++});
+ const escC={};fans.forEach(f=>f.esc&&f.esc.picks.forEach(p=>escC[p]=(escC[p]||0)+1));
+ const ingC={};fans.forEach(f=>f.caixa&&f.caixa.ings.forEach(p=>ingC[p]=(ingC[p]||0)+1));
+ const has=(f,k)=>!!f.progs[k];
+ const mx={ac:fans.filter(f=>has(f,"arena")&&has(f,"craque")).length,ah:fans.filter(f=>has(f,"arena")&&has(f,"chef")).length,ch:fans.filter(f=>has(f,"craque")&&has(f,"chef")).length,all:fans.filter(f=>has(f,"arena")&&has(f,"craque")&&has(f,"chef")).length};
+ const engaged=fans.filter(f=>f.tl.length>=3).length;
+ const consent=fans.filter(f=>f.mkt).length;
+ const part=BASE.part+fans.filter(f=>f.sim).length*37+real.length;
+ const scale=n?part/n:0;
+ const segs=[
+  {k:"Futebol + culinária",d:"jogaram Fan Arena e MasterChef",n:mx.ah,prop:.74,brand:"vila"},
+  {k:"Exploradores Playverse",d:"interagiram nos 3 programas",n:mx.all,prop:.81,brand:"rota"},
+  {k:"Discordam do Neto",d:"maioria 'discordo' nas provocações",n:fans.filter(f=>f.ops.filter(c=>c===2).length>=2).length,prop:.58,brand:"brasa"},
+  {k:"Palpiteiros do clássico",d:"palpite + VAR",n:fans.filter(f=>f.pal!=null&&f.vr!=null).length,prop:.63,brand:"pulso"},
+  {k:"Chefs amadores",d:"montaram a caixa misteriosa",n:fans.filter(f=>f.caixa).length,prop:.69,brand:"vila"},
+  {k:"Corinthianos engajados",d:"Corinthians com 3+ interações",n:fans.filter(f=>f.team==="Corinthians"&&f.tl.length>=3).length,prop:.66,brand:"pulso"}
+ ];segs.forEach(s=>s.proj=Math.round(s.n*scale));
+ return{fans,real,n,palC,varC,starC,opC,opLast,torC,escC,ingC,mx,engaged,consent,part,scale,segs,
+  eng:n?Math.min(.95,.55+engaged/n*.35):BASE.eng,
+  idn:BASE.id+fans.filter(f=>f.mkt).reduce((t,f)=>t+(f.sim?14:1),0),
+  rev:BASE.rev+segs.reduce((a,s)=>a+s.proj*s.prop*.9,0)/12};
+}
+
+/* ===== telão ===== */
+let rq=false;function onData(){if(rq)return;rq=true;requestAnimationFrame(()=>{rq=false;renderTelao()})}
+const barsHTML=(labels,vals,colors,lw=110)=>{const t=vals.reduce((a,b)=>a+b,0)||1;return labels.map((l,i)=>`<div class="bar" style="grid-template-columns:${lw}px 1fr 46px"><div class="n" style="font-size:12px">${esc(l)}</div><div class="t" style="height:18px"><div class="f" style="width:${vals[i]/t*100}%;background:${colors?colors[i]:"linear-gradient(90deg,var(--vf),var(--gold))"}"></div></div><div class="p" style="font-size:15px">${Math.round(vals[i]/t*100)}%</div></div>`).join("")};
+function renderTelao(){
+ if($("#telao").classList.contains("hide"))return;
+ const a=agg();
+ $("#kPart").textContent=fmt(a.part);$("#kPartS").textContent=`${a.real.length} ao vivo na sala · ${a.n} na sessão`;
+ $("#kEng").textContent=Math.round(a.eng*100)+"%";
+ $("#kId").textContent=fmt(a.idn);$("#kIdS").textContent=`${a.consent} opt-ins na sessão`;
+ $("#kRev").textContent=brlk(a.rev);
+ $("#arPal").innerHTML=barsHTML(ARENA.pal.o,a.palC,["var(--spfc)","#5c6b8a","var(--cor)"],90);
+ $("#varQ").textContent=a.varC.reduce((x,y)=>x+y,0)+" votos";
+ $("#arVar").innerHTML=barsHTML(ARENA.var.o,a.varC,null,120);
+ const esc5=Object.entries(a.escC).sort((x,y)=>y[1]-x[1]).slice(0,6);
+ $("#arEsc").innerHTML=esc5.map(([k,v],i)=>`<span class="chip ${i<3?"g":""}">${esc(k)} · ${v}</span>`).join("")||`<span class="mut">sem votos ainda</span>`;
+ // gauge
+ const ot=a.opC.reduce((x,y)=>x+y,0);const pc=ot?a.opC[0]/ot:0;
+ drawGauge(pc);$("#gVal").textContent=Math.round(pc*100)+"%";$("#gSub").textContent=`concordam com o Neto · ${ot} respostas`;
+ const lt=a.opLast.reduce((x,y)=>x+y,0)||1;
+ $("#ntBar").innerHTML=`<i style="width:${a.opLast[0]/lt*100}%;background:var(--ok)"></i><i style="width:${a.opLast[1]/lt*100}%;background:#5c6b8a"></i><i style="width:${a.opLast[2]/lt*100}%;background:var(--bad)"></i>`;
+ const lastOp=S.feed.find(x=>x.m.type==="op");$("#ntQ").textContent=lastOp?`"${NETO.ops[lastOp.m.p.i]}"`:"Provocação no ar";
+ const tk=Object.keys(TEAMS).sort((x,y)=>a.torC[y]-a.torC[x]).slice(0,4);
+ $("#ntTor").innerHTML=barsHTML(tk,tk.map(k=>a.torC[k]),tk.map(k=>TEAMS[k].c),90);
+ $("#chStar").innerHTML=barsHTML(CHEF.star.o,a.starC,["#ff8a65","#c8a27a","#7b4a2e"],90);
+ const ig=Object.entries(a.ingC).sort((x,y)=>y[1]-x[1]).slice(0,6);
+ $("#chIng").innerHTML=ig.map(([k,v],i)=>`<span class="chip ${i<3?"g":""}">${esc(k)} · ${v}</span>`).join("")||`<span class="mut">ninguém abriu a caixa ainda</span>`;
+ const r=S.lastRecipe;$("#chLast").innerHTML=r?`<b>${esc(r.prato)}</b> · nota <b>${esc(r.nota)}</b>/10<br><span class="mut">${r.real?"<span class='gold'>● AO VIVO</span> ":""}${esc(r.name)} · ${esc((r.ings||[]).join(" + "))}</span><div style="margin-top:4px">${esc(r.comentario||"")}</div>`:"Aguardando o primeiro chef...";
+ // audiência por time
+ const tf={};Object.keys(TEAMS).forEach(k=>tf[k]=TEAMS[k].base);a.fans.forEach(f=>{const k=TEAMS[f.team]?f.team:"Outros";tf[k]+=f.sim?37:1});
+ const tmax=Math.max(...Object.values(tf));
+ $("#aud").innerHTML=Object.keys(TEAMS).sort((x,y)=>tf[y]-tf[x]).map(k=>`<div class="bar" style="grid-template-columns:100px 1fr 64px"><div class="n">${k}</div><div class="t"><div class="f" style="width:${tf[k]/tmax*100}%;background:${TEAMS[k].c}"></div></div><div class="p">${fmt(tf[k])}</div></div>`).join("");
+ // ranking
+ const top=[...a.fans].sort((x,y)=>y.xp-x.xp).slice(0,8);
+ $("#rkp").innerHTML=top.map((f,i)=>`<div class="r ${f.sim?"":"real"}"><div class="pos">${i+1}</div><div class="av" style="background:${teamHex(f.team)}">${esc(ini(f.name))}</div><div><b style="font-size:13px">${esc(f.name)}</b><div class="md">${(f.medals||[]).map(id=>MEDALS.find(m=>m[0]===id)[1]).join(" ")||"<span class='mut' style='font-size:11px'>sem medalhas</span>"}</div></div><div class="xp">${fmt(f.xp)}</div></div>`).join("")||`<p class="mut">Aguardando participantes...</p>`;
+ $("#feed").innerHTML=S.feed.slice(0,30).map(({m,real})=>{const pts=m.p&&m.p.pts?`+${m.p.pts}`:"";const pr=m.prog?PROGS[m.prog].ic+" ":"";return`<div class="fi ${real?"real":""}"><div class="av" style="background:${teamHex(m.fan.team)}">${esc(ini(m.fan.name))}</div><div class="tx"><b>${esc(m.fan.name)}</b> ${pr}${esc(evtText(m))}<small>${real?"<span class='gold'>● AO VIVO NA SALA</span> · ":""}${new Date(m.ts).toLocaleTimeString("pt-BR")}</small></div><div class="pt">${pts}</div></div>`}).join("")||`<p class="mut">Aguardando o primeiro participante...</p>`;
+ if($('#v-intel').classList.contains('on'))renderIntel(a);if($('#v-camp').classList.contains('on'))renderCamp();
+}
+function drawGauge(p){const cx=110,cy=110,r=90;const ang=Math.PI*(1-p);const x=cx+r*Math.cos(ang),y=cy-r*Math.sin(ang);
+ $("#gsvg").innerHTML=`<path d="M20,110 A90,90 0 0 1 200,110" fill="none" stroke="#16234a" stroke-width="16" stroke-linecap="round"/>${p>0?`<path d="M20,110 A90,90 0 0 1 ${x.toFixed(1)},${y.toFixed(1)}" fill="none" stroke="url(#gg)" stroke-width="16" stroke-linecap="round"/>`:""}<defs><linearGradient id="gg"><stop offset="0" stop-color="#ff6a1a"/><stop offset="1" stop-color="#f5b82e"/></linearGradient></defs>`}
+function interests(f){const ok=f.quiz.filter(q=>q&&q.ok).length;return{"Futebol / clássicos":Math.min(100,(f.pal!=null?30:0)+(f.vr!=null?20:0)+ok*12+(f.esc?15:0)),"Debate e opinião":Math.min(100,f.ops.filter(c=>c!=null).length*28+(f.tor?16:0)),"Culinária":Math.min(100,(f.star!=null?30:0)+(f.caixa?40:0)+(f.recipe?20:0)),"Nostalgia / acervo":Math.min(100,ok*25+(f.esc?25:0)),"Propensão a patrocínio":Math.min(100,(f.mkt?50:10)+Object.keys(f.rewards).length*20)}}
+function nba(f){const ks=Object.keys(f.progs);if(ks.length>=3)return spo("rota");if(f.progs.chef&&f.progs.arena)return spo("vila");if(f.progs.chef)return spo("vila");if(f.progs.craque)return spo("brasa");return spo("pulso")}
+function renderIntel(a){
+ $("#fanCount").textContent=a.n;
+ const fans=[...a.fans].sort((x,y)=>(x.sim-y.sim)||(y.last-x.last));
+ $("#fanlist").innerHTML=fans.slice(0,40).map(f=>`<button class="fanrow ${S.selected===f.id?"on":""}" data-id="${f.id}"><div class="av" style="background:${teamHex(f.team)}">${esc(ini(f.name))}</div><div><div class="nm">${esc(f.name)} ${!f.sim?"<span class='tag gold'>sala</span>":""}</div><small>${esc(f.team)} · ${Object.keys(f.progs).map(k=>PROGS[k].ic).join(" ")} · ${fmt(f.xp)} XP</small></div></button>`).join("")||`<p class="mut">Ninguém ainda.</p>`;
+ const mx=a.mx;$("#matrix").innerHTML=[["Arena + Neto",mx.ac,"futebol e debate"],["Arena + MasterChef",mx.ah,"futebol e culinária"],["Neto + MasterChef",mx.ch,"debate e culinária"],["Nos 3 programas",mx.all,"Exploradores Playverse"]].map((r,i)=>`<div class="mx ${i===1||i===3?"hl":""}"><small>${r[0]}</small><div class="v">${fmt(r[1])}</div><small>${r[2]} · projeção ${fmt(r[1]*a.scale)}</small></div>`).join("");
+ const f=S.fans.get(S.selected);
+ if(!f)$("#f360").innerHTML=`<h3>Fan 360</h3><p class="mut">Selecione um perfil.</p>`;
+ else{const it=interests(f),b=nba(f),lv=level(f.xp);
+  $("#f360").innerHTML=`<h3>Fan 360 · ${esc(f.name)} <span class="tag ${f.sim?"sim":"gold"}">${f.sim?"simulado":"ao vivo"}</span></h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+   <div><div class="prof"><div class="av" style="background:${teamHex(f.team)}">${esc(ini(f.name))}</div><div><b>${esc(f.name)}</b><span class="mut">${esc(f.team)} · ${lv.name} · ${fmt(f.xp)} XP</span></div></div>
+    <div class="chips">${Object.keys(f.progs).map(k=>`<span class="chip g">${PROGS[k].ic} ${PROGS[k].name}</span>`).join("")}</div>
+    <div class="medals" style="margin-top:8px">${MEDALS.map(m=>`<span class="medal ${f.medals.includes(m[0])?"on":""}">${m[1]} ${m[2]}</span>`).join("")}</div>
+    <div style="margin-top:10px;font-size:12px" class="mut">Próxima melhor ação: <b class="gold">${esc(b.name)}</b> · ${esc(b.reward)}${f.mkt?"":" (sem opt-in: só comunicação dos programas)"}</div></div>
+   <div><div class="meter" style="margin-top:0">${Object.entries(it).map(([k,v])=>`<div class="row"><span>${k}</span><div class="t"><div class="f" style="width:${v}%"></div></div><b>${Math.round(v)}</b></div>`).join("")}</div>
+    <div class="tl" style="margin-top:8px;max-height:120px">${f.tl.slice(0,6).map(e=>`<div><code>${new Date(e.t).toLocaleTimeString("pt-BR")}</code><span>${esc(e.txt)}</span></div>`).join("")}</div></div>
+  </div>`}
+ $("#segs").innerHTML=a.segs.map(s=>{const b=spo(s.brand);return`<tr><td><b>${s.k}</b><br><small class="mut">${s.d}</small></td><td class="num">${fmt(s.n)}</td><td class="num">${fmt(s.proj)}</td><td class="num">${Math.round(s.prop*100)}%</td><td>${esc(b.name)}<br><small class="mut">${esc(b.cat)}</small></td></tr>`}).join("");
+}
+
+/* ===== campanhas ===== */
+const MECS=[{k:"Cupom de benefício",conv:.09,cpa:4},{k:"Sorteio de experiência",conv:.16,cpa:2.5},{k:"Quiz patrocinado",conv:.22,cpa:1.8},{k:"Desafio entre torcidas",conv:.19,cpa:2.2}];
+const CHS=[{k:"QR na TV",cpm:38},{k:"Push no app",cpm:22},{k:"Bandplay",cpm:30},{k:"YouTube",cpm:26},{k:"Rádio",cpm:18}];
+const C={seg:0,spo:"vila",mec:0,ch:[0,1],lastRev:0};
+function renderCamp(){
+ const a=agg();
+ $("#cSeg").innerHTML=a.segs.map((s,i)=>`<button class="pill ${C.seg===i?"on":""}" data-cseg="${i}">${s.k} · ${fmt(s.proj)}</button>`).join("");
+ $("#cSpo").innerHTML=SPONSORS.map(s=>`<button class="pill ${C.spo===s.id?"on":""}" data-cspo="${s.id}">${s.name}</button>`).join("");
+ $("#cMec").innerHTML=MECS.map((m,i)=>`<button class="pill ${C.mec===i?"on":""}" data-cmec="${i}">${m.k}</button>`).join("");
+ $("#cCh").innerHTML=CHS.map((c,i)=>`<button class="pill ${C.ch.includes(i)?"on":""}" data-cch="${i}">${c.k}</button>`).join("");
+ const s=a.segs[C.seg],m=MECS[C.mec];
+ const base=Math.max(s.proj,a.n?0:Math.round(BASE.id*.08));
+ const reach=Math.round(base*(a.n?a.consent/Math.max(1,a.n):.46)*(1+(C.ch.length-1)*.18));
+ const fit=SPONSORS.find(x=>x.id===C.spo).id===s.brand?1.25:1;
+ const conv=Math.round(reach*m.conv*s.prop*fit);
+ const impressions=reach*4*C.ch.length;
+ const cpm=C.ch.reduce((x,i)=>x+CHS[i].cpm,0)/Math.max(1,C.ch.length);
+ const rev=impressions/1000*cpm+conv*m.cpa*3+25000;
+ C.lastRev=rev;
+ $("#rAlc").textContent=fmt(reach);$("#rConv").textContent=fmt(conv);$("#rConvS").textContent=`${(reach?conv/reach*100:0).toFixed(1)}% de conversão${fit>1?" · fit de marca ✓":""}`;
+ $("#rRev").textContent=brl(rev);$("#rRevS").textContent=`mídia ${brl(impressions/1000*cpm)} + CPA + cota fixa R$ 25 mil`;
+ renderFin();
+}
+function renderFin(){const r=+$("#fRec").value,t=+$("#fTax").value,net=Math.max(0,r-t);$("#fRecV").textContent=brl(r);$("#fTaxV").textContent=brl(t);$("#fNet").textContent=brl(net);$("#fBand").textContent=brl(net/2);$("#fVF").textContent=brl(net/2)}
+async function genCamp(){
+ const a=agg(),s=a.segs[C.seg],sp=spo(C.spo),m=MECS[C.mec];
+ const el=$("#aiCamp");el.innerHTML="<span class='mut'>Gerando...</span>";
+ const fb=`**${sp.name} · ${s.k}**\n- Mecânica: ${m.k.toLowerCase()} nos programas ${s.k.includes("culinária")?"Jogo Aberto e MasterChef":"do Playverse"}, ativada por ${C.ch.map(i=>CHS[i].k).join(", ")}.\n- Mensagem: "Você joga, a ${sp.name} recompensa: ${sp.reward}."\n- Alvo: ${fmt(s.proj)} perfis projetados, só quem deu opt-in.\n- Medição: resgates por código único no Band Pass.`;
+ let out=null;
+ try{const smp=await (window.claude&&claude.use?claude.use("sample"):null);
+  if(smp){const r=await smp(`Você é o Marketing Copilot da ClubBrain.ai no Band Playverse (parceria Band × Virtual Fans). Crie uma proposta curta de campanha patrocinada, em português do Brasil, para apresentar ao vivo a executivos da Band.
+Dados: segmento "${s.k}" (${s.d}), ${fmt(s.proj)} perfis projetados, propensão ${Math.round(s.prop*100)}%. Patrocinador fictício: ${sp.name} (${sp.cat}), recompensa: ${sp.reward}. Mecânica: ${m.k}. Canais: ${C.ch.map(i=>CHS[i].k).join(", ")}. Receita estimada: ${brl(C.lastRev)}.
+Formato: primeira linha com **nome da campanha**, depois 4 tópicos iniciados por "- " (mecânica no ar, mensagem para o fã, como mede, por que a marca compra). No máximo 110 palavras. Só segmentos agregados com opt-in, sem dados pessoais.`,{modelTier:"quick",cache:false,onText:({text})=>{el.innerHTML=md(text)}});out=r&&r.text}}catch(e){}
+ el.innerHTML=md(out||fb);
+}
+
+/* ===== agente ===== */
+const COPIS=[
+ {id:"sponsor",n:"Sponsor Activation Copilot",d:"desenha ativações e mede resultado",sugs:["Quais são as oportunidades de patrocínio para os perfis que acabaram de interagir nos três programas?","Quantos torcedores do Corinthians participaram e quais marcas poderiam ativar esse público?","Que marca de alimentos deveria comprar o segmento futebol + culinária, e por quê?"]},
+ {id:"exec",n:"Executive Copilot",d:"resume indicadores e próximos passos",sugs:["Resuma esta sessão em 4 pontos para a diretoria da Band.","Qual o resultado 50/50 do simulador e o que falta validar?","Como isso complementa a Vibra e o Bandplay sem competir?"]},
+ {id:"match",n:"Matchday Copilot",d:"apoia a operação ao vivo",sugs:["Qual provocação o Neto deveria fazer agora para aumentar a participação?","O VAR da audiência discordou da arbitragem? Como explorar isso no ar?"]},
+ {id:"mkt",n:"Marketing Copilot",d:"recomenda e orquestra campanhas",sugs:["Crie 3 notificações para trazer de volta quem só jogou um programa.","Que receita da caixa misteriosa vale virar conteúdo patrocinado?"]}
+];
+let COPI=COPIS[0];const CHAT=[];
+function md(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").split(/\n/).map(l=>/^\s*[-•]\s+/.test(l)?`<li>${l.replace(/^\s*[-•]\s+/,"")}</li>`:(l.trim()?`<p>${l}</p>`:"")).join("").replace(/(<li>.*?<\/li>)+/g,m=>`<ul>${m}</ul>`)}
+function renderCopis(){$("#copis").innerHTML=COPIS.map(c=>`<button class="copi ${c===COPI?"on":""}" data-c="${c.id}"><b>${c.n}</b><small>${c.d}</small></button>`).join("");$("#copiName").textContent=COPI.n;$("#sugs").innerHTML=COPI.sugs.map(s=>`<button class="sug">${esc(s)}</button>`).join("")}
+function renderChat(){$("#msgs").innerHTML=CHAT.map(m=>m.r==="u"?`<div class="m u">${esc(m.t)}</div>`:`<div class="m a"><div class="who">${esc(m.c)}</div>${md(m.t||"…")}</div>`).join("")||`<div class="m a"><div class="who">Band AI</div><p>Estou acompanhando os três programas ao vivo. Pergunte sobre participantes, segmentos, patrocínios ou receita.</p></div>`;$("#msgs").scrollTop=1e9}
+function ctx(){const a=agg();return{
+ programas:Object.values(PROGS).map(p=>({nome:p.name,programa:p.program,apresentador:p.host,patrocinador_ficticio:spo(p.sponsor).name})),
+ kpis:{participantes_projecao:a.part,engajamento:Math.round(a.eng*100)+"%",perfis_identificados:a.idn,receita_potencial:Math.round(a.rev),sessao_total:a.n,pessoas_reais_na_sala:a.real.length,eventos:S.events,opt_ins:a.consent},
+ pessoas_reais_na_sala:a.real.map(f=>({nome:f.name,time:f.team,xp:f.xp,programas:Object.keys(f.progs).map(k=>PROGS[k].name),medalhas:f.medals,palpite:f.pal!=null?ARENA.pal.o[f.pal]:null,var:f.vr!=null?ARENA.var.o[f.vr]:null,concordancia_neto:f.ops.map(c=>c!=null?NETO.o[c]:null),caixa:f.caixa,receita_ia:f.recipe?f.recipe.prato:null,opt_in:f.mkt})),
+ fan_arena:{palpites:Object.fromEntries(ARENA.pal.o.map((o,i)=>[o,a.palC[i]])),var:Object.fromEntries(ARENA.var.o.map((o,i)=>[o,a.varC[i]])),escalacao_mais_votada:a.escC},
+ desafio_craque:{concordo_depende_discordo:a.opC,torcida_que_canta_mais:a.torC},
+ masterchef:{estrela:Object.fromEntries(CHEF.star.o.map((o,i)=>[o,a.starC[i]])),ingredientes:a.ingC,ultima_receita:S.lastRecipe&&S.lastRecipe.prato},
+ cruzamento:a.mx,segmentos:a.segs.map(s=>({segmento:s.k,criterio:s.d,sessao:s.n,projecao:s.proj,propensao:s.prop,marca:spo(s.brand).name})),
+ marcas_ficticias:SPONSORS.map(s=>({marca:s.name,categoria:s.cat,fit:s.fit,recompensa:s.reward})),
+ simulador_financeiro:{receita:+$("#fRec").value,deducoes:+$("#fTax").value,divisao:"50% Band / 50% Virtual Fans sobre o resultado líquido distribuível"},
+ regras:["Nunca vender dados pessoais: só segmentos agregados com opt-in.","Valores ilustrativos e não contratuais.","Virtual Fans é a experiência e ClubBrain é a inteligência; complementam a Vibra Digital e o Bandplay, sem substituí-los.","Uso de marcas, imagens de apresentadores e do universo MasterChef depende de autorização."]}}
+function fallbackAnswer(){const a=agg();const best=[...a.segs].sort((x,y)=>y.proj*y.prop-x.proj*x.prop)[0];return`**Leitura da sessão (modo offline)**
+- ${a.n} participantes na sessão (${a.real.length} na sala), ${S.events} interações e ${a.consent} opt-ins.
+- ${a.mx.all} perfis jogaram nos 3 programas e ${a.mx.ah} cruzaram futebol e culinária.
+- Concordância com o Neto: ${Math.round(a.opC[0]/Math.max(1,a.opC.reduce((x,y)=>x+y,0))*100)}%.
+- Maior oportunidade: **${best.k}** (${fmt(best.proj)} perfis projetados) para ${spo(best.brand).name}.
+Próximo passo: lançar a campanha na aba Campanhas e receita, só para quem deu opt-in.`}
+async function ask(q){if(!q.trim())return;CHAT.push({r:"u",t:q});const msg={r:"a",t:"",c:COPI.n};CHAT.push(msg);renderChat();
+ let s=null;try{s=await (window.claude&&claude.use?claude.use("sample"):null)}catch(e){}
+ if(!s){msg.t=fallbackAnswer();$("#aiState").textContent="offline";renderChat();return}
+ $("#aiState").textContent="pensando…";
+ const hist=CHAT.slice(0,-1).slice(-5).map(m=>({role:m.r==="u"?"user":"assistant",content:m.t||"-"}));
+ const sys=`Você é a Band AI, no papel de ${COPI.n} da ClubBrain.ai, operando o Band Playverse (Virtual Fans + ClubBrain.ai para o Grupo Bandeirantes): três programas gamificados ao mesmo tempo (Band Fan Arena no Jogo Aberto com Renata Fan, Desafio do Craque em Os Donos da Bola com Craque Neto, MasterChef Challenge). Papel: ${COPI.d}.
+Público: executivos da Band numa reunião ao vivo. Responda em português do Brasil, executivo e direto: no máximo 170 palavras, 3 a 5 tópicos iniciados por "- " e uma linha final "Próximo passo: ...". Use **negrito** só em números-chave. Cite pessoas reais da sala pelo nome quando ajudar a provar que os dados são ao vivo. Use só os dados do contexto e diga quando algo é projeção ilustrativa. Respeite as regras.
+CONTEXTO AO VIVO (JSON):
+${JSON.stringify(ctx())}`;
+ const msgs=[{role:"user",content:sys+"\n\nOk?"},{role:"assistant",content:"Entendido. Pronto para responder com base no contexto ao vivo."},...hist.slice(0,-1),{role:"user",content:q}];
+ try{const r=await s(msgs,{modelTier:"default",cache:false,onText:({text})=>{msg.t=text;renderChat()}});msg.t=(r&&r.text)||msg.t;$("#aiState").textContent="IA ao vivo"}
+ catch(e){msg.t=fallbackAnswer();$("#aiState").textContent=e&&e.code?e.code:"offline"}
+ renderChat()}
+
+/* ===== IA do Chef ===== */
+function chefLocal(ings,tec){const sweet=ings.includes("Chocolate amargo")||ings.includes("Manga");const sea=ings.includes("Camarão");const br=ings.filter(i=>["Mandioca","Queijo coalho","Castanha-do-pará","Pimenta dedo-de-moça"].includes(i)).length;
+ let nota=6.5+br*.6+(sea&&ings.includes("Limão-siciliano")?1:0)+(sweet&&ings.includes("Pimenta dedo-de-moça")?.8:0)-(sea&&ings.includes("Chocolate amargo")?1.2:0);nota=Math.max(5,Math.min(9.6,nota+Math.random()*.6));
+ const main=ings[0],prato=`${main} ${tec==="Cru / ceviche"?"em ceviche":tec==="Confitar"?"confitado":tec==="Grelhar"?"grelhado":"assado"} com ${ings[1].toLowerCase()} e ${ings[2].toLowerCase()}`;
+ return{prato,nota:nota.toFixed(1),comentario:br>=2?"Combinação com muita identidade brasileira. Os jurados iam gostar.":sea&&ings.includes("Chocolate amargo")?"Ousado demais: o chocolate briga com o camarão. Equilibre com acidez.":"Boa harmonia. Cuide do ponto e da acidez para chegar ao 9.",passos:[`Prepare o ${main.toLowerCase()} e tempere com sal e um fio de azeite.`,`${tec==="Cru / ceviche"?"Cure em limão por 10 minutos":tec==="Confitar"?"Confite em azeite a fogo baixo por 25 minutos":tec==="Grelhar"?"Grelhe em fogo alto, 2 a 3 minutos por lado":"Asse a 200 °C por cerca de 20 minutos"}.`,`Finalize com ${ings[1].toLowerCase()} e ${ings[2].toLowerCase()}, ajustando o sal.`]}}
+async function chefAI(ings,tec,team,name,onT){
+ try{const s=await (window.claude&&claude.use?claude.use("sample"):null);
+  if(s){const r=await s(`Você é a IA do Chef do MasterChef Challenge no Band Playverse. Um participante (${name}, torcedor do ${team}) abriu a caixa misteriosa virtual e escolheu: ${ings.join(", ")}, com a técnica "${tec}".
+Avalie a combinação como um jurado exigente porém gentil e proponha uma receita personalizada e viável em casa.
+Responda SOMENTE com JSON válido, sem markdown: {"prato":"nome criativo, até 6 palavras","nota":"número de 0 a 10 com uma casa decimal","comentario":"1 frase de jurado, até 22 palavras","passos":["passo 1","passo 2","passo 3"]}. Português do Brasil.`,{modelTier:"quick",cache:false});
+   const t=(r&&r.text)||"";const j=JSON.parse(t.slice(t.indexOf("{"),t.lastIndexOf("}")+1));if(j&&j.prato)return{prato:String(j.prato),nota:String(j.nota),comentario:String(j.comentario||""),passos:(j.passos||[]).slice(0,4).map(String),ia:true}}}catch(e){}
+ return chefLocal(ings,tec)}
+
+/* ===== APP CELULAR ===== */
+function PhoneApp(root,key){
+ let fan=ls.get(key);let scr=fan?"hub":"onboard";let qs=null,th=null,tmp={};
+ const save=()=>fan&&ls.set(key,fan);
+ const snap=()=>({id:fan.id,name:fan.name,team:fan.team,mkt:fan.mkt,xp:fan.xp,medals:fan.medals,sim:false});
+ const emit=(type,prog,p)=>BUS.send({kind:"evt",type,prog,fan:snap(),p});
+ const toast=t=>{const el=root.querySelector(".toast");if(!el)return;el.textContent=t;el.classList.add("on");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("on"),1500)};
+ const add=(n,l)=>{fan.xp+=n;save();toast(`+${n} ${l||"XP"}`)};
+ const D=()=>fan.d;
+ function medal(id){if(fan.medals.includes(id))return;fan.medals.push(id);save();const m=MEDALS.find(x=>x[0]===id);setTimeout(()=>toast(`${m[1]} Medalha: ${m[2]}`),900);emit("medal",null,{label:m[2]});checkExplorer()}
+ function checkExplorer(){const p=fan.played||{};if(p.arena&&p.craque&&p.chef&&!fan.medals.includes("explorador")){fan.xp+=150;medal("explorador")}}
+ function played(prog){fan.played=fan.played||{};fan.played[prog]=true;save();checkExplorer()}
+ function hd(){return`<div class="hd"><div class="mark" style="width:30px;height:30px;font-size:14px;border-radius:8px">VF</div><div class="lg">BAND <span>PLAYVERSE</span></div>${fan?`<div class="xp">${fmt(fan.xp)} XP</div>`:""}</div>`}
+ function progDone(k){const d=D();if(k==="arena")return[d.pal,d.quiz,d.esc,d.var].filter(Boolean).length+"/4";if(k==="craque")return[d.ops,d.tor].filter(Boolean).length+"/2";return[d.star,d.caixa].filter(Boolean).length+"/2"}
+ function mi(go,ic,b,s,done,st){return`<button class="mi ${done?"done":""}" data-go="${go}"><div class="ic">${ic}</div><div><b>${esc(b)}</b><small>${esc(s)}</small></div><div class="st">${done?"✓":esc(st)}</div></button>`}
+ function rewardBtn(prog){const sp=spo(PROGS[prog].sponsor),got=fan.rw&&fan.rw[sp.id],can=fan.xp>=REWARD_AT;return`<button class="mi ${got?"done":(can?"":"lock")}" data-rw="${sp.id}"><div class="ic">🎁</div><div><b>${esc(sp.name)}</b><small>${can?esc(sp.reward):`desbloqueia com ${REWARD_AT} XP`}</small></div><div class="st">${got?"resgatada":(can?"abrir":"🔒")}</div></button>`}
+ function render(){let h="";const d=fan&&D();
+  if(scr==="onboard"){h=`<div class="ct"><h2>Um <span>Band Pass</span><br>para tudo</h2><p class="lead">Jogue com a Renata, desafie o Neto e abra a caixa misteriosa do MasterChef. XP, medalhas e recompensas valem nos três.</p>
+   <label class="field"><span>Seu apelido no ranking</span><input id="nm" maxlength="22" placeholder="Apelido" value="${esc(tmp.nm||"")}"></label>
+   <div class="field"><span>Time do coração</span><div class="teams">${Object.keys(TEAMS).map(k=>`<button class="tm ${tmp.team===k?"on":""}" data-team="${k}"><i style="background:${TEAMS[k].hex}"></i>${k}</button>`).join("")}</div></div>
+   <label class="chk"><input type="checkbox" id="c1" ${tmp.c1?"checked":""}><span>Aceito os termos e a política de privacidade. Minha participação será usada para pontos, ranking e personalização <b>(obrigatório)</b>.</span></label>
+   <label class="chk"><input type="checkbox" id="c2" ${tmp.c2?"checked":""}><span>Quero receber ofertas dos patrocinadores dos programas <b>(opcional, +50 XP)</b>.</span></label>
+   <button class="cta" id="go" ${(tmp.team&&tmp.c1&&(tmp.nm||"").trim())?"":"disabled"}>Entrar no Playverse</button><div class="foot">Demo conceitual · dados de teste · consentimento registrado</div></div>`}
+  else if(scr==="hub"){const lv=level(fan.xp);h=`<div class="ct"><div class="pass"><div class="r1"><span>Band Pass</span><span>${esc(fan.team)}</span></div><b>${esc(fan.name)}</b><div class="lvl"><span>${lv.name}</span><span>${lv.next?`${fmt(lv.next-fan.xp)} XP para ${lv.nextName}`:"nível máximo"}</span></div><div class="pb"><i style="width:${lv.pct}%"></i></div>
+    <div class="medals">${MEDALS.map(m=>`<span class="medal ${fan.medals.includes(m[0])?"on":""}" title="${m[2]}">${m[1]}</span>`).join("")}</div></div>
+   <div class="mut" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 8px">Agora no ar</div>
+   <div class="hub">${Object.entries(PROGS).map(([k,p])=>`<button class="pcard ${k}" data-go="${k}"><div class="ic">${p.ic}</div><div><b>${p.name}</b><small>${p.program} · ${p.host}</small><small>${p.tag}</small></div><div class="st">${progDone(k)}</div></button>`).join("")}</div>
+   ${fan.medals.includes("explorador")?`<button class="mi" data-rw="rota" style="margin-top:10px"><div class="ic">🌐</div><div><b>Prêmio Explorador · Rota Bank</b><small>${spo("rota").reward}</small></div><div class="st">${fan.rw&&fan.rw.rota?"resgatado":"abrir"}</div></button>`:`<p class="foot" style="margin-top:10px">Jogue nos 3 programas para virar 🌐 Explorador Playverse (+150 XP e prêmio master).</p>`}
+   <button class="mi" data-go="minu" style="margin-top:10px;border-color:rgba(245,184,46,.5)"><div class="ic">⇄</div><div><b>Trocar XP na Minu</b><small>Recarga, corrida, delivery, cinema...</small></div><div class="st">${fmt(fan.xp-(fan.spent||0))} XP</div></button>
+   <div class="foot">Marcas de patrocinadores fictícias · demo</div></div>`}
+  else if(scr==="minu"){const bal=fan.xp-(fan.spent||0);h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><h2>Trocar <span>XP</span></h2><p class="lead">Seu saldo: <b style="color:var(--gold)">${fmt(bal)} XP</b>. ${XP_PER_REAL} XP = R$ 1. Recompensas instantâneas via <b>Minu</b>.</p>
+   ${tmp.voucher?`<div class="coupon" style="margin-bottom:12px"><small>Minu · voucher instantâneo</small><b>${esc(tmp.voucher.n)}</b><div>Enviado por push e WhatsApp</div><div class="code">MINU-${esc(fan.id.slice(0,3).toUpperCase())}${tmp.voucher.k}</div></div>`:""}
+   <div class="ms">${MINU_CAT.map((c,i)=>{const cost=c[2]*XP_PER_REAL;return`<button class="mi ${bal<cost?"lock":""}" data-minu="${i}"><div class="ic">${c[0]}</div><div><b>${esc(c[1])}</b><small>R$ ${c[2]} em valor</small></div><div class="st">${fmt(cost)} XP</div></button>`}).join("")}</div>
+   <p class="foot" style="margin-top:10px">Integração Minu simulada · catálogo e valores ilustrativos</p></div>`}
+  else if(scr==="arena"){h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><div class="live"><span class="tag">AO VIVO</span><div><b>Jogo Aberto · Band Fan Arena</b><small>com Renata Fan · o torcedor vira comentarista</small></div></div><div class="ms">
+   ${mi("a-pal","🎯","Palpite do clássico",ARENA.pal.q,d.pal,"+100")}${mi("a-quiz","🧠","Quiz do Majestoso","3 perguntas · bônus de velocidade",d.quiz,"até +540")}${mi("a-esc","📋","Escalação dos sonhos","formação + 3 ídolos do acervo",d.esc,"+120")}${mi("a-var","🖥️","VAR interativo","você decide o lance polêmico",d.var,"+80")}${rewardBtn("arena")}</div></div>`}
+  else if(scr==="craque"){h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><div class="live"><span class="tag">AO VIVO</span><div><b>Os Donos da Bola · Desafio do Craque</b><small>com Craque Neto · concorde ou desafie</small></div></div><div class="ms">
+   ${mi("c-ops","🔥","Duelo de opiniões","3 provocações do Neto",d.ops,"+180")}${mi("c-tor","📣","Provocação entre torcidas",NETO.tor,d.tor,"+60")}${rewardBtn("craque")}</div></div>`}
+  else if(scr==="chef"){h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><div class="live"><span class="tag">AO VIVO</span><div><b>MasterChef Challenge</b><small>caixa misteriosa virtual · IA do Chef</small></div></div><div class="ms">
+   ${mi("h-star","⭐","A estrela da caixa",CHEF.star.q,d.star,"+60")}${mi("h-caixa","📦","Abrir a caixa misteriosa","3 ingredientes + técnica · a IA avalia",d.caixa,"até +300")}${rewardBtn("chef")}</div>
+   ${fan.recipe?`<div class="hist" style="margin-top:12px"><div class="who">🍳 Sua criação</div><b>${esc(fan.recipe.prato)}</b> · nota ${esc(fan.recipe.nota)}</div>`:""}</div>`}
+  else if(scr==="a-pal"||scr==="h-star"||scr==="c-tor"||scr==="a-var"){const cfg={"a-pal":[ARENA.pal.q,ARENA.pal.o,"pal","arena",100,"palC"],"h-star":[CHEF.star.q,CHEF.star.o,"star","chef",60,"starC"],"c-tor":[NETO.tor,Object.keys(TEAMS),"tor","craque",60,null],"a-var":[ARENA.var.q,ARENA.var.o,"var","arena",80,"varC"]}[scr];
+   const mine=d[cfg[2]+"V"];const a=agg();let vals=cfg[5]?a[cfg[5]]:Object.keys(TEAMS).map(k=>a.torC[k]);const t=vals.reduce((x,y)=>x+y,0)||1;const back=cfg[3];
+   h=`<div class="ct"><button class="back" data-go="${back}">‹ voltar</button><h2 style="font-size:26px">${esc(cfg[0])}</h2>${scr==="a-var"?`<div class="lance">${ARENA.var.txt}</div>`:`<p class="lead">${mine!=null?"Voto registrado. Veja a audiência:":`Vale ${cfg[4]} XP.`}</p>`}
+   <div class="opts ${cfg[1].length>3?"g2":""}">${cfg[1].map((o,i)=>`<button class="op ${mine===i?"me":""}" data-vote="${i}" ${mine!=null?"disabled":""}><div class="fill" style="width:${mine!=null?vals[i]/t*100:0}%"></div><span>${esc(o)}</span>${mine!=null?`<span class="pc">${Math.round(vals[i]/t*100)}%</span>`:""}</button>`).join("")}</div>
+   ${mine!=null&&scr==="a-var"?`<div class="expl">🧑‍⚖️ ${esc(ARENA.var.ref)}</div>`:""}${mine!=null?`<button class="cta ghost" data-go="${back}">Continuar</button>`:""}</div>`}
+  else if(scr==="a-quiz"){const q=ARENA.quiz[qs.i];h=`<div class="ct"><button class="back" data-go="arena">‹ sair</button><div class="qmeta"><span>Quiz do Majestoso</span><span>${qs.i+1}/3</span></div><div class="timer"><i id="tmr"></i></div><h2 style="font-size:24px">${esc(q.q)}</h2>
+   <div class="opts" style="margin-top:12px">${q.o.map((o,i)=>{let c="";if(qs.ans!=null){if(i===q.a)c="right";else if(i===qs.ans)c="wrong"}return`<button class="op ${c}" data-ans="${i}" ${qs.ans!=null?"disabled":""}><span>${esc(o)}</span></button>`}).join("")}</div>
+   ${qs.ans!=null?`<div class="expl">${qs.ans===q.a?"✅ ":"❌ "}${esc(q.e)}</div><button class="cta" data-qn="1">${qs.i<2?"Próxima":"Ver resultado"}</button>`:""}</div>`}
+  else if(scr==="a-esc"){tmp.form=tmp.form||ARENA.forms[0];tmp.picks=tmp.picks||[];h=`<div class="ct"><button class="back" data-go="arena">‹ voltar</button><h2>Escalação <span>dos sonhos</span></h2><p class="lead">Escolha a formação e 3 ídolos do acervo para o seu Majestoso de todos os tempos.</p>
+   <div class="pills" style="margin-bottom:12px">${ARENA.forms.map(f=>`<button class="pill ${tmp.form===f?"on":""}" data-form="${f}">${f}</button>`).join("")}</div>
+   <div class="opts g2">${ARENA.legends.map(l=>`<button class="op ${tmp.picks.includes(l)?"me":""}" data-pick="${esc(l)}" style="padding:11px 10px;font-size:13px"><span>${esc(l)}</span></button>`).join("")}</div>
+   <button class="cta" id="escGo" ${tmp.picks.length===3?"":"disabled"}>Confirmar escalação (${tmp.picks.length}/3)</button></div>`}
+  else if(scr==="c-ops"){const i=fan.opI||0;const done=fan.opAns!=null;const a=agg();
+   const vals=[0,0,0];a.fans.forEach(f=>{const c=f.ops[i];if(c!=null)vals[c]++});const t=vals.reduce((x,y)=>x+y,0)||1;
+   h=`<div class="ct"><button class="back" data-go="craque">‹ voltar</button><div class="qmeta"><span>Provocação ${i+1}/3</span><span>+60 XP</span></div><div class="lance" style="margin-top:8px;font-size:15px">🎙️ <b>Neto:</b> "${esc(NETO.ops[i])}"</div>
+   <div class="opts">${NETO.o.map((o,j)=>`<button class="op ${fan.opAns===j?"me":""}" data-op="${j}" ${done?"disabled":""}><div class="fill" style="width:${done?vals[j]/t*100:0}%"></div><span>${esc(o)}</span>${done?`<span class="pc">${Math.round(vals[j]/t*100)}%</span>`:""}</button>`).join("")}</div>
+   ${done?`<p class="expl">${fan.opAns===0?"Você está com o Neto.":fan.opAns===2?"Você desafiou o Neto! Polêmica conta pontos.":"Em cima do muro, mas com argumento."}</p><button class="cta" data-opn="1">${i<2?"Próxima provocação":"Concluir duelo"}</button>`:""}</div>`}
+  else if(scr==="h-caixa"){tmp.ings=tmp.ings||[];tmp.tec=tmp.tec||null;
+   if(fan.recipe&&!tmp.redo){const r=fan.recipe;h=`<div class="ct"><button class="back" data-go="chef">‹ voltar</button><div class="hist"><div class="who">🍳 IA do Chef · avaliação</div><div class="score">${esc(r.prato?r.nota:"…")}</div><b style="font-size:17px;display:block;margin:4px 0">${esc(r.prato||"Avaliando sua caixa...")}</b>${r.comentario?`<p>${esc(r.comentario)}</p>`:""}${r.passos&&r.passos.length?`<ol style="margin:8px 0 0 18px">${r.passos.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`:""}</div>
+    <p class="foot">${r.ia?"Receita criada pela IA em tempo real":r.prato?"Avaliação do modo offline":""} · universo MasterChef sujeito a licença</p><button class="cta ghost" data-go="chef">Voltar ao MasterChef</button></div>`}
+   else h=`<div class="ct"><button class="back" data-go="chef">‹ voltar</button><h2>Caixa <span>misteriosa</span></h2><p class="lead">Escolha 3 ingredientes e a técnica. A IA do Chef avalia e cria uma receita só sua.</p>
+   <div class="ingr">${CHEF.ings.map(([e,n])=>`<button class="ing ${tmp.ings.includes(n)?"on":""}" data-ing="${esc(n)}" ${tmp.ings.length>=3&&!tmp.ings.includes(n)?"disabled":""}><span>${e}</span>${esc(n)}</button>`).join("")}</div>
+   <div class="pills" style="margin-top:12px">${CHEF.tecs.map(t=>`<button class="pill ${tmp.tec===t?"on":""}" data-tec="${t}">${t}</button>`).join("")}</div>
+   <button class="cta" id="cxGo" ${tmp.ings.length===3&&tmp.tec?"":"disabled"}>Cozinhar e avaliar</button></div>`}
+  else if(scr==="reward"){const sp=spo(tmp.rw);h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><h2>Recompensa <span>liberada</span></h2><div class="coupon"><small>${esc(sp.name)} · ${esc(sp.cat)}</small><b>${esc(sp.reward)}</b><div>1 por Band Pass</div><div class="code">${esc(sp.code)}-${esc(fan.id.slice(0,4).toUpperCase())}</div></div><p class="foot" style="margin-top:10px">Marca fictícia para demonstração.</p><button class="cta ghost" data-go="hub">Voltar</button></div>`}
+  root.innerHTML=`<div class="app">${hd()}${h}<div class="toast"></div></div>`;
+  if(scr==="a-quiz"&&qs.ans==null)startT();
+ }
+ function startT(){clearInterval(th);qs.t0=Date.now();const el=root.querySelector("#tmr");th=setInterval(()=>{const r=Math.max(0,1-(Date.now()-qs.t0)/15000);if(el)el.style.width=r*100+"%";if(r<=0){clearInterval(th);ans(-1)}},100)}
+ function ans(i){if(qs.ans!=null)return;clearInterval(th);const q=ARENA.quiz[qs.i],ok=i===q.a,sec=(Date.now()-qs.t0)/1000,pts=ok?150+Math.max(0,Math.round(30*(1-sec/15))):0;qs.ans=i;if(ok){fan.qok=(fan.qok||0)+1;add(pts,"acerto")}emit("quiz","arena",{i:qs.i,ok,pts});render()}
+ root.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b)return;const ds=b.dataset;
+  if(ds.team){tmp.team=ds.team;render();return}
+  if(b.id==="go"){tmp.nm=(root.querySelector("#nm").value||"").trim();if(!tmp.nm||!tmp.team||!tmp.c1)return;fan={id:uid(),name:tmp.nm,team:tmp.team,mkt:!!tmp.c2,xp:0,d:{},medals:[],rw:{}};save();emit("join",null,{pts:tmp.c2?50:0});if(tmp.c2)add(50,"opt-in");tmp={};scr="hub";render();return}
+  if(ds.go){clearInterval(th);const g=ds.go;if(g!=="minu")tmp.voucher=null;
+   if(["a-pal","h-star","c-tor","a-var","a-quiz","a-esc","c-ops","h-caixa"].includes(g)){
+    const dk={"a-pal":"pal","h-star":"star","c-tor":"tor","a-var":"var","a-quiz":"quiz","a-esc":"esc","c-ops":"ops","h-caixa":"caixa"}[g];
+    if(D()[dk]&&!["a-pal","h-star","c-tor","a-var","h-caixa"].includes(g)){toast("Missão concluída ✓");return}
+    if(g==="a-quiz"){qs={i:0,ans:null};fan.qok=0}
+    if(g==="c-ops"){fan.opI=0;fan.opAns=null}
+    if(g==="a-esc")tmp.picks=[];
+    if(g==="h-caixa"){tmp.ings=[];tmp.tec=null}}
+   scr=g;render();return}
+  if(ds.vote!=null){const map={"a-pal":["pal","arena",100,"pal"],"h-star":["star","chef",60,"star"],"c-tor":["tor","craque",60,"tor"],"a-var":["var","arena",80,"var"]}[scr];const v=+ds.vote;
+   D()[map[0]]=true;D()[map[0]+"V"]=v;add(map[2]);played(map[1]);emit(map[3],map[1],{c:map[3]==="tor"?Object.keys(TEAMS)[v]:v,pts:map[2]});
+   if(D().pal&&D().var)medal("comentarista");render();return}
+  if(ds.ans!=null){ans(+ds.ans);return}
+  if(ds.qn){if(qs.i<2){qs={i:qs.i+1,ans:null};render()}else{D().quiz=true;played("arena");if(fan.qok>=2)medal("memoria");save();scr="arena";render();toast(`Quiz: ${fan.qok}/3`)}return}
+  if(ds.form){tmp.form=ds.form;render();return}
+  if(ds.pick){const p=ds.pick;if(tmp.picks.includes(p))tmp.picks=tmp.picks.filter(x=>x!==p);else if(tmp.picks.length<3)tmp.picks.push(p);render();return}
+  if(b.id==="escGo"){D().esc=true;add(120,"escalação");played("arena");emit("esc","arena",{form:tmp.form,picks:tmp.picks,pts:120});scr="arena";render();return}
+  if(ds.op!=null){const i=fan.opI||0;fan.opAns=+ds.op;add(60,fan.opAns===2?"desafiou o Neto":"opinião");played("craque");emit("op","craque",{i,c:fan.opAns,pts:60});render();return}
+  if(ds.opn){if((fan.opI||0)<2){fan.opI=(fan.opI||0)+1;fan.opAns=null;render()}else{D().ops=true;medal("polemico");save();scr="craque";render()}return}
+  if(ds.ing){const n=ds.ing;if(tmp.ings.includes(n))tmp.ings=tmp.ings.filter(x=>x!==n);else if(tmp.ings.length<3)tmp.ings.push(n);render();return}
+  if(ds.tec){tmp.tec=ds.tec;render();return}
+  if(b.id==="cxGo"){const ings=[...tmp.ings],tec=tmp.tec;D().caixa=true;played("chef");fan.recipe={prato:"",nota:"…"};emit("caixa","chef",{ings,tec,pts:150});add(150,"caixa");render();
+   const r=await chefAI(ings,tec,fan.team,fan.name);fan.recipe=r;const bonus=Math.round((parseFloat(String(r.nota).replace(",","."))||7)*15);add(bonus,"nota do Chef");medal("chef");save();emit("recipe","chef",{prato:r.prato,nota:r.nota,comentario:r.comentario,ings,pts:bonus});if(scr==="h-caixa")render();return}
+  if(ds.minu!=null){const c=MINU_CAT[+ds.minu],cost=c[2]*XP_PER_REAL,bal=fan.xp-(fan.spent||0);if(bal<cost){toast(`Faltam ${fmt(cost-bal)} XP`);return}fan.spent=(fan.spent||0)+cost;save();tmp.voucher={n:c[1],k:Math.floor(1000+Math.random()*9000)};emit("minu",null,{item:c[1],xp:cost});toast("Voucher emitido via Minu");render();return}
+  if(ds.rw){const id=ds.rw;if(fan.xp<REWARD_AT&&id!=="rota"){toast(`Faltam ${REWARD_AT-fan.xp} XP`);return}fan.rw=fan.rw||{};if(!fan.rw[id]){fan.rw[id]=true;save();emit("reward",null,{sp:id})}tmp.rw=id;scr="reward";render();return}
+ });
+ root.addEventListener("input",e=>{if(e.target.id==="nm"){tmp.nm=e.target.value;const g=root.querySelector("#go");if(g)g.disabled=!(tmp.team&&tmp.c1&&tmp.nm.trim())}});
+ root.addEventListener("change",e=>{if(e.target.id==="c1"||e.target.id==="c2"){tmp[e.target.id]=e.target.checked;const g=root.querySelector("#go");if(g)g.disabled=!(tmp.team&&tmp.c1&&(tmp.nm||"").trim())}});
+ let rt=0,rp=null;const live=["a-pal","h-star","c-tor","a-var","c-ops"];
+ const soft=()=>{if(!live.includes(scr)||!fan)return;const now=Date.now();if(now-rt>1200){rt=now;render()}else if(!rp)rp=setTimeout(()=>{rp=null;rt=Date.now();if(live.includes(scr))render()},1200)};
+ return{render:soft,hard:render,newFan:()=>{ls.del(key);fan=null;tmp={};scr="onboard";render()}};
+}
+
+/* ===== plateia simulada ===== */
+const SIM={lv:1,h:null,bots:[]};
+function simEmit(b,type,prog,p){BUS.send({kind:"evt",type,prog,sim:true,fan:{id:b.id,name:b.name,team:b.team,mkt:b.mkt,xp:b.xp,medals:b.medals,sim:true},p})}
+function simTick(){if(!SIM.lv)return;
+ if(Math.random()<(SIM.lv===2?.8:.4)||SIM.bots.length<5){const r=Math.random();const team=r<.3?"Corinthians":r<.52?"Palmeiras":r<.72?"São Paulo":r<.82?"Santos":"Outros";
+  const b={id:"b"+uid(),name:rand(NAMES)+" "+rand(SURN),team,mkt:Math.random()<.5,xp:0,medals:[],plan:[],progs:{}};if(b.mkt)b.xp=50;
+  const pick=Math.random();const ps=pick<.25?["arena","craque","chef"]:pick<.5?["arena","chef"]:pick<.7?["arena","craque"]:pick<.85?["craque"]:["chef"];
+  ps.forEach(p=>{if(p==="arena")b.plan.push("pal","quiz0","quiz1","quiz2","var","esc");if(p==="craque")b.plan.push("op0","op1","op2","tor");if(p==="chef")b.plan.push("star","caixa")});
+  b.plan.sort(()=>Math.random()-.5);SIM.bots.push(b);simEmit(b,"join",null,{pts:b.mkt?50:0})}
+ const n=SIM.lv===2?4:2;
+ for(let k=0;k<n;k++){const b=rand(SIM.bots);if(!b||!b.plan.length)continue;const st=b.plan.shift();
+  if(st==="pal"){const w=b.team==="São Paulo"?[.6,.2,.2]:b.team==="Corinthians"?[.15,.2,.65]:[.36,.3,.34];const r=Math.random(),c=r<w[0]?0:r<w[0]+w[1]?1:2;b.xp+=100;simEmit(b,"pal","arena",{c,pts:100})}
+  else if(st.startsWith("quiz")){const ok=Math.random()<.6,pts=ok?160:0;b.xp+=pts;simEmit(b,"quiz","arena",{i:+st[4],ok,pts})}
+  else if(st==="var"){const r=Math.random();b.xp+=80;simEmit(b,"var","arena",{c:r<.55?0:r<.8?1:2,pts:80})}
+  else if(st==="esc"){const l=[...ARENA.legends].sort(()=>Math.random()-.5).slice(0,3);b.xp+=120;simEmit(b,"esc","arena",{form:rand(ARENA.forms),picks:l,pts:120})}
+  else if(st.startsWith("op")){const i=+st[2];const r=Math.random();const c=b.team==="Corinthians"?(r<.6?0:r<.8?1:2):(r<.35?0:r<.6?1:2);b.xp+=60;simEmit(b,"op","craque",{i,c,pts:60})}
+  else if(st==="tor"){b.xp+=60;simEmit(b,"tor","craque",{c:Math.random()<.6?b.team:rand(Object.keys(TEAMS)),pts:60})}
+  else if(st==="star"){const r=Math.random();b.xp+=60;simEmit(b,"star","chef",{c:r<.45?0:r<.75?1:2,pts:60})}
+  else if(st==="caixa"){const ings=[...CHEF.ings].sort(()=>Math.random()-.5).slice(0,3).map(x=>x[1]);const tec=rand(CHEF.tecs);b.xp+=150;simEmit(b,"caixa","chef",{ings,tec,pts:150});
+   const r=chefLocal(ings,tec);const bonus=Math.round(parseFloat(r.nota)*15);b.xp+=bonus;if(!b.medals.includes("chef"))b.medals.push("chef");setTimeout(()=>simEmit(b,"recipe","chef",{prato:r.prato,nota:r.nota,comentario:r.comentario,ings,pts:bonus}),900)}
+  if(!b.plan.length&&b.xp>=REWARD_AT&&Math.random()<.5)simEmit(b,"reward",null,{sp:rand(["pulso","brasa","vila"])});
+ }
+ if(SIM.bots.length>240)SIM.bots.splice(0,40)}
+function setSim(l){SIM.lv=l;clearInterval(SIM.h);if(l)SIM.h=setInterval(simTick,l===2?600:1400);document.querySelectorAll("#simseg button").forEach(x=>x.classList.toggle("on",+x.dataset.s===l))}
+
+/* ===== boot ===== */
+let simPhone=null,realPhone=null;
+function onReset(){SIM.bots=[];simPhone&&simPhone.newFan();realPhone&&realPhone.newFan();CHAT.length=0;if($("#msgs"))renderChat();renderTelao()}
+BUS.on(apply);BUS.on(m=>{if(m.kind==="evt"){simPhone&&simPhone.render();realPhone&&realPhone.render()}});
+let ok=false;
+function bootTelao(){if(ok){renderTelao();return}ok=true;
+ $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));renderTelao()});
+ $("#simseg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setSim(+b.dataset.s)});
+ $("#bReset").addEventListener("click",()=>BUS.send({kind:"reset"}));
+ $("#bRot").addEventListener("click",()=>$("#rot").classList.remove("hide"));$("#rotX").addEventListener("click",()=>$("#rot").classList.add("hide"));
+ $("#rot").addEventListener("click",e=>{if(e.target.id==="rot")$("#rot").classList.add("hide")});
+ $("#bNewFan").addEventListener("click",()=>simPhone.newFan());
+ $("#fanlist").addEventListener("click",e=>{const b=e.target.closest(".fanrow");if(!b)return;S.selected=b.dataset.id;renderTelao()});
+ $("#copis").addEventListener("click",e=>{const b=e.target.closest(".copi");if(!b)return;COPI=COPIS.find(c=>c.id===b.dataset.c);renderCopis()});
+ $("#sugs").addEventListener("click",e=>{const b=e.target.closest(".sug");if(b)ask(b.textContent)});
+ $("#askF").addEventListener("submit",e=>{e.preventDefault();const v=$("#askI").value;$("#askI").value="";ask(v)});
+ $("#v-camp").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+  if(d.cseg!=null)C.seg=+d.cseg;else if(d.cspo)C.spo=d.cspo;else if(d.cmec!=null)C.mec=+d.cmec;else if(d.cch!=null){const i=+d.cch;C.ch=C.ch.includes(i)?(C.ch.length>1?C.ch.filter(x=>x!==i):C.ch):[...C.ch,i]}
+  else if(b.id==="bGen"){genCamp();return}else if(b.id==="bUseCamp"){$("#fRec").value=Math.min(1000000,Math.max(50000,Math.round(C.lastRev/10000)*10000));renderFin();return}else return;renderCamp()});
+ $("#fRec").addEventListener("input",renderFin);$("#fTax").addEventListener("input",renderFin);
+ simPhone=PhoneApp($("#simPhone"),"playverse-sim");simPhone.hard();
+ const url=(APP_URL.startsWith("http")?APP_URL:location.href.split("#")[0])+"#celular";
+ try{new QRCode($("#qr"),{text:url,width:80,height:80,colorDark:"#060a14",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}catch(e){$("#qr").innerHTML=`<div style="color:#000;font-size:10px">QR</div>`}
+ renderCopis();renderChat();setSim(1);renderTelao()}
+function route(){const h=(location.hash||"").slice(1);const mode=h==="celular"||(!h&&window.innerWidth<700)?"celular":"telao";
+ $("#telao").classList.toggle("hide",mode!=="telao");$("#celular").classList.toggle("hide",mode!=="celular");
+ if(mode==="celular"){if(!realPhone){realPhone=PhoneApp($("#celular"),"playverse-real");realPhone.hard()}setSim(0)}else bootTelao()}
+window.addEventListener("hashchange",route);BUS.init();route();
+</script>
+</body>
+</html>

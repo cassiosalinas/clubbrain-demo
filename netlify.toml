@@ -39,6 +39,15 @@
   to = "/index.html"
   status = 200
 
+# Grupo Bandeirantes (tenant de mídia): /band/os abre o mesmo painel já com
+# a Band selecionada, como /vasco/os faz com o Vasco. As páginas da Band
+# (Band Playverse, BandBrain OS e demos de propriedade) são arquivos estáticos
+# em band/apps/ e aparecem embutidas no painel.
+[[redirects]]
+  from = "/band/os"
+  to = "/index.html"
+  status = 200
+
 # O backend (mvp-vasco/) vive neste repo mas NAO faz parte do site. Como o
 # publish e a raiz ("."), sem esta regra o Netlify serviria o codigo-fonte do
 # backend como arquivo estatico em /mvp-vasco/... — force = true e necessario
