@@ -51,6 +51,11 @@
 # Site do fã da Band (equivalente a /vasco/socio, /vasco/virtual, /vasco/loja e
 # /vasco/sucesso). Checkout, CRM e Minu simulados: contas reais do Vasco não
 # são usadas aqui.
+# Site do Fã: acesso do torcedor em formato de celular, separado do painel interno.
+[[redirects]]
+  from = "/band/fan"
+  to = "/band/fan.html"
+  status = 200
 [[redirects]]
   from = "/band/pass"
   to = "/band/pass.html"

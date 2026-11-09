@@ -41,6 +41,18 @@ B.emit = (type, prog, p, src) => {
   try { bc && bc.postMessage(ev); } catch (e) {}
 };
 
+/* ---------- modo app (dentro do Site do Fã, /band/fan) ----------
+   As páginas do fã são abertas pelo Site do Fã, num formato de celular e
+   separado do Intelligence Hub interno. Fora dele, quem chega direto por
+   /band/pass, /band/historia-viva ou /band/loja é levado ao Site do Fã. */
+let inFanShell = false; try { inFanShell = window.top !== window && window.top.location.pathname.indexOf('/band/fan') === 0; } catch (e) {}
+B.app = inFanShell || new URLSearchParams(location.search).get('app') === '1';
+if (B.app) document.documentElement.classList.add('app-mode');
+if (window.top === window && !B.app) {
+  const tab = { '/band/pass': 'pass', '/band/pass.html': 'pass', '/band/historia-viva': 'hv', '/band/historia-viva.html': 'hv', '/band/loja': 'loja', '/band/loja.html': 'loja', '/band/sucesso': 'loja', '/band/sucesso.html': 'loja' }[location.pathname];
+  if (tab) { location.replace('/band/fan#' + tab); B.redirecting = true; ['top', 'login', 'rewards', 'checkout', 'toast', 'modal', 'close'].forEach(k => B[k] = () => {}); document.documentElement.style.visibility = 'hidden'; return; }
+}
+
 /* ---------- topo, rodapé, toast, modal ---------- */
 B.top = active => {
   const links = [['/band/pass', 'Band Pass'], ['/band/historia-viva', 'História Viva'], ['/band/loja', 'Experiências Band'], ['/band/apps/playverse/#fa', 'App do fã']];
