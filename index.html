@@ -538,7 +538,7 @@ canvas{ max-width:100%; }
       <div id="login-error">Usuário ou senha incorretos.</div>
       <button type="submit" class="btn-primary" style="width:100%; padding:12px; font-size:13.5px;">Entrar</button>
     </form>
-    <div class="login-hint">Ambiente de demonstração — acesso restrito<br>Grupo Bandeirantes: entre como CEO, Op, MKT ou IT</div>
+    <div class="login-hint">Ambiente de demonstração — acesso restrito<br>Grupo Bandeirantes: entre como CEO, Op, MKT ou IT · Site do Fã: fan</div>
   </div>
 </div>
 
@@ -686,10 +686,6 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M10 8l5 3-5 3z"/></svg>
         Demo ao vivo
       </div>
-      <div class="nav-item band-only-nav" data-view="band" data-band="pv:fan" data-title="App do fã" data-sub="Band Pass: programas, jogos em Phaser, Minu e privacidade" data-mode="operacional" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
-        App do fã
-      </div>
       <div class="nav-item band-only-nav" data-view="band" data-band="os:programas" data-title="Programas &amp; grade" data-sub="Grade 2026 da TV aberta, BandSports, rádio e YouTube, com fase do roadmap" data-mode="operacional" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
         Programas &amp; grade
@@ -740,19 +736,6 @@ canvas{ max-width:100%; }
       <div class="nav-item band-only-nav" data-view="band" data-band="pv:erp" data-title="ERP &amp; financeiro" data-sub="Pedidos, notas, contas a receber e a pagar e a conciliação 50/50, para qualquer ERP" data-mode="operacional" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4zM4 9h16M9 9v11"/></svg>
         ERP &amp; financeiro
-      </div>
-      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Jornada do fã (site)</div>
-      <div class="nav-item band-only-nav" data-view="band" data-band="site:pass" data-title="Band Pass" data-sub="Site do fã: nível, XP, medalhas, grade da semana com lembretes e recompensas Minu" data-mode="operacional" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
-        Band Pass
-      </div>
-      <div class="nav-item band-only-nav" data-view="band" data-band="site:hv" data-title="História Viva · museu" data-sub="Site do fã: cinco salas do acervo, quiz com XP e sala de memórias com historiador de IA" data-mode="operacional" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
-        História Viva · museu
-      </div>
-      <div class="nav-item band-only-nav" data-view="band" data-band="site:loja" data-title="Experiências Band" data-sub="Site do fã: plateia, tour, Stock Car e kit, com desconto por nível e checkout simulado" data-mode="operacional" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
-        Experiências Band
       </div>
       <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Demos de propriedade</div>
       <div class="nav-item band-only-nav" data-view="band" data-band="hv:" data-title="Pré-Jogo &amp; História Viva" data-sub="Demo da primeira propriedade: Pré-Jogo do Derby com AI Historian" data-mode="operacional" style="display:none;">
@@ -2348,6 +2331,12 @@ canvas{ max-width:100%; }
     const pass = document.getElementById('login-pass').value;
     const errorEl = document.getElementById('login-error');
     // Perfis da Band: cada papel entra direto na Band com menu e página inicial próprios.
+    // Fã: o Site do Fã é um acesso separado do Intelligence Hub (formato de celular).
+    if (user.toLowerCase() === 'fan' && pass.toLowerCase() === 'band') {
+      try { sessionStorage.setItem('band-fan-auth', '1'); } catch (e) {}
+      window.location.href = '/band/fan';
+      return;
+    }
     const bandRole = BAND_ROLE_LOGINS[user.toLowerCase()];
     if (bandRole && pass.toLowerCase() === 'band') {
       screen.style.display = 'none';
@@ -2518,11 +2507,11 @@ const BAND_EXTRA_PAGES = {
 };
 const BAND_ROLES = {
   ceo:{ name:'Diretoria executiva', role:'CEO · Grupo Bandeirantes', av:'CEO', home:['Início do CEO','Receita, audiência, patrocínio e decisões da diretoria'],
-    groups:[['Visão executiva',['os:cockpit','os:receita','os:governanca','pv:analytics']],['Estratégia',['os:inventario','pv:onto','os:agentes']],['Para apresentar',['pv:pres','site:pass']]] },
+    groups:[['Visão executiva',['os:cockpit','os:receita','os:governanca','pv:analytics']],['Estratégia',['os:inventario','pv:onto','os:agentes']],['Para apresentar',['pv:pres']]] },
   op:{ name:'Operações', role:'Programação e produção', av:'OP', home:['Início de Operações','O que está no ar, o que vem a seguir e o que precisa de ação'],
-    groups:[['No ar',['os:visao','os:central','os:aovivo','os:programas']],['Conteúdo e engajamento',['os:acervo','os:comunidades','os:gamif','pv:rewards']],['Experiência do fã',['pv:fan','site:pass','site:hv','site:loja']],['Demos de propriedade',['hv:','p3:']]] },
+    groups:[['No ar',['os:visao','os:central','os:aovivo','os:programas']],['Conteúdo e engajamento',['os:acervo','os:comunidades','os:gamif','pv:rewards']],['Experiência do fã (monitoramento)',['pv:pres']],['Demos de propriedade',['hv:','p3:']]] },
   mkt:{ name:'Marketing', role:'CRM, audiência e campanhas', av:'MKT', home:['Início de Marketing','Base, consentimento, segmentos e jornadas prontos para ativar'],
-    groups:[['Audiência',['pv:cdp','pv:segments','os:comunidades','pv:analytics']],['Ativação',['pv:marketing','os:campanhas','os:automacao','os:beneficios','pv:rewards']],['Comercial',['os:inventario','os:receita']],['Privacidade',['pv:consent']],['Site do fã',['site:pass','site:loja']]] },
+    groups:[['Audiência',['pv:cdp','pv:segments','os:comunidades','pv:analytics']],['Ativação',['pv:marketing','os:campanhas','os:automacao','os:beneficios','pv:rewards']],['Comercial',['os:inventario','os:receita']],['Privacidade',['pv:consent']]] },
   it:{ name:'Tecnologia', role:'TI · Integrações, dados e segurança', av:'TI', home:['Início de TI','Conectores, sincronização, modelo de dados e LGPD'],
     groups:[['Integrações',['pv:hub','os:saude','pv:erp']],['Dados e governança',['pv:schema','pv:consent','pv:onto']],['Inteligência',['os:agentes','pv:analytics']]] }
 };

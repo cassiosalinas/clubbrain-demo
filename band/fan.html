@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06102a">
+<title>Site do Fã · Band Playverse</title>
+<!-- Site do Fã: acesso do torcedor, separado do Intelligence Hub interno da Band.
+     No computador aparece dentro de um celular; no celular ocupa a tela toda.
+     Login de demonstração: fan / band. As abas carregam as páginas do fã
+     (app Band Playverse, Band Pass, História Viva, Experiências Band) em modo app. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--ink:#06102a;--ink2:#0b1a40;--card:#0f2150;--line:rgba(255,255,255,.12);--paper:#f2f5fc;--dim:#aab6d6;--gold:#f5b82e;--green:#008c44;--yellow:#ffcb03}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Inter,system-ui,sans-serif;color:var(--paper);background:radial-gradient(900px 600px at 15% 10%,rgba(0,140,68,.28),transparent 60%),radial-gradient(900px 600px at 90% 90%,rgba(255,203,3,.18),transparent 60%),#040a1c;min-height:100vh;display:flex;align-items:center;justify-content:center;gap:70px;padding:24px}
+button,input{font:inherit;color:inherit}
+/* lado de fora do celular (só no computador) */
+.side{max-width:380px}
+.side img{width:96px;display:block;margin-bottom:18px}
+.side .ey{color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.side h1{font:800 54px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:8px 0 14px}
+.side h1 span{color:var(--yellow)}
+.side p{color:var(--dim);font-size:15px;line-height:1.55}
+.side ul{list-style:none;margin:20px 0;display:grid;gap:10px}
+.side li{display:flex;gap:10px;align-items:center;font-size:14px;color:#d8e0f5}.side li b{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.07);display:grid;place-items:center;flex:none}
+.side .hint{margin-top:22px;padding:12px 14px;border-radius:12px;border:1px dashed rgba(245,184,46,.45);font-size:12.5px;color:var(--dim)}
+.side .hint code{color:var(--gold);font-weight:700}
+/* celular */
+.phone{width:400px;height:min(840px,calc(100vh - 48px));border-radius:54px;padding:12px;background:#01030a;border:1px solid #2a3654;box-shadow:0 40px 90px -25px #000,inset 0 0 0 2px #0e1424,0 0 0 8px #0b1124;position:relative;flex:none}
+.scr{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;background:var(--ink);display:flex;flex-direction:column}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:118px;height:32px;border-radius:20px;background:#000;z-index:30}
+.sb{height:46px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 30px 0;font-size:14px;font-weight:700;z-index:20;background:var(--ink)}
+.sb .ic{display:flex;gap:6px;align-items:center;font-size:12px}
+.view{flex:1;position:relative;min-height:0}
+.view iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--ink)}
+.tabbar{flex:none;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 6px 20px;background:rgba(6,16,42,.96);border-top:1px solid var(--line);backdrop-filter:blur(10px)}
+.tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--dim);cursor:pointer;padding:4px 0}
+.tabbar button i{font-style:normal;font-size:20px;line-height:1;filter:grayscale(.5);opacity:.8}
+.tabbar button.on{color:var(--gold)}.tabbar button.on i{filter:none;opacity:1}
+/* login */
+.login{position:absolute;inset:0;z-index:25;display:flex;flex-direction:column;justify-content:flex-end;padding:0 26px 34px;background:linear-gradient(180deg,rgba(6,16,42,.1),var(--ink) 58%),radial-gradient(500px 380px at 50% 18%,rgba(0,140,68,.55),transparent 70%),radial-gradient(400px 300px at 80% 0%,rgba(255,203,3,.35),transparent 70%),var(--ink)}
+.login .logo{position:absolute;top:110px;left:0;right:0;text-align:center}
+.login .logo img{width:150px;filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+.login .logo b{display:block;margin-top:14px;font:800 30px "Barlow Condensed",sans-serif;letter-spacing:.06em}.login .logo b span{color:var(--gold)}
+.login .logo small{color:var(--dim);font-size:13px}
+.login h2{font:800 26px "Barlow Condensed",sans-serif;text-transform:uppercase;margin-bottom:4px}
+.login p{color:var(--dim);font-size:13.5px;margin-bottom:18px}
+.login label{display:block;font-size:12px;color:var(--dim);margin:10px 0 6px;font-weight:600}
+.login input{width:100%;padding:14px 15px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:15px;outline:none}
+.login input:focus{border-color:var(--gold)}
+.login .go{width:100%;margin-top:18px;padding:15px;border-radius:15px;border:0;background:linear-gradient(135deg,var(--gold),#f39c12);color:#1a1200;font-weight:800;font-size:15px;cursor:pointer}
+.login .err{display:none;color:#ff9aa8;font-size:12.5px;margin-top:10px}
+.login .alt{margin-top:14px;text-align:center;font-size:11.5px;color:var(--dim)}
+.toast{position:absolute;left:50%;top:60px;transform:translateX(-50%);background:var(--gold);color:#1a1200;font-weight:800;font-size:12.5px;padding:8px 14px;border-radius:999px;z-index:40;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.menu{position:absolute;right:14px;top:50px;z-index:35;background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:6px;display:none;min-width:180px;box-shadow:0 20px 40px -10px #000}
+.menu.on{display:block}.menu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:none;border-radius:9px;font-size:13px;cursor:pointer}.menu button:hover{background:rgba(255,255,255,.06)}
+.avbtn{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.08);cursor:pointer;font-size:13px;font-weight:800}
+/* celular de verdade: tela cheia */
+@media (max-width:560px),(max-height:600px){
+  body{padding:0;display:block;background:var(--ink)}
+  .side{display:none}
+  .phone{width:100%;height:100vh;height:100dvh;border-radius:0;padding:0;border:0;box-shadow:none}
+  .scr{border-radius:0}
+  .island{display:none}
+  .sb{height:auto;padding:max(10px,env(safe-area-inset-top)) 16px 8px}
+  .sb .clock,.sb .ic{display:none}
+  .sb .sbbrand{display:flex!important}
+  .tabbar{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+  .login .logo{top:70px}
+}
+@media (max-width:1000px) and (min-width:561px){.side{display:none}}
+</style>
+</head>
+<body>
+<section class="side">
+  <img src="/band/assets/band-logo.svg" alt="Band">
+  <div class="ey">Site do Fã · Band Playverse</div>
+  <h1>A Band no <span>seu celular</span>.</h1>
+  <p>Este é o acesso do torcedor, separado do Intelligence Hub da Band. O fã participa dos programas, joga, ganha XP e troca por recompensas, tudo pelo celular.</p>
+  <ul>
+    <li><b>📺</b>Ao vivo: enquetes, quiz, desafie o Neto e games</li>
+    <li><b>🎟️</b>Band Pass: nível, XP, medalhas e grade da semana</li>
+    <li><b>📼</b>História Viva: o museu do esporte da Band</li>
+    <li><b>🛍️</b>Experiências: plateia, tour, Stock Car e kit</li>
+  </ul>
+  <div class="hint">Demonstração · entre com <code>fan</code> e senha <code>band</code>. No celular, abra este mesmo endereço: o site ocupa a tela toda.</div>
+</section>
+
+<div class="phone">
+  <div class="scr" id="scr">
+    <div class="island"></div>
+    <div class="sb"><span class="clock" id="clk">9:41</span><span class="sbbrand" style="display:none;align-items:center;gap:8px"><img src="/band/assets/band-logo.svg" alt="" style="width:30px"><b style="font:800 15px 'Barlow Condensed',sans-serif;letter-spacing:.05em">BAND <span style="color:var(--gold)">PLAYVERSE</span></b></span><span style="display:flex;gap:8px;align-items:center"><span class="ic">▂▄▆ 5G 🔋</span><button class="avbtn" id="av" title="Conta" style="display:none">☰</button></span></div>
+    <div class="view" id="view"></div>
+    <nav class="tabbar" id="tabs" style="display:none"></nav>
+    <div class="menu" id="menu"><button data-m="reset">Começar de novo (novo Band Pass)</button><button data-m="out">Sair</button></div>
+    <div class="toast" id="toast"></div>
+
+    <form class="login" id="login" autocomplete="off">
+      <div class="logo"><img src="/band/assets/band-logo.svg" alt="Band"><b>BAND <span>PLAYVERSE</span></b><small>O jogo continua com você</small></div>
+      <h2>Entrar</h2>
+      <p>Assista, participe e ganhe recompensas com a Band.</p>
+      <label for="fu">Usuário</label><input id="fu" autocapitalize="none" placeholder="fan">
+      <label for="fp">Senha</label><input id="fp" type="password" placeholder="••••">
+      <button class="go" type="submit">Entrar no Site do Fã</button>
+      <div class="err" id="err">Usuário ou senha incorretos.</div>
+      <div class="alt">Ambiente de demonstração · Grupo Bandeirantes × Virtual Fans</div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const TABS = [
+  ['live', '📺', 'Ao vivo', '/band/apps/playverse/#fa'],
+  ['pass', '🎟️', 'Band Pass', '/band/pass?app=1'],
+  ['hv', '📼', 'História', '/band/historia-viva?app=1'],
+  ['loja', '🛍️', 'Loja', '/band/loja?app=1'],
+  ['me', '👤', 'Conta', null]
+];
+const frames = {};
+let cur = null;
+const authed = () => { try { return sessionStorage.getItem('band-fan-auth') === '1'; } catch (e) { return false; } };
+const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('on'), 2000); };
+function tick(){ const d = new Date(); $('#clk').textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }
+tick(); setInterval(tick, 20000);
+
+function show(id){
+  if (id === 'me') { $('#menu').classList.toggle('on'); return; }
+  $('#menu').classList.remove('on');
+  const t = TABS.find(x => x[0] === id); cur = id;
+  if (!frames[id]) {
+    const f = document.createElement('iframe'); f.src = t[3]; f.title = t[2]; f.dataset.tab = id;
+    f.addEventListener('load', () => sync(f));
+    $('#view').appendChild(f); frames[id] = f;
+  }
+  Object.entries(frames).forEach(([k, f]) => f.style.display = k === id ? 'block' : 'none');
+  $('#tabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === id));
+  try { history.replaceState(null, '', '#' + id); } catch (e) {}
+}
+// Links dentro das páginas (ex.: "Jogar no app", "Ver meu Band Pass") navegam no próprio iframe:
+// aqui só acendemos a aba certa conforme o endereço carregado.
+function sync(f){
+  try {
+    const p = f.contentWindow.location.pathname;
+    const id = p.startsWith('/band/apps/playverse') ? 'live' : p.startsWith('/band/pass') ? 'pass' : p.startsWith('/band/historia-viva') ? 'hv' : (p.startsWith('/band/loja') || p.startsWith('/band/sucesso')) ? 'loja' : null;
+    if (id && id !== f.dataset.tab) {
+      // a página foi para outra aba: troca os papéis para não duplicar
+      if (frames[id] && frames[id] !== f) frames[id].remove();
+      delete frames[f.dataset.tab]; f.dataset.tab = id; frames[id] = f; show(id);
+    }
+  } catch (e) {}
+}
+function enter(){
+  $('#login').style.display = 'none'; $('#tabs').style.display = 'grid'; $('#av').style.display = 'grid';
+  $('#tabs').innerHTML = TABS.map(t => `<button data-t="${t[0]}"><i>${t[1]}</i>${t[2]}</button>`).join('');
+  const h = location.hash.slice(1);
+  show(TABS.some(t => t[0] === h && t[3]) ? h : 'live');
+}
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b) show(b.dataset.t); });
+$('#av').onclick = () => $('#menu').classList.toggle('on');
+$('#menu').addEventListener('click', e => {
+  const b = e.target.closest('[data-m]'); if (!b) return;
+  if (b.dataset.m === 'out') { try { sessionStorage.removeItem('band-fan-auth'); } catch (er) {} location.replace('/band/fan'); }
+  if (b.dataset.m === 'reset') { ['bpx-fan', 'band-hv', 'band-reminders', 'band-last-order'].forEach(k => { try { localStorage.removeItem(k); } catch (er) {} }); Object.values(frames).forEach(f => f.remove()); for (const k in frames) delete frames[k]; $('#menu').classList.remove('on'); show('live'); toast('Pronto: crie um novo Band Pass'); }
+});
+$('#login').addEventListener('submit', e => {
+  e.preventDefault();
+  if ($('#fu').value.trim().toLowerCase() === 'fan' && $('#fp').value.trim().toLowerCase() === 'band') {
+    try { sessionStorage.setItem('band-fan-auth', '1'); } catch (er) {}
+    $('#err').style.display = 'none'; enter(); toast('Bem-vindo ao Band Playverse!');
+  } else $('#err').style.display = 'block';
+});
+if (authed()) enter(); else setTimeout(() => $('#fu').focus(), 200);
+})();
+</script>
+</body>
+</html>
