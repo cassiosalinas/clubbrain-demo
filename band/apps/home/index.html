@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Início · Intelligence Hub Band</title>
+<!-- Página inicial de cada papel no Intelligence Hub da Band (#ceo, #op, #mkt, #it).
+     Abre dentro do painel /band/os depois do login por papel. Lê o mesmo núcleo
+     de dados do Band Playverse (perfis, eventos, conectores) e escuta o canal
+     band-playverse-x, então reflete ao vivo o que acontece no app e no site. -->
+<style>
+:root{--bg:#090c18;--card:#121729;--card2:#0f1428;--line:#222a44;--txt:#e8ebf5;--mut:#8a93ae;--mut2:#5f6886;--pur:#7c6cff;--pur2:#a86bff;--grn:#2dd4a7;--yel:#fbbf4a;--red:#f05a6e;--blu:#5b8cff;--gold:#f5b82e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.5 Inter,system-ui,sans-serif;padding:24px 28px 50px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.hero{display:flex;align-items:center;gap:18px;padding:22px 24px;border-radius:18px;background:linear-gradient(135deg,var(--c1),#0d1226 75%);border:1px solid var(--line);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,var(--c2),transparent 70%);opacity:.5}
+.hero .ic{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:28px;background:rgba(255,255,255,.08);flex:none}
+.hero small{color:#c4cbe3;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.hero h1{font-size:26px;margin:2px 0 4px}.hero p{color:#c4cbe3;max-width:70ch}
+.hero .clock{margin-left:auto;text-align:right;z-index:1}.hero .clock b{font-size:28px;display:block}.hero .clock span{color:#c4cbe3;font-size:12px}
+.grid{display:grid;gap:14px;margin-top:16px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1.25fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:980px){.g4{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.card h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}.card h3 .r{margin-left:auto;font-weight:500;color:var(--mut);font-size:12px}
+.kpi small{color:var(--mut);font-size:12px}.kpi b{display:block;font-size:26px;letter-spacing:-.01em;margin:2px 0}.kpi i{font-style:normal;font-size:12px;color:var(--grn)}.kpi i.w{color:var(--yel)}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}.row:first-of-type{border-top:0}
+.row .t{flex:1}.row .t small{display:block;color:var(--mut);font-size:11.5px}
+.pill{padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.p-r{background:rgba(240,90,110,.16);color:#ff8ea0}.p-y{background:rgba(251,191,74,.16);color:var(--yel)}.p-g{background:rgba(45,212,167,.14);color:var(--grn)}.p-b{background:rgba(91,140,255,.16);color:#9db8ff}.p-m{background:rgba(255,255,255,.07);color:var(--mut)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.sc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px;border-radius:14px;background:var(--card2);border:1px solid var(--line);transition:.15s}
+.sc:hover{border-color:var(--pur);transform:translateY(-1px)}.sc .e{font-size:20px}.sc b{font-size:13.5px}.sc small{color:var(--mut);font-size:12px}
+.bar{height:8px;border-radius:5px;background:#1b2140;overflow:hidden;flex:1}.bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--pur),var(--pur2))}
+.brief{margin-top:16px;padding:16px 18px;border-radius:16px;border:1px solid rgba(45,212,167,.4);background:linear-gradient(135deg,rgba(45,212,167,.08),var(--card))}
+.brief .h{display:flex;align-items:center;gap:10px}.brief .h b{color:var(--grn)}
+.btn{padding:8px 13px;border-radius:10px;font-weight:700;font-size:12.5px;background:linear-gradient(135deg,var(--pur),var(--pur2));color:#fff}
+.btn.g{background:rgba(45,212,167,.15);color:var(--grn);border:1px solid rgba(45,212,167,.4)}
+#briefTxt{margin-top:10px;color:#d5dbef;white-space:pre-wrap;font-size:13.5px}
+.note{color:var(--mut2);font-size:11.5px;margin-top:14px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#ff8ea0;font-weight:700}.live:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red);animation:pl 1.4s infinite}
+@keyframes pl{50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="/band/apps/claude-shim.js"></script>
+<script src="/band/apps/playverse/js/core.js"></script>
+<script>
+(function(){
+const U = BP.u, S = BP.S, esc = U.esc, fmt = U.fmt, kk = U.kk;
+const role = () => (location.hash.slice(1) || 'ceo').toLowerCase();
+const go = k => { try { const el = parent.document.querySelector(`.role-nav[data-band="${k}"], .band-only-nav.nav-item[data-band="${k}"]`); if (el && parent !== window) { el.click(); return; } } catch(e){} location.href = '/band/os'; };
+const all = () => Array.from(S.profiles.values());
+const scale = () => BP.SCALE();
+const optin = () => Math.round(all().filter(p => p.consent.marketing).length / Math.max(1, all().length) * 100);
+const nowSP = () => U.nowSP();
+const hhmm = d => String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+const onAir = () => BP.PROGRAMS.filter(BP.onAir);
+const nextToday = () => { const d = nowSP(), t = hhmm(d); return BP.PROGRAMS.filter(p => p.days.includes(d.getDay()) && p.e && p.s > t).sort((a,b) => a.s.localeCompare(b.s)); };
+const evMin = () => S.events.filter(e => Date.now() - e.ts < 60000).length;
+const ledgerSum = k => S.ledger.filter(l => l.kind === k).reduce((a, l) => a + (l.value || 0), 0);
+const sc = (k, e, b, s) => `<button class="sc" data-go="${k}"><span class="e">${e}</span><b>${b}</b><small>${s}</small></button>`;
+const kpi = (l, v, d, w) => `<div class="card kpi"><small>${l}</small><b>${v}</b><i class="${w ? 'w' : ''}">${d}</i></div>`;
+const pill = (t, c) => `<span class="pill p-${c}">${t}</span>`;
+
+const ROLES = {
+  ceo: { ic:'🎯', c1:'#2a2f7a', c2:'#7c6cff', who:'CEO · Diretoria executiva', h:'Visão executiva do Band Playverse',
+    p:'Receita incremental, audiência que participa, patrocinadores e as decisões que dependem da diretoria.',
+    kpis: () => [kpi('Receita incremental projetada', 'R$ 2,31M', '6 meses após o MVP'), kpi('Audiência participante', kk(all().length * scale()), 'Band Pass · projeção'), kpi('Receita já lançada no ERP', U.brl(ledgerSum('Receita')), 'cotas, games e Experiências'), kpi('Divisão do resultado', '50 / 50', 'Band × VF · auditoria bilateral', 1)],
+    left: () => `<div class="card"><h3>Decisões que dependem da diretoria <span class="r">memorando 09/10</span></h3>
+      ${[['Prazo de exclusividade','2–3 anos (VF) × 5 anos (proposta Band)','r'],['Divisão do resultado','50/50 × 60/40 sobre o líquido distribuível','y'],['Entidade contratante','Virtual Fans ou ClubBrain (CNPJ)','y'],['Custeio das recompensas Minu','VF, patrocinador ou rateio','b']].map(([t,s,c]) => `<div class="row"><div class="t">${t}<small>${s}</small></div>${pill(c==='r'?'Urgente':c==='y'?'Em aberto':'A definir',c)}</div>`).join('')}</div>`,
+    right: () => `<div class="card"><h3>Marcos do MVP · 90 dias</h3>${[['Semana 1–4','Band Pass + Jogo Aberto no ar',100],['Semana 5–8','Os Donos da Bola na TV e no rádio',65],['Semana 9–12','Primeira cota patrocinada e relatório 50/50',30]].map(([a,b,v]) => `<div class="row"><div class="t">${b}<small>${a}</small></div><div class="bar" style="max-width:120px"><i style="width:${v}%"></i></div><small style="width:34px;text-align:right">${v}%</small></div>`).join('')}</div>`,
+    sc: [['os:cockpit','📊','Cockpit executivo','Números consolidados'],['os:receita','💰','Receita & inventário','ROI dos patrocinadores'],['os:governanca','⚖️','Governança & 50/50','Comitê e auditoria'],['os:agentes','🤖','Agentes de IA','Recomendações prontas']],
+    ctx: () => ({ foco:'estratégia, receita, patrocinadores e decisões pendentes da diretoria' }) },
+  op: { ic:'📡', c1:'#0f4a46', c2:'#2dd4a7', who:'Operações · Programação e produção', h:'Central da operação no ar',
+    p:'O que está no ar agora, o que entra em seguida, a participação por minuto e o que precisa de ação da produção.',
+    kpis: () => [kpi('No ar agora', String(onAir().length), onAir().map(p => p.n).join(', ') || 'nenhum programa interativo'), kpi('Interações no último minuto', fmt(evMin() * scale()), 'projeção na escala Band'), kpi('Próximo programa', (nextToday()[0] || {}).s || '—', (nextToday()[0] || {}).n || 'grade encerrada hoje', 1), kpi('Fila de moderação', String(3 + (S.events.filter(e => e.type === 'memory').length % 5)), 'memórias e comentários', 1)],
+    left: () => `<div class="card"><h3>Grade de hoje <span class="r">${['dom','seg','ter','qua','qui','sex','sáb'][nowSP().getDay()]} · horário de Brasília</span></h3>
+      ${(() => { const d = nowSP(); const l = BP.PROGRAMS.filter(p => p.days.includes(d.getDay()) && p.e).sort((a,b) => a.s.localeCompare(b.s)); return l.length ? l.map(p => `<div class="row"><span class="dot" style="background:${p.color}"></span><div class="t">${p.s}${p.tbc?'*':''} · ${esc(p.n)}<small>${esc(p.host)} · ${esc(p.tag)}</small></div>${BP.onAir(p) ? '<span class="live">AO VIVO</span>' : p.s < hhmm(d) ? pill('Encerrado','m') : pill('Próximo','b')}</div>`).join('') : '<div class="row"><div class="t">Sem programas interativos fixos hoje.</div></div>'; })()}</div>`,
+    right: () => `<div class="card"><h3>Alertas da produção</h3>${[['QR do Jogo Aberto: subir 2 min antes do bloco de clássico','y'],['Enquete do Apito Final pendente de aprovação','r'],['Patrocinador do game Pênalti: arte nova recebida','g'],['Datas das etapas de Stock Car e Indy a confirmar','b']].map(([t,c]) => `<div class="row"><div class="t">${t}</div>${pill(c==='r'?'Ação':c==='y'?'Atenção':c==='g'?'OK':'Pendente',c)}</div>`).join('')}</div>`,
+    sc: [['os:central','🛰️','Central ao vivo','Moderação e alertas'],['os:aovivo','🗳️','Interações ao vivo','Pergunta e QR no ar'],['os:programas','🗓️','Programas & grade','Roadmap por programa'],['pv:pres','📱','Demo ao vivo','App e backoffice']],
+    ctx: () => ({ foco:'operação do dia, programas no ar, próximos programas, moderação e alertas', no_ar: onAir().map(p => p.n), proximos: nextToday().slice(0,3).map(p => p.s + ' ' + p.n) }) },
+  mkt: { ic:'📣', c1:'#5a2a12', c2:'#ff8a3d', who:'Marketing · CRM e audiência', h:'Audiência pronta para ativar',
+    p:'Base do Band Pass, consentimento, segmentos em crescimento e jornadas automáticas, sempre com dado agregado e opt-in.',
+    kpis: () => [kpi('Base Band Pass', kk(all().length * scale()), 'perfis únicos · projeção'), kpi('Opt-in de marketing', optin() + '%', 'LGPD por finalidade'), kpi('Mensagens enviadas', fmt(BP.JOURNEYS.reduce((a,j) => a + j.sent, 0)), BP.JOURNEYS.length + ' jornadas ativas'), kpi('Resgates Minu', fmt(all().reduce((a,p) => a + p.rewards.length, 0) * scale()), 'vouchers emitidos · projeção', 1)],
+    left: () => { const segs = BP.SEGMENTS.map(s => ({ n: s.n, r: s.rule, v: BP.segCount(s.f) * scale() })).sort((a,b) => b.v - a.v); const mx = segs[0] ? segs[0].v : 1; return `<div class="card"><h3>Segmentos <span class="r">recalculados a cada evento</span></h3>${segs.slice(0,6).map(s => `<div class="row"><div class="t">${esc(s.n)}<small>${esc(s.r)}</small></div><div class="bar" style="max-width:110px"><i style="width:${s.v/mx*100}%"></i></div><b style="width:56px;text-align:right">${kk(s.v)}</b></div>`).join('')}</div>`; },
+    right: () => `<div class="card"><h3>Jornadas automáticas</h3>${BP.JOURNEYS.map(j => `<div class="row"><div class="t">${esc(j.n)}<small>${esc(j.steps[j.steps.length-1])}</small></div>${pill(j.ch,'b')}<b style="width:52px;text-align:right">${fmt(j.sent)}</b></div>`).join('')}</div>`,
+    sc: [['pv:segments','🧩','Segmentos','Públicos dinâmicos'],['pv:marketing','✉️','Marketing','Jornadas e disparos'],['os:campanhas','🎯','Campanhas','Monte e simule'],['pv:cdp','👤','CDP · Perfis','Perfil único do fã']],
+    ctx: () => ({ foco:'audiência, segmentos, jornadas, opt-in e campanhas com patrocinadores', opt_in_pct: optin(), segmentos: BP.SEGMENTS.map(s => s.n + ': ' + BP.segCount(s.f) * scale()) }) },
+  it: { ic:'🛠️', c1:'#123a63', c2:'#5b8cff', who:'TI · Integrações, dados e segurança', h:'Integrações e saúde da plataforma',
+    p:'Conectores com os sistemas da Band, sincronizações em tempo real, modelo de dados e conformidade com a LGPD.',
+    kpis: () => { const c = BP.CONNECTORS; return [kpi('Conectores', String(c.length), c.filter(x => x.st === 'live').length + ' ativo · ' + c.filter(x => x.st === 'sim').length + ' simulados'), kpi('Pendentes de contrato', String(c.filter(x => x.st === 'att').length), c.filter(x => x.st === 'att').map(x => x.n.split(' ·')[0]).join(', '), 1), kpi('Sincronizações na sessão', fmt(S.sync.length ? Object.values(S.counts.byConn).reduce((a,b) => a + b, 0) : 0), 'eventos, CRM, ERP, Minu'), kpi('Disponibilidade (30 dias)', '99,95%', 'meta para picos do ao vivo')]; },
+    left: () => `<div class="card"><h3>Conectores <span class="r">status</span></h3>${BP.CONNECTORS.map(c => `<div class="row"><div class="t">${esc(c.n)}<small>${esc(c.cat)} · ${esc(c.ex)} · ${esc(c.auth)}</small></div>${c.st === 'live' ? pill('Ativo','g') : c.st === 'att' ? pill('A contratar','y') : pill('Simulado','m')}</div>`).join('')}</div>`,
+    right: () => `<div class="card"><h3>Log de sincronização <span class="live" style="margin-left:auto">ao vivo</span></h3>${(S.sync.slice(0,9).map(s => `<div class="row"><div class="t"><code style="font:12px ui-monospace,Menlo,monospace;color:#c9b8ff">${esc(s.op)}</code><small>${esc((BP.conn(s.conn)||{n:s.conn}).n)} · ${esc(s.obj)}</small></div><small style="color:var(--mut)">${U.time(s.t)}</small></div>`).join('')) || '<div class="row"><div class="t">Aguardando eventos. Interaja no app ou no site do fã.</div></div>'}</div>
+      <div class="card" style="margin-top:14px"><h3>Checklist de segurança e LGPD</h3>${[['Dado pessoal nunca sai para patrocinador (só segmento agregado)','g'],['Prova de consentimento versionada (v1.3)','g'],['Hash SHA-256 nas audiências de mídia paga','g'],['DPA com Minu e Vibra Digital','y']].map(([t,c]) => `<div class="row"><div class="t">${t}</div>${pill(c==='g'?'OK':'Pendente',c)}</div>`).join('')}</div>`,
+    sc: [['pv:hub','🔌','Integration Hub','Mapeamento e sync'],['os:saude','🩺','Saúde do sistema','APIs e picos do ao vivo'],['pv:schema','🗂️','Modelo de dados','Campos e base legal'],['pv:erp','🧾','ERP & financeiro','Pedidos, notas, 50/50']],
+    ctx: () => ({ foco:'integrações, status dos conectores, sincronização, segurança e LGPD', conectores: BP.CONNECTORS.map(c => c.n + ' (' + c.st + ')') }) }
+};
+
+function render(){
+  const r = ROLES[role()] || ROLES.ceo, d = nowSP();
+  document.documentElement.style.setProperty('--c1', r.c1); document.documentElement.style.setProperty('--c2', r.c2);
+  document.getElementById('root').innerHTML = `
+  <div class="hero"><div class="ic">${r.ic}</div><div style="z-index:1"><small>${esc(r.who)}</small><h1>${esc(r.h)}</h1><p>${esc(r.p)}</p></div><div class="clock"><b id="clk">${hhmm(d)}</b><span>${d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})}</span></div></div>
+  <div class="grid g4" id="kpis">${r.kpis().join('')}</div>
+  <div class="grid g4">${r.sc.map(s => sc(...s)).join('')}</div>
+  <div class="brief"><div class="h"><b>✦ Briefing do dia</b><span style="color:var(--mut);font-size:12.5px">o agente de IA resume o que importa para o seu papel</span><span style="flex:1"></span><button class="btn g" id="briefGo">Gerar briefing</button></div><div id="briefTxt"></div></div>
+  <div class="grid g2"><div id="L">${r.left()}</div><div id="R">${r.right()}</div></div>
+  <p class="note">Dados simulados para a proposta Band × Virtual Fans. Os números da sessão reagem ao app e ao site do fã abertos neste navegador.</p>`;
+  document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  document.getElementById('briefGo').onclick = brief;
+}
+function refresh(){
+  const r = ROLES[role()] || ROLES.ceo;
+  const k = document.getElementById('kpis'); if (k) k.innerHTML = r.kpis().join('');
+  const R = document.getElementById('R'); if (R && role() === 'it') R.innerHTML = r.right();
+  const c = document.getElementById('clk'); if (c) c.textContent = hhmm(nowSP());
+}
+async function brief(){
+  const r = ROLES[role()] || ROLES.ceo, out = document.getElementById('briefTxt'), btn = document.getElementById('briefGo');
+  btn.disabled = true; btn.textContent = 'Gerando…'; out.textContent = '';
+  const ctx = { papel: r.who, ...r.ctx(), plataforma: 'Band Playverse (Grupo Bandeirantes × Virtual Fans, by ClubBrain.ai)', grade_hoje: BP.PROGRAMS.filter(p => p.days.includes(nowSP().getDay()) && p.e).map(p => p.s + ' ' + p.n), regras: ['Todos os números são simulados para a proposta.', 'Nunca vender dado pessoal; só segmentos agregados com opt-in.', 'Minu e Vibra: integrações a contratar/validar.'] };
+  const prompt = `Você é o agente do Intelligence Hub da Band. Escreva o briefing do dia para ${r.who}, em português do Brasil, com no máximo 5 tópicos curtos começando com "- ". Seja concreto e use os dados do contexto; não invente números fora dele e lembre que são simulados. Termine com uma linha "Próxima ação:" com UMA recomendação. Sem markdown além dos hífens.\n\nContexto:\n${JSON.stringify(ctx)}`;
+  const t = await BP.llm(prompt, txt => { out.textContent = txt; });
+  out.textContent = t || ({ ceo:'- Receita incremental projetada de R$ 2,31M em 6 meses após o MVP (simulado).\n- Exclusividade e divisão 50/50 × 60/40 seguem em aberto e travam o contrato.\n- MVP com Jogo Aberto e Os Donos da Bola é o caminho mais curto para a primeira cota.\nPróxima ação: fechar a entidade contratante e o prazo de exclusividade nesta semana.', op:'- Confira a grade de hoje e suba o QR dois minutos antes de cada bloco interativo.\n- Mantenha a fila de moderação abaixo de 5 itens durante o ao vivo.\n- Datas de Stock Car e Indy ainda precisam de confirmação.\nPróxima ação: aprovar a enquete do Apito Final.', mkt:'- A base com opt-in é o ativo vendável: só segmentos agregados.\n- Superfãs com opt-in e Cross-tela TV + rádio são os públicos mais valiosos para patrocinador.\n- A jornada "Da TV para o rádio" leva audiência para o 2º turno do Neto.\nPróxima ação: montar a campanha de Stock Car com o patrocinador de banco digital.', it:'- Conectores de experiência ativos; CRM, ERP e marketing simulados até a contratação.\n- Minu e Vibra Digital dependem de contrato e DPA.\n- Monitorar picos do ao vivo nos horários do Jogo Aberto e d’Os Donos da Bola.\nPróxima ação: agendar a validação da arquitetura com a Vibra Digital.' })[role()];
+  btn.disabled = false; btn.textContent = 'Gerar de novo';
+}
+addEventListener('hashchange', render);
+BP.on(() => refresh());
+setInterval(refresh, 5000);
+render();
+})();
+</script>
+</body>
+</html>

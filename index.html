@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torcedor 360 · Fan Platform</title>
+<title>Intelligence Hub</title>
 <script>
 /*!
  * Chart.js v4.4.4
@@ -538,7 +538,7 @@ canvas{ max-width:100%; }
       <div id="login-error">Usuário ou senha incorretos.</div>
       <button type="submit" class="btn-primary" style="width:100%; padding:12px; font-size:13.5px;">Entrar</button>
     </form>
-    <div class="login-hint">Ambiente de demonstração — acesso restrito</div>
+    <div class="login-hint">Ambiente de demonstração — acesso restrito<br>Grupo Bandeirantes: entre como CEO, Op, MKT ou IT</div>
   </div>
 </div>
 
@@ -2347,7 +2347,16 @@ canvas{ max-width:100%; }
     const user = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value;
     const errorEl = document.getElementById('login-error');
+    // Perfis da Band: cada papel entra direto na Band com menu e página inicial próprios.
+    const bandRole = BAND_ROLE_LOGINS[user.toLowerCase()];
+    if (bandRole && pass.toLowerCase() === 'band') {
+      screen.style.display = 'none';
+      errorEl.style.display = 'none';
+      enterBandRole(bandRole);
+      return;
+    }
     if (user === 'admin' && pass === 'VirtualFans00') {
+      clearBandRole();
       screen.style.display = 'none';
       errorEl.style.display = 'none';
       // Acessou /vasco/os direto (a "porta" do Vasco) — pula a tela de
@@ -2367,6 +2376,7 @@ canvas{ max-width:100%; }
 })();
 function logoutDemo(){
   stopHubspotAutoRefresh();
+  clearBandRole();
   const screen = document.getElementById('login-screen');
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
@@ -2485,6 +2495,78 @@ const BAND_APPS = { os:'/band/apps/os/?embed=1', pv:'/band/apps/playverse/?embed
 // Páginas públicas da Band (site do fã), abertas dentro do painel. Ficam na
 // mesma origem, então compras e resgates aparecem ao vivo no backoffice.
 const BAND_SITE = { pass:'/band/pass', hv:'/band/historia-viva', loja:'/band/loja' };
+BAND_APPS.home = '/band/apps/home/';
+
+/* ============ BAND · LOGIN POR PAPEL ============ */
+// Usuários CEO, Op, MKT e IT (senha "Band"): cada um entra na Band com um menu
+// próprio e uma página inicial do papel (/band/apps/home/#ceo|op|mkt|it).
+// Os itens reaproveitam as páginas existentes (data-band = app:página).
+const BAND_ROLE_LOGINS = { ceo:'ceo', op:'op', mkt:'mkt', it:'it' };
+const BAND_EXTRA_PAGES = {
+  'os:visao':['Visão do dia','O que está no ar, participação e próximos programas'],
+  'os:central':['Central ao vivo','Programas no ar, moderação, atendimento ao fã e alertas dos agentes'],
+  'os:comunidades':['Torcidas & comunidades','Tamanho, engajamento, rivalidade e sentimento das torcidas'],
+  'os:gamif':['Gamificação','XP, missões, medalhas e economia de pontos do Band Pass'],
+  'os:campanhas':['Campanhas','Monte a campanha: público, oferta, patrocinador e canal, com simulação de resultado'],
+  'os:automacao':['Automação de marketing','Jornadas automáticas e campanhas por canal, disparadas pelo comportamento no ar'],
+  'os:beneficios':['Benefícios & recompensas','Catálogo e resgates do Band Pass'],
+  'os:saude':['Saúde do sistema','Infraestrutura e APIs, com atenção aos picos do ao vivo'],
+  'os:minu':['Economia Minu','Regras de conversão de XP, custo e patrocínio das recompensas']
+};
+const BAND_ROLES = {
+  ceo:{ name:'Diretoria executiva', role:'CEO · Grupo Bandeirantes', av:'CEO', home:['Início do CEO','Receita, audiência, patrocínio e decisões da diretoria'],
+    groups:[['Visão executiva',['os:cockpit','os:receita','os:governanca','pv:analytics']],['Estratégia',['os:inventario','pv:onto','os:agentes']],['Para apresentar',['pv:pres','site:pass']]] },
+  op:{ name:'Operações', role:'Programação e produção', av:'OP', home:['Início de Operações','O que está no ar, o que vem a seguir e o que precisa de ação'],
+    groups:[['No ar',['os:visao','os:central','os:aovivo','os:programas']],['Conteúdo e engajamento',['os:acervo','os:comunidades','os:gamif','pv:rewards']],['Experiência do fã',['pv:fan','site:pass','site:hv','site:loja']],['Demos de propriedade',['hv:','p3:']]] },
+  mkt:{ name:'Marketing', role:'CRM, audiência e campanhas', av:'MKT', home:['Início de Marketing','Base, consentimento, segmentos e jornadas prontos para ativar'],
+    groups:[['Audiência',['pv:cdp','pv:segments','os:comunidades','pv:analytics']],['Ativação',['pv:marketing','os:campanhas','os:automacao','os:beneficios','pv:rewards']],['Comercial',['os:inventario','os:receita']],['Privacidade',['pv:consent']],['Site do fã',['site:pass','site:loja']]] },
+  it:{ name:'Tecnologia', role:'TI · Integrações, dados e segurança', av:'TI', home:['Início de TI','Conectores, sincronização, modelo de dados e LGPD'],
+    groups:[['Integrações',['pv:hub','os:saude','pv:erp']],['Dados e governança',['pv:schema','pv:consent','pv:onto']],['Inteligência',['os:agentes','pv:analytics']]] }
+};
+const ROLE_HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>';
+const ROLE_PAGE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>';
+let SIDEBAR_FOOT_DEFAULT = null;
+function buildRoleNav(roleId){
+  document.querySelectorAll('.role-nav').forEach(el => el.remove());
+  const r = BAND_ROLES[roleId], nav = document.getElementById('nav');
+  const esc = t => String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const item = (key, title, sub, icon) => `<div class="nav-item band-only-nav role-nav" data-view="band" data-band="${key}" data-title="${esc(title)}" data-sub="${esc(sub)}" data-mode="role">${icon}${esc(title)}</div>`;
+  let html = `<div class="nav-group-label band-only-nav role-nav" data-mode="role">${esc(r.name)}</div>` + item('home:' + roleId, r.home[0], r.home[1], ROLE_HOME_ICON);
+  r.groups.forEach(([label, keys]) => {
+    html += `<div class="nav-group-label band-only-nav role-nav" data-mode="role">${esc(label)}</div>`;
+    keys.forEach(k => {
+      const src = document.querySelector(`.band-only-nav.nav-item:not(.role-nav)[data-band="${k}"]`);
+      const tmp = document.createElement('div');
+      if(src){ tmp.innerHTML = src.dataset.title; html += item(k, tmp.textContent, src.dataset.sub, src.querySelector('svg') ? src.querySelector('svg').outerHTML : ROLE_PAGE_ICON); }
+      else if(BAND_EXTRA_PAGES[k]) html += item(k, BAND_EXTRA_PAGES[k][0], BAND_EXTRA_PAGES[k][1], ROLE_PAGE_ICON);
+    });
+  });
+  nav.insertAdjacentHTML('afterbegin', html);
+}
+function enterBandRole(roleId){
+  const r = BAND_ROLES[roleId];
+  window.BAND_ROLE = roleId;
+  buildRoleNav(roleId);
+  const foot = document.querySelector('.sidebar-foot');
+  if(SIDEBAR_FOOT_DEFAULT === null) SIDEBAR_FOOT_DEFAULT = [foot.querySelector('.avatar-round').textContent, foot.querySelector('.name').textContent, foot.querySelector('.role').textContent];
+  foot.querySelector('.avatar-round').textContent = r.av;
+  foot.querySelector('.name').textContent = r.name;
+  foot.querySelector('.role').textContent = r.role;
+  // Reabre a Band do zero para cair na página inicial do papel.
+  document.querySelectorAll('#band-frames iframe[data-app="home"]').forEach(f => f.remove());
+  chooseClubFromCover('band');
+  document.getElementById('topbar-club-sub').textContent = 'Perfil: ' + r.name;
+  goToDefaultView('role');
+}
+function clearBandRole(){
+  if(!window.BAND_ROLE) return;
+  window.BAND_ROLE = null;
+  document.querySelectorAll('.role-nav').forEach(el => el.remove());
+  const foot = document.querySelector('.sidebar-foot');
+  if(SIDEBAR_FOOT_DEFAULT){ foot.querySelector('.avatar-round').textContent = SIDEBAR_FOOT_DEFAULT[0]; foot.querySelector('.name').textContent = SIDEBAR_FOOT_DEFAULT[1]; foot.querySelector('.role').textContent = SIDEBAR_FOOT_DEFAULT[2]; }
+  document.getElementById('sidebar-mode-switch').style.display = '';
+  updateNavVisibility();
+}
 function showBandPage(item){
   const [app, page] = item.dataset.band.split(':');
   const host = document.getElementById('band-frames');
@@ -2685,7 +2767,14 @@ let currentClubId = 'flamengo';
 // isto só filtra visibilidade, nenhum módulo muda de conteúdo por causa do modo.
 let currentSidebarMode = 'cockpit';
 function updateNavVisibility(){
+  const roleOn = !!(window.BAND_ROLE && currentClubId === 'band');
+  document.getElementById('sidebar-mode-switch').style.display = roleOn ? 'none' : '';
   document.querySelectorAll('.nav-item, .nav-group-label').forEach(el => {
+    // Login por papel (CEO, Op, MKT, IT): só o menu montado para o papel.
+    if(roleOn || el.classList.contains('role-nav')){
+      el.style.display = (roleOn && el.classList.contains('role-nav')) ? (el.classList.contains('nav-item') ? 'flex' : 'block') : 'none';
+      return;
+    }
     const modeOk = el.dataset.mode === currentSidebarMode;
     // Band é um tenant de mídia: com ela selecionada o menu mostra só as
     // páginas da Band (band-only-nav); com qualquer clube, essas ficam ocultas.
@@ -2707,6 +2796,11 @@ function setSidebarMode(mode){
 
 // Primeira página de cada modo; para a Band, o primeiro item visível do menu dela.
 function goToDefaultView(mode){
+  if(currentClubId === 'band' && window.BAND_ROLE){
+    const home = document.querySelector('.role-nav.nav-item');
+    if(home) home.click();
+    return;
+  }
   if(currentClubId === 'band'){
     const first = document.querySelector(`.band-only-nav.nav-item[data-mode="${mode}"]`);
     if(first) first.click();
@@ -2735,6 +2829,7 @@ function chooseClubFromCover(id){
 function selectClub(id, silent){
   const c = CLUB_PROFILES[id];
   if(!c) return;
+  if(window.BAND_ROLE && id !== 'band') return;
   currentClubId = id;
 
   // Mantém a URL coerente com o clube ativo — /vasco/os é a "porta" oficial
