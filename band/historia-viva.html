@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>História Viva · Band Playverse</title>
+<link rel="stylesheet" href="/band/assets/band-site.css">
+</head>
+<body>
+<header id="top"></header>
+<main class="b-wrap">
+  <div class="eyebrow">História Viva · museu virtual do esporte</div>
+  <h1 style="font-size:clamp(34px,5vw,54px)">O acervo da Band <span style="color:var(--gold)">volta a jogar</span>.</h1>
+  <p class="lead">Cinco salas, um quiz por sala e uma sala de memórias com o historiador de IA. Visitar tudo rende XP e a medalha Memória viva. No domingo, as melhores memórias dos fãs vão ao ar no Show do Esporte.</p>
+
+  <div style="margin-top:22px" class="login-bar" id="login"></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><b id="progT">0 de 5 salas</b><small style="color:var(--dim)">+100 XP por sala visitada · +150 XP por quiz certo · +500 XP ao completar</small></div>
+  <div class="progress" style="margin-top:8px"><i id="progB" style="width:0"></i></div>
+  <div class="rooms" id="rooms"></div>
+  <div class="card" id="room"></div>
+
+  <div class="sec"><div class="eyebrow">Sobre o acervo</div><h2>O que é real e o que é ilustrativo</h2></div>
+  <div class="card"><ul class="facts" style="padding-left:18px;margin:0">
+    <li>Os fatos esportivos citados são públicos. As imagens de cada sala são espaços reservados: o uso de trechos do acervo de vídeo da Band depende de licenciamento de imagem e de direitos de transmissão de cada competição.</li>
+    <li>As memórias enviadas pelos fãs passam por moderação antes de qualquer exibição e só vão ao ar com autorização explícita do autor.</li>
+    <li>O historiador de IA responde com cautela e avisa quando não tem certeza de um fato.</li>
+  </ul></div>
+</main>
+
+<script src="/band/apps/claude-shim.js"></script>
+<script src="/band/assets/band-site.js"></script>
+<script>
+(function(){
+const B = BAND, esc = B.esc;
+B.top('/band/historia-viva');
+const ROOMS = [
+  { id:'derby', n:'Clássicos de SP', yr:'1917', icon:'⚔️', title:'Derby, Majestoso e a rivalidade paulista',
+    lead:'O primeiro Corinthians × Palestra Itália (hoje Palmeiras) foi disputado em 1917. Mais de um século depois, o Derby segue entre os jogos mais vistos do país, ao lado do Majestoso (São Paulo × Corinthians).',
+    facts:['O Derby paulista começou em 1917, quando o Palmeiras ainda se chamava Palestra Itália.','Majestoso é o apelido do clássico São Paulo × Corinthians.','No Jogo Aberto e n’Os Donos da Bola, a semana de clássico é a de maior participação esperada do Band Playverse.'],
+    q:['Como se chamava o Palmeiras no primeiro Derby, em 1917?',['Palestra Itália','Sociedade Esportiva Paulista','Palmeiras Futebol Clube'],0] },
+  { id:'copas', n:'Copas do Mundo', yr:'1958–2002', icon:'🏆', title:'Do primeiro título ao penta',
+    lead:'O Brasil ganhou sua primeira Copa em 1958, na Suécia. O tetra veio em 1994, nos Estados Unidos, na disputa de pênaltis contra a Itália. Em 2002, no Japão, o penta saiu com dois gols de Ronaldo na final contra a Alemanha.',
+    facts:['1958: primeiro título mundial, na Suécia.','1994: final contra a Itália decidida nos pênaltis, em Pasadena.','2002: 2 × 0 na Alemanha, em Yokohama, com dois gols de Ronaldo.'],
+    q:['Contra qual seleção o Brasil decidiu a final de 1994?',['Alemanha','Itália','Holanda'],1] },
+  { id:'mundial', n:'Mundial de Clubes', yr:'2000', icon:'🌎', title:'O primeiro Mundial da FIFA',
+    lead:'Em janeiro de 2000, a FIFA realizou no Brasil o primeiro Mundial de Clubes. O Corinthians foi campeão ao vencer o Vasco nos pênaltis, na final disputada no Maracanã.',
+    facts:['Primeira edição do Mundial de Clubes organizado pela FIFA.','Final brasileira: Corinthians × Vasco, no Maracanã.','Decisão nos pênaltis, depois de 0 × 0.'],
+    q:['Quem o Corinthians venceu na final do Mundial de 2000?',['Real Madrid','Vasco','Manchester United'],1] },
+  { id:'motor', n:'Velocidade', yr:'1980s–2026', icon:'🏁', title:'A casa do automobilismo na TV aberta',
+    lead:'A Band foi a primeira emissora a exibir a Fórmula Indy na íntegra na TV aberta brasileira, ainda nos anos 1980. Em 2026, a Stock Car passou a ser transmitida com exclusividade pela Band.',
+    facts:['Fórmula Indy na íntegra na TV aberta: pioneirismo da Band nos anos 1980.','Stock Car 2026: transmissão exclusiva na Band, com bolão do pódio no Band Playverse.','O game Reta Final, no app, usa a cota de patrocínio do automobilismo.'],
+    q:['Qual categoria a Band passou a transmitir com exclusividade em 2026?',['Stock Car','Fórmula 1','MotoGP'],0] },
+  { id:'memo', n:'Sala das memórias', yr:'Você', icon:'📼', title:'A sua memória vira acervo',
+    lead:'Conte um jogo, uma corrida ou uma narração que marcou a sua vida. O historiador de IA comenta e devolve o contexto. Com a sua autorização, a memória pode ir ao ar no Show do Esporte.',
+    facts:[], q:null }
+];
+const ST_KEY = 'band-hv';
+let st; try { st = JSON.parse(localStorage.getItem(ST_KEY)) || {}; } catch(e){ st = {}; }
+st.visited = st.visited || {}; st.quiz = st.quiz || {};
+const saveSt = () => { try { localStorage.setItem(ST_KEY, JSON.stringify(st)); } catch(e){} };
+let cur = 0;
+
+function progress(){
+  const n = Object.keys(st.visited).length;
+  document.getElementById('progT').textContent = `${n} de ${ROOMS.length} salas`;
+  document.getElementById('progB').style.width = (n / ROOMS.length * 100) + '%';
+  document.getElementById('rooms').innerHTML = ROOMS.map((r,i) => `<button class="${i===cur?'on':''} ${st.visited[r.id]?'done':''}" data-r="${i}">${r.icon} ${r.n}${st.visited[r.id]?' ✓':''}</button>`).join('');
+  if (n === ROOMS.length && B.fan && !st.complete) { st.complete = 1; saveSt(); B.addXP(500, 'por completar o museu'); B.emit('memory', 'se', { moment: 'Museu completo', xp: 500 }, 'Site Band'); B.medal('memoria'); B.redrawLogin && B.redrawLogin(); }
+}
+function visit(r){
+  if (!B.fan || st.visited[r.id]) return;
+  st.visited[r.id] = Date.now(); saveSt(); B.addXP(100, `· sala ${r.n}`);
+  B.emit('memory', 'se', { moment: r.title, room: r.id, xp: 100 }, 'Site Band'); B.redrawLogin && B.redrawLogin();
+}
+function room(){
+  const r = ROOMS[cur], el = document.getElementById('room');
+  const media = `<div class="reel"><span class="yr">${r.yr}</span><div><div style="font-size:46px">${r.icon}</div><div style="font-size:13px;margin-top:6px">Trecho do acervo Band<br><small style="color:#888">espaço reservado · imagens a licenciar</small></div></div></div>`;
+  if (r.id === 'memo') {
+    el.innerHTML = `<div class="room">${media}<div><div class="eyebrow">Sala ${cur+1}</div><h2 style="font-size:28px">${r.title}</h2><p style="color:#d4dcf2">${r.lead}</p>
+    <textarea id="mem" placeholder="Ex.: Eu tinha 9 anos e vi o penta com meu avô, que chorou no segundo gol do Ronaldo..."></textarea>
+    <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--dim);margin:8px 0"><input type="checkbox" id="memOk"> Autorizo a Band a exibir minha memória no Show do Esporte (após moderação)</label>
+    <button class="btn" id="memGo">Enviar memória (+200 XP)</button><div id="memOut"></div></div></div>`;
+    document.getElementById('memGo').onclick = sendMemory;
+  } else {
+    const done = st.quiz[r.id];
+    el.innerHTML = `<div class="room">${media}<div><div class="eyebrow">Sala ${cur+1} · ${r.yr}</div><h2 style="font-size:28px">${r.title}</h2><p style="color:#d4dcf2">${r.lead}</p><ul class="facts" style="padding-left:18px">${r.facts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>
+    <div class="q" style="margin-top:14px"><b>Quiz da sala</b> <small style="color:var(--dim)">+150 XP se acertar</small><p style="margin:6px 0 4px">${esc(r.q[0])}</p>${r.q[1].map((o,i) => `<button data-a="${i}" class="${done!=null ? (i===r.q[2]?'ok':(i===done?'no':'')) : ''}" ${done!=null?'disabled':''}>${esc(o)}</button>`).join('')}</div>
+    ${cur < ROOMS.length-1 ? `<button class="btn ghost" style="margin-top:12px" id="next">Próxima sala →</button>` : ''}</div></div>`;
+    el.querySelectorAll('[data-a]').forEach(b => b.onclick = () => {
+      if (!B.fan) { B.toast('Entre com o Band Pass para valer XP'); window.scrollTo({top:0,behavior:'smooth'}); return; }
+      if (st.quiz[r.id] != null) return; const a = +b.dataset.a, ok = a === r.q[2]; st.quiz[r.id] = a; saveSt();
+      B.emit('quiz', 'se', { ok, room: r.id, xp: ok ? 150 : 0 }, 'Site Band');
+      if (ok) B.addXP(150, 'no quiz'); else B.toast('Quase! A resposta certa está em verde');
+      B.redrawLogin && B.redrawLogin(); room();
+    });
+    const nx = document.getElementById('next'); if (nx) nx.onclick = () => { cur++; go(); };
+  }
+}
+async function sendMemory(){
+  if (!B.fan) { B.toast('Entre com o Band Pass para enviar'); window.scrollTo({top:0,behavior:'smooth'}); return; }
+  const txt = document.getElementById('mem').value.trim(); if (txt.length < 15) { B.toast('Conte um pouco mais (mínimo 15 letras)'); return; }
+  const ok = document.getElementById('memOk').checked, out = document.getElementById('memOut'), btn = document.getElementById('memGo');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  st.mem = (st.mem || 0) + 1; saveSt();
+  if (st.mem <= 3) B.addXP(200, 'pela memória');
+  B.emit('memory', 'se', { moment: txt.slice(0, 60), ugc: true, onAir: ok, xp: st.mem <= 3 ? 200 : 0 }, 'Site Band');
+  B.redrawLogin && B.redrawLogin();
+  out.innerHTML = `<div class="hist"><b>Historiador Band · IA</b><p id="histTxt" style="margin:6px 0 0;color:#e8ecf8">Lendo a sua memória…</p></div>`;
+  const fallback = 'Que memória bonita. Lembranças assim, vividas em família diante da TV ou do rádio, são exatamente o que o acervo da Band guarda do outro lado da tela. ' + (ok ? 'Sua memória entrou na fila de moderação do Show do Esporte.' : 'Ela fica guardada no seu Band Pass; se quiser vê-la no ar, marque a autorização da próxima vez.');
+  let text = null;
+  try {
+    const s = await claude.use('sample');
+    if (s) { const r = await s([{ role:'user', content:`Você é o Historiador Band, curador do museu virtual do esporte da Band (TV Bandeirantes). Um fã enviou esta memória:\n"""${txt.slice(0,800)}"""\nResponda em português do Brasil, em no máximo 4 frases: acolha a memória com calor, acrescente UM fato histórico seguro e verificável relacionado (se não tiver certeza de um fato, não invente; prefira algo genérico), e convide o fã a assistir o Show do Esporte no domingo. Não invente que a Band transmitiu um evento específico. Sem markdown.` }]); text = r && r.text; }
+  } catch(e) { text = null; }
+  document.getElementById('histTxt').textContent = text || fallback;
+  if (ok && text) document.getElementById('histTxt').insertAdjacentHTML('afterend', '<p class="note">Enviada para moderação do Show do Esporte.</p>');
+  btn.disabled = false; btn.textContent = 'Enviar outra memória';
+}
+function go(){ visit(ROOMS[cur]); progress(); room(); }
+document.getElementById('rooms').addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b) { cur = +b.dataset.r; go(); } });
+B.login(document.getElementById('login'), () => { go(); });
+go();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Band Pass · Band Playverse</title>
+<link rel="stylesheet" href="/band/assets/band-site.css">
+</head>
+<body>
+<header id="top"></header>
+<main class="b-wrap">
+  <div class="eyebrow">Band Pass · programa de fidelidade do fã</div>
+  <h1 style="font-size:clamp(34px,5vw,54px)">Assista, participe, <span style="color:var(--gold)">ganhe</span>.</h1>
+  <p class="lead">Um único passe para TV aberta, BandSports, rádio e YouTube. Cada participação nos programas da Band vale XP, e o XP vira recompensa real pela Minu e desconto nas Experiências Band.</p>
+
+  <div style="margin-top:22px" class="login-bar" id="login"></div>
+
+  <div class="grid g2" id="passRow"></div>
+
+  <div class="sec"><div class="eyebrow">Grade da semana</div><h2>Onde ganhar XP hoje</h2><p class="lead">Ative o lembrete e receba o push (ou o WhatsApp, se você autorizou) antes de o programa entrar no ar. Horários marcados com * ainda serão confirmados pela Band.</p></div>
+  <div class="daytabs" id="days"></div>
+  <div id="grade"></div>
+
+  <div class="sec"><div class="eyebrow">Velocidade</div><h2>Temporada de motor na Band</h2><p class="lead">Bolão do pódio e palpites de corrida valem XP em dobro no fim de semana de etapa.</p></div>
+  <div class="grid g3" id="motor"></div>
+
+  <div class="sec"><div class="eyebrow">Níveis</div><h2>Quanto mais você participa, mais vale</h2></div>
+  <div class="grid g4" id="levels"></div>
+
+  <div class="sec"><div class="eyebrow">Recompensas Minu</div><h2>Troque XP por benefícios do dia a dia</h2><p class="lead">100 XP equivalem a R$ 1 em recompensa. Itens com cortesia de patrocinador não custam nada para a Band.</p></div>
+  <div class="grid g4" id="rewards"></div>
+</main>
+
+<script src="/band/apps/playverse/js/core.js"></script>
+<script src="/band/assets/band-site.js"></script>
+<script>
+(function(){
+const B = BAND, esc = B.esc, fmt = B.fmt;
+B.top('/band/pass');
+const DAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const now = BP.u.nowSP(); let day = now.getDay();
+const IX = { poll:'Enquete', quiz:'Quiz', opinion:'Desafie o apresentador', var:'VAR da audiência', 'game:penalti':'Game Pênalti', 'game:stock':'Game Reta Final', memory:'História Viva', gincana:'Gincana', bolao:'Bolão', indy:'Palpite', nota:'Nota da manobra', pbr:'Palpite PBR' };
+const CH = { tv:'📺 TV aberta', bs:'🏟️ BandSports', radio:'📻 Rádio', yt:'▶️ YouTube' };
+const rem = () => { try { return JSON.parse(localStorage.getItem('band-reminders')) || {}; } catch(e){ return {}; } };
+
+function pass(){
+  const f = B.fan, el = document.getElementById('passRow');
+  if (!f) { el.innerHTML = `<div class="pass"><div class="eyebrow">Seu Band Pass</div><div class="n">—</div><p style="color:var(--dim);margin:0">Crie seu Band Pass na barra acima para ver XP, nível e medalhas.</p></div><div class="card"><div class="eyebrow">Como funciona</div><ol style="margin:0;padding-left:18px;color:#d4dcf2"><li>Escaneie o QR na tela ou abra o app durante o programa.</li><li>Vote, responda o quiz, desafie o Neto, jogue.</li><li>Troque XP por recompensas Minu ou use como desconto.</li></ol></div>`; return; }
+  const lv = B.level(f.xp);
+  el.innerHTML = `<div class="pass"><div class="eyebrow">Band Pass · ${esc(f.id)}</div><div style="display:flex;align-items:center;gap:10px"><div class="n">${fmt(f.xp)} XP</div><span class="tier t${lv.i}">${lv.name}</span></div>
+  <div class="pb"><i style="width:${lv.pct}%"></i></div><small style="color:var(--dim)">${lv.next ? `Faltam ${fmt(lv.next - f.xp)} XP para ${lv.nextName}` : 'Nível máximo alcançado'} · saldo para resgate ${fmt(B.balance())} XP</small>
+  <div class="medals">${Object.entries(B.MEDALS).map(([k,m]) => `<span class="${f.medals.includes(k)?'on':''}" title="${m[1]}">${m[0]} ${m[1]}</span>`).join('')}</div></div>
+  <div class="card grid g2" style="align-content:start"><div class="stat"><b>${Object.keys(f.progs||{}).length}</b><small>programas em que você participou</small></div><div class="stat"><b>${f.medals.length}/6</b><small>medalhas</small></div><div class="stat"><b>${lv.disc}%</b><small>desconto nas Experiências Band</small></div><div class="stat"><b>${Object.keys(rem()).length}</b><small>lembretes ativos</small></div>
+  <a class="btn" href="/band/apps/playverse/#fa" style="grid-column:1/-1">Abrir o app e ganhar XP</a></div>`;
+}
+
+function grade(){
+  document.getElementById('days').innerHTML = DAYS.map((d,i) => `<button class="${i===day?'on':''}" data-d="${i}">${i===now.getDay()?'Hoje':d}</button>`).join('');
+  const list = BP.PROGRAMS.filter(p => p.days.includes(day) && p.s !== 'etapa').sort((a,b) => a.s.localeCompare(b.s));
+  const r = rem();
+  document.getElementById('grade').innerHTML = list.length ? list.map(p => {
+    const live = day === now.getDay() && BP.onAir(p);
+    return `<div class="prog" style="--c:${p.color}"><div class="when"><b>${p.s}${p.tbc?'*':''}</b><small>${DAYS[day]}</small></div>
+    <div class="t"><b>${esc(p.n)} ${live?'<span class="chip r">AO VIVO</span>':''}</b><small>${esc(p.host)} · ${p.ch.map(c=>CH[c]).join(' · ')}</small><small style="color:var(--gold2)">${esc(p.tag)} · ${p.ix.map(x=>IX[x]||x).filter(l=>!p.tag.includes(l)).join(', ')}</small></div>
+    ${live ? `<a class="btn sm" href="/band/apps/playverse/#fa">Participar</a>` : `<button class="btn ${r[p.id]?'':'ghost'} sm" data-rem="${p.id}">${r[p.id]?'🔔 Lembrete ativo':'Lembrar'}</button>`}</div>`;
+  }).join('') : `<div class="card" style="color:var(--dim)">Sem programas interativos fixos neste dia. Veja a temporada de motor abaixo.</div>`;
+}
+document.getElementById('days').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) { day = +b.dataset.d; grade(); } });
+document.getElementById('grade').addEventListener('click', e => {
+  const b = e.target.closest('[data-rem]'); if (!b) return;
+  if (!B.fan) { B.toast('Entre com o Band Pass para ativar lembretes'); return; }
+  const r = rem(), id = b.dataset.rem, p = BP.prog(id);
+  if (r[id]) delete r[id]; else { r[id] = Date.now(); B.emit('consent', id, { reminder: true, ch: B.fan.consent.whatsapp ? 'whatsapp' : 'push' }); B.toast(`Lembrete de ${p.n} ativado`); }
+  try { localStorage.setItem('band-reminders', JSON.stringify(r)); } catch(e){}
+  grade(); pass();
+});
+
+document.getElementById('motor').innerHTML = [
+  ['stock','🏁','Stock Car','Transmissão exclusiva na Band em 2026. Bolão do pódio antes da largada e game Reta Final no app.'],
+  ['indy','🏎️','Fórmula Indy','A Band foi a primeira a exibir a Indy na íntegra na TV aberta, ainda nos anos 1980. Palpite de vencedor e de pole.'],
+  ['stu','🛹','STU · Skate','Nas etapas do circuito, o fã dá a nota da manobra e compara com os juízes.']
+].map(([id,ic,n,d]) => { const p = BP.prog(id); return `<div class="card" style="border-top:3px solid ${p.color}"><div style="font-size:30px">${ic}</div><h3 style="font-size:22px;margin:6px 0">${n}</h3><small style="color:var(--dim)">${p.host} · ${p.ch.map(c=>CH[c]).join(' · ')}</small><p style="color:#d4dcf2;font-size:14px">${d}</p><span class="chip y">Datas das etapas a confirmar com a Band</span></div>`; }).join('');
+
+document.getElementById('levels').innerHTML = B.LEVELS.map((l,i) => `<div class="card"><span class="tier t${i}">${l[1]}</span><div class="stat" style="margin-top:10px"><b>${fmt(l[0])} XP</b><small>a partir de</small></div><ul class="facts" style="padding-left:18px;font-size:13px">${[
+  ['Ranking da torcida','Recompensas Minu'],
+  ['5% nas Experiências Band','Enquetes com 2× XP no rádio'],
+  ['10% nas Experiências Band','Acesso antecipado a plateias','Selo no ranking do Jogo Aberto'],
+  ['20% nas Experiências Band','Sorteio mensal de bate-papo com apresentador','Convite para gravações especiais']
+][i].map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('');
+
+B.login(document.getElementById('login'), () => { pass(); grade(); B.redrawRewards && B.redrawRewards(); });
+B.rewards(document.getElementById('rewards'));
+pass(); grade();
+})();
+</script>
+</body>
+</html>

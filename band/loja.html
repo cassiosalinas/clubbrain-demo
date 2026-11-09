@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Experiências Band · Band Playverse</title>
+<link rel="stylesheet" href="/band/assets/band-site.css">
+</head>
+<body>
+<header id="top"></header>
+<main class="b-wrap">
+  <div class="eyebrow">Experiências Band</div>
+  <h1 style="font-size:clamp(34px,5vw,54px)">Do sofá para <span style="color:var(--gold)">dentro do estúdio</span>.</h1>
+  <p class="lead">Plateia, bastidores, autódromo e itens exclusivos. Seu nível no Band Pass vira desconto automático e cada real gasto vira XP.</p>
+
+  <div style="margin-top:22px" class="login-bar" id="login"></div>
+  <div class="daytabs" id="filters"></div>
+  <div class="grid g3" id="prods"></div>
+
+  <div class="sec"><div class="eyebrow">Pagar com XP</div><h2>Prefere trocar XP? Recompensas Minu</h2></div>
+  <div class="grid g4" id="rewards"></div>
+
+  <div class="sec"><div class="eyebrow">Como funciona por trás</div><h2>Uma compra, seis sistemas</h2><p class="lead">Ao confirmar, o pedido vira evento no Band Playverse: o gateway confirma o pagamento, o ERP lança a receita, a nota fiscal é emitida, o CRM registra o pedido e a jornada de pós-compra dispara. Abra o <a href="/band/os">Painel Band</a> em outra aba para ver acontecer.</p></div>
+  <div class="grid g3">
+    <div class="card"><b>💳 Gateway / Pix</b><p style="color:var(--dim);font-size:13px;margin:6px 0 0">Webhook de pagamento confirmado. Nesta demo, simulado.</p></div>
+    <div class="card"><b>🧾 ERP + NFS-e</b><p style="color:var(--dim);font-size:13px;margin:6px 0 0">Título recebido e nota fiscal de serviço, com conciliação do 50/50.</p></div>
+    <div class="card"><b>📇 CRM + jornada</b><p style="color:var(--dim);font-size:13px;margin:6px 0 0">Pedido no perfil do fã e e-mail com ingresso, respeitando o consentimento.</p></div>
+  </div>
+</main>
+
+<script src="/band/assets/band-site.js"></script>
+<script>
+(function(){
+const B = BAND, esc = B.esc, brl = B.brl;
+B.top('/band/loja');
+const P = [
+  { id:'plateia-ja', kind:'Plateia', emoji:'🎙️', bg:'linear-gradient(135deg,#2f6bff,#0b1a40)', name:'Plateia do Jogo Aberto', d:'Assista ao vivo no estúdio, com credencial e foto no cenário. Sujeito a disponibilidade da produção.', price:89, when:'Dias úteis · 10h30', prog:'ja', tag:'Mais procurado' },
+  { id:'tour', kind:'Bastidores', emoji:'🎬', bg:'linear-gradient(135deg,#a86bff,#2b145c)', name:'Tour pelos estúdios da Band', d:'Visita guiada ao Morumbi: estúdios de esporte, controle mestre e a história da emissora.', price:120, when:'Sábados · 10h e 14h', prog:'se' },
+  { id:'stock', kind:'Velocidade', emoji:'🏁', bg:'linear-gradient(135deg,#ef4444,#3a0a0a)', name:'Ingresso · etapa da Stock Car', d:'Arquibancada com kit Band Playverse e bolão do pódio valendo 2× XP no dia.', price:180, when:'Etapa a confirmar', prog:'stock', tag:'Exclusivo Band' },
+  { id:'kit', kind:'Produto', emoji:'🧢', bg:'linear-gradient(135deg,#f5b82e,#7a4b00)', name:'Kit Band Playverse', d:'Boné, caneca e adesivos com o selo do Band Pass. Entrega para todo o Brasil.', price:149, when:'Envio em até 7 dias' },
+  { id:'premium', kind:'Assinatura', emoji:'⭐', bg:'linear-gradient(135deg,#0ea5e9,#062a3d)', name:'Band Pass Premium · 12 meses', d:'2× XP em todos os programas, acesso antecipado a plateias e sorteios exclusivos.', price:99, when:'Renovação anual', noDiscount:true },
+  { id:'papo', kind:'Bastidores', emoji:'🤝', bg:'linear-gradient(135deg,#ff6a1a,#3d1500)', name:'Bate-papo com apresentador', d:'Encontro em grupo pequeno depois do programa. Datas e apresentadores sujeitos a autorização da Band e dos talentos.', price:250, when:'Datas sob consulta', prog:'db', tag:'Edição limitada' }
+];
+let filter = 'Todos';
+const kinds = ['Todos', ...new Set(P.map(p => p.kind))];
+function draw(){
+  document.getElementById('filters').innerHTML = kinds.map(k => `<button class="${k===filter?'on':''}" data-k="${k}">${k}</button>`).join('');
+  const lv = B.fan ? B.level(B.fan.xp) : null;
+  document.getElementById('prods').innerHTML = P.filter(p => filter==='Todos' || p.kind===filter).map(p => {
+    const disc = lv && !p.noDiscount ? lv.disc : 0, total = p.price * (1 - disc/100);
+    return `<div class="prod"><div class="thumb" style="background:${p.bg}">${p.emoji}${p.tag?`<span class="chip y tag">${p.tag}</span>`:''}</div><div class="body"><span class="chip">${p.kind} · ${esc(p.when)}</span><b>${esc(p.name)}</b><small>${esc(p.d)}</small><span style="flex:1"></span>
+    <div class="price">${disc?`<s>${brl(p.price)}</s>`:''}${brl(total)}</div><small>${disc?`Desconto ${lv.name} de ${disc}% · `:''}ganhe +${B.fmt(Math.round(total))} XP</small><button class="btn" data-buy="${p.id}">Comprar</button></div></div>`;
+  }).join('');
+}
+document.getElementById('filters').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) { filter = b.dataset.k; draw(); } });
+document.getElementById('prods').addEventListener('click', e => { const b = e.target.closest('[data-buy]'); if (b) B.checkout(P.find(p => p.id === b.dataset.buy)); });
+B.login(document.getElementById('login'), () => { draw(); B.redrawRewards && B.redrawRewards(); });
+B.rewards(document.getElementById('rewards'));
+draw();
+})();
+</script>
+</body>
+</html>

@@ -741,6 +741,19 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4zM4 9h16M9 9v11"/></svg>
         ERP &amp; financeiro
       </div>
+      <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Jornada do fã (site)</div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="site:pass" data-title="Band Pass" data-sub="Site do fã: nível, XP, medalhas, grade da semana com lembretes e recompensas Minu" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+        Band Pass
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="site:hv" data-title="História Viva · museu" data-sub="Site do fã: cinco salas do acervo, quiz com XP e sala de memórias com historiador de IA" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+        História Viva · museu
+      </div>
+      <div class="nav-item band-only-nav" data-view="band" data-band="site:loja" data-title="Experiências Band" data-sub="Site do fã: plateia, tour, Stock Car e kit, com desconto por nível e checkout simulado" data-mode="operacional" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+        Experiências Band
+      </div>
       <div class="nav-group-label band-only-nav" data-mode="operacional" style="display:none;">Band · Demos de propriedade</div>
       <div class="nav-item band-only-nav" data-view="band" data-band="hv:" data-title="Pré-Jogo &amp; História Viva" data-sub="Demo da primeira propriedade: Pré-Jogo do Derby com AI Historian" data-mode="operacional" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7 7 .6-5.3 4.7L18.4 22 12 18l-6.4 4 1.7-7.7L2 9.6 9 9z"/></svg>
@@ -2469,11 +2482,17 @@ function toggleMobileSidebar(force){
 
 /* ============ BAND · páginas do tenant de mídia ============ */
 const BAND_APPS = { os:'/band/apps/os/?embed=1', pv:'/band/apps/playverse/?embed=1', hv:'/band/apps/historia-viva/', p3:'/band/apps/playverse-3/' };
+// Páginas públicas da Band (site do fã), abertas dentro do painel. Ficam na
+// mesma origem, então compras e resgates aparecem ao vivo no backoffice.
+const BAND_SITE = { pass:'/band/pass', hv:'/band/historia-viva', loja:'/band/loja' };
 function showBandPage(item){
   const [app, page] = item.dataset.band.split(':');
   const host = document.getElementById('band-frames');
   let fr = host.querySelector(`iframe[data-app="${app}"]`);
-  if(!fr){
+  if(app === 'site'){
+    if(!fr){ fr = document.createElement('iframe'); fr.className = 'band-frame'; fr.dataset.app = app; host.appendChild(fr); }
+    fr.src = BAND_SITE[page];
+  } else if(!fr){
     fr = document.createElement('iframe');
     fr.className = 'band-frame'; fr.dataset.app = app; fr.setAttribute('allow', 'clipboard-write');
     fr.src = BAND_APPS[app] + (page ? '#' + page : '');

@@ -183,7 +183,8 @@ BP.JOURNEYS = [
   { id: "j2", n: "Da TV para o rádio", trig: "opinion", cond: (p, e) => e.prog === "db", steps: ["Respondeu ao Neto na TV", "Push às 17h50: 2º turno no rádio vale 2× XP"], ch: "push", entered: 860, sent: 812 },
   { id: "j3", n: "Recorde no game", trig: "game_end", cond: (p, e) => (e.p.score || 0) >= (e.p.game === "penalti" ? 4 : 1200), steps: ["Recorde no jogo", "WhatsApp: cupom do patrocinador do game"], ch: "whatsapp", entered: 410, sent: 377 },
   { id: "j4", n: "Recibo de resgate", trig: "reward", cond: () => true, steps: ["Resgate na Minu", "E-mail/WhatsApp com voucher e marca patrocinadora"], ch: "email", entered: 1190, sent: 1190 },
-  { id: "j5", n: "Bolão da Stock Car", trig: "bolao", cond: () => true, steps: ["Palpite enviado", "Push no domingo: largada em 10 min", "Resultado + XP"], ch: "push", entered: 530, sent: 498 }
+  { id: "j5", n: "Bolão da Stock Car", trig: "bolao", cond: () => true, steps: ["Palpite enviado", "Push no domingo: largada em 10 min", "Resultado + XP"], ch: "push", entered: 530, sent: 498 },
+  { id: "j6", n: "Pós-compra · Experiências Band", trig: "purchase", cond: () => true, steps: ["Compra no site da Band", "E-mail com ingresso e nota fiscal", "Véspera: lembrete + missão bônus no app"], ch: "email", entered: 96, sent: 96 }
 ];
 
 /* ---------- barramento ---------- */
@@ -229,6 +230,7 @@ function ingest(ev) {
   if (d.xp) p.xp += d.xp;
   if (t === "medal") p.medals = Array.from(new Set([...p.medals, d.id]));
   if (t === "reward") { p.spent += d.xp; p.rewards.push({ item: d.item, xp: d.xp, t: ev.ts }); sync("minu", "POST /redemptions", "Resgate", 1); ledger("Despesa", `Recompensa Minu · ${d.item}`, "Minu", -(d.value || d.xp / BP.XP_PER_REAL) * (d.sponsored ? 0 : 1), ev.prog || "—", "Pedido Minu #" + (S.order++), d.sponsored ? "Custeado pelo patrocinador" : "A pagar"); sync("erp", "POST /payables", "Título a pagar", 1); }
+  if (t === "purchase") { sync("pay", "WEBHOOK payment.confirmed", "Pagamento", 1); ledger("Receita", `Experiência Band · ${d.item}`, p.name, d.value || 0, ev.prog || "—", "Pedido " + (d.order || "#" + S.order++), "Recebido via " + (d.method === "cartao" ? "cartão" : "Pix")); sync("erp", "POST /receivables", "Título recebido", 1); sync("nfe", "POST /nfse", "Nota fiscal", 1); sync("crm", "PATCH /contacts/orders", "Pedido", 1); }
   if (t === "join") { sync("crm", "UPSERT /contacts", "Contato", 1); if (p.consent.marketing) sync("vibra", "STREAM profiles", "Perfil consentido", 1); }
   if (t === "consent") { sync("crm", "PATCH /contacts/consent", "Consentimento", 1); }
   p.tl.unshift({ t: ev.ts, type: t, prog: ev.prog, p: d }); if (p.tl.length > 40) p.tl.length = 40;
