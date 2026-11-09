@@ -52,6 +52,7 @@ button,input{font:inherit;color:inherit}
 .login input:focus{border-color:var(--gold)}
 .login .go{width:100%;margin-top:18px;padding:15px;border-radius:15px;border:0;background:linear-gradient(135deg,var(--gold),#f39c12);color:#1a1200;font-weight:800;font-size:15px;cursor:pointer}
 .login .err{display:none;color:#ff9aa8;font-size:12.5px;margin-top:10px}
+.login .demo{width:100%;margin-top:12px;padding:11px;border-radius:13px;border:1px dashed rgba(245,184,46,.55);background:rgba(245,184,46,.08);color:var(--paper);font-size:13px;cursor:pointer}.login .demo b{color:var(--gold)}.login .demo span{display:block;font-size:11px;color:var(--dim);margin-top:2px}
 .login .alt{margin-top:14px;text-align:center;font-size:11.5px;color:var(--dim)}
 .toast{position:absolute;left:50%;top:60px;transform:translateX(-50%);background:var(--gold);color:#1a1200;font-weight:800;font-size:12.5px;padding:8px 14px;border-radius:999px;z-index:40;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1}
@@ -106,6 +107,7 @@ button,input{font:inherit;color:inherit}
       <label for="fp">Senha</label><input id="fp" type="password" placeholder="••••">
       <button class="go" type="submit">Entrar no Site do Fã</button>
       <div class="err" id="err">Usuário ou senha incorretos.</div>
+      <button type="button" class="demo" id="demoFill">Acesso da demo: <b>Fan</b> · senha <b>Band</b> <span>toque para preencher</span></button>
       <div class="alt">Ambiente de demonstração · Grupo Bandeirantes × Virtual Fans</div>
     </form>
   </div>
@@ -174,6 +176,7 @@ $('#login').addEventListener('submit', e => {
     $('#err').style.display = 'none'; enter(); toast('Bem-vindo ao Band Playverse!');
   } else $('#err').style.display = 'block';
 });
+$('#demoFill').onclick = () => { $('#fu').value = 'Fan'; $('#fp').value = 'Band'; $('#err').style.display = 'none'; };
 if (authed()) enter(); else setTimeout(() => $('#fu').focus(), 200);
 })();
 </script>
