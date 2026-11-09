@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BandBrain OS · Grupo Bandeirantes × Virtual Fans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0d1a;--side:#0c1020;--card:#121729;--card2:#161c31;--line:#222a44;--txt:#e8ebf5;--mut:#8a93ae;--mut2:#5f6886;
+--pur:#7c6cff;--pur2:#a86bff;--grn:#2dd4a7;--yel:#fbbf4a;--red:#f05a6e;--blu:#5b8cff;--org:#ff8a3d}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select,textarea{font:inherit;color:var(--txt)}
+.app{display:grid;grid-template-columns:250px 1fr;height:100vh}
+/* sidebar */
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.pw{display:flex;align-items:center;gap:8px;padding:18px 20px 10px;font-size:12px;color:var(--mut)}
+.pw i{width:16px;height:16px;border-radius:50%;background:conic-gradient(#1f9d55 0 50%,#f5c400 0);display:inline-block}
+.mode{margin:6px 14px 12px;display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#0f1428;border:1px solid var(--line);padding:4px;border-radius:12px}
+.mode button{padding:8px 6px;border-radius:9px;font-weight:600;font-size:13px;color:var(--mut)}
+.mode button.on{background:linear-gradient(135deg,var(--pur),var(--pur2));color:#fff}
+.nav{flex:1;overflow:auto;padding:0 12px 12px}
+.nav h6{font-size:10.5px;letter-spacing:.1em;color:var(--mut2);text-transform:uppercase;margin:16px 10px 6px;font-weight:600}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:9px 12px;border-radius:10px;color:#c5cbe0;font-size:14px;text-align:left}
+.nav button:hover{background:#141a30}
+.nav button.on{background:linear-gradient(90deg,rgba(124,108,255,.22),rgba(124,108,255,.05));color:#fff;box-shadow:inset 3px 0 0 var(--pur);font-weight:600}
+.nav button .ic{width:18px;text-align:center;opacity:.85}
+.nav .new{margin-left:auto;font-size:9px;padding:2px 6px;border-radius:999px;background:rgba(45,212,167,.15);color:var(--grn);font-weight:700}
+.user{border-top:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:10px}
+.user .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pur),var(--pur2));display:grid;place-items:center;font-weight:700;font-size:13px}
+.user b{display:block;font-size:13px}.user small{color:var(--mut);font-size:11px}
+/* main */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.hdr{display:flex;align-items:center;gap:18px;padding:14px 26px;border-bottom:1px solid var(--line);background:rgba(10,13,26,.85)}
+.tenant{display:flex;align-items:center;gap:10px;padding-right:18px;border-right:1px solid var(--line)}
+.tenant .lg{width:38px;height:38px;border-radius:50%;background:#fff;color:#0a2a8a;display:grid;place-items:center;font-weight:800;font-size:11px;letter-spacing:.02em}
+.tenant b{display:block;font-size:13px;line-height:1.15}.tenant small{color:var(--mut);font-size:11px}
+.ttl h1{font-size:22px;font-weight:700}
+.ttl p{color:var(--mut);font-size:12.5px;max-width:560px}
+.sp{flex:1}
+.sim{display:flex;align-items:center;gap:6px;color:var(--grn);font-size:12px;font-weight:600}
+.sim i{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn)}
+.hb{padding:9px 14px;border-radius:12px;border:1px solid var(--line);background:#11162a;font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center}
+.hb.agent{background:rgba(45,212,167,.1);border-color:rgba(45,212,167,.4);color:var(--grn)}
+.hb.exp{background:linear-gradient(135deg,var(--pur),var(--pur2));border:0;color:#fff}
+.content{flex:1;overflow:auto;padding:22px 26px 40px}
+/* cards */
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1fr 1fr}.g21{grid-template-columns:2fr 1fr}.g12{grid-template-columns:1fr 2fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.card h3{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card h3 .r{margin-left:auto}
+.card .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+.kpi .top{display:flex;align-items:center;gap:10px;color:#c5cbe0;font-size:13px}
+.kpi .icn{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:#1b2140;font-size:15px}
+.kpi .v{font-size:30px;font-weight:800;margin:10px 0 6px;letter-spacing:-.01em}
+.kpi .v.red{color:var(--red)}.kpi .v.grn{color:var(--grn)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600;background:#1b2140;color:var(--mut)}
+.chip.g{background:rgba(45,212,167,.12);color:var(--grn)}.chip.r{background:rgba(240,90,110,.12);color:var(--red)}.chip.y{background:rgba(251,191,74,.12);color:var(--yel)}.chip.p{background:rgba(124,108,255,.15);color:#b4abff}.chip.b{background:rgba(91,140,255,.14);color:#9db8ff}
+.simtag{margin-left:auto;font-size:9.5px;letter-spacing:.06em;padding:3px 7px;border-radius:999px;border:1px solid var(--line);color:var(--mut2);font-weight:700}
+.spark{width:100%;height:36px;display:block;margin-top:4px}
+.intro{background:linear-gradient(90deg,rgba(45,212,167,.08),rgba(124,108,255,.06));border:1px solid rgba(45,212,167,.28);border-radius:14px;padding:14px 18px;color:#c9d1e6;font-size:13px;line-height:1.55;margin-bottom:16px}
+.intro b{color:#fff}
+.tabs{display:inline-flex;gap:4px;background:#0f1428;border:1px solid var(--line);padding:4px;border-radius:12px;margin-bottom:16px}
+.tabs button{padding:8px 14px;border-radius:9px;font-weight:600;font-size:13px;color:var(--mut)}
+.tabs button.on{background:linear-gradient(135deg,var(--pur),var(--pur2));color:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+input[type=range]{accent-color:#7c6cff}
+th{text-align:left;color:var(--mut2);font-weight:600;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid #1a2038;vertical-align:middle}
+tr.click{cursor:pointer}tr.click:hover td{background:#141a30}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.bar{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center;margin:8px 0;font-size:13px}
+.bar .t{height:8px;background:#1b2140;border-radius:6px;overflow:hidden}
+.bar .f{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--pur),var(--pur2));transition:width .5s}
+.bar b{text-align:right;font-variant-numeric:tabular-nums}
+.alert{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:#0f1428;border:1px solid var(--line);margin-bottom:8px}
+.alert .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none}
+.alert b{font-size:12px}.alert p{font-size:13px;color:#c9d1e6;margin-top:2px;line-height:1.4}
+.alert .fw{margin-left:auto;flex:none}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#141a30;font-weight:600;font-size:13px}
+.btn:hover{border-color:#34406a}
+.btn.p{background:linear-gradient(135deg,var(--pur),var(--pur2));border:0;color:#fff}
+.btn.g{background:rgba(45,212,167,.12);border-color:rgba(45,212,167,.4);color:var(--grn)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:default}
+.legend{display:flex;gap:14px;justify-content:center;font-size:12px;color:#c5cbe0;margin-bottom:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.donut{display:grid;place-items:center;position:relative;margin:6px 0 10px}
+.donut .c{position:absolute;text-align:center}.donut .c b{font-size:17px;display:block}.donut .c small{color:var(--mut);font-size:11px}
+.li{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a2038;font-size:13px}
+.li i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
+.otype{padding:14px;border-radius:14px;background:#0f1428;border:1px solid var(--line);text-align:left;width:100%}
+.otype:hover,.otype.on{border-color:var(--pur)}
+.otype b{display:flex;gap:8px;align-items:center;font-size:14px}.otype small{color:var(--mut);font-size:11.5px;display:block;margin:4px 0 8px}
+.otype .chips{display:flex;flex-wrap:wrap;gap:4px}
+.stat{padding:14px;border-radius:12px;background:#0f1428;border:1px solid var(--line);text-align:center}
+.stat b{font-size:24px;display:block}.stat small{color:var(--mut);font-size:11.5px}
+.flow{display:flex;align-items:stretch;gap:10px}
+.flow .st{flex:1;padding:12px;border-radius:12px;background:#0f1428;border:1px solid var(--line);text-align:center}
+.flow .st b{display:block;font-size:13px}.flow .st small{color:var(--mut);font-size:11px}
+.flow .ar{display:grid;place-items:center;color:var(--mut2)}
+.ag{padding:12px;border-radius:12px;background:#0f1428;border:1px solid var(--line);margin-bottom:8px;font-size:13px;line-height:1.45}
+.ag b{color:#fff;display:flex;gap:8px;align-items:center}.ag b:before{content:"●";color:var(--yel);font-size:10px}
+.ev{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #1a2038;font-size:13px;animation:in .4s}
+.ev .a{width:30px;height:30px;border-radius:50%;background:#1b2140;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.ev small{color:var(--mut);display:block;font-size:11px}
+.ev .tm{margin-left:auto;color:var(--mut2);font-size:11px;white-space:nowrap}
+.frm{display:grid;grid-template-columns:150px 1fr;gap:10px 14px;align-items:center}
+.frm label{font-size:12px;color:var(--mut)}
+.frm input,.frm select,.frm textarea{background:#0f1428;border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:#0f1428;font-size:12px;font-weight:600;color:#c5cbe0}
+.pill.on{border-color:var(--pur);background:rgba(124,108,255,.15);color:#fff}
+.rw{padding:16px;border-radius:14px;background:#0f1428;border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.rw .e{font-size:28px}.rw b{font-size:14px}.rw .pts{color:var(--yel);font-weight:700}.rw small{color:var(--mut);font-size:11.5px}
+.aibox{margin-top:12px;padding:12px 14px;border-radius:12px;border:1px dashed #34406a;background:#0f1428;font-size:13px;line-height:1.5;min-height:48px}
+.aibox ul{margin:6px 0 0 18px}
+.prog-now{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:#0f1428;border:1px solid var(--line);margin-bottom:8px}
+.prog-now .live{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;background:#d61f1f;color:#fff}
+.prog-now .off{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;background:#1b2140;color:var(--mut)}
+.map{position:relative;height:380px;border-radius:14px;background:radial-gradient(circle at 50% 50%,#151b35,#0d1124);border:1px solid var(--line);overflow:hidden}
+.node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:#c5cbe0;text-align:center;width:96px}
+.node .c{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;background:#141a30;border:2px solid #34406a}
+.node.real .c{border-color:var(--grn);color:var(--grn)}.node.att .c{border-color:var(--yel);color:var(--yel)}.node.sim .c{border-style:dashed;color:var(--mut)}
+.node.core .c{width:86px;height:86px;background:linear-gradient(135deg,var(--pur),var(--pur2));border:0;color:#fff;font-size:13px}
+.qbox{padding:14px;border-radius:12px;background:#0f1428;border:1px solid var(--line);margin-bottom:10px}
+.qbox b{display:block;margin-bottom:8px}
+/* drawer */
+.drawer{position:fixed;top:0;right:0;width:440px;max-width:100vw;height:100vh;background:#0e1222;border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;transform:translateX(105%);transition:transform .25s;box-shadow:-30px 0 60px -20px rgba(0,0,0,.7)}
+.drawer.on{transform:none}
+.drawer .dh{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.drawer .dh b{font-size:15px}.drawer .dh small{display:block;color:var(--mut);font-size:11px}
+.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:90%;padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.5}
+.m.u{align-self:flex-end;background:#232b55}
+.m.a{align-self:flex-start;background:#141a30;border:1px solid var(--line)}
+.m.a .who{font-size:11px;font-weight:700;color:var(--grn);margin-bottom:4px}
+.m ul{margin:4px 0 4px 16px}.m p{margin:3px 0}
+.sugs{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+.sug{padding:6px 10px;border-radius:999px;background:#141a30;border:1px solid var(--line);font-size:11.5px;text-align:left}
+.ask{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.ask input{flex:1;background:#141a30;border:1px solid var(--line);border-radius:10px;padding:10px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:#1d2a4f;border:1px solid var(--pur);padding:10px 16px;border-radius:12px;font-size:13px;z-index:60;transition:.3s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.mut{color:var(--mut)}
+@keyframes in{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+.embed .app{grid-template-columns:1fr}.embed .side,.embed .hdr{display:none}
+@media (max-width:1200px){.g4{grid-template-columns:1fr 1fr}.g3,.g21,.g12{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="pw"><i></i>Powered by ClubBrain.ai × Virtual Fans</div>
+    <div class="mode"><button id="mC" class="on">🎯 Cockpit</button><button id="mO">⚙️ Operacional</button></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="user"><div class="av">DE</div><div><b>Diretoria Executiva</b><small>Grupo Bandeirantes</small></div></div>
+  </aside>
+  <div class="main">
+    <header class="hdr">
+      <div class="tenant"><div class="lg">BAND</div><div><b>Grupo<br>Bandeirantes</b><small>Piloto 2026/27</small></div></div>
+      <div class="ttl"><h1 id="pT"></h1><p id="pS"></p></div>
+      <div class="sp"></div>
+      <div class="sim"><i></i>Dados simulados · demo</div>
+      <button class="hb agent" id="bAgent">💬 Falar com um agente</button>
+      <button class="hb" id="bPer">📅 Projeção · 6 meses pós-MVP</button>
+      <button class="hb exp" id="bExp">Exportar relatório</button>
+    </header>
+    <div class="content" id="ct"></div>
+  </div>
+</div>
+<div class="drawer" id="dr">
+  <div class="dh"><div style="width:34px;height:34px;border-radius:10px;background:rgba(45,212,167,.15);display:grid;place-items:center">🧠</div><div><b id="drT">Agente Executivo</b><small>IA real · consulta a Media Ontology™ da Band</small></div><div class="sp"></div><button class="btn sm" id="drX">Fechar</button></div>
+  <div class="msgs" id="msgs"></div>
+  <div class="sugs" id="sugs"></div>
+  <form class="ask" id="askF"><input id="askI" placeholder="Pergunte em linguagem natural..." autocomplete="off"><button class="btn p">Enviar</button></form>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="../claude-shim.js"></script>
+<script>
+/* ================= DADOS ================= */
+const SPONSORS=[{n:"Pulso Energy",c:"Bebida energética"},{n:"Brasa Burger",c:"Delivery"},{n:"Mercado Vila",c:"Supermercado"},{n:"Rota Bank",c:"Banco digital"},{n:"Atlântica Seguros",c:"Seguros"}];
+const PROGRAMS=[
+ {id:"ja",n:"Jogo Aberto",h:"Renata Fan",c:"TV aberta",pl:"Band · Bandplay · YouTube (simultâneo)",days:[1,2,3,4,5],s:"11:00",e:"12:50",fase:"MVP",part:42800,opt:.38,ix:"Palpites, quiz, VAR da audiência"},
+ {id:"db",n:"Os Donos da Bola · TV",h:"Craque Neto",c:"TV aberta",pl:"Band · Bandplay · Band.com.br",days:[1,2,3,4,5],s:"12:50",e:"14:30",fase:"MVP",part:31600,opt:.34,ix:"Desafio do Craque (duelo de opiniões)"},
+ {id:"dbr",n:"Os Donos da Bola · Rádio",h:"Craque Neto, Sergio, Leandro Guerreiro",c:"Rádio",pl:"Bandeirantes · Bandplay · YouTube",days:[1,2,3,4,5],s:"18:00",e:"19:00",fase:"MVP",part:9800,opt:.33,ix:"Desafio do Craque · 2º turno do dia",tbc:1},
+ {id:"af",n:"Apito Final",h:"Neto, Marília Ruiz, Quesada, Godói",c:"TV aberta",pl:"Band · Bandplay",days:[1],s:"22:30",e:"23:59",fase:"Fase 2",part:12400,opt:.3,ix:"Notas da rodada e VAR da audiência"},
+ {id:"bec",n:"Band Esporte Clube",h:"Kalinka Schutel",c:"TV aberta",pl:"Band",days:[6],s:"12:00",e:"13:00",fase:"Piloto sugerido",part:6800,opt:.27,ix:"Games e quadros de entretenimento (novo formato)",tbc:1},
+ {id:"se",n:"Show do Esporte",h:"Equipe Band",c:"TV aberta",pl:"Band · Bandplay",days:[0],s:"12:00",e:"18:00",fase:"Fase 2",part:18900,opt:.29,ix:"História Viva · Gincana das Torcidas",tbc:1},
+ {id:"stock",n:"Stock Car (exclusiva)",h:"Sérgio Maurício",c:"Automobilismo",pl:"Band · BandSports",days:[],s:"etapa",e:"",fase:"Fase 2",part:14200,opt:.31,ix:"Bolão do pódio e piloto da torcida"},
+ {id:"indy",n:"Fórmula Indy",h:"Geferson Kern, Reginaldo Leme",c:"Automobilismo",pl:"Band",days:[],s:"etapa",e:"",fase:"Fase 2",part:7100,opt:.28,ix:"Palpite de largada e pódio"},
+ {id:"serc",n:"Brasileirão Séries C e D",h:"Band Campinas · Band Bahia",c:"Futebol regional",pl:"Band (regional)",days:[6],s:"sábado",e:"",fase:"Fase 3",part:5400,opt:.26,ix:"Palpite regional e Gincana local"},
+ {id:"res",n:"Resenha",h:"Pedro Martelli e equipe",c:"Rádio",pl:"Bandeirantes · YouTube",days:[1,2,3,4,5],s:"17:00",e:"18:00",fase:"Fase 2",part:4600,opt:.3,ix:"Interação com o ouvinte"},
+ {id:"eed",n:"Esporte em Debate",h:"Capriotti, Praetzel, Quesada, Gavazzi",c:"Rádio",pl:"Bandeirantes · Bandplay · YouTube",days:[1,2,3,4,5],s:"21:00",e:"22:30",fase:"Fase 2",part:7600,opt:.33,ix:"Palpite do ouvinte",tbc:1},
+ {id:"bna",n:"BandNews na Área",h:"Mauricio Ferreira, Bruno Camarão",c:"Rádio",pl:"BandNews FM · YouTube BandNews Esportes · Fast TV",days:[0,1,2,3,4,5,6],s:"20:30",e:"22:00",fase:"Fase 3",part:5300,opt:.29,ix:"Enquete diária · NBA/NFL/F1 no rádio",tbc:1},
+ {id:"bs",n:"BandSports (PBR, STU, Liga Saudita)",h:"Equipe BandSports",c:"TV fechada",pl:"BandSports · Band Play",days:[],s:"grade",e:"",fase:"Fase 3",part:3900,opt:.28,ix:"Nota da manobra (skate) e montaria (PBR)"},
+ {id:"mc",n:"MasterChef",h:"Band (sujeito a licença)",c:"Entretenimento",pl:"Band · Bandplay",days:[2],s:"22:30",e:"23:59",fase:"Fora da exclusividade",part:0,opt:0,ix:"Caixa misteriosa virtual (a licenciar)"}
+];
+const SOURCES=[["QR na tela (TV aberta)","TV",182000,"real-ready"],["App Virtual Fans Band","Mobile",1240000,"ok"],["Bandplay","Streaming",96000,"sim"],["YouTube · Esporte na Band","Social",340000,"sim"],["Rádio (Bandeirantes / BandNews)","Áudio",41000,"sim"],["band.com.br","Web",88000,"sim"],["Vibra Digital · data lake","Dados",0,"val"]];
+const FIRST=["Rafael","Camila","Diego","Bruno","Larissa","Ana","Pedro","Juliana","Marcos","Fernanda","Lucas","Beatriz","Thiago","Mariana","Gustavo","Helena","Otávio","Yasmin","Caio","Letícia"];
+const LAST=["Souza","Alves","Farias","Lima","Melo","Costa","Rocha","Pereira","Gomes","Ribeiro"];
+const TEAMS=["Corinthians","Palmeiras","São Paulo","Santos","Flamengo","Vasco","Outros"];
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646};
+const FANS=Array.from({length:48},(_,i)=>{const f=FIRST[Math.floor(rnd()*FIRST.length)],l=LAST[Math.floor(rnd()*LAST.length)];const team=TEAMS[Math.floor(rnd()*TEAMS.length)];const progs=PROGRAMS.slice(0,8).filter(()=>rnd()<.35).map(p=>p.n);if(!progs.length)progs.push("Jogo Aberto");const score=Math.round(40+rnd()*58);
+ return{id:"BP-"+(10231+i*7),name:f+" "+l,team,progs,score,lvl:score>85?"Lenda Band":score>70?"Superfã":score>55?"Fã":"Espectador",opt:rnd()<.42,churn:Math.round(rnd()*60)/100,ltv:Math.round(20+rnd()*260),canal:["QR na TV","App","Bandplay","YouTube","Rádio"][Math.floor(rnd()*5)],reg:["Sudeste","Nordeste","Sul","Centro-Oeste","Norte"][Math.floor(rnd()*5)],int:{Futebol:Math.round(50+rnd()*50),Debate:Math.round(rnd()*100),Nostalgia:Math.round(rnd()*100),Culinária:Math.round(rnd()*80),Automobilismo:Math.round(rnd()*70)}}});
+const ST={
+ rewards:[{e:"🎟️",n:"Assistir ao Jogo Aberto na plateia do estúdio",p:9000,q:4},{e:"🎙️",n:"Bate-papo virtual com apresentador (sob autorização)",p:15000,q:1},{e:"🏟️",n:"Tour pelos estúdios da Band",p:6000,q:10},{e:"📼",n:"Clipe exclusivo do acervo do seu clube",p:1200,q:999},{e:"🍔",n:"Brasa Burger · 30% no combo do clássico",p:800,q:999},{e:"⚡",n:"Pulso Energy · combo grátis",p:500,q:300}],
+ redeems:[{id:"BP-10238",r:"Tour pelos estúdios da Band",p:6000,d:"02/11/2026",s:"Entregue"},{id:"BP-10301",r:"Pulso Energy · combo grátis",p:500,d:"05/11/2026",s:"Entregue"},{id:"BP-10252",r:"Clipe exclusivo do acervo do seu clube",p:1200,d:"07/11/2026",s:"Confirmado"}],
+ promos:[{n:"Volta ao Jogo Aberto",pub:"Inativos há 14 dias",of:"Desafio + 2× XP",pr:"Jogo Aberto",ch:"Push app",s:"Ativa",imp:6200,rev:18400},{n:"Clássico · cota Pulso",pub:"Palpiteiros do clássico",of:"Cupom patrocinado",pr:"Jogo Aberto",ch:"QR na TV",s:"Ativa",imp:12800,rev:64000},{n:"Neto desafia",pub:"Discordam do Neto",of:"Sorteio de experiência",pr:"Os Donos da Bola",ch:"YouTube",s:"Encerrada",imp:8100,rev:22000}],
+ inv:[{n:"Cota master · Pré-Jogo do Jogo Aberto",pr:"Jogo Aberto",u:"bloco/semana",p:30000,tot:4,sold:3,buyer:"Pulso Energy"},{n:"Quiz patrocinado",pr:"Jogo Aberto",u:"episódio",p:8000,tot:20,sold:12,buyer:"Rota Bank"},{n:"Placar de concordância · naming",pr:"Os Donos da Bola",u:"mês",p:45000,tot:1,sold:1,buyer:"Brasa Burger"},{n:"História Viva · série do acervo",pr:"Show do Esporte",u:"temporada",p:60000,tot:4,sold:1,buyer:"Atlântica Seguros"},{n:"Gincana das Torcidas · causa",pr:"Show do Esporte",u:"rodada",p:25000,tot:8,sold:0,buyer:"—"},{n:"Bolão do pódio · Stock Car",pr:"Stock Car",u:"etapa",p:35000,tot:12,sold:3,buyer:"Rota Bank"},{n:"Desafio do Neto · 3 telas",pr:"Donos da Bola (TV + rádio) + Apito Final",u:"semana",p:40000,tot:4,sold:1,buyer:"Brasa Burger"},{n:"Palpite do ouvinte",pr:"Esporte em Debate",u:"semana",p:6000,tot:8,sold:2,buyer:"Mercado Vila"},{n:"Ativação de segmento (opt-in)",pr:"Transversal",u:"campanha",p:25000,tot:6,sold:2,buyer:"Rota Bank"}],
+ inits:[{n:"Pré-Jogo interativo · Jogo Aberto",p:"Jogo Aberto",o:"Conjunta",cl:"Pulso Energy",st:"Aprovada",rev:120000},{n:"Desafio do Craque",p:"Os Donos da Bola",o:"VF",cl:"Brasa Burger",st:"Aprovada",rev:45000},{n:"História Viva · Copa 2002",p:"Show do Esporte",o:"Band",cl:"Atlântica Seguros",st:"Em análise",rev:60000}],
+ queue:[{n:"Camila Alves",t:"Memória: \"Vi o penta com meu avô, na sala de casa\"",pr:"História Viva",s:"Novo"},{n:"Diego Farias",t:"Comentário ofensivo a torcida rival no Desafio do Craque",pr:"Os Donos da Bola",s:"Novo"},{n:"Larissa Melo",t:"Não recebeu o cupom da recompensa",pr:"Benefícios",s:"Em atendimento"},{n:"Bruno Lima",t:"Memória: \"Fui ao Derby de 1993 com meu pai\"",pr:"História Viva",s:"Novo"}],
+ live:[],questions:[{pr:"Jogo Aberto",q:"Quem vence o clássico de domingo?",o:["Mandante","Empate","Visitante"],v:[4210,1830,3390],on:true}]
+};
+const AGENTS=[["AudienceBrain","Aquisição e retenção","#5b8cff"],["SponsorBrain","Monetização","#fbbf4a"],["ContentBrain","Acervo e conteúdo","#a86bff"],["LiveBrain","Operação ao vivo","#f05a6e"],["Agente Executivo","Estratégia","#2dd4a7"]];
+const ALERTS=[
+ ["AudienceBrain","Cross-plataforma","Neto está na TV (12h50) e no rádio (18h). 38% de quem joga o Desafio do Craque na TV não volta à noite: sugerir o 2º turno do desafio no rádio com 2× XP."],
+ ["SponsorBrain","Monetização","Cota master do Pré-Jogo do Jogo Aberto com 3 de 4 blocos vendidos. Recomenda oferecer o último bloco à categoria delivery."],
+ ["AudienceBrain","Retenção","6,2 mil participantes de Os Donos da Bola não voltam há 14 dias. Recomenda disparar o Desafio do Craque via push antes do programa."],
+ ["ContentBrain","Acervo","Memórias sobre a Copa de 2002 cresceram 3,4× na semana. Sugere um quadro História Viva no Show do Esporte com cota patrocinada."],
+ ["Agente Executivo","Estratégia","62% da receita projetada depende de 2 programas. Recomenda incluir o Esporte em Debate (rádio) na fase 2 para diversificar."],
+ ["LiveBrain","Ao vivo","Pico de participação às 11h42 no Jogo Aberto: a pergunta do clássico teve 3× a média do programa."]
+];
+const MONTHS=["Mês 1","Mês 2","Mês 3","Mês 4","Mês 5","Mês 6"];
+const REVSRC=[["Patrocínio digital e cotas","#2dd4a7",.41],["Gamificação patrocinada","#fbbf4a",.22],["Benefícios e fidelização","#7c6cff",.15],["Inteligência comercial (estudos)","#5b8cff",.12],["Premium e licenciamento","#a86bff",.10]];
+const REVM=[180000,260000,340000,420000,510000,600000];
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const fmt=n=>Math.round(n).toLocaleString("pt-BR");
+const brl=n=>"R$ "+Math.round(n).toLocaleString("pt-BR");
+const mi=n=>n>=1e6?"R$ "+(n/1e6).toFixed(2).replace(".",",")+"M":n>=1e3?"R$ "+(n/1e3).toFixed(1).replace(".",",")+"K":brl(n);
+const kk=n=>n>=1e6?(n/1e6).toFixed(1).replace(".",",")+"M":n>=1e3?Math.round(n/1e3)+"K":fmt(n);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("on"),2200)};
+function md(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").split(/\n/).map(l=>/^\s*[-•]\s+/.test(l)?`<li>${l.replace(/^\s*[-•]\s+/,"")}</li>`:(l.trim()?`<p>${l}</p>`:"")).join("").replace(/(<li>.*?<\/li>)+/g,m=>`<ul>${m}</ul>`)}
+function spark(vals,col){const w=240,h=36,mx=Math.max(...vals),mn=Math.min(...vals);const pts=vals.map((v,i)=>[i/(vals.length-1)*w,h-4-(v-mn)/(mx-mn||1)*(h-10)]);const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join("");return`<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${d}L${w},${h}L0,${h}Z" fill="${col}" opacity=".18"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2"/></svg>`}
+function kpi(ic,l,v,foot,col="#7c6cff",sp=null,cls=""){return`<div class="card kpi"><div class="top"><span class="icn">${ic}</span>${l}<span class="simtag">○ SIMULADO</span></div><div class="v ${cls}">${v}</div>${sp?spark(sp,col):""}<div style="margin-top:6px">${foot}</div></div>`}
+function donut(parts,center,sub){let a=-Math.PI/2;const R=62,r=44,cx=75,cy=75;const segs=parts.map(([n,c,p])=>{const a2=a+p*2*Math.PI;const L=p>.5?1:0;const P=(ang,rad)=>[cx+rad*Math.cos(ang),cy+rad*Math.sin(ang)];const[x1,y1]=P(a,R),[x2,y2]=P(a2,R),[x3,y3]=P(a2,r),[x4,y4]=P(a,r);const d=`M${x1},${y1}A${R},${R} 0 ${L} 1 ${x2},${y2}L${x3},${y3}A${r},${r} 0 ${L} 0 ${x4},${y4}Z`;a=a2;return`<path d="${d}" fill="${c}"/>`}).join("");return`<div class="donut"><svg width="150" height="150">${segs}</svg><div class="c"><b>${center}</b><small>${sub}</small></div></div>`}
+function stacked(){const mx=Math.max(...REVM);const w=560,h=220,bw=52;return`<div class="legend">${REVSRC.map(s=>`<span><i style="background:${s[1]}"></i>${s[0]}</span>`).join("")}</div><svg viewBox="0 0 ${w} ${h+24}" style="width:100%;height:auto">${[0,.25,.5,.75,1].map(t=>`<line x1="44" x2="${w}" y1="${h-t*h*.9}" y2="${h-t*h*.9}" stroke="#1d2440"/><text x="0" y="${h-t*h*.9+4}" fill="#5f6886" font-size="10">R$${Math.round(mx*t/1000)}K</text>`).join("")}${REVM.map((v,i)=>{let y=h;const x=70+i*((w-90)/6);return REVSRC.map(s=>{const hh=v*s[2]/mx*h*.9;y-=hh;return`<rect x="${x}" y="${y}" width="${bw}" height="${hh}" fill="${s[1]}" rx="2"/>`}).join("")+`<text x="${x+bw/2}" y="${h+16}" fill="#8a93ae" font-size="11" text-anchor="middle">${MONTHS[i]}</text>`}).join("")}</svg>`}
+function nowSP(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:"America/Sao_Paulo"}));return d}
+function onAir(p){const d=nowSP();if(!p.days.includes(d.getDay()))return false;const m=d.getHours()*60+d.getMinutes();const[s1,s2]=p.s.split(":").map(Number),[e1,e2]=p.e.split(":").map(Number);return m>=s1*60+s2&&m<=e1*60+e2}
+
+/* ================= NAV ================= */
+const NAV={
+ C:[["Executivo",[["cockpit","▦","Cockpit executivo"],["receita","$","Receita & inventário"]]],["Inteligência",[["onto","⟁","Media Ontology™"],["agentes","⌂","Agentes de IA"]]]],
+ O:[["Visão da audiência",[["visao","⌂","Visão geral"],["aud360","◎","Audiência 360"],["programas","▣","Programas & grade"],["comunidades","☺","Torcidas & comunidades"],["acervo","📼","História Viva · acervo",1]]],
+    ["Monetização",[["aovivo","◉","Interações ao vivo",1],["gamif","★","Gamificação"],["inventario","▤","Inventário comercial",1],["campanhas","➚","Campanhas & promoções"],["beneficios","🎁","Benefícios & recompensas"],["minu","⇄","Recompensas · Minu",1]]],
+    ["Parceria Band × VF",[["governanca","⚖","Governança & 50/50",1]]],
+    ["Operação",[["central","☷","Central ao vivo"],["automacao","✉","Automação de marketing"],["hub","⛓","Integration Hub"],["saude","♡","Saúde do sistema"]]]]
+};
+let MODE="C",PAGE="cockpit",SUB=null;
+function renderNav(){$("#nav").innerHTML=NAV[MODE].map(([g,items])=>`<h6>${g}</h6>`+items.map(([id,ic,l,nw])=>`<button data-p="${id}" class="${PAGE===id?"on":""}"><span class="ic">${ic}</span>${l}${nw?`<span class="new">BAND</span>`:""}</button>`).join("")).join("");$("#mC").classList.toggle("on",MODE==="C");$("#mO").classList.toggle("on",MODE==="O")}
+function go(p){PAGE=p;SUB=null;renderNav();renderPage();$("#ct").scrollTop=0}
+
+/* ================= PÁGINAS ================= */
+const P={};
+P.cockpit=()=>["Cockpit executivo","Receita digital incremental, audiência participante, patrocínio e benefícios num painel só, para a diretoria",
+`<div class="grid g4">
+${kpi("$","Receita incremental projetada",mi(REVM.reduce((a,b)=>a+b,0)),`<span class="chip g">Projeção 6 meses pós-MVP</span>`,"#fbbf4a",REVM)}
+${kpi("👥","Audiência participante","128.450",`<span class="chip p">3 programas · 2 plataformas</span>`,"#7c6cff",[60,72,80,91,104,118,128])}
+${kpi("⚡","Engajamento / NPS","72% · 61",`<span class="chip g">↑ 4 pts</span>`,"#a86bff",[55,57,58,60,59,61])}
+<div class="card kpi"><div class="top"><span class="icn" style="background:rgba(240,90,110,.15)">⚠</span>Participantes em risco de evasão<span class="simtag">○ SIMULADO</span></div><div class="v red">11,4%</div><div class="mut" style="font-size:12.5px">≈ 14,6 mil participantes sem interação há 14+ dias</div></div>
+</div>
+<div class="grid g21" style="margin-top:16px">
+ <div class="card"><h3>Composição da receita incremental · próximos 6 meses</h3><div class="sub">Somente receitas elegíveis da parceria (sem redistribuir o inventário atual)</div>${stacked()}</div>
+ <div class="card"><h3>Receita por fonte</h3>${donut(REVSRC.map(s=>[s[0],s[1],s[2]]),mi(REVM[5]),"no mês 6")}${REVSRC.map(s=>`<div class="li"><span><i style="background:${s[1]}"></i>${s[0]}</span><b>${Math.round(s[2]*100)}%</b></div>`).join("")}</div>
+</div>
+<div class="grid g12" style="margin-top:16px">
+ <div class="card"><h3>Audiência participante por região</h3>${[["Sudeste",48],["Nordeste",19],["Sul",17],["Centro-Oeste",10],["Norte",6]].map(([r,v])=>`<div class="bar"><span>${r}</span><div class="t"><div class="f" style="width:${v*2}%"></div></div><b>${v}%</b></div>`).join("")}</div>
+ <div class="card"><h3>Alertas estratégicos dos agentes de IA</h3><div class="sub">O orquestrador cruza audiência, programas, inventário e acervo</div>${ALERTS.map(([a,t,m])=>{const c=AGENTS.find(x=>x[0]===a)[2];return`<div class="alert"><span class="dot" style="background:${c}"></span><div><b>${a}</b> <span class="chip">${t}</span><p>${m}</p></div><button class="btn sm fw" data-fw="${esc(m)}">Encaminhar</button></div>`}).join("")}</div>
+</div>
+<div class="grid g4" style="margin-top:16px">
+ ${[["Novos Band Pass no mês","3.420","↑ 12%"],["Opt-in para marcas","34%","↑ 3pp"],["Resgates de recompensa","2.180","↑ 18%"],["ROI médio de patrocínio","380%","↑ 22%"]].map(([l,v,c])=>`<div class="card"><div class="mut" style="font-size:12.5px">${l}</div><div style="font-size:24px;font-weight:800;margin:6px 0">${v}</div><span class="chip g">${c}</span></div>`).join("")}
+</div>`];
+
+P.receita=()=>{const sold=ST.inv.reduce((a,i)=>a+i.sold*i.p,0),tot=ST.inv.reduce((a,i)=>a+i.tot*i.p,0);return["Receita & inventário","Receitas elegíveis, funil de participação e ROI dos patrocinadores",
+`<div class="grid g4">${kpi("$","Receita recorrente mensal (MRR)",mi(sold),`<span class="chip g">cotas vendidas</span>`,"#2dd4a7",[40,55,70,92,110,sold/1000])}${kpi("▤","Ocupação do inventário novo",Math.round(sold/tot*100)+"%",`<span class="mut" style="font-size:12px">${mi(tot-sold)} ainda disponível</span>`)}${kpi("🎟","Receita média por participante","R$ 3,40",`<span class="chip g">↑ 9%</span>`)}${kpi("✓","Resultado distribuível (mês)",mi(sold*.79),`<span class="chip b">50% Band · 50% VF</span>`)}</div>
+<div class="grid g2" style="margin-top:16px">
+<div class="card"><h3>Receitas elegíveis da parceria</h3><div class="sub">Conforme a proposta executiva · projeção anual ilustrativa ${mi(5.2e6)}</div>
+<table><thead><tr><th>Fonte</th><th class="num">Receita anual</th><th class="num">% do total</th></tr></thead><tbody>${[["Patrocínios e cotas de novas propriedades digitais",.32],["Gamificações na programação",.22],["Publicidade, ativações e campanhas patrocinadas",.14],["Programa de Benefícios e fidelização",.12],["Pesquisas e inteligência comercial autorizada",.10],["Assinaturas, premium e licenciamento",.07],["Outras modalidades aprovadas pelo Comitê",.03]].map(([n,p])=>`<tr><td>${n}</td><td class="num">${mi(5.2e6*p)}</td><td class="num">${Math.round(p*100)}%</td></tr>`).join("")}</tbody></table></div>
+<div class="card"><h3>Funil de participação</h3><div class="sub">Da tela da TV ao fã identificado e monetizado</div>${[["Audiência alcançada (programas MVP)",2400000],["Escanearam o QR / abriram o app",312000],["Criaram Band Pass",128450],["Deram opt-in para marcas",43820],["Resgataram benefício patrocinado",11900]].map(([l,v],i,a)=>`<div class="bar" style="grid-template-columns:230px 1fr 110px"><span>${l}</span><div class="t"><div class="f" style="width:${Math.max(3,Math.sqrt(v/a[0][1])*100)}%"></div></div><b>${fmt(v)} <span class="mut" style="font-weight:400">${(v/a[0][1]*100).toFixed(1).replace(".",",")}%</span></b></div>`).join("")}</div></div>
+<div class="card" style="margin-top:16px"><h3>Desempenho de patrocínio <span class="chip" style="margin-left:6px">marcas fictícias</span></h3><table><thead><tr><th>Patrocinador</th><th>Campanha</th><th>Programa</th><th class="num">Impressões</th><th class="num">Interações</th><th class="num">Receita</th><th class="num">ROI</th></tr></thead><tbody>${[["Pulso Energy","Pré-Jogo do Clássico","Jogo Aberto",8.9e6,320e3,120000,"520%"],["Brasa Burger","Placar de concordância","Os Donos da Bola",6.4e6,210e3,45000,"410%"],["Rota Bank","Quiz patrocinado","Jogo Aberto",4.1e6,150e3,96000,"380%"],["Atlântica Seguros","História Viva · Copa 2002","Show do Esporte",2.2e6,64e3,60000,"290%"]].map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${kk(r[3])}</td><td class="num">${kk(r[4])}</td><td class="num">${brl(r[5])}</td><td class="num"><span class="chip g">${r[6]}</span></td></tr>`).join("")}</tbody></table></div>`]};
+
+const OBJ=[["Fã / Band Pass","👤","128.450 perfis · 7 dependentes","Espectador identificado com consentimento: nível, interesses, Fan Score, propensão e risco de evasão.",["Interação","Programa","Clube","Segmento","Recompensa"]],
+ ["Programa","📺","11 na grade · 8 dependentes","Programa da grade (TV aberta, BandSports, rádio): faixa horária, apresentador, audiência participante.",["Exibição","Apresentador","Cota comercial","Canal"]],
+ ["Exibição / Episódio","🎬","~260 por mês · 5 dependentes","Cada exibição ao vivo: perguntas no ar, picos de participação e receita do episódio.",["Programa","Interação","Patrocinador"]],
+ ["Apresentador / Talento","🎙️","24 talentos · 3 dependentes","Talentos da Band ligados a programas e quadros. Uso de imagem e avatares sob autorização.",["Programa","Cota comercial"]],
+ ["Interação","⚡","1,24M eventos/dia · 4 dependentes","Palpite, quiz, voto, memória, resgate: o evento que alimenta o Fan 360.",["Fã","Exibição","Momento do acervo"]],
+ ["Momento do acervo","📼","3.800 momentos catalogados · 4 dependentes","Lances, jogos e coberturas históricas do acervo da Band, ligados a clubes, épocas e personagens.",["Clube","Programa","Memória do fã"]],
+ ["Clube / Torcida","⚽","20 clubes · 4 dependentes","Torcidas como comunidades: tamanho, engajamento e rivalidades.",["Fã","Momento do acervo"]],
+ ["Patrocinador","🤝","5 marcas (fictícias) · 4 dependentes","Marca parceira: contratos, contrapartidas, cotas e ROI.",["Cota comercial","Campanha","Exibição"]],
+ ["Cota comercial","▤","7 produtos · 3 dependentes","Inventário novo criado pela parceria: preço, ocupação e comprador.",["Programa","Patrocinador"]],
+ ["Campanha","➚","12 ativas · 3 dependentes","Ativação para um segmento com opt-in, por canal, com medição de conversão.",["Segmento","Patrocinador","Canal"]],
+ ["Recompensa","🎁","6 no catálogo · 2 dependentes","Benefícios do Band Pass: experiências, conteúdo do acervo e cupons de marcas.",["Fã","Patrocinador"]],
+ ["Canal / Plataforma","📡","7 canais · 3 dependentes","TV aberta, BandSports, rádio, Bandplay, YouTube, site e app.",["Programa","Interação"]],
+ ["Iniciativa da parceria","⚖","3 registradas · 3 dependentes","Registro formal Band × VF: propriedade, cliente, origem, custos elegíveis e receita.",["Programa","Patrocinador","Cota comercial"]]];
+P.onto=()=>{const sel=SUB??0,o=OBJ[sel];return["Media Ontology™","Camada 3: o grafo de conhecimento que conecta fã, programa, exibição, talento, acervo, patrocínio e inventário num modelo único",
+`<div class="card"><h3>Recursos da Media Ontology™</h3><div class="sub">Adaptação da Football Ontology™ do Vasco para uma emissora: os mesmos motores, com objetos de mídia.</div>
+<div class="grid" style="grid-template-columns:repeat(5,1fr)">${[[13,"Tipos de objeto"],[218,"Propriedades"],[29,"Propriedades compartilhadas"],[37,"Tipos de link"],[52,"Tipos de ação"],[8,"Grupos"],[4,"Interfaces"],[11,"Tipos de valor"],[131,"Funções"],[0,"Problemas de saúde"]].map(([v,l])=>`<div class="stat"><b>${v}</b><small>${l}</small></div>`).join("")}</div></div>
+<div class="grid g21" style="margin-top:16px"><div class="card"><h3>Tipos de objeto</h3><div class="sub">Clique para ver como cada um se conecta aos demais</div><div class="grid g3">${OBJ.map((x,i)=>`<button class="otype ${i===sel?"on":""}" data-obj="${i}"><b>${x[1]} ${x[0]}</b><small>${x[2]}</small><div class="chips">${x[4].map(c=>`<span class="chip">${c}</span>`).join("")}</div></button>`).join("")}</div></div>
+<div class="card"><h3>${o[1]} ${o[0]}</h3><div class="sub">${o[3]}</div>${graph(o)}</div></div>
+<div class="card" style="margin-top:16px"><h3>Gêmeos digitais em uso</h3><div class="sub">Modelos vivos usados pelos agentes para simular antes de agir</div><div class="grid g4">${[["Gêmeo Digital da Grade","Programa","Simula a participação por faixa horária e prevê o melhor momento para soltar a pergunta no ar."],["Gêmeo Digital do Fã","Fã / Band Pass","Modelo comportamental individual (Fan Score, propensão, evasão) usado antes de ativar uma campanha."],["Gêmeo Digital da Exibição","Exibição","Simula picos de QR e carga do backend durante o ao vivo, e o preço da cota por bloco."],["Gêmeo Digital do Acervo","Momento do acervo","Prevê quais momentos históricos geram mais memórias e recorrência por clube e época."]].map(([n,b,d])=>`<div class="ag" style="margin:0"><b>${n}</b><span class="mut" style="font-size:11px">Baseado em: ${b}</span><div style="margin-top:4px">${d}</div></div>`).join("")}</div></div>`]};
+function graph(o){const n=o[4].length,cx=160,cy=130,R=95;return`<svg viewBox="0 0 320 260" style="width:100%">${o[4].map((l,i)=>{const a=-Math.PI/2+i*2*Math.PI/n,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);return`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#34406a"/><circle cx="${x}" cy="${y}" r="26" fill="#141a30" stroke="#a86bff"/><text x="${x}" y="${y+3}" fill="#e8ebf5" font-size="9" text-anchor="middle">${esc(l.length>13?l.slice(0,12)+"…":l)}</text>`}).join("")}<circle cx="${cx}" cy="${cy}" r="38" fill="url(#gp)"/><defs><linearGradient id="gp"><stop stop-color="#7c6cff"/><stop offset="1" stop-color="#a86bff"/></linearGradient></defs><text x="${cx}" y="${cy+4}" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">${esc(o[0].split(" /")[0])}</text></svg>`}
+
+P.agentes=()=>["Agentes de IA","Camada 4: o orquestrador que transforma a Media Ontology™ em decisão",
+`<div class="intro">Um <b>orquestrador</b> roteia cada gatilho (um evento do fã durante o programa ou uma pergunta de um executivo) para o agente especializado certo. Ele consulta a <b>Media Ontology™</b> e devolve uma ação. A IA não só relata: ela age.</div>
+<div class="card" style="display:flex;align-items:center;gap:14px;border-color:rgba(45,212,167,.4)"><div style="font-size:28px">💬</div><div><h3>Fale com um agente agora (IA real)</h3><div class="mut" style="font-size:12.5px">Responde com base nos dados deste OS: programas, inventário, campanhas, benefícios e governança.</div></div><div class="sp"></div><button class="btn p" data-open="1">Abrir chat →</button></div>
+<div class="card" style="margin-top:16px"><h3>Como o orquestrador decide</h3><div class="flow" style="margin-top:10px">${[["Gatilho","Evento do fã no ar ou pergunta do executivo"],["Orquestrador","Identifica a intenção e roteia"],["Agente especializado","Consulta a Ontology via ferramentas"],["Ação","Pergunta no ar, campanha, alerta ou relatório"]].map(([b,s],i)=>`${i?'<div class="ar">→</div>':""}<div class="st"><b>${b}</b><small>${s}</small></div>`).join("")}</div></div>
+<div class="grid g2" style="margin-top:16px">${[["📣 Aquisição e retenção","Audiência, CRM",[["AudienceBrain","Detecta um espectador que escaneou o QR mas não criou Band Pass e dispara um convite com 2× XP no próximo programa."],["AudienceBrain","Identifica participantes de alto valor sem interação há 14 dias e aciona o desafio do apresentador favorito."]]],
+["💰 Monetização","Comercial, inventário",[["SponsorBrain","Cruza cotas, programas e segmentos e sugere o pacote ideal para cada categoria de anunciante."],["SponsorBrain","Gera automaticamente o relatório de entrega e ROI para o patrocinador ao fim de cada exibição."],["SponsorBrain","Simula o preço da cota por bloco a partir do Gêmeo Digital da Exibição."]]],
+["📼 Conteúdo e acervo","Acervo, História Viva",[["ContentBrain","Recomenda o momento do acervo certo para levar ao ar, a partir das memórias enviadas pelos fãs."],["ContentBrain (AI Historian)","Responde ao fã que conta uma memória, com contexto do acervo, e o convida a ver o trecho."]]],
+["📺 Ao vivo e estratégia","Operação, diretoria",[["LiveBrain","Sugere ao produtor a próxima pergunta no ar quando a participação cai abaixo da média do programa."],["Agente Executivo","Responde em linguagem natural às perguntas da diretoria sobre toda a operação, sem analista no meio."]]]].map(([t,s,l])=>`<div class="card"><h3>${t}</h3><div class="sub">${s}</div>${l.map(([a,d])=>`<div class="ag"><b>${a}</b>${d}</div>`).join("")}</div>`).join("")}</div>`];
+
+P.visao=()=>{const onp=PROGRAMS.filter(onAir);return["Visão geral","O dia da operação: o que está no ar, participação e próximos programas",
+`<div class="grid g4">${kpi("👥","Participantes hoje","18.904",`<span class="chip g">↑ 9% vs. média</span>`,"#7c6cff",[8,10,9,12,14,17,19])}${kpi("⚡","Interações hoje","412 mil",`<span class="chip g">1,24M eventos/dia de pico</span>`,"#2dd4a7",[20,25,22,30,34,38,41])}${kpi("◉","Programas no ar agora",String(onp.length),onp.length?`<span class="chip r">● ${esc(onp.map(p=>p.n).join(", "))}</span>`:`<span class="mut" style="font-size:12px">nenhum programa do piloto no ar neste horário</span>`)}${kpi("🎁","Resgates hoje","312",`<span class="chip g">R$ 2,1 mil em CPA</span>`)}</div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>Grade de hoje · programas do piloto</h3><div class="sub">Horário de Brasília, calculado ao vivo</div>${PROGRAMS.filter(p=>p.days.includes(nowSP().getDay())).map(p=>`<div class="prog-now"><span class="${onAir(p)?"live":"off"}">${onAir(p)?"NO AR":p.s}</span><div><b>${p.n}</b><div class="mut" style="font-size:12px">${p.h} · ${p.pl}</div></div><div class="sp"></div><span class="chip ${p.fase==="MVP"?"g":"p"}">${p.fase}</span></div>`).join("")||`<p class="mut">Nenhum programa do piloto hoje.</p>`}</div>
+<div class="card"><h3>Eventos chegando agora</h3><div class="sub">Ao vivo · resolvidos ao Band Pass na hora</div><div id="evs"></div></div></div>`]};
+
+P.aud360=()=>{const t=SUB||"overview";const tabs=[["overview","Overview"],["fans","Fãs"],["f360","Fan 360°"],["fontes","Fontes de dados"],["insights","AI Insights"]];
+let body="";
+if(t==="overview")body=`<div class="intro">A <b>CDP (Fan Data Platform)</b> é a Camada 2: unifica todo evento do espectador, de qualquer tela (TV, rádio, Bandplay, YouTube, site, app), num perfil único, o <b>Band Pass</b>, antes de virar a Media Ontology™. <b>Complementa a Vibra Digital</b>: os dados de participação com consentimento podem alimentar o data lake da Band.</div>
+<div class="grid g4">${kpi("👥","Universo alcançado","2,4M","<span class='mut' style='font-size:12px'>audiência dos programas MVP</span>")}${kpi("☑","Identificados (Band Pass)","128.450",`<span class="chip g">↑ 11%</span>`,"#2dd4a7",[80,90,96,104,112,120,128])}${kpi("✓","Opt-in para marcas","43.820","<span class='mut' style='font-size:12px'>34% dos identificados · LGPD</span>")}${kpi("★","Fan Score médio","74/100",`<span class="chip g">↑ 3</span>`)}</div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>Engajamento da audiência</h3><div class="sub">Classificação comportamental dos participantes</div>${[["Lendas Band",9800],["Superfãs",28400],["Fãs",51200],["Espectadores",39050]].map(([l,v])=>`<div class="bar"><span>${l}</span><div class="t"><div class="f" style="width:${v/512}%"></div></div><b>${kk(v)}</b></div>`).join("")}</div>
+<div class="card"><h3>Canal de origem do Band Pass</h3>${donut([["QR na TV","#7c6cff",.46],["App","#2dd4a7",.21],["YouTube","#f05a6e",.14],["Bandplay","#5b8cff",.11],["Rádio","#fbbf4a",.08]],"46%","via QR na TV")}</div></div>`;
+if(t==="fans"||t==="f360"){const q=(ST.q||"").toLowerCase();const list=FANS.filter(f=>!q||f.name.toLowerCase().includes(q)||f.team.toLowerCase().includes(q));const sel=FANS.find(f=>f.id===ST.fan)||list[0]||FANS[0];
+ body=`<div class="grid g12"><div class="card"><input id="fq" placeholder="Buscar por nome ou time..." value="${esc(ST.q||"")}" style="width:100%;background:#0f1428;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:10px"><div style="max-height:520px;overflow:auto">${list.map(f=>`<div class="ev" style="cursor:pointer;${f.id===sel.id?"background:#141a30;border-radius:8px;padding-left:6px":""}" data-fan="${f.id}"><div class="a">${f.name.split(" ").map(w=>w[0]).join("")}</div><div><b>${esc(f.name)}</b><small>${f.team} · ${f.lvl} · ${f.id}</small></div><span class="tm">${f.score}</span></div>`).join("")}</div></div>
+ <div class="card"><h3>Fan 360° · ${esc(sel.name)} <span class="chip ${sel.opt?"g":""}">${sel.opt?"opt-in marcas ✓":"sem opt-in"}</span></h3><div class="sub">${sel.id} · ${sel.team} · ${sel.reg} · entrou via ${sel.canal}</div>
+ <div class="grid g4">${[["Fan Score",sel.score+"/100"],["Nível",sel.lvl],["Risco de evasão",Math.round(sel.churn*100)+"%"],["Valor/ano (LTV)",brl(sel.ltv)]].map(([l,v])=>`<div class="stat"><b style="font-size:18px">${v}</b><small>${l}</small></div>`).join("")}</div>
+ <div class="grid g2" style="margin-top:14px"><div><h3 style="font-size:13px">Interesses (Fan DNA)</h3>${Object.entries(sel.int).map(([k,v])=>`<div class="bar" style="grid-template-columns:110px 1fr 36px"><span>${k}</span><div class="t"><div class="f" style="width:${v}%"></div></div><b>${v}</b></div>`).join("")}</div>
+ <div><h3 style="font-size:13px">Programas em que participa</h3><div class="pills" style="margin:8px 0 14px">${sel.progs.map(p=>`<span class="pill">${p}</span>`).join("")}</div><h3 style="font-size:13px">Próxima melhor ação</h3><div class="aibox" style="margin-top:6px">${sel.churn>.35?`<b>Retenção:</b> convidar para o desafio de ${esc(sel.progs[0])} com 2× XP.`:sel.opt?`<b>Monetização:</b> oferecer ${sel.int.Culinária>50?"Mercado Vila":"Pulso Energy"} (fit com interesses).`:`<b>Relacionamento:</b> pedir opt-in de marcas em troca de 50 XP.`}</div></div></div></div></div>`}
+if(t==="fontes")body=`<div class="card"><h3>Fontes de dados conectadas</h3><div class="sub">Unificadas no Band Pass via Identity Graph</div><table><thead><tr><th>Fonte</th><th>Canal</th><th class="num">Eventos/dia</th><th>Status</th></tr></thead><tbody>${SOURCES.map(s=>`<tr><td><b>${s[0]}</b></td><td>${s[1]}</td><td class="num">${s[2]?fmt(s[2]):"—"}</td><td>${s[3]==="ok"?'<span class="chip g">Conectado</span>':s[3]==="real-ready"?'<span class="chip g">Pronto · MVP</span>':s[3]==="val"?'<span class="chip y">A validar com a Vibra</span>':'<span class="chip">Simulado</span>'}</td></tr>`).join("")}</tbody></table></div>
+<div class="grid g3" style="margin-top:16px">${[["Match determinístico (login, e-mail, CPF)","88,9%"],["Match probabilístico (device, comportamento)","9,6%"],["Não resolvido (aguarda próximo sinal)","1,5%"]].map(([l,v])=>`<div class="stat"><b>${v}</b><small>${l}</small></div>`).join("")}</div>`;
+if(t==="insights")body=`<div class="card"><h3>AI Insights</h3><div class="sub">Gerados pelos agentes a partir do Fan 360</div>${[["AudienceBrain","Quem joga em 2+ programas tem 3,1× mais chance de dar opt-in para marcas."],["ContentBrain","Fãs com Nostalgia > 70 enviam 4× mais memórias: público ideal para a História Viva."],["SponsorBrain","O segmento Futebol + Culinária (8,4 mil perfis) não tem patrocinador: oportunidade para supermercados."],["LiveBrain","A participação cai 40% depois de 12 minutos sem pergunta no ar."]].map(([a,m])=>`<div class="alert"><span class="dot" style="background:${AGENTS.find(x=>x[0]===a)[2]}"></span><div><b>${a}</b><p>${m}</p></div><button class="btn sm fw" data-fw="${esc(m)}">Encaminhar</button></div>`).join("")}</div>`;
+return["Audiência 360","CDP + CRM: Band Pass, Identity Resolution, Fan 360°, fontes e AI Insights num só lugar",`<div class="tabs">${tabs.map(([k,l])=>`<button data-sub="${k}" class="${t===k?"on":""}">${l}</button>`).join("")}</div>${body}`]};
+
+P.programas=()=>{const sel=PROGRAMS.find(p=>p.id===SUB);return["Programas & grade","Cada programa como um ativo de relacionamento: participação, opt-in, quadro interativo e fase do roadmap",
+`<div class="intro">Grade atualizada com a programação de 2026. O MVP de 90 dias pede <b>1 ou 2 programas em 2 plataformas</b>: a sugestão é <b>Jogo Aberto</b> (TV + YouTube) e <b>Os Donos da Bola</b>, que agora está em <b>três telas com o Neto</b>: TV às 12h50, rádio Bandeirantes às 18h e Apito Final às segundas. O Desafio do Craque vira uma experiência cross-plataforma no mesmo dia.</div>
+<div class="grid g4" style="margin-bottom:16px">${[["⚽ Futebol","Jogo Aberto, Donos da Bola, Apito Final, Band E.C., Séries C e D (exclusivas na TV aberta, regional), Liga Saudita","Palpites, VAR da audiência, Gincana regional"],["🏁 Automobilismo","Stock Car (exclusiva desde março), Fórmula Indy, MotoGP (GP Brasil), Fórmula E, WEC, Copa Truck, Porsche Cup","Bolão do pódio, piloto da torcida, palpite de largada"],["📻 Rádio","Bandeirantes (Resenha, Donos da Bola, Esporte em Debate) e BandNews FM (na Área diário; NBA, NFL, MLB, NHL e F1)","Palpite do ouvinte, enquete diária, desafio cross-tela"],["🛹 Arena e radicais","BandSports: PBR (rodeio, Mundo PBR às quartas) e STU (skate, 8+ etapas)","Nota da manobra, montaria da galera"]].map(([t,d,g])=>`<div class="card"><h3>${t}</h3><div class="mut" style="font-size:12px;line-height:1.5;margin:6px 0">${d}</div><span class="chip p">${g}</span></div>`).join("")}</div>
+<div class="card"><table><thead><tr><th>Programa</th><th>Canal</th><th>Apresentação</th><th>Plataformas</th><th>Horário</th><th class="num">Participação/mês</th><th class="num">Opt-in</th><th>Quadro interativo</th><th>Fase</th></tr></thead><tbody>${PROGRAMS.map(p=>`<tr class="click" data-prog="${p.id}"><td><b>${onAir(p)?'<span style="color:var(--red)">● </span>':""}${p.n}</b>${p.tbc?' <span class="chip" title="horário a confirmar com a Band">a confirmar</span>':""}</td><td><span class="chip b">${p.c}</span></td><td>${p.h}</td><td class="mut">${p.pl}</td><td>${p.days.length===7?"Diário":p.days.join()==="1,2,3,4,5"?"Seg–Sex":p.days.length?["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"].filter((_,i)=>p.days.includes(i)).join(", "):"Calendário"} · ${p.s}</td><td class="num">${p.part?fmt(p.part):"—"}</td><td class="num">${p.opt?Math.round(p.opt*100)+"%":"—"}</td><td>${p.ix}</td><td><span class="chip ${p.fase==="MVP"?"g":p.fase.startsWith("Fora")?"r":"p"}">${p.fase}</span></td></tr>`).join("")}</tbody></table></div>
+${sel?`<div class="card" style="margin-top:16px"><h3>${sel.n} · ${sel.h}</h3><div class="sub">${sel.pl}</div><div class="grid g4">${[["Participação/mês",fmt(sel.part)],["Opt-in",Math.round(sel.opt*100)+"%"],["Receita potencial/mês",mi(sel.part*sel.opt*2.4)],["Quadro",sel.ix]].map(([l,v])=>`<div class="stat"><b style="font-size:17px">${v}</b><small>${l}</small></div>`).join("")}</div><button class="btn g" style="margin-top:12px" data-ask="Qual a melhor estratégia de gamificação e patrocínio para o programa ${esc(sel.n)}?">💬 Perguntar ao agente sobre ${esc(sel.n)}</button></div>`:""}`]};
+
+P.comunidades=()=>["Torcidas & comunidades","Torcidas como comunidades vivas: tamanho, engajamento, rivalidade e sentimento",
+`<div class="grid g2"><div class="card"><h3>Torcidas no Band Pass</h3>${[["Corinthians",24100,82],["Palmeiras",19800,79],["São Paulo",16200,74],["Flamengo",15400,77],["Santos",9100,71],["Vasco",7600,80],["Outros",36250,63]].map(([t,v,e])=>`<div class="bar" style="grid-template-columns:110px 1fr 120px"><span>${t}</span><div class="t"><div class="f" style="width:${v/241}%"></div></div><b>${kk(v)} <span class="chip">eng. ${e}</span></b></div>`).join("")}</div>
+<div class="card"><h3>Sentimento & buzz por programa</h3><div class="sub">Social listening e comentários no app · ilustrativo</div><table><thead><tr><th>Programa</th><th class="num">Menções/dia</th><th class="num">Sentimento</th><th>Assunto em alta</th></tr></thead><tbody>${[["Jogo Aberto","18,2K",71,"clássico de domingo"],["Os Donos da Bola","24,9K",58,"provocação do Neto"],["Show do Esporte","6,1K",76,"Copa de 2002"],["Esporte em Debate","3,4K",69,"arbitragem"]].map(r=>`<tr><td><b>${r[0]}</b></td><td class="num">${r[1]}</td><td class="num"><span class="chip ${r[2]>65?"g":"y"}">${r[2]}</span></td><td>${r[3]}</td></tr>`).join("")}</tbody></table></div></div>
+<div class="card" style="margin-top:16px"><h3>Gincana das Torcidas · causas da rodada</h3><div class="sub">Rivalidade que vira impacto social: pontos por ações reais</div><div class="grid g4">${[["🍲 Combate à fome","Corinthians","12,4 t de alimentos"],["♻️ Meio ambiente","Palmeiras","8,1 t recicladas"],["📚 Educação","São Paulo","3.200 livros"],["❤️ Saúde","Flamengo","1.150 doações de sangue"]].map(([c,t,v])=>`<div class="stat"><b style="font-size:16px">${c}</b><small>Líder: ${t} · ${v}</small></div>`).join("")}</div></div>`];
+
+P.acervo=()=>["História Viva · acervo","A memória esportiva da Band como produto: momentos do acervo, memórias dos fãs e cotas patrocinadas",
+`<div class="grid g4">${kpi("📼","Momentos catalogados","3.800","<span class='mut' style='font-size:12px'>a licenciar e curar com a Band</span>")}${kpi("✍","Memórias enviadas","21.430",`<span class="chip g">↑ 3,4× na semana</span>`,"#a86bff",[3,4,4,6,9,14,21])}${kpi("▶","Trechos assistidos","412 mil",`<span class="chip g">tempo médio 2m10s</span>`)}${kpi("$","Cota História Viva",brl(60000),`<span class="chip y">1 de 4 vendidas</span>`)}</div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>Coleções do acervo mais engajadas</h3>${[["Copa do Mundo 2002 · o penta",9800],["Derbies históricos",7400],["Majestosos inesquecíveis",5200],["Grandes coberturas do esporte",4100],["Ídolos e personagens",3600]].map(([n,v])=>`<div class="bar" style="grid-template-columns:220px 1fr 60px"><span>${n}</span><div class="t"><div class="f" style="width:${v/98}%"></div></div><b>${kk(v)}</b></div>`).join("")}</div>
+<div class="card"><h3>Memórias recentes dos fãs</h3><div class="sub">Moderadas na Central ao vivo antes de ir ao ar</div>${[["Camila A.","Vi o penta com meu avô, na sala de casa.","Copa 2002"],["Bruno L.","Fui ao Derby de 1993 com meu pai.","Derbies"],["Ana C.","Chorei no gol do título narrado na TV.","Ídolos"]].map(([n,t,c])=>`<div class="ev"><div class="a">${n[0]}</div><div><b>${n}</b> <span class="chip p">${c}</span><small>"${t}"</small></div></div>`).join("")}<p class="mut" style="font-size:11.5px;margin-top:10px">Uso do acervo, imagens e direitos de arena depende das autorizações da Band.</p></div></div>`];
+
+P.aovivo=()=>["Interações ao vivo","Crie a pergunta, solte no ar e acompanhe os votos em tempo real, com o QR na tela",
+`<div class="grid g21"><div class="card"><h3>Perguntas no ar e recentes</h3><div id="qs">${qHTML()}</div></div>
+<div class="card"><h3>Nova pergunta</h3><div class="sub">Vai para o app e para o QR na tela do programa</div><div class="frm"><label>Programa</label><select id="nqP">${PROGRAMS.filter(p=>p.part).map(p=>`<option>${p.n}</option>`).join("")}</select><label>Pergunta</label><input id="nqQ" value="O VAR acertou no lance do pênalti?"><label>Opções (vírgula)</label><input id="nqO" value="Acertou,Errou,Lance interpretativo"><label>Patrocínio</label><select id="nqS"><option>Sem patrocínio</option>${SPONSORS.map(s=>`<option>${s.n}</option>`).join("")}</select></div><button class="btn p" id="nqGo" style="margin-top:12px">Soltar no ar</button><button class="btn g" id="nqAI" style="margin-top:12px">✨ Sugerir com IA (LiveBrain)</button><div class="aibox" id="nqBox"><span class="mut">O LiveBrain pode sugerir a pergunta com maior chance de participação.</span></div></div></div>`];
+function qHTML(){return ST.questions.map((q,i)=>{const t=q.v.reduce((a,b)=>a+b,0)||1;return`<div class="qbox"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="chip ${q.on?"r":""}">${q.on?"● NO AR":"encerrada"}</span><span class="chip">${esc(q.pr)}</span>${q.sp&&q.sp!=="Sem patrocínio"?`<span class="chip y">oferecido por ${esc(q.sp)}</span>`:""}<span class="sp"></span><span class="mut" style="font-size:12px">${fmt(t)} votos</span>${q.on?`<button class="btn sm" data-close="${i}">Encerrar</button>`:""}</div><b>${esc(q.q)}</b>${q.o.map((o,j)=>`<div class="bar" style="grid-template-columns:170px 1fr 50px"><span>${esc(o)}</span><div class="t"><div class="f" style="width:${q.v[j]/t*100}%"></div></div><b>${Math.round(q.v[j]/t*100)}%</b></div>`).join("")}</div>`}).join("")}
+
+P.gamif=()=>["Gamificação","XP, missões, medalhas e economia de pontos do Band Pass",
+`<div class="grid g4">${kpi("★","XP emitido","4,2M",`<span class="chip g">↑ 23%</span>`)}${kpi("👥","Band Pass ativos","128K",`<span class="chip g">↑ 18,7%</span>`)}${kpi("✓","Missões concluídas","94,1K",`<span class="chip g">↑ 31%</span>`)}${kpi("🎁","Recompensas resgatadas","11,9K",`<span class="chip g">↑ 16%</span>`)}</div>
+<div class="grid g4" style="margin-top:16px"><div class="card"><h3>Medalhas mais conquistadas</h3>${[["🎙️ Comentarista",24800],["🔥 Polêmico (desafiou o Neto)",19100],["📼 Memória viva",15200],["🌐 Explorador (3 programas)",8300],["🏆 Sequência de ouro",6400]].map(([n,v],i)=>`<div class="li"><span>${i+1}. ${n}</span><b>${kk(v)}</b></div>`).join("")}</div>
+<div class="card"><h3>Conclusão de missões</h3>${[["Palpites no ar",92],["Quiz do acervo",78],["Duelo de opiniões",84],["Memórias",41],["Desafios entre torcidas",67]].map(([l,v])=>`<div class="bar" style="grid-template-columns:140px 1fr 40px"><span>${l}</span><div class="t"><div class="f" style="width:${v}%"></div></div><b>${v}%</b></div>`).join("")}</div>
+<div class="card"><h3>Regras de pontuação <span class="r"><button class="btn sm" data-goto="minu">Trocar na Minu →</button></span></h3><div class="sub">XP do Band Pass, convertido em recompensas na Minu</div>${XPRULES.map(([a,v])=>`<div class="li"><span>${a}</span><b class="mut" style="color:var(--yel)">${v}</b></div>`).join("")}</div>
+<div class="card"><h3>Economia de XP</h3><div class="sub">Emissão × uso no mês</div>${[["Emitido · participação ao vivo","1,9M"],["Emitido · quiz e acervo","1,1M"],["Emitido · indicações","0,4M"],["Usado · experiências Band","1,3M"],["Usado · cupons de marcas","0,9M"],["Usado · conteúdo exclusivo","0,6M"]].map(([l,v])=>`<div class="li"><span>${l}</span><b>${v}</b></div>`).join("")}</div></div>`];
+
+P.inventario=()=>["Inventário comercial","O inventário novo que a parceria cria: cotas, quadros patrocinados e ativações de segmento",
+`<div class="intro">Não é redistribuição do inventário existente: são <b>produtos comerciais novos</b> nascidos da participação. Para patrocinadores que já atendem a Band, só a parcela incremental é elegível, conforme a proposta.</div>
+<div class="card"><table><thead><tr><th>Produto</th><th>Programa</th><th>Unidade</th><th class="num">Preço</th><th class="num">Ocupação</th><th>Comprador</th><th class="num">Receita</th><th></th></tr></thead><tbody>${ST.inv.map((x,i)=>`<tr><td><b>${x.n}</b></td><td>${x.pr}</td><td class="mut">${x.u}</td><td class="num">${brl(x.p)}</td><td class="num"><span class="chip ${x.sold===x.tot?"g":x.sold?"y":""}">${x.sold}/${x.tot}</span></td><td>${x.buyer}</td><td class="num">${brl(x.sold*x.p)}</td><td>${x.sold<x.tot?`<button class="btn sm" data-sell="${i}">Reservar</button>`:'<span class="chip g">esgotado</span>'}</td></tr>`).join("")}</tbody></table>
+<div style="display:flex;justify-content:flex-end;gap:24px;margin-top:12px;font-size:14px"><span class="mut">Vendido: <b style="color:#fff">${brl(ST.inv.reduce((a,x)=>a+x.sold*x.p,0))}</b></span><span class="mut">Disponível: <b style="color:var(--yel)">${brl(ST.inv.reduce((a,x)=>a+(x.tot-x.sold)*x.p,0))}</b></span></div></div>`];
+
+P.campanhas=()=>{const C=ST.camp||(ST.camp={pub:0,of:0,pr:0,ch:0,d:15,v:7});const PUB=[["Inativos há 14 dias",14600],["Palpiteiros do clássico",21400],["Discordam do Neto",9800],["Futebol + culinária",8400],["Nostálgicos (memórias)",12100],["Todos com opt-in",43820]];const OF=["Desafio + 2× XP","Cupom patrocinado","Sorteio de experiência","Conteúdo exclusivo do acervo"];const PR=["Jogo Aberto","Os Donos da Bola","Show do Esporte","Esporte em Debate"];const CH=["Push app","QR na TV","YouTube","WhatsApp","Todos os canais"];
+const reach=Math.round(PUB[C.pub][1]*(C.ch===4?.62:.38)),conv=Math.round(reach*[.21,.09,.16,.12][C.of]*(1+C.d/100)),rev=conv*[2.2,4,2.5,3][C.of]*3+12000;ST.campSim={reach,conv,rev,pub:PUB[C.pub][0],of:OF[C.of],pr:PR[C.pr],ch:CH[C.ch]};
+return["Campanhas & promoções","Construtor de campanhas cruzando segmento, programa, oferta e canal numa ativação única",
+`<div class="intro">Adaptado do construtor de promoções do Vasco: em vez de ingresso e loja, a campanha cruza o <b>segmento do Audiência 360</b>, o <b>programa</b> em que acontece e a <b>oferta do patrocinador</b>. Só públicos com opt-in, sem dado pessoal para o anunciante.</div>
+<div class="grid g4">${[["Campanhas ativas",ST.promos.filter(p=>p.s==="Ativa").length],["Participantes impactados",fmt(ST.promos.reduce((a,p)=>a+p.imp,0))],["Receita gerada",brl(ST.promos.reduce((a,p)=>a+p.rev,0))],["Conversão média","11,8%"]].map(([l,v])=>`<div class="card"><div class="mut" style="font-size:12.5px">${l}</div><div style="font-size:24px;font-weight:800;margin-top:6px">${v}</div></div>`).join("")}</div>
+<div class="grid g2" style="margin-top:16px"><div class="card"><h3>Nova campanha</h3><div class="frm" style="margin-top:10px"><label>Nome</label><input id="cN" value="${esc(ST.campName||"Clássico com a Renata")}">
+<label>Público-alvo</label><div class="pills">${PUB.map((p,i)=>`<button class="pill ${C.pub===i?"on":""}" data-c="pub" data-i="${i}">${p[0]} (${kk(p[1])})</button>`).join("")}</div>
+<label>Oferta</label><div class="pills">${OF.map((p,i)=>`<button class="pill ${C.of===i?"on":""}" data-c="of" data-i="${i}">${p}</button>`).join("")}</div>
+<label>Programa</label><div class="pills">${PR.map((p,i)=>`<button class="pill ${C.pr===i?"on":""}" data-c="pr" data-i="${i}">${p}</button>`).join("")}</div>
+<label>Canal</label><div class="pills">${CH.map((p,i)=>`<button class="pill ${C.ch===i?"on":""}" data-c="ch" data-i="${i}">${p}</button>`).join("")}</div>
+<label>Incentivo: ${C.d}%</label><input type="range" id="cD" min="0" max="40" value="${C.d}"></div>
+<div class="grid g3" style="margin-top:12px"><div class="stat"><b>${fmt(reach)}</b><small>alcance</small></div><div class="stat"><b>${fmt(conv)}</b><small>conversões</small></div><div class="stat"><b style="color:var(--grn)">${brl(rev)}</b><small>receita estimada</small></div></div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn g" id="cAI">✨ Simular impacto com IA</button><button class="btn p" id="cGo">Lançar campanha</button></div><div class="aibox" id="cBox"><span class="mut">O SponsorBrain avalia público, oferta e canal antes do lançamento.</span></div></div>
+<div class="card"><h3>Campanhas da Band</h3><table><thead><tr><th>Campanha</th><th>Público</th><th>Programa</th><th>Status</th><th class="num">Impactados</th><th class="num">Receita</th></tr></thead><tbody>${ST.promos.map(p=>`<tr><td><b>${esc(p.n)}</b><br><small class="mut">${esc(p.of)} · ${esc(p.ch)}</small></td><td>${esc(p.pub)}</td><td>${esc(p.pr)}</td><td><span class="chip ${p.s==="Ativa"?"g":""}">${p.s}</span></td><td class="num">${fmt(p.imp)}</td><td class="num">${brl(p.rev)}</td></tr>`).join("")}</tbody></table></div></div>`]};
+
+P.beneficios=()=>["Benefícios & recompensas","Programa de Benefícios Band × Virtual Fans: catálogo e resgates do Band Pass",
+`<div class="intro">Pilar transversal da proposta: <b>fidelização, benefícios, monetização e inteligência</b>. As experiências com talentos e estúdios dependem de autorização da Band; os cupons são das marcas patrocinadoras (fictícias na demo).</div>
+<div class="grid g4">${[["XP em circulação","1,4M"],["Band Pass no programa","128.450"],["Missões concluídas","94,1K"],["Resgates",fmt(11900+ST.redeems.length-3)]].map(([l,v])=>`<div class="card"><div class="mut" style="font-size:12.5px">${l}</div><div style="font-size:24px;font-weight:800;margin-top:6px">${v}</div></div>`).join("")}</div>
+<div class="card" style="margin-top:16px;display:flex;align-items:center;gap:14px;border-color:rgba(251,191,74,.45)"><div style="font-size:26px">⇄</div><div><h3>Micro-recompensas do dia a dia via Minu</h3><div class="mut" style="font-size:12.5px">Recarga, corrida por app, delivery, cinema, streaming: o XP vira recompensa instantânea. As experiências Band ficam no catálogo próprio abaixo.</div></div><div class="sp"></div><button class="btn p" data-goto="minu">Abrir Recompensas · Minu →</button></div>
+<div class="card" style="margin-top:16px"><h3>Experiências e benefícios Band</h3><div class="sub">Clique em "Resgatar" para simular um fã trocando XP</div><div class="grid g3">${ST.rewards.map((r,i)=>`<div class="rw"><span class="e">${r.e}</span><b>${esc(r.n)}</b><span class="pts">${fmt(r.p)} XP</span><small>${r.q>=999?"Estoque ilimitado":r.q+" disponíveis"}</small><button class="btn sm" data-rw="${i}" ${r.q<=0?"disabled":""}>Resgatar</button></div>`).join("")}</div></div>
+<div class="card" style="margin-top:16px"><h3>Resgates recentes</h3><table><thead><tr><th>Band Pass</th><th>Recompensa</th><th class="num">XP</th><th>Data</th><th>Status</th></tr></thead><tbody>${ST.redeems.map(r=>`<tr><td>${r.id}</td><td>${esc(r.r)}</td><td class="num">${fmt(r.p)}</td><td>${r.d}</td><td><span class="chip ${r.s==="Entregue"?"g":"b"}">${r.s}</span></td></tr>`).join("")}</tbody></table></div>`];
+
+P.governanca=()=>{const g=ST.gov||(ST.gov={rec:432000,ded:15,rw:6});const net=g.rec*(1-g.ded/100-g.rw/100);return["Governança & 50/50","Comitê executivo, registro de iniciativas, demonstrativo mensal e auditoria bilateral, conforme a proposta executiva",
+`<div class="grid g3"><div class="card"><h3>Demonstrativo do mês</h3><div class="sub">Simulação · valores ilustrativos e não contratuais</div>
+<div class="frm"><label>Receita recebida</label><input type="range" id="gR" min="50000" max="1500000" step="10000" value="${g.rec}"><label>Tributos e deduções</label><input type="range" id="gD" min="0" max="35" value="${g.ded}"><label>Custo de recompensas</label><input type="range" id="gW" min="0" max="20" value="${g.rw}"></div>
+<div class="li" style="margin-top:10px"><span>Receita recebida</span><b>${brl(g.rec)}</b></div><div class="li"><span>Tributos e deduções (${g.ded}%)</span><b>− ${brl(g.rec*g.ded/100)}</b></div><div class="li"><span>Recompensas (${g.rw}%)</span><b>− ${brl(g.rec*g.rw/100)}</b></div><div class="li"><span><b>Resultado líquido distribuível</b></span><b style="color:var(--yel);font-size:18px">${brl(net)}</b></div>
+<div class="grid g2" style="margin-top:12px"><div class="stat" style="border-color:rgba(91,140,255,.5)"><b>${brl(net/2)}</b><small>Grupo Bandeirantes · 50%</small></div><div class="stat" style="border-color:rgba(255,138,61,.5)"><b>${brl(net/2)}</b><small>Virtual Fans · 50%</small></div></div></div>
+<div class="card"><h3>Calendário financeiro</h3><div class="sub">Proposto no contrato</div>${[["Fechamento mensal","Último dia do mês","g"],["Demonstrativos da VF","Até o 5º dia útil","b"],["Conciliação com a Band","Até o 10º dia útil","p"],["Pagamento da participação da Band","Até o 15º dia útil","y"]].map(([a,b,c])=>`<div class="li"><span>${a}</span><span class="chip ${c}">${b}</span></div>`).join("")}<p class="mut" style="font-size:12px;margin-top:10px;line-height:1.5">Faturamento pela Virtual Fans · conta bancária exclusiva da operação · auditoria bilateral · divergências não travam valores incontroversos.</p></div>
+<div class="card"><h3>Comitê Executivo Band × VF</h3><div class="sub">Rituais de governança</div>${[["Ritual semanal","Diretorias de Esporte e Vibra + squad VF"],["Steering mensal","Demonstrativo, pipeline e indicadores"],["Revisão trimestral","Roadmap, novas propriedades e preços"],["Coordenação dedicada","1 pessoa 100% no projeto (pedido do CEO)"]].map(([a,b])=>`<div class="li"><span><b>${a}</b><br><small class="mut">${b}</small></span></div>`).join("")}</div></div>
+<div class="card" style="margin-top:16px"><h3>Registro de iniciativas <span class="r"><button class="btn sm p" id="giAdd">+ Registrar iniciativa</button></span></h3><div class="sub">Cada iniciativa aprovada pelas duas partes: propriedade, cliente, origem e receita atribuída</div><table><thead><tr><th>Iniciativa</th><th>Propriedade</th><th>Origem</th><th>Cliente</th><th>Status</th><th class="num">Receita/mês</th></tr></thead><tbody>${ST.inits.map(x=>`<tr><td><b>${esc(x.n)}</b></td><td>${esc(x.p)}</td><td><span class="chip ${x.o==="Band"?"b":x.o==="VF"?"y":"p"}">${x.o}</span></td><td>${esc(x.cl)}</td><td><span class="chip ${x.st==="Aprovada"?"g":"y"}">${x.st}</span></td><td class="num">${brl(x.rev)}</td></tr>`).join("")}</tbody></table></div>`]};
+
+P.central=()=>["Central ao vivo","Programas no ar, moderação, atendimento ao fã e alertas dos agentes num só lugar",
+`<div class="grid g3"><div class="card"><h3>No ar agora</h3>${PROGRAMS.filter(onAir).map(p=>`<div class="prog-now"><span class="live">NO AR</span><div><b>${p.n}</b><div class="mut" style="font-size:12px">${p.h}</div></div></div>`).join("")||`<p class="mut" style="font-size:13px">Nenhum programa do piloto no ar agora (horário de Brasília). Próximo: <b>${nextProg()}</b>.</p>`}
+<div style="margin-top:12px"><div class="mut" style="font-size:12px">QRs lidos hoje</div><div style="font-size:28px;font-weight:800" id="qrN">${fmt(ST.qr||18412)}</div><button class="btn sm" id="qrSim" style="margin-top:6px">📷 Simular leitura de QR</button></div></div>
+<div class="card"><h3>Fila de moderação e atendimento</h3>${ST.queue.map((q,i)=>`<div class="alert"><div><b>${esc(q.n)}</b> <span class="chip">${esc(q.pr)}</span> <span class="chip ${q.s==="Novo"?"y":q.s==="Aprovado"||q.s==="Resolvido"?"g":q.s==="Removido"?"r":"b"}">${q.s}</span><p>${esc(q.t)}</p>${q.s==="Novo"||q.s==="Em atendimento"?`<div style="display:flex;gap:6px;margin-top:8px"><button class="btn sm g" data-mod="${i}" data-a="ok">${q.t.startsWith("Memória")?"Aprovar para o ar":"Resolver"}</button><button class="btn sm" data-mod="${i}" data-a="no">${q.t.startsWith("Memória")?"Rejeitar":"Remover"}</button></div>`:""}</div></div>`).join("")}</div>
+<div class="card"><h3>Alertas dos agentes</h3>${ALERTS.slice(0,4).map(([a,t,m])=>`<div class="alert"><span class="dot" style="background:${AGENTS.find(x=>x[0]===a)[2]}"></span><div><b>${a}</b><p>${m}</p></div></div>`).join("")}</div></div>`];
+function nextProg(){const d=nowSP();for(let k=0;k<8;k++){const day=(d.getDay()+k)%7;const m=k?0:d.getHours()*60+d.getMinutes();const c=PROGRAMS.filter(p=>p.part&&p.days.includes(day)).map(p=>({p,t:+p.s.split(":")[0]*60+ +p.s.split(":")[1]})).filter(x=>x.t>m).sort((a,b)=>a.t-b.t)[0];if(c)return`${c.p.n} · ${["dom","seg","ter","qua","qui","sex","sáb"][day]} ${c.p.s}`}return"—"}
+
+P.automacao=()=>["Automação de marketing","Jornadas automáticas e campanhas por canal, disparadas pelo comportamento no ar",
+`<div class="card"><h3>Jornada automática · boas-vindas ao Band Pass</h3><div class="flow" style="margin-top:12px">${[["⚡ Gatilho","Escaneou o QR no Jogo Aberto"],["🔔 Push","Bem-vindo + 1ª missão"],["⏱ Espera","Até o próximo programa"],["🎯 Missão","Palpite no ar com 2× XP"],["❓ Condição","Deu opt-in?"],["🎁 Oferta","Cupom do patrocinador"]].map(([b,s],i)=>`${i?'<div class="ar">→</div>':""}<div class="st"><b>${b}</b><small>${s}</small></div>`).join("")}</div></div>
+<div class="grid g3" style="margin-top:16px"><div class="card"><div class="mut">Taxa de abertura (push)</div><div style="font-size:26px;font-weight:800">31%</div><span class="chip g">↑ 8%</span></div><div class="card"><div class="mut">Push enviados no mês</div><div style="font-size:26px;font-weight:800">1,2M</div><span class="chip g">↑ 12%</span></div><div class="card"><div class="mut">Workflows ativos</div><div style="font-size:26px;font-weight:800">9</div><span class="chip">push · WhatsApp · in-app · e-mail</span></div></div>
+<div class="card" style="margin-top:16px"><h3>Campanhas automáticas</h3><table><thead><tr><th>Campanha</th><th>Status</th><th class="num">Enviados</th><th class="num">Abertura</th><th class="num">CTR</th></tr></thead><tbody>${[["Lembrete: Jogo Aberto começa em 10 min","Ativa",420000,"34%","6,1%"],["Neto te desafiou","Ativa",280000,"29%","5,2%"],["Sua memória foi ao ar","Ativa",12000,"61%","22%"],["Semana do Band Pass","Concluída",900000,"25%","4,8%"]].map(r=>`<tr><td><b>${r[0]}</b></td><td><span class="chip ${r[1]==="Ativa"?"g":""}">${r[1]}</span></td><td class="num">${fmt(r[2])}</td><td class="num">${r[3]}</td><td class="num">${r[4]}</td></tr>`).join("")}</tbody></table></div>`];
+
+const HUB=[["VF","App Virtual Fans",50,14,"real"],["QR","QR na tela (playout)",22,30,"real"],["BP","Bandplay",80,16,"sim"],["YT","YouTube Live",86,46,"sim"],["RD","Rádio (streaming)",80,78,"sim"],["VB","Vibra Digital · data lake",50,88,"att"],["GG","Google · Sala Digital",18,78,"att"],["AD","Ad server Band",14,48,"sim"],["PX","Pix / pagamentos",30,10,"sim"],["WA","WhatsApp Business",68,90,"sim"],["CR","CRM / e-mail",32,92,"sim"],["MN","Minu · recompensas",8,20,"att"]];
+P.hub=()=>["Integration Hub","Sistemas da Band e de terceiros conectados ao BandBrain: status, volume e sincronização",
+`<div class="grid g4">${[["Integrações ativas","2 de 12","conectadas no piloto"],["Prontas para integrar","7","simuladas na demo"],["A validar / contratar","3","Vibra, Google e Minu"],["Eventos/dia (pico)","1,24M","via app e QR"]].map(([l,v,s])=>`<div class="card"><div class="mut" style="font-size:12.5px">${l}</div><div style="font-size:24px;font-weight:800;margin:6px 0">${v}</div><small class="mut">${s}</small></div>`).join("")}</div>
+<div class="card" style="margin-top:16px"><h3>Mapa de conexões</h3><div class="sub">🟢 sólido = conectado no piloto · 🟡 âmbar = a validar com a Band/Vibra · ⚪ tracejado = simulado (pronto para integrar)</div>
+<div class="map"><svg style="position:absolute;inset:0;width:100%;height:100%">${HUB.map(h=>`<line x1="50%" y1="50%" x2="${h[2]}%" y2="${h[3]}%" stroke="${h[4]==="real"?"#2dd4a7":h[4]==="att"?"#fbbf4a":"#34406a"}" stroke-width="${h[4]==="real"?2:1.2}" ${h[4]==="real"?"":'stroke-dasharray="5 5"'}/>`).join("")}</svg><div class="node core" style="left:50%;top:50%"><div class="c">BandBrain</div><span>Media Ontology™</span></div>${HUB.map(h=>`<div class="node ${h[4]}" style="left:${h[2]}%;top:${h[3]}%"><div class="c">${h[0]}</div><span>${h[1]}</span></div>`).join("")}</div>
+<p class="mut" style="font-size:12px;margin-top:10px">A arquitetura respeita a governança da Band: a VF complementa a Vibra Digital e o Bandplay, sem substituí-los. As integrações são definidas em conjunto na fase de diagnóstico.</p></div>`];
+
+P.saude=()=>["Saúde do sistema","Monitoramento de infraestrutura e APIs, com atenção especial aos picos do ao vivo",
+`<div class="grid g4">${[["Disponibilidade","99,98%","g"],["Latência média da API","48ms","b"],["Taxa de erro","0,03%","g"],["Pico suportado (QR/min)","120 mil","p"]].map(([l,v,c])=>`<div class="card"><div class="mut" style="font-size:12.5px">${l}</div><div style="font-size:26px;font-weight:800;margin:6px 0">${v}</div><span class="chip ${c}">últimas 24h</span></div>`).join("")}</div>
+<div class="card" style="margin-top:16px"><h3>Carga durante o Jogo Aberto (hoje)</h3>${spark([10,12,14,40,95,88,70,120,64,30,18],"#7c6cff").replace('height:36px','height:120px').replace('class="spark"','class="spark" style="height:120px"')}<div class="mut" style="font-size:12px">Pico às 11h42: pergunta do clássico no ar · autoscaling ativado</div></div>
+<div class="card" style="margin-top:16px"><h3>Log de eventos</h3><table><thead><tr><th>Horário</th><th>Nível</th><th>Serviço</th><th>Endpoint</th><th>Status</th></tr></thead><tbody>${[["11:42:09","WARN","Interações","POST /api/v1/live/vote","429 · rate limit"],["11:41:58","INFO","Autoscaling","pool live-votes","+12 instâncias"],["10:58:21","ERROR","Notificações","POST /api/v1/push/send","retry"],["09:12:33","WARN","Integração","GET /vibra/datalake/sync","aguarda credencial"]].map(r=>`<tr><td>${r[0]}</td><td><span class="chip ${r[1]==="ERROR"?"r":r[1]==="WARN"?"y":"b"}">${r[1]}</span></td><td>${r[2]}</td><td class="mut">${r[3]}</td><td>${r[4]}</td></tr>`).join("")}</tbody></table></div>`];
+
+function renderPage(){const[t,s,h]=P[PAGE]();$("#pT").textContent=t;$("#pS").textContent=s;$("#ct").innerHTML=h;if(PAGE==="visao")renderEvs()}
+
+
+/* ================= MINU ================= */
+const XPRULES=[["Palpite no ar","+100 XP"],["Acerto no quiz do acervo","+150 XP (+ bônus de velocidade)"],["Desafio do Craque (por resposta)","+60 XP"],["Memória enviada à História Viva","+200 XP"],["Opt-in de marcas","+50 XP (1 vez)"],["TV + rádio no mesmo dia","2× XP"],["Jogou em 3 programas (Explorador)","+150 XP"],["Bolão do pódio (Stock Car / Indy)","+120 XP, +300 se acertar"]];
+const MINU={rate:100,cap:3,spons:45,payer:"vf",redeem:9,log:[],seq:4810,
+ cat:[["📱","Recarga de celular","Telefonia",10,null],["🚗","Crédito de corrida por app","Transporte",15,null],["🍔","Vale-delivery","Alimentação",20,"Brasa Burger"],["🎬","Ingresso de cinema","Entretenimento",25,null],["🎧","1 mês de streaming de música","Entretenimento",22,null],["🎮","Crédito em games","Games",10,null],["💊","Cupom em farmácia","Saúde",15,null],["🛒","Vale-supermercado","Compras",30,"Mercado Vila"],["⚡","Bebida energética","Alimentação",8,"Pulso Energy"]]};
+function minuEcon(){const red=Math.round(128450*MINU.redeem/100);const avg=MINU.cat.reduce((a,c)=>a+c[3],0)/MINU.cat.length;const gross=red*avg;const sp=gross*MINU.spons/100;const net=gross-sp;const rev=ST.inv.reduce((a,x)=>a+x.sold*x.p,0);return{red,avg,gross,sp,net,rev,dist:rev*.85-(MINU.payer==="res"?net:0)}}
+P.minu=()=>{const e=minuEcon();return["Recompensas · Minu","O XP ganho na gamificação vira recompensa real: catálogo de micro-recompensas da Minu, integrado ao Band Pass",
+`<div class="intro"><b>Minu</b> (antiga Minutrade) é a martech de marketing de recompensas proposta para o catálogo digital do Band Pass: micro-recompensas instantâneas e clube de benefícios. O fã joga, ganha XP e troca na hora. <b>Integração simulada nesta demo</b>, sujeita a contrato e homologação. A proposta não pressupõe fornecedor específico.</div>
+<div class="card"><h3>Como a gamificação vira recompensa</h3><div class="flow" style="margin-top:10px">${[["🎯 Missão no ar","Palpite, quiz, desafio do Neto, bolão"],["★ XP no Band Pass","Regras de pontuação + multiplicadores"],["⇄ Conversão","XP → crédito de recompensa"],["🎁 Catálogo Minu","Escolha no app, sem sair da Band"],["🔐 Antifraude","Limite por Band Pass, CPF e dispositivo"],["📲 Voucher instantâneo","Entrega por push/WhatsApp"],["📊 ClubBrain mede","Resgate vira dado de preferência"]].map(([b,s],i)=>`${i?'<div class="ar">→</div>':""}<div class="st"><b>${b}</b><small>${s}</small></div>`).join("")}</div></div>
+<div class="grid g4" style="margin-top:16px">${[["Resgates/mês (projeção)",fmt(e.red),"y"],["Custo bruto de recompensas",brl(e.gross),"r"],["Custeado por patrocinadores",brl(e.sp)+" · "+MINU.spons+"%","g"],["Custo líquido",brl(e.net),MINU.payer==="vf"?"y":"p"]].map(([l,v,c])=>`<div class="card"><div class="mut" style="font-size:12.5px">${l}</div><div style="font-size:24px;font-weight:800;margin:6px 0">${v}</div><span class="chip ${c}">${l.includes("líquido")?(MINU.payer==="vf"?"absorvido pela VF":"deduzido do resultado"):"simulado"}</span></div>`).join("")}</div>
+<div class="grid g2" style="margin-top:16px">
+<div class="card"><h3>Regras de conversão</h3><div class="sub">Ajuste e veja o catálogo e o custo recalcularem</div>
+<div class="frm"><label>${MINU.rate} XP = R$ 1</label><input type="range" id="mR" min="50" max="300" step="10" value="${MINU.rate}">
+<label>Teto: ${MINU.cap} resgates/dia</label><input type="range" id="mC" min="1" max="10" value="${MINU.cap}">
+<label>Patrocinado: ${MINU.spons}%</label><input type="range" id="mS" min="0" max="90" step="5" value="${MINU.spons}">
+<label>Taxa de resgate: ${MINU.redeem}%/mês</label><input type="range" id="mT" min="1" max="30" value="${MINU.redeem}">
+<label>Quem paga o custo líquido</label><div class="pills"><button class="pill ${MINU.payer==="vf"?"on":""}" data-payer="vf">VF absorve (memorando 09/10)</button><button class="pill ${MINU.payer==="res"?"on":""}" data-payer="res">Deduz do resultado (requer Comitê)</button></div></div>
+<div class="aibox" style="border-style:solid">${MINU.payer==="vf"?`No memorando, a VF assume as recompensas digitais. Com ${MINU.spons}% patrocinado, o custo da VF cai para <b>${brl(e.net)}/mês</b>. A meta é patrocinar 50%+ do catálogo.`:`Com o custo deduzido antes do 50/50, o resultado distribuível estimado fica em <b>${brl(e.dist)}/mês</b> (${brl(e.dist/2)} para cada parte). Exige aprovação expressa das duas partes.`}</div>
+<p class="mut" style="font-size:11.5px;margin-top:8px">Em toda recompensa, a marca patrocinadora aparece no voucher: o custo vira mídia mensurável para o anunciante.</p></div>
+<div class="card"><h3>Catálogo Minu no Band Pass <span class="r"><button class="btn sm g" id="mSim">⚡ Simular resgate</button></span></h3><div class="sub">Valores de face ilustrativos · categorias de micro-recompensas</div>
+<table><thead><tr><th>Recompensa</th><th>Categoria</th><th class="num">Valor</th><th class="num">Custo em XP</th><th>Patrocínio</th></tr></thead><tbody>${MINU.cat.map(c=>`<tr><td>${c[0]} <b>${c[1]}</b></td><td class="mut">${c[2]}</td><td class="num">${brl(c[3])}</td><td class="num"><b style="color:var(--yel)">${fmt(c[3]*MINU.rate)}</b></td><td>${c[4]?`<span class="chip g">${c[4]}</span>`:'<span class="chip">aberto a marca</span>'}</td></tr>`).join("")}</tbody></table></div></div>
+<div class="card" style="margin-top:16px"><h3>Log da API de resgates (simulada) <span class="chip y" style="margin-left:6px">Minu · sandbox</span></h3><div class="sub">Solicitação → antifraude → emissão do voucher → entrega</div><div id="mLog">${minuLogHTML()}</div></div>`]};
+function minuLogHTML(){return MINU.log.length?`<table><thead><tr><th>Pedido</th><th>Band Pass</th><th>Recompensa</th><th class="num">XP</th><th>Etapa</th><th>Horário</th></tr></thead><tbody>${MINU.log.map(l=>`<tr><td class="mut">#${l.id}</td><td>${esc(l.fan)}</td><td>${l.item}</td><td class="num">${fmt(l.xp)}</td><td><span class="chip ${["y","b","p","g"][l.st]}">${["Solicitado","Antifraude ok","Voucher emitido","Entregue · push"][l.st]}</span></td><td class="mut">${l.t}</td></tr>`).join("")}</tbody></table>`:`<p class="mut" style="font-size:13px">Nenhum resgate nesta sessão. Clique em "Simular resgate".</p>`}
+function minuRedeem(){const f=FANS[Math.floor(Math.random()*FANS.length)],c=MINU.cat[Math.floor(Math.random()*MINU.cat.length)];const it={id:++MINU.seq,fan:f.name+" · "+f.id,item:c[0]+" "+c[1],xp:c[3]*MINU.rate,st:0,t:new Date().toLocaleTimeString("pt-BR")};MINU.log.unshift(it);MINU.log.length=Math.min(MINU.log.length,10);
+ const up=()=>{const el=$("#mLog");if(el&&PAGE==="minu")el.innerHTML=minuLogHTML()};up();[700,1500,2400].forEach((ms,i)=>setTimeout(()=>{it.st=i+1;up()},ms))}
+setInterval(()=>{if(Math.random()<.35)minuRedeem()},6000);
+
+/* ================= AO VIVO (eventos e votos) ================= */
+const EVT=[["QR na TV","qr_scan"],["App Virtual Fans","live_vote"],["App Virtual Fans","quiz_answer"],["YouTube","chat_poll"],["Bandplay","stream_join"],["App Virtual Fans","memory_sent"],["Rádio","listener_vote"],["App Virtual Fans","reward_redeem"]];
+function pushEv(){const f=FANS[Math.floor(Math.random()*FANS.length)],e=EVT[Math.floor(Math.random()*EVT.length)],anon=Math.random()<.25;ST.live.unshift({n:anon?"(anônimo)":f.name,s:e[0],e:e[1],t:Date.now()});ST.live.length=Math.min(ST.live.length,9);if(PAGE==="visao")renderEvs()}
+function renderEvs(){const el=$("#evs");if(!el)return;el.innerHTML=ST.live.map(x=>`<div class="ev"><div class="a">${x.n==="(anônimo)"?"?":x.n.split(" ").map(w=>w[0]).join("")}</div><div><b>${esc(x.n)}</b> <span class="mut">${x.s}</span><small>evento: ${x.e}</small></div><span class="tm">${Math.max(0,Math.round((Date.now()-x.t)/1000))}s atrás</span></div>`).join("")}
+setInterval(pushEv,2500);for(let i=0;i<6;i++)pushEv();
+setInterval(()=>{ST.questions.forEach(q=>{if(q.on)q.v=q.v.map((v,i)=>v+Math.round(Math.random()*40*(i===0?1.3:1)))});if(PAGE==="aovivo"){const el=$("#qs");if(el)el.innerHTML=qHTML()}},1500);
+
+/* ================= IA ================= */
+let SAMPLE;async function getSample(){if(SAMPLE!==undefined)return SAMPLE;try{SAMPLE=await (window.claude&&claude.use?claude.use("sample"):null)}catch(e){SAMPLE=null}return SAMPLE}
+async function llm(prompt,onText,tier="default"){const s=await getSample();if(!s)return null;try{const r=await s(prompt,{modelTier:tier,cache:false,onText:onText?({text})=>onText(text):undefined});return r&&r.text}catch(e){return null}}
+function osContext(){return{tenant:"Grupo Bandeirantes",plataforma:"BandBrain OS (ClubBrain.ai + Virtual Fans), adaptação do OS do Vasco para uma emissora",pagina_aberta:$("#pT").textContent,
+ kpis:{receita_incremental_6m:REVM.reduce((a,b)=>a+b,0),audiencia_participante:128450,perfis_optin:43820,engajamento:"72%",nps:61,risco_evasao:"11,4%"},
+ programas:PROGRAMS.map(p=>({programa:p.n,apresentacao:p.h,plataformas:p.pl,horario:p.s,participacao_mes:p.part,optin:p.opt,fase:p.fase,quadro:p.ix})),
+ inventario:ST.inv.map(x=>({produto:x.n,programa:x.pr,preco:x.p,vendidas:x.sold,total:x.tot,comprador:x.buyer})),
+ campanhas:ST.promos,iniciativas:ST.inits,recompensas_minu:{parceiro:"Minu (ex-Minutrade), integração simulada e sujeita a contrato",xp_por_real:MINU.rate,teto_resgates_dia:MINU.cap,pct_patrocinado:MINU.spons,quem_paga:MINU.payer==="vf"?"VF absorve (memorando)":"deduzido do resultado (requer Comitê)",economia:minuEcon(),catalogo:MINU.cat.map(c=>({item:c[1],valor:c[3],patrocinio:c[4]})),regras_xp:XPRULES},alertas:ALERTS.map(a=>a[0]+": "+a[2]),receitas_fontes:REVSRC.map(s=>({fonte:s[0],pct:s[2]})),
+ regras:["Divisão 50/50 sobre o resultado líquido distribuível; faturamento VF; conta exclusiva; auditoria bilateral.","Nunca vender dados pessoais: só segmentos agregados com opt-in.","Valores simulados e ilustrativos.","A VF complementa a Vibra Digital e o Bandplay.","Marcas de patrocinadores são fictícias.","Uso de acervo, imagem de talentos e MasterChef depende de autorização."]}}
+const CHAT=[];const SUGS=["Como reduzir o custo das recompensas Minu sem perder engajamento?","Quais são as 3 maiores oportunidades de receita nos próximos 90 dias?","Qual cota do inventário devo vender primeiro e para quem?","Como o MVP de 90 dias deve ser faseado entre Jogo Aberto e Os Donos da Bola?","Quais riscos de LGPD e de governança precisamos endereçar com a Vibra?"];
+function renderChat(){$("#msgs").innerHTML=CHAT.map(m=>m.r==="u"?`<div class="m u">${esc(m.t)}</div>`:`<div class="m a"><div class="who">${esc(m.w||"Agente Executivo")}</div>${md(m.t||"…")}</div>`).join("")||`<div class="m a"><div class="who">Agente Executivo</div><p>Olá! Eu consulto toda a Media Ontology™ da Band: programas, audiência, inventário, campanhas e governança. O que você quer saber?</p></div>`;$("#msgs").scrollTop=1e9;$("#sugs").innerHTML=SUGS.map(s=>`<button class="sug">${esc(s)}</button>`).join("")}
+function fallback(){return`**Leitura do OS (modo offline)**
+- Receita incremental projetada em 6 meses: **${mi(REVM.reduce((a,b)=>a+b,0))}**, concentrada em Jogo Aberto e Os Donos da Bola.
+- Inventário: ${ST.inv.filter(x=>x.sold<x.tot).length} produtos com cotas disponíveis (${brl(ST.inv.reduce((a,x)=>a+(x.tot-x.sold)*x.p,0))}).
+- Audiência: 128.450 Band Pass, 43.820 com opt-in.
+Próximo passo: vender o último bloco da cota master do Pré-Jogo e incluir o rádio na fase 2.`}
+async function ask(q,who="Agente Executivo"){if(!q.trim())return;openDrawer();CHAT.push({r:"u",t:q});const m={r:"a",t:"",w:who};CHAT.push(m);renderChat();
+ const hist=CHAT.slice(0,-1).slice(-5).map(x=>({role:x.r==="u"?"user":"assistant",content:x.t||"-"}));
+ const sys=`Você é o ${who} do BandBrain OS: a plataforma ClubBrain.ai + Virtual Fans adaptada para o Grupo Bandeirantes (emissora de TV aberta, BandSports, rádio e digital), a partir do OS que a ClubBrain opera para o Vasco. Responda à diretoria da Band em português do Brasil, executivo e direto: no máximo 160 palavras, 3 a 5 tópicos iniciados por "- " e uma linha final "Próximo passo: ...". **Negrito** só em números-chave. Use apenas os dados do contexto e deixe claro que são simulados quando citar números. Respeite as regras.
+CONTEXTO DO OS (JSON):
+${JSON.stringify(osContext())}`;
+ const msgs=[{role:"user",content:sys+"\n\nOk?"},{role:"assistant",content:"Entendido."},...hist.slice(0,-1),{role:"user",content:q}];
+ const r=await llm(msgs,t=>{m.t=t;renderChat()});m.t=r||fallback();renderChat()}
+function openDrawer(){$("#dr").classList.add("on");renderChat()}
+
+/* ================= EVENTOS ================= */
+$("#mC").onclick=()=>{MODE="C";go("cockpit")};$("#mO").onclick=()=>{MODE="O";go("visao")};
+$("#nav").onclick=e=>{const b=e.target.closest("button[data-p]");if(b)go(b.dataset.p)};
+$("#bAgent").onclick=openDrawer;$("#drX").onclick=()=>$("#dr").classList.remove("on");
+$("#bExp").onclick=()=>toast("Relatório gerado (demo): exportação em PDF disponível na versão integrada.");
+$("#bPer").onclick=()=>toast("Período da demo: projeção dos 6 meses após o lançamento do MVP.");
+$("#sugs").onclick=e=>{const b=e.target.closest(".sug");if(b)ask(b.textContent)};
+$("#askF").onsubmit=e=>{e.preventDefault();const v=$("#askI").value;$("#askI").value="";ask(v)};
+$("#ct").addEventListener("input",e=>{const id=e.target.id;
+ if(id==="fq"){ST.q=e.target.value;const pos=e.target.selectionStart;renderPage();const f=$("#fq");f.focus();f.setSelectionRange(pos,pos)}
+
+ if(id==="cN")ST.campName=e.target.value;
+
+});
+$("#ct").addEventListener("change",e=>{const id=e.target.id,y=$("#ct").scrollTop;
+ if(id==="cD"){ST.camp.d=+e.target.value;ST.campName=$("#cN").value}
+ else if(["mR","mC","mS","mT"].includes(id))MINU[{mR:"rate",mC:"cap",mS:"spons",mT:"redeem"}[id]]=+e.target.value;
+ else if(id==="gR"||id==="gD"||id==="gW")ST.gov[{gR:"rec",gD:"ded",gW:"rw"}[id]]=+e.target.value;
+ else return;renderPage();$("#ct").scrollTop=y});
+$("#ct").addEventListener("click",async e=>{const b=e.target.closest("button,[data-fan],tr[data-prog]");if(!b)return;const d=b.dataset;
+ if(d.goto){MODE="O";go(d.goto);return}
+ if(d.payer){MINU.payer=d.payer;renderPage();return}
+ if(b.id==="mSim"){minuRedeem();toast("Resgate enviado à Minu (sandbox)");return}
+ if(d.fw){ask(`Analise este alerta e diga o que fazer: "${d.fw}"`);return}
+ if(d.open){openDrawer();return}
+ if(d.ask){ask(d.ask);return}
+ if(d.sub){SUB=d.sub;renderPage();return}
+ if(d.obj!=null){SUB=+d.obj;renderPage();return}
+ if(d.fan){ST.fan=d.fan;SUB="f360";renderPage();return}
+ if(d.prog){SUB=d.prog;renderPage();return}
+ if(d.sell!=null){const x=ST.inv[+d.sell];x.sold++;if(x.buyer==="—")x.buyer=SPONSORS[Math.floor(Math.random()*SPONSORS.length)].n;toast(`Cota reservada: ${x.n} · ${brl(x.p)}`);renderPage();return}
+ if(d.rw!=null){const r=ST.rewards[+d.rw];if(r.q<999)r.q--;const f=FANS[Math.floor(Math.random()*FANS.length)];ST.redeems.unshift({id:f.id,r:r.n,p:r.p,d:new Date().toLocaleDateString("pt-BR"),s:"Confirmado"});toast(`${f.name} resgatou: ${r.n}`);renderPage();return}
+ if(d.close!=null){ST.questions[+d.close].on=false;renderPage();return}
+ if(d.mod!=null){const q=ST.queue[+d.mod];q.s=d.a==="ok"?(q.t.startsWith("Memória")?"Aprovado":"Resolvido"):"Removido";toast(q.s==="Aprovado"?"Memória aprovada: vai para o quadro História Viva":"Item atualizado");renderPage();return}
+ if(d.c){ST.camp[d.c]=+d.i;ST.campName=$("#cN").value;renderPage();return}
+ if(b.id==="cGo"){const s=ST.campSim;ST.promos.unshift({n:$("#cN").value||"Nova campanha",pub:s.pub,of:s.of,pr:s.pr,ch:s.ch,s:"Ativa",imp:s.reach,rev:Math.round(s.rev)});toast("Campanha lançada");renderPage();return}
+ if(b.id==="cAI"){const s=ST.campSim,box=$("#cBox");box.innerHTML="<span class='mut'>SponsorBrain analisando...</span>";
+  const r=await llm(`Você é o SponsorBrain do BandBrain OS (Grupo Bandeirantes × Virtual Fans). Avalie esta campanha antes do lançamento, em português do Brasil, em 4 tópicos iniciados por "- " (público, oferta, canal e programa, risco/LGPD) e uma linha final "Recomendação: ...". Máximo 100 palavras. Dados simulados: público "${s.pub}", oferta "${s.of}", programa "${s.pr}", canal "${s.ch}", alcance ${s.reach}, conversões ${s.conv}, receita estimada ${brl(s.rev)}. Só segmentos com opt-in.`,t=>box.innerHTML=md(t),"quick");
+  box.innerHTML=md(r||`- Público "${s.pub}" com bom fit para "${s.of}".\n- ${s.ch} no ${s.pr} maximiza o alcance no ao vivo.\n- Conversão esperada de ${(s.conv/s.reach*100).toFixed(1)}%.\n- Só perfis com opt-in: sem risco de LGPD.\nRecomendação: lançar no próximo programa.`);return}
+ if(b.id==="nqGo"){const o=$("#nqO").value.split(",").map(x=>x.trim()).filter(Boolean).slice(0,4);if(o.length<2){toast("Informe ao menos 2 opções");return}ST.questions.forEach(q=>{if(q.pr===$("#nqP").value)q.on=false});ST.questions.unshift({pr:$("#nqP").value,q:$("#nqQ").value,o,v:o.map(()=>0),on:true,sp:$("#nqS").value});toast("Pergunta no ar: QR na tela e push enviados");renderPage();return}
+ if(b.id==="nqAI"){const box=$("#nqBox");box.innerHTML="<span class='mut'>LiveBrain pensando...</span>";const pr=$("#nqP").value;
+  const r=await llm(`Você é o LiveBrain do BandBrain OS. Sugira 3 perguntas curtas para soltar AGORA no ar no programa "${pr}" (Grupo Bandeirantes), para maximizar a participação via QR na tela. Para cada uma, dê as opções de resposta entre parênteses. Formato: 3 tópicos iniciados por "- ". Português do Brasil, sem citar fatos ou resultados recentes que você não conheça.`,t=>box.innerHTML=md(t),"quick");
+  box.innerHTML=md(r||"- Quem vence o clássico do fim de semana? (Mandante, Empate, Visitante)\n- O técnico deveria mudar o esquema? (Sim, Não, Só no 2º tempo)\n- Qual foi o maior clássico da história? (escolha entre 4 do acervo)");return}
+ if(b.id==="qrSim"){ST.qr=(ST.qr||18412)+1;$("#qrN").textContent=fmt(ST.qr);toast("QR lido · novo Band Pass resolvido ao perfil");return}
+ if(b.id==="giAdd"){const n=["Gincana das Torcidas · rodada solidária","Palpite do ouvinte · Esporte em Debate","Quiz patrocinado · Majestoso"][ST.inits.length%3];ST.inits.push({n,p:n.includes("ouvinte")?"Esporte em Debate":n.includes("Gincana")?"Show do Esporte":"Jogo Aberto",o:["Conjunta","Band","VF"][ST.inits.length%3],cl:SPONSORS[ST.inits.length%5].n,st:"Em análise",rev:[25000,6000,8000][ST.inits.length%3]});toast("Iniciativa registrada para aprovação do Comitê");renderPage();return}
+});
+renderNav();renderPage();
+/* modo embutido (?embed=1): a página vem do hash (#cockpit, #programas, #governanca...) */
+if(new URLSearchParams(location.search).get("embed")==="1"){document.body.classList.add("embed");const r=()=>{const h=location.hash.slice(1)||"cockpit";if(P[h]){MODE=["cockpit","receita","onto","agentes"].includes(h)?"C":"O";go(h);}};r();addEventListener("hashchange",r);}
+</script>
+</body>
+</html>
