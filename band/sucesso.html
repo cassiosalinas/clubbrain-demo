@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pedido confirmado · Band Playverse</title>
+<link rel="stylesheet" href="/band/assets/band-site.css">
+</head>
+<body>
+<header id="top"></header>
+<main class="b-wrap" style="max-width:760px">
+  <div id="box"></div>
+</main>
+<script src="/band/assets/band-site.js"></script>
+<script>
+(function(){
+const B = BAND, esc = B.esc;
+B.top('');
+let o = null; try { o = JSON.parse(localStorage.getItem('band-last-order')); } catch(e){}
+const want = new URLSearchParams(location.search).get('pedido');
+const box = document.getElementById('box');
+if (!o || (want && o.id !== want)) {
+  box.innerHTML = `<div class="card" style="text-align:center;padding:40px"><div style="font-size:46px">🧾</div><h1 style="font-size:34px;margin:10px 0">Nenhum pedido encontrado</h1><p class="lead" style="margin:0 auto 18px">Este navegador não tem um pedido recente. Escolha uma experiência para começar.</p><a class="btn" href="/band/loja">Ver Experiências Band</a></div>`;
+  return;
+}
+const lv = B.fan ? B.level(B.fan.xp) : null;
+const dt = new Date(o.ts).toLocaleString('pt-BR', { dateStyle:'short', timeStyle:'short' });
+box.innerHTML = `<div class="card" style="text-align:center;padding:34px 24px">
+  <div style="font-size:54px">${o.emoji || '✅'}</div><div class="eyebrow" style="margin-top:8px">Pagamento confirmado · simulado</div>
+  <h1 style="font-size:clamp(32px,5vw,46px)">Valeu, ${esc(o.fan)}!</h1>
+  <p class="lead" style="margin:10px auto 0">Seu pedido de <b style="color:var(--paper)">${esc(o.item)}</b> está confirmado. O comprovante e as instruções seguem por e-mail.</p>
+  <div style="margin:22px auto 0;max-width:420px;text-align:left">
+    <div class="modal" style="width:auto;box-shadow:none">
+      <div class="row"><span>Pedido</span><b>${esc(o.id)}</b></div>
+      <div class="row"><span>Data</span><b>${dt}</b></div>
+      ${o.when ? `<div class="row"><span>Quando</span><b>${esc(o.when)}</b></div>` : ''}
+      <div class="row"><span>Forma de pagamento</span><b>${o.method === 'cartao' ? 'Cartão' : 'Pix'}</b></div>
+      ${o.disc ? `<div class="row"><span>Desconto Band Pass</span><b style="color:#6ee7a0">${o.disc}%</b></div>` : ''}
+      <div class="row"><span>Total</span><b style="color:var(--gold)">${B.brl(o.total)}</b></div>
+      <div class="row" style="border:0"><span>XP ganho</span><b style="color:var(--gold)">+${B.fmt(o.xp)} XP</b></div>
+    </div>
+  </div>
+  ${lv ? `<p style="margin-top:16px">Seu Band Pass agora tem <b style="color:var(--gold)">${B.fmt(B.fan.xp)} XP</b> · nível <span class="tier t${lv.i}">${lv.name}</span>${lv.next ? ` · faltam ${B.fmt(lv.next - B.fan.xp)} XP para ${lv.nextName}` : ''}</p>` : ''}
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px"><a class="btn" href="/band/pass">Ver meu Band Pass</a><a class="btn ghost" href="/band/loja">Continuar comprando</a><a class="btn ghost" href="/band/apps/playverse/#fa">Ganhar mais XP no app</a></div>
+  <p class="note">Demonstração: nenhum valor foi cobrado. Na versão integrada, esta página é o retorno do gateway de pagamento.</p>
+</div>`;
+})();
+</script>
+</body>
+</html>

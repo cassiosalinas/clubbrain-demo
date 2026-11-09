@@ -48,6 +48,26 @@
   to = "/index.html"
   status = 200
 
+# Site do fã da Band (equivalente a /vasco/socio, /vasco/virtual, /vasco/loja e
+# /vasco/sucesso). Checkout, CRM e Minu simulados: contas reais do Vasco não
+# são usadas aqui.
+[[redirects]]
+  from = "/band/pass"
+  to = "/band/pass.html"
+  status = 200
+[[redirects]]
+  from = "/band/historia-viva"
+  to = "/band/historia-viva.html"
+  status = 200
+[[redirects]]
+  from = "/band/loja"
+  to = "/band/loja.html"
+  status = 200
+[[redirects]]
+  from = "/band/sucesso"
+  to = "/band/sucesso.html"
+  status = 200
+
 # O backend (mvp-vasco/) vive neste repo mas NAO faz parte do site. Como o
 # publish e a raiz ("."), sem esta regra o Netlify serviria o codigo-fonte do
 # backend como arquivo estatico em /mvp-vasco/... — force = true e necessario
