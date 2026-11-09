@@ -664,9 +664,9 @@ canvas{ max-width:100%; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         Receita &amp; inventário
       </div>
-      <div class="nav-item band-only-nav" data-view="band" data-band="os:governanca" data-title="Governança &amp; 50/50" data-sub="Comitê executivo, registro de iniciativas, demonstrativo mensal e auditoria bilateral" data-mode="cockpit" style="display:none;">
+      <div class="nav-item band-only-nav" data-view="band" data-band="os:governanca" data-title="Governança" data-sub="Comitê executivo, registro de iniciativas, demonstrativo mensal e auditoria bilateral" data-mode="cockpit" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7h14M5 7l-3 7h6l-3-7zM19 7l-3 7h6l-3-7z"/></svg>
-        Governança &amp; 50/50
+        Governança
       </div>
       <div class="nav-item band-only-nav" data-view="band" data-band="pv:analytics" data-title="Analytics ao vivo" data-sub="O que está acontecendo agora em todos os programas, canais e games" data-mode="cockpit" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
@@ -2507,7 +2507,7 @@ const BAND_EXTRA_PAGES = {
 };
 const BAND_ROLES = {
   ceo:{ name:'Diretoria executiva', role:'CEO · Grupo Bandeirantes', av:'CEO', home:['Início do CEO','Receita, audiência, patrocínio e decisões da diretoria'],
-    groups:[['Visão executiva',['os:cockpit','os:receita','os:governanca','pv:analytics']],['Estratégia',['os:inventario','pv:onto','os:agentes']],['Para apresentar',['pv:pres']]] },
+    groups:[['Visão executiva',['os:cockpit','os:receita','os:inventario','os:governanca','pv:analytics']],['Para apresentar',['pv:pres']]] },
   op:{ name:'Operações', role:'Programação e produção', av:'OP', home:['Início de Operações','O que está no ar, o que vem a seguir e o que precisa de ação'],
     groups:[['No ar',['os:visao','os:central','os:aovivo','os:programas']],['Conteúdo e engajamento',['os:acervo','os:comunidades','os:gamif','pv:rewards']],['Experiência do fã (monitoramento)',['pv:pres']],['Demos de propriedade',['hv:','p3:']]] },
   mkt:{ name:'Marketing', role:'CRM, audiência e campanhas', av:'MKT', home:['Início de Marketing','Base, consentimento, segmentos e jornadas prontos para ativar'],

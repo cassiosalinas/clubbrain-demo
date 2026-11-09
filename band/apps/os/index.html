@@ -250,7 +250,7 @@ const NAV={
  C:[["Executivo",[["cockpit","▦","Cockpit executivo"],["receita","$","Receita & inventário"]]],["Inteligência",[["onto","⟁","Media Ontology™"],["agentes","⌂","Agentes de IA"]]]],
  O:[["Visão da audiência",[["visao","⌂","Visão geral"],["aud360","◎","Audiência 360"],["programas","▣","Programas & grade"],["comunidades","☺","Torcidas & comunidades"],["acervo","📼","História Viva · acervo",1]]],
     ["Monetização",[["aovivo","◉","Interações ao vivo",1],["gamif","★","Gamificação"],["inventario","▤","Inventário comercial",1],["campanhas","➚","Campanhas & promoções"],["beneficios","🎁","Benefícios & recompensas"],["minu","⇄","Recompensas · Minu",1]]],
-    ["Parceria Band × VF",[["governanca","⚖","Governança & 50/50",1]]],
+    ["Parceria Band × VF",[["governanca","⚖","Governança",1]]],
     ["Operação",[["central","☷","Central ao vivo"],["automacao","✉","Automação de marketing"],["hub","⛓","Integration Hub"],["saude","♡","Saúde do sistema"]]]]
 };
 let MODE="C",PAGE="cockpit",SUB=null;
@@ -393,7 +393,7 @@ P.beneficios=()=>["Benefícios & recompensas","Programa de Benefícios Band × V
 <div class="card" style="margin-top:16px"><h3>Experiências e benefícios Band</h3><div class="sub">Clique em "Resgatar" para simular um fã trocando XP</div><div class="grid g3">${ST.rewards.map((r,i)=>`<div class="rw"><span class="e">${r.e}</span><b>${esc(r.n)}</b><span class="pts">${fmt(r.p)} XP</span><small>${r.q>=999?"Estoque ilimitado":r.q+" disponíveis"}</small><button class="btn sm" data-rw="${i}" ${r.q<=0?"disabled":""}>Resgatar</button></div>`).join("")}</div></div>
 <div class="card" style="margin-top:16px"><h3>Resgates recentes</h3><table><thead><tr><th>Band Pass</th><th>Recompensa</th><th class="num">XP</th><th>Data</th><th>Status</th></tr></thead><tbody>${ST.redeems.map(r=>`<tr><td>${r.id}</td><td>${esc(r.r)}</td><td class="num">${fmt(r.p)}</td><td>${r.d}</td><td><span class="chip ${r.s==="Entregue"?"g":"b"}">${r.s}</span></td></tr>`).join("")}</tbody></table></div>`];
 
-P.governanca=()=>{const g=ST.gov||(ST.gov={rec:432000,ded:15,rw:6});const net=g.rec*(1-g.ded/100-g.rw/100);return["Governança & 50/50","Comitê executivo, registro de iniciativas, demonstrativo mensal e auditoria bilateral, conforme a proposta executiva",
+P.governanca=()=>{const g=ST.gov||(ST.gov={rec:432000,ded:15,rw:6});const net=g.rec*(1-g.ded/100-g.rw/100);return["Governança","Comitê executivo, registro de iniciativas, demonstrativo mensal e auditoria bilateral, conforme a proposta executiva",
 `<div class="grid g3"><div class="card"><h3>Demonstrativo do mês</h3><div class="sub">Simulação · valores ilustrativos e não contratuais</div>
 <div class="frm"><label>Receita recebida</label><input type="range" id="gR" min="50000" max="1500000" step="10000" value="${g.rec}"><label>Tributos e deduções</label><input type="range" id="gD" min="0" max="35" value="${g.ded}"><label>Custo de recompensas</label><input type="range" id="gW" min="0" max="20" value="${g.rw}"></div>
 <div class="li" style="margin-top:10px"><span>Receita recebida</span><b>${brl(g.rec)}</b></div><div class="li"><span>Tributos e deduções (${g.ded}%)</span><b>− ${brl(g.rec*g.ded/100)}</b></div><div class="li"><span>Recompensas (${g.rw}%)</span><b>− ${brl(g.rec*g.rw/100)}</b></div><div class="li"><span><b>Resultado líquido distribuível</b></span><b style="color:var(--yel);font-size:18px">${brl(net)}</b></div>
