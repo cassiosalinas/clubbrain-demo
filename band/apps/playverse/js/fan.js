@@ -44,7 +44,7 @@ BP.Fan = function (root, opts = {}) {
   function pollBars(key, opts2, mine) { const live = S.polls[key] || {}; const v = opts2.map((_, i) => (BASE[key] ? BASE[key][i] || 20 : 20) + (live[i] || 0)); const t = v.reduce((a, b) => a + b, 0) || 1; return opts2.map((o, i) => `<button class="fop ${mine === i ? "me" : ""}" data-vote="${i}" ${mine != null ? "disabled" : ""}><i style="width:${mine != null ? v[i] / t * 100 : 0}%"></i><span>${esc(o)}</span>${mine != null ? `<b>${Math.round(v[i] / t * 100)}%</b>` : ""}</button>`).join(""); }
 
   /* ---------- telas ---------- */
-  function header() { return `<div class="fhd"><div class="flogo">BAND <span>PLAYVERSE</span></div>${fan ? `<div class="fxp">${fmt(bal())} XP</div>` : ""}</div>`; }
+  function header() { return `<div class="fhd"><div class="flogo"><img src="/band/assets/band-logo.svg" alt="Band" style="width:46px;height:28px;vertical-align:middle;margin-right:8px">BAND <span>PLAYVERSE</span></div>${fan ? `<div class="fxp">${fmt(bal())} XP</div>` : ""}</div>`; }
   function nav() { return fan ? `<nav class="fnav">${[["home", "🏠", "Início"], ["progs", "📺", "Programas"], ["games", "🎮", "Jogos"], ["wallet", "🎁", "Carteira"], ["me", "👤", "Perfil"]].map(([k, i, l]) => `<button data-tab="${k}" class="${tab === k ? "on" : ""}"><span>${i}</span>${l}</button>`).join("")}</nav>` : ""; }
   function render() {
     if (game && scr !== "game") { game.destroy(); game = null; }

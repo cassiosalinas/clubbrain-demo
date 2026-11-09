@@ -44,7 +44,7 @@ B.emit = (type, prog, p, src) => {
 /* ---------- topo, rodapé, toast, modal ---------- */
 B.top = active => {
   const links = [['/band/pass', 'Band Pass'], ['/band/historia-viva', 'História Viva'], ['/band/loja', 'Experiências Band'], ['/band/apps/playverse/#fa', 'App do fã']];
-  $('#top').innerHTML = `<div class="b-logo">BAND</div><div class="b-brand"><b>BAND <span>PLAYVERSE</span></b><small>Grupo Bandeirantes × Virtual Fans</small></div>
+  $('#top').innerHTML = `<a class="b-logo" href="/band/pass" title="Band"><img src="/band/assets/band-logo.svg" alt="Band"></a><div class="b-brand"><b>BAND <span>PLAYVERSE</span></b><small>Grupo Bandeirantes × Virtual Fans</small></div>
   <nav class="b-nav">${links.map(([h, l]) => `<a href="${h}" class="${active === h ? 'active' : ''}">${l}</a>`).join('')}</nav><span class="b-badge">Ambiente de demonstração · pagamentos simulados</span>`;
   $('#top').className = 'b-top';
   const ft = document.createElement('div'); ft.className = 'b-foot';
