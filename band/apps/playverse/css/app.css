@@ -153,3 +153,9 @@ tr.click{cursor:pointer}tr.click:hover td{background:#141a30}.num{text-align:rig
 
 /* modo embutido */
 .embed .top{display:none}.embed .bocol{grid-template-columns:1fr}.embed .side{display:none}.embed #app{height:100vh}
+
+/* responsivo (embutido no Intelligence Hub ou aberto no celular/tablet) */
+.embed .bh{display:none}
+.card{overflow-x:auto}
+@media (max-width:900px){.g4,.g5,.g6{grid-template-columns:1fr 1fr}.g3,.g21{grid-template-columns:1fr}.conns{grid-template-columns:1fr 1fr}.bc{padding:14px 14px 40px}}
+@media (max-width:560px){.g2,.g3,.g21,.conns,.rot,.frm{grid-template-columns:1fr}.g4,.g5,.g6{grid-template-columns:1fr 1fr}.bc{padding:12px 12px 40px}.card{padding:13px}table{font-size:12px}h1{font-size:20px}}

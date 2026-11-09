@@ -237,7 +237,7 @@ Traga de 2 a 3 insights, ordenados por impacto. Chaves de página válidas: ${pa
     if (t.dataset.scan) { scan(); return; }
     if (t.dataset.go) { goPage(t.dataset.go); app.classList.remove('bai-mob'); return; }
     if (t.dataset.pin) { const x = S.insights.find(y => y.id === t.dataset.pin); if (x) { x.pinned = !x.pinned; render(); } return; }
-    if (t.id === 'baiMin') { setOpen(false); return; }
+    if (t.id === 'baiMin') { if (window.matchMedia('(max-width:1180px)').matches) app.classList.remove('bai-mob'); else setOpen(false); return; }
     if (t.id === 'baiOpen1' || t.id === 'baiOpen2') { setOpen(true); return; }
     if (t.id === 'baiGo') { send(); return; }
     if (t.id === 'baiCopy') { const txt = S.insights.map(x => `• [${x.impacto}] ${x.titulo}${x.metrica ? ' (' + x.metrica + ')' : ''}: ${x.detalhe}${x.acao ? ' → ' + x.acao : ''}`).join('\n'); try { navigator.clipboard.writeText(txt); t.textContent = 'Copiado!'; } catch (er) {} return; }

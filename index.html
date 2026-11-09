@@ -160,7 +160,21 @@ nav.nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
 .view.active{ display:block; animation: fadein .25s ease; }
 /* Band: páginas servidas por /band/apps/ dentro do painel */
 .view.band-view{ padding:0; }
-.band-frame{ width:100%; height:calc(100vh - 78px); border:0; display:block; background:#090c18; }
+.band-frame{ width:100%; height:calc(100vh - var(--tbh, 78px)); height:calc(100dvh - var(--tbh, 78px)); border:0; display:block; background:#090c18; }
+/* Band: topo compacto e responsivo (o agente ocupa a coluna da direita) */
+body.bai-on .topbar h1{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+body.bai-on .topbar .subtitle{ display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+body.bai-on .topbar > div:nth-of-type(2){ min-width:0; flex:1; }
+@media (max-width:1500px){ body.bai-on .live-chip, body.bai-on #date-range-pill{ display:none; } }
+@media (max-width:1180px){ body.bai-on .topbar-actions .btn-primary{ padding:9px 12px; font-size:12px; } }
+@media (max-width:700px){
+  body.bai-on .topbar{ flex-wrap:nowrap; padding:10px 12px; gap:10px; }
+  body.bai-on .topbar-actions{ display:none; }
+  body.bai-on .topbar > div:first-of-type{ padding-right:10px !important; }
+  body.bai-on #topbar-club-name, body.bai-on #topbar-club-sub{ display:none; }
+  body.bai-on .topbar h1{ font-size:17px; }
+  body.bai-on .view.band-view{ padding:0; }
+}
 @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
 
 /* ---------- Grid / cards ---------- */
@@ -2508,6 +2522,10 @@ function toggleMobileSidebar(force){
 }
 
 /* ============ BAND · páginas do tenant de mídia ============ */
+(function(){
+  const tb = document.querySelector('.topbar'); if(!tb || !window.ResizeObserver) return;
+  new ResizeObserver(() => document.documentElement.style.setProperty('--tbh', tb.offsetHeight + 'px')).observe(tb);
+})();
 const BAND_APPS = { os:'/band/apps/os/?embed=1', pv:'/band/apps/playverse/?embed=1', hv:'/band/apps/historia-viva/', p3:'/band/apps/playverse-3/' };
 // Páginas públicas da Band (site do fã), abertas dentro do painel. Ficam na
 // mesma origem, então compras e resgates aparecem ao vivo no backoffice.
