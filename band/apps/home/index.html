@@ -6,7 +6,7 @@
 <title>Início · Intelligence Hub Band</title>
 <!-- Página inicial de cada papel no Intelligence Hub da Band (#ceo, #op, #mkt, #it).
      Abre dentro do painel /band/os depois do login por papel. Lê o mesmo núcleo
-     de dados do Band Playverse (perfis, eventos, conectores) e escuta o canal
+     de dados do Band Connect (perfis, eventos, conectores) e escuta o canal
      band-playverse-x, então reflete ao vivo o que acontece no app e no site. -->
 <style>
 :root{--bg:#090c18;--card:#121729;--card2:#0f1428;--line:#222a44;--txt:#e8ebf5;--mut:#8a93ae;--mut2:#5f6886;--pur:#7c6cff;--pur2:#a86bff;--grn:#2dd4a7;--yel:#fbbf4a;--red:#f05a6e;--blu:#5b8cff;--gold:#f5b82e}
@@ -66,7 +66,7 @@ const kpi = (l, v, d, w) => `<div class="card kpi"><small>${l}</small><b>${v}</b
 const pill = (t, c) => `<span class="pill p-${c}">${t}</span>`;
 
 const ROLES = {
-  ceo: { ic:'🎯', c1:'#2a2f7a', c2:'#7c6cff', who:'CEO · Diretoria executiva', h:'Visão executiva do Band Playverse',
+  ceo: { ic:'🎯', c1:'#2a2f7a', c2:'#7c6cff', who:'CEO · Diretoria executiva', h:'Visão executiva do Band Connect',
     p:'Como a Band cria, vende, opera e monetiza uma nova propriedade comercial digital: receita, cardápio comercial, anunciantes e as decisões da diretoria.',
     kpis: () => [kpi('Receita mensal potencial · Jogo Aberto', 'R$ 330 mil', 'R$ 3,96 mi/ano · bruto, após maturação'), kpi('Band · 50% do líquido', '≈ R$ 124 mil/mês', 'após tributos e custos (ilustrativo)'), kpi('Primeiro contrato', 'R$ 360 mil', 'ArenaBand Founding Partner · 90 dias', 1), kpi('Audiência participante', kk(all().length * scale()), 'Band ID · projeção')],
     left: () => `<div class="card"><h3>Decisões que dependem da diretoria <span class="r">memorando 09/10</span></h3>
@@ -121,7 +121,7 @@ function refresh(){
 async function brief(){
   const r = ROLES[role()] || ROLES.ceo, out = document.getElementById('briefTxt'), btn = document.getElementById('briefGo');
   btn.disabled = true; btn.textContent = 'Gerando…'; out.textContent = '';
-  const ctx = { papel: r.who, ...r.ctx(), plataforma: 'Band Playverse (Grupo Bandeirantes × Virtual Fans, by ClubBrain.ai)', grade_hoje: BP.PROGRAMS.filter(p => p.days.includes(nowSP().getDay()) && p.e).map(p => p.s + ' ' + p.n), regras: ['Todos os números são simulados para a proposta.', 'Nunca vender dado pessoal; só segmentos agregados com opt-in.', 'Minu e Vibra: integrações a contratar/validar.'] };
+  const ctx = { papel: r.who, ...r.ctx(), plataforma: 'Band Connect (Grupo Bandeirantes × Virtual Fans, by ClubBrain.ai)', grade_hoje: BP.PROGRAMS.filter(p => p.days.includes(nowSP().getDay()) && p.e).map(p => p.s + ' ' + p.n), regras: ['Todos os números são simulados para a proposta.', 'Nunca vender dado pessoal; só segmentos agregados com opt-in.', 'Minu e Vibra: integrações a contratar/validar.'] };
   const prompt = `Você é o agente do Intelligence Hub da Band. Escreva o briefing do dia para ${r.who}, em português do Brasil, com no máximo 5 tópicos curtos começando com "- ". Seja concreto e use os dados do contexto; não invente números fora dele e lembre que são simulados. Termine com uma linha "Próxima ação:" com UMA recomendação. Sem markdown além dos hífens.\n\nContexto:\n${JSON.stringify(ctx)}`;
   const t = await BP.llm(prompt, txt => { out.textContent = txt; });
   out.textContent = t || ({ ceo:'- Receita incremental projetada de R$ 2,31M em 6 meses após o MVP (simulado).\n- Exclusividade e divisão 50/50 × 60/40 seguem em aberto e travam o contrato.\n- MVP com Jogo Aberto e Os Donos da Bola é o caminho mais curto para a primeira cota.\nPróxima ação: fechar a entidade contratante e o prazo de exclusividade nesta semana.', op:'- Confira a grade de hoje e suba o QR dois minutos antes de cada bloco interativo.\n- Mantenha a fila de moderação abaixo de 5 itens durante o ao vivo.\n- Datas de Stock Car e Indy ainda precisam de confirmação.\nPróxima ação: aprovar a enquete do Apito Final.', mkt:'- A base com opt-in é o ativo vendável: só segmentos agregados.\n- Superfãs com opt-in e Cross-tela TV + rádio são os públicos mais valiosos para patrocinador.\n- A jornada "Da TV para o rádio" leva audiência para o 2º turno do Neto.\nPróxima ação: montar a campanha de Stock Car com o patrocinador de banco digital.', it:'- Conectores de experiência ativos; CRM, ERP e marketing simulados até a contratação.\n- Minu e Vibra Digital dependem de contrato e DPA.\n- Monitorar picos do ao vivo nos horários do Jogo Aberto e d’Os Donos da Bola.\nPróxima ação: agendar a validação da arquitetura com a Vibra Digital.' })[role()];

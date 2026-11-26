@@ -34,7 +34,7 @@ selecionada, o menu mostra só as páginas dela, nos modos Cockpit e Operacional
 
 | Pasta | O que é |
 |---|---|
-| `band/apps/playverse/` | Band Playverse: app do fã (programas, jogos em Phaser, Minu, LGPD) + backoffice (analytics, CDP, segmentos, marketing, Integration Hub, ERP, Media Ontology) |
+| `band/apps/playverse/` | Band Connect: app do fã (programas, jogos em Phaser, Minu, LGPD) + backoffice (analytics, CDP, segmentos, marketing, Integration Hub, ERP, Media Ontology) |
 | `band/apps/os/` | BandBrain OS: cockpit executivo, receita e inventário, programas e grade, governança 50/50 |
 | `band/apps/historia-viva/` | Demo da propriedade Pré-Jogo + História Viva |
 | `band/apps/playverse-3/` | Demo dos 3 programas simultâneos (Fan Arena, Desafio do Craque, MasterChef) |

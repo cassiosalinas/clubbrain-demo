@@ -1,4 +1,4 @@
-/* Band Playverse · núcleo: dados, barramento de eventos e pipeline (CDP → segmentos → marketing → ERP → ontologia) */
+/* Band Connect · núcleo: dados, barramento de eventos e pipeline (CDP → segmentos → marketing → ERP → ontologia) */
 (function(){
 const BP = window.BP = {};
 /* ---------- util ---------- */

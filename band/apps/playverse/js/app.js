@@ -1,4 +1,4 @@
-/* Band Playverse · shell: modos de visualização, Band AI, roteiro, QR */
+/* Band Connect · shell: modos de visualização, Band AI, roteiro, QR */
 (function(){
 const U = BP.u, $ = U.$, esc = U.esc;
 const APP_URL = "";
@@ -14,7 +14,7 @@ if (isPhone) {
   return;
 }
 let mode = U.ls.get("bpx-mode") || "pres";
-$("#app").innerHTML = `<header class="top"><div class="tbrand"><div class="mk">VF</div><div><b>BAND <span>PLAYVERSE</span></b><small>Demo funcional · Virtual Fans + ClubBrain.ai</small></div></div>
+$("#app").innerHTML = `<header class="top"><div class="tbrand"><div class="mk">VF</div><div><b>BAND <span>CONNECT</span></b><small>Demo funcional · Virtual Fans + ClubBrain.ai</small></div></div>
 <div class="modes">${[["pres", "Apresentação"], ["fan", "App do fã"], ["bo", "Backoffice"]].map(([k, l]) => `<button data-mode="${k}">${l}</button>`).join("")}</div><span class="sp"></span>
 <div class="seg" id="bots" title="Audiência simulada"><button data-l="0">Plateia: off</button><button data-l="1">baixa</button><button data-l="2">alta</button></div>
 <button class="hb" id="qrBtn">📱 Abrir no celular</button><button class="hb" id="rotBtn">Roteiro</button><button class="hb" id="rstBtn">Reiniciar</button></header>
@@ -55,7 +55,7 @@ $("#sugs").onclick = e => { const b = e.target.closest(".sug"); if (b) ask(b.tex
 $("#askF").onsubmit = e => { e.preventDefault(); const v = $("#askI").value; $("#askI").value = ""; ask(v); };
 async function ask(q) {
   if (!q.trim()) return; CHAT.push({ r: "u", t: q }); const m = { r: "a", t: "" }; CHAT.push(m); renderChat();
-  const sys = `Você é a Band AI, agente executivo da plataforma Band Playverse (Virtual Fans + ClubBrain.ai) para o Grupo Bandeirantes. Responda à diretoria da Band em português do Brasil, direto: no máximo 170 palavras, 3 a 5 tópicos iniciados por "- " e uma linha final "Próximo passo: ...". Use **negrito** só em números-chave. Cite fãs reais da sessão pelo nome quando ajudar. Use só os dados do contexto e diga quando algo é projeção ou simulação. Respeite as regras.\nCONTEXTO AO VIVO (JSON):\n${JSON.stringify(BP.BO.ctx())}`;
+  const sys = `Você é a Band AI, agente executivo da plataforma Band Connect (Virtual Fans + ClubBrain.ai) para o Grupo Bandeirantes. Responda à diretoria da Band em português do Brasil, direto: no máximo 170 palavras, 3 a 5 tópicos iniciados por "- " e uma linha final "Próximo passo: ...". Use **negrito** só em números-chave. Cite fãs reais da sessão pelo nome quando ajudar. Use só os dados do contexto e diga quando algo é projeção ou simulação. Respeite as regras.\nCONTEXTO AO VIVO (JSON):\n${JSON.stringify(BP.BO.ctx())}`;
   const hist = CHAT.slice(0, -1).slice(-5).map(x => ({ role: x.r === "u" ? "user" : "assistant", content: x.t || "-" }));
   const r = await BP.llm([{ role: "user", content: sys + "\n\nOk?" }, { role: "assistant", content: "Entendido." }, ...hist.slice(0, -1), { role: "user", content: q }], t => { m.t = t; renderChat(); });
   if (!r) { const c = BP.BO.ctx(); m.t = `**Leitura da sessão (modo offline)**\n- ${c.perfis_sessao} perfis, ${c.opt_in_pct}% com opt-in de marcas.\n- Programa com mais interações: ${Object.entries(c.interacoes_por_programa).sort((a, b) => b[1] - a[1])[0]?.[0] || "—"}.\n- ${c.resgates_minu} resgates Minu na sessão.\nPróximo passo: ativar o segmento "Fãs de velocidade" com o bolão da Stock Car.`; } else m.t = r;

@@ -1,4 +1,4 @@
-/* Band Playverse · app do fã */
+/* Band Connect · app do fã */
 (function(){
 const U = BP.u, S = BP.S, esc = U.esc, fmt = U.fmt;
 const CITIES = [["São Paulo", "SP", "Sudeste"], ["Campinas", "SP", "Sudeste"], ["Rio de Janeiro", "RJ", "Sudeste"], ["Belo Horizonte", "MG", "Sudeste"], ["Salvador", "BA", "Nordeste"], ["Recife", "PE", "Nordeste"], ["Fortaleza", "CE", "Nordeste"], ["Curitiba", "PR", "Sul"], ["Porto Alegre", "RS", "Sul"], ["Goiânia", "GO", "Centro-Oeste"], ["Belém", "PA", "Norte"]];
@@ -44,7 +44,7 @@ BP.Fan = function (root, opts = {}) {
   function pollBars(key, opts2, mine) { const live = S.polls[key] || {}; const v = opts2.map((_, i) => (BASE[key] ? BASE[key][i] || 20 : 20) + (live[i] || 0)); const t = v.reduce((a, b) => a + b, 0) || 1; return opts2.map((o, i) => `<button class="fop ${mine === i ? "me" : ""}" data-vote="${i}" ${mine != null ? "disabled" : ""}><i style="width:${mine != null ? v[i] / t * 100 : 0}%"></i><span>${esc(o)}</span>${mine != null ? `<b>${Math.round(v[i] / t * 100)}%</b>` : ""}</button>`).join(""); }
 
   /* ---------- telas ---------- */
-  function header() { return `<div class="fhd"><div class="flogo"><img src="/band/assets/band-logo.svg" alt="Band" style="width:46px;height:28px;vertical-align:middle;margin-right:8px">BAND <span>PLAYVERSE</span></div>${fan ? `<div class="fxp">${fmt(bal())} XP</div>` : ""}</div>`; }
+  function header() { return `<div class="fhd"><div class="flogo"><img src="/band/assets/band-logo.svg" alt="Band" style="width:46px;height:28px;vertical-align:middle;margin-right:8px">BAND <span>CONNECT</span></div>${fan ? `<div class="fxp">${fmt(bal())} XP</div>` : ""}</div>`; }
   function nav() { return fan ? `<nav class="fnav">${[["home", "🏠", "Início"], ["progs", "📺", "Programas"], ["games", "🎮", "Jogos"], ["wallet", "🎁", "Carteira"], ["me", "👤", "Perfil"]].map(([k, i, l]) => `<button data-tab="${k}" class="${tab === k ? "on" : ""}"><span>${i}</span>${l}</button>`).join("")}</nav>` : ""; }
   function render() {
     if (game && scr !== "game") { game.destroy(); game = null; }
@@ -150,7 +150,7 @@ BP.Fan = function (root, opts = {}) {
   function done(k) { fan.done[ctx.prog + ":" + k] = 1; save(); }
   async function historian(moment, text) {
     const fb = `Que memória, ${fan.name}! "${moment}" é o tipo de momento que o acervo da Band guarda com carinho. Sua lembrança entra agora na linha do tempo da História Viva, ao lado das imagens daquele dia. Quer ver o trecho?`;
-    const r = await BP.llm(`Você é o AI Historian do Band Playverse (quadro História Viva, Grupo Bandeirantes). Um torcedor do ${fan.team} contou uma memória. Momento: ${moment}. Relato: ${text || "(sem texto)"}. Responda em português do Brasil, em 2 ou 3 frases calorosas, como um narrador esportivo, chamando-o de ${fan.name}. Use só fatos amplamente conhecidos; se não tiver certeza de um detalhe, não cite. Termine convidando a ver o trecho do acervo da Band. Sem emojis nem markdown.`, t => { const el = root.querySelector("#hist"); if (el) el.textContent = t; }, "quick");
+    const r = await BP.llm(`Você é o AI Historian do Band Connect (quadro História Viva, Grupo Bandeirantes). Um torcedor do ${fan.team} contou uma memória. Momento: ${moment}. Relato: ${text || "(sem texto)"}. Responda em português do Brasil, em 2 ou 3 frases calorosas, como um narrador esportivo, chamando-o de ${fan.name}. Use só fatos amplamente conhecidos; se não tiver certeza de um detalhe, não cite. Termine convidando a ver o trecho do acervo da Band. Sem emojis nem markdown.`, t => { const el = root.querySelector("#hist"); if (el) el.textContent = t; }, "quick");
     return r || fb;
   }
 
