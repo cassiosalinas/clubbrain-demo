@@ -572,7 +572,8 @@ canvas{ max-width:100%; }
         <button type="button" class="la-row" data-u="OPE" data-p="Band"><b>OPE</b><span>Operações e produção</span><code>OPE · Band</code></button>
         <button type="button" class="la-row" data-u="MKT" data-p="Band"><b>MKT</b><span>Marketing e CRM</span><code>MKT · Band</code></button>
         <button type="button" class="la-row" data-u="IT" data-p="Band"><b>IT</b><span>TI, integrações e dados</span><code>IT · Band</code></button>
-        <button type="button" class="la-row fan" data-u="Fan" data-p="Band"><b>Fan</b><span>ArenaBand: games, enquetes, ranking</span><code>Fan · Band</code></button>
+        <button type="button" class="la-row fan" data-u="Fan" data-p="Band"><b>Fan</b><span>Site do Fã: games, interações, loja</span><code>Fan · Band</code></button>
+        <a class="la-row fan" href="https://demo.virtualfans.com.br/band/interface/" target="_blank" rel="noopener" style="text-decoration:none"><b>Arena</b><span>ArenaBand (Virtual Fans): jogos, enquetes, ranking</span><code>abrir ↗</code></a>
       </div>
     </div>
     <div class="login-access" data-club="vasco">
@@ -2419,7 +2420,7 @@ canvas{ max-width:100%; }
     if(only && box.dataset.club !== only) box.style.display = 'none';
   });
   // Lista de acessos da demo: clicar preenche usuário e senha.
-  document.querySelectorAll('.la-row').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.la-row[data-u]').forEach(b => b.addEventListener('click', () => {
     document.getElementById('login-user').value = b.dataset.u;
     document.getElementById('login-pass').value = b.dataset.p;
     document.getElementById('login-error').style.display = 'none';
@@ -2431,9 +2432,10 @@ canvas{ max-width:100%; }
     const pass = document.getElementById('login-pass').value;
     const errorEl = document.getElementById('login-error');
     // Perfis da Band: cada papel entra direto na Band com menu e página inicial próprios.
-    // Fã: abre a ArenaBand, a experiência do fã criada pelo time Virtual Fans.
+    // Fã: Site do Fã (/band/fan), acesso separado do Intelligence Hub. A ArenaBand (Virtual Fans) fica como opção ao lado.
     if (user.toLowerCase() === 'fan' && pass.toLowerCase() === 'band') {
-      window.location.href = ARENABAND_URL;
+      try { sessionStorage.setItem('band-fan-auth', '1'); } catch (e) {}
+      window.location.href = '/band/fan';
       return;
     }
     // Perfis por papel (CEO, OPE, MKT, IT): a senha define o tenant — Band ou Vasco.
