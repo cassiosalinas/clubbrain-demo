@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Band Commercial Studio · Intelligence Hub</title>
+<!-- Camada comercial da Band no Intelligence Hub (ClubBrain × Virtual Fans).
+     Telas (hash): #cockpit (Revenue Cockpit), #marketplace (cardápio comercial),
+     #jornada (jornada 360° de uma campanha), #anunciante (Advertiser Cockpit),
+     #oportunidades (IA monta a proposta), #bandid (Band ID: dado → inteligência →
+     oportunidade), #experiencias (propriedades e experiências), #roadmap
+     (integração ArenaBand ↔ ClubBrain).
+     Todos os valores são sugestões ilustrativas, não tabela comercial aprovada
+     pela Band. Resultado dividido 50/50 sobre o líquido distribuível, como na
+     proposta executiva de outubro. -->
+<style>
+:root{--bg:#090c18;--card:#121729;--card2:#0f1428;--line:#222a44;--txt:#e8ebf5;--mut:#8a93ae;--mut2:#5f6886;--pur:#7c6cff;--pur2:#a86bff;--grn:#2dd4a7;--yel:#fbbf4a;--red:#f05a6e;--blu:#5b8cff;--gold:#f5b82e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.5 Inter,system-ui,sans-serif;padding:22px 26px 60px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+h2{font-size:20px;letter-spacing:-.01em}h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}h3 .r{margin-left:auto;font-weight:500;color:var(--mut);font-size:12px}
+.intro{padding:14px 16px;border-radius:14px;border:1px solid rgba(124,108,255,.35);background:linear-gradient(135deg,rgba(124,108,255,.12),var(--card));color:#d5dbef;font-size:13.5px;margin-bottom:16px}
+.intro b{color:#fff}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g21{grid-template-columns:1.4fr 1fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;min-width:0}
+.kpi small{color:var(--mut);font-size:12px}.kpi b{display:block;font-size:24px;letter-spacing:-.01em;margin:2px 0}.kpi i{font-style:normal;font-size:12px;color:var(--grn)}.kpi.gold b{color:#ffd76a}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}.row:first-of-type{border-top:0}.row .t{flex:1;min-width:0}.row .t small{display:block;color:var(--mut);font-size:11.5px}
+.pill{padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.p-r{background:rgba(240,90,110,.16);color:#ff8ea0}.p-y{background:rgba(251,191,74,.16);color:var(--yel)}.p-g{background:rgba(45,212,167,.14);color:var(--grn)}.p-b{background:rgba(91,140,255,.16);color:#9db8ff}.p-m{background:rgba(255,255,255,.07);color:var(--mut)}.p-p{background:rgba(124,108,255,.18);color:#c4b8ff}
+.btn{padding:9px 14px;border-radius:10px;font-weight:700;font-size:13px;background:linear-gradient(135deg,var(--pur),var(--pur2));color:#fff;display:inline-flex;align-items:center;gap:6px}
+.btn.g{background:rgba(45,212,167,.15);color:var(--grn);border:1px solid rgba(45,212,167,.4)}.btn.o{background:var(--card2);border:1px solid var(--line);color:var(--txt)}
+.btn:disabled{opacity:.5}
+.bar{height:8px;border-radius:5px;background:#1b2140;overflow:hidden;flex:1}.bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--pur),var(--pur2))}
+.note{color:var(--mut2);font-size:11.5px;margin-top:12px}
+.sl{display:grid;grid-template-columns:1fr 120px;gap:4px 12px;align-items:center;margin:8px 0}.sl label{font-size:12.5px;color:var(--mut)}.sl b{text-align:right;font-size:13px}.sl input{grid-column:1/-1;width:100%;accent-color:var(--pur)}
+/* marketplace */
+.mk{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.prod{text-align:left;padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px;transition:.15s;position:relative}
+.prod:hover,.prod.on{border-color:var(--pur);background:linear-gradient(160deg,rgba(124,108,255,.14),var(--card))}
+.prod .e{font-size:22px}.prod b{font-size:14px}.prod small{color:var(--mut);font-size:12px}.prod .pr{font-size:19px;font-weight:800;color:#ffd76a;margin-top:6px}.prod .u{font-size:11.5px;color:var(--mut)}
+.prod .in{position:absolute;top:10px;right:10px}
+.det h2{margin:2px 0 4px}.det ul{padding-left:18px;margin:6px 0;color:#d5dbef;font-size:13px}.det li{margin:3px 0}
+/* jornada */
+.steps{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}.steps button{flex:1;min-width:120px;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card2);text-align:left;font-size:12px;color:var(--mut)}
+.steps button b{display:block;color:var(--txt);font-size:12.5px}.steps button.on{border-color:var(--pur);background:rgba(124,108,255,.14)}.steps button.done{border-color:rgba(45,212,167,.4)}.steps button.done b:after{content:" ✓";color:var(--grn)}
+.big{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.funnel .row b{width:90px;text-align:right}
+.tv{border-radius:14px;padding:16px;background:linear-gradient(135deg,#0f2150,#06102a);border:1px solid #2a3a6e;position:relative;overflow:hidden}
+.tv .lt{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:linear-gradient(90deg,#f5b82e,#ffcb03);color:#1a1200;font-weight:800;font-size:13px;display:flex;gap:10px;align-items:center}
+.qr{width:64px;height:64px;background:repeating-conic-gradient(#000 0 25%,#fff 0 50%) 0 0/16px 16px;border:4px solid #fff;border-radius:6px;flex:none}
+/* IA */
+.ai{border:1px solid rgba(45,212,167,.45);background:linear-gradient(135deg,rgba(45,212,167,.08),var(--card))}
+.ai .out{margin-top:12px;font-size:13.5px;color:#d5dbef}
+.typing{display:flex;gap:5px;padding:8px 0}.typing span{width:7px;height:7px;border-radius:50%;background:var(--grn);animation:t 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}@keyframes t{50%{opacity:.25}}
+.opt{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}.opt button{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card2);font-size:12.5px;color:var(--mut)}.opt button.on{border-color:var(--pur);color:#fff;background:rgba(124,108,255,.2)}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--mut);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:8px 8px;border-bottom:1px solid var(--line)}td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tw{overflow-x:auto}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.chain span{padding:6px 10px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:12.5px}.chain i{font-style:normal;color:var(--mut2)}
+.exp{display:flex;flex-direction:column;gap:6px}.exp .e{font-size:26px}
+a{color:#b9adff}
+@media(max-width:980px){.g4{grid-template-columns:1fr 1fr}.g3,.g2,.g21{grid-template-columns:1fr}body{padding:16px 14px 50px}}
+@media(max-width:560px){.g4{grid-template-columns:1fr}.big{font-size:26px}.steps button{min-width:46%}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="/band/apps/claude-shim.js"></script>
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+const kbrl = n => n >= 1e6 ? 'R$ ' + (n/1e6).toLocaleString('pt-BR',{maximumFractionDigits:2}) + ' mi' : n >= 1e3 ? 'R$ ' + (n/1e3).toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' mil' : brl(n);
+const fmt = n => Math.round(n).toLocaleString('pt-BR');
+const ARENA = 'https://demo.virtualfans.com.br/band/interface/';
+const go = k => { try { const el = parent.document.querySelector(`.role-nav[data-band="${k}"], .band-only-nav.nav-item[data-band="${k}"]`); if (el && parent !== window) { el.click(); return; } } catch(e){} location.hash = k.split(':')[1]; };
+
+/* ---------- estado salvo (business plan e proposta) ---------- */
+const KEY = 'band-commercial-v1';
+let ST; try { ST = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ ST = {}; }
+ST.bp = Object.assign({ naming:80000, ativ:8, ativP:15000, perf:1, perfP:100000, intel:3, intelP:10000, trib:15, custos:10 }, ST.bp || {});
+ST.cart = ST.cart || [];
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch(e){} };
+
+/* ---------- cardápio comercial (valores ilustrativos) ---------- */
+const P = [
+  { id:'naming', e:'🏟️', n:'Naming Rights', prop:'ArenaBand', price:80000, unit:'mensal', cob:'Mensal (contrato de 12 meses = R$ 960 mil)', kpi:'Alcance e exposição',
+    d:'Uma marca apresenta a ArenaBand por um período, com presença digital e chamadas aprovadas na TV.',
+    ent:['Marca na página principal da ArenaBand','Menções durante o Jogo Aberto','Identidade visual nos desafios','Presença no ranking','Relatório mensal de engajamento (ClubBrain)'] },
+  { id:'enquete', e:'🗳️', n:'Enquete ao vivo patrocinada', prop:'Jogo Aberto', price:15000, unit:'por edição', cob:'Por ativação (8 por mês = R$ 120 mil)', kpi:'Participação e lembrança de marca',
+    d:'A enquete do estúdio ("Foi pênalti?") ganha oferecimento. A marca participa da experiência, não só do intervalo.',
+    ent:['"Oferecimento" na enquete e no QR na tela','Chamada da apresentadora','Resultado ao vivo com a marca','Relatório de votos e perfil agregado'] },
+  { id:'desafio', e:'🎯', n:'Desafio patrocinado', prop:'Os Donos da Bola', price:20000, unit:'por campanha', cob:'Por campanha', kpi:'Participantes e taxa de conclusão',
+    d:'"Desafie o Neto": duelo de opiniões, desafios entre torcidas e recompensas com a marca.',
+    ent:['Desafio com nome da marca','Recompensa patrocinada (Minu)','Ranking da campanha','Relatório de participação'] },
+  { id:'prejogo', e:'⚽', n:'Pré-Jogo Band', prop:'Clássicos e grandes jogos', price:40000, unit:'por clássico', cob:'Por jogo (pacote de temporada)', kpi:'Audiência antes do jogo e engajamento',
+    d:'A Band pode não ter os 90 minutos, mas tem tudo antes deles: história do clássico, voz do torcedor e experiências na cidade.',
+    ent:['Cota master do pré-jogo digital','Conteúdo "História do Clássico"','Ativação nas cidades','Bolão do clássico com a marca'] },
+  { id:'historia', e:'📼', n:'História Viva · coleção', prop:'Acervo Band', price:50000, unit:'mensal', cob:'Mensal', kpi:'Tempo de consumo e visitas ao acervo',
+    d:'Patrocínio de coleções do maior acervo do esporte brasileiro: grandes jogos, ídolos, narrações e quiz de nostalgia. Receita o ano todo, sem depender de direitos de transmissão.',
+    ent:['Coleção "apresentada por"','Quiz de nostalgia com a marca','Experiência premium do acervo','Relatório de consumo por clube'] },
+  { id:'gincana', e:'🏆', n:'Gincana das Torcidas', prop:'Causas e cidades', price:60000, unit:'por temporada', cob:'Por temporada', kpi:'Impacto social e engajamento das torcidas',
+    d:'Rivalidade que transforma: torcidas acumulam pontos com ações reais (meio ambiente, combate à fome, educação, saúde). Patrocínio de impacto (ESG).',
+    ent:['Marca da causa na gincana','Ranking ao vivo na TV','Ações nas cidades dos clubes','Relatório de impacto'] },
+  { id:'leads', e:'📈', n:'Geração de leads', prop:'Todos os programas', price:35, unit:'por lead validado', cob:'CPL (+ valor fixo da campanha)', kpi:'Leads qualificados e autorizados',
+    d:'Durante o programa, o apresentador anuncia um desafio. Adultos interessados pedem contato da marca, com consentimento.',
+    ent:['Oferta integrada ao desafio','Formulário com consentimento LGPD','Entrega de leads ao CRM do anunciante','Atribuição de conversão (ClubBrain)'] },
+  { id:'rewards', e:'🛍️', n:'Commerce & Rewards', prop:'Band Pass', price:10, unit:'% por venda', cob:'Comissão sobre vendas e resgates', kpi:'Vendas e resgates',
+    d:'Cupons, vouchers e benefícios via Minu dentro do Band Pass. A Band ganha sobre cada transação.',
+    ent:['Oferta no clube de benefícios','Cupom rastreável','Relatório de resgates e vendas'] },
+  { id:'research', e:'🔬', n:'Audience Research', prop:'ClubBrain', price:25000, unit:'por estudo', cob:'Por estudo', kpi:'Insights entregues',
+    d:'Inteligência de audiência e consumo com dados agregados e anonimizados. A Band vende inteligência, não dado pessoal.',
+    ent:['Mapa das torcidas por região','Afinidade com categorias de produto','Recomendações de ativação'] },
+  { id:'chef', e:'👨‍🍳', n:'Chef Challenge', prop:'MasterChef', price:30000, unit:'por campanha', cob:'Por campanha', kpi:'Participação e conversão de cupons',
+    d:'Caixa misteriosa, receitas com IA, ranking e ofertas de produtos da marca.',
+    ent:['Desafio com ingredientes da marca','Receitas geradas com IA','Cupons de compra','Ranking de participantes'] },
+  { id:'cockpit', e:'📊', n:'Advertiser Cockpit', prop:'ClubBrain', price:10000, unit:'mensal por anunciante', cob:'Licença mensal', kpi:'ROI da campanha',
+    d:'Portal exclusivo do anunciante: público impactado, leads, conversões e recomendações de IA.',
+    ent:['Acesso ao Advertiser Cockpit','Acompanhamento de campanhas','Recomendações de IA'] }
+];
+let sel = 'naming';
+
+/* ---------- business plan ---------- */
+function plan(){
+  const b = ST.bp, ativ = b.ativ * b.ativP, perf = b.perf * b.perfP, intel = b.intel * b.intelP;
+  const bruto = b.naming + ativ + perf + intel, trib = bruto * b.trib / 100, cust = bruto * b.custos / 100, liq = bruto - trib - cust;
+  return { naming:b.naming, ativ, perf, intel, bruto, trib, cust, liq, band: liq/2, vf: liq/2 };
+}
+
+/* ---------- telas ---------- */
+const V = {};
+V.cockpit = () => { const p = plan(), b = ST.bp;
+  return `<div class="intro"><b>Band Revenue Cockpit.</b> Quanto a nova camada comercial gera para a Band. O piloto começa só no <b>Jogo Aberto</b>; o resultado é dividido <b>50/50 sobre o líquido distribuível</b> (depois de tributos e custos diretos), como na proposta executiva de outubro. Ajuste as premissas.</div>
+  <div class="grid g4">
+    <div class="card kpi gold"><small>Receita mensal bruta · Jogo Aberto</small><b>${kbrl(p.bruto)}</b><i>${kbrl(p.bruto*12)} por ano</i></div>
+    <div class="card kpi"><small>Resultado líquido distribuível</small><b>${kbrl(p.liq)}</b><i>após ${b.trib}% tributos e ${b.custos}% custos</i></div>
+    <div class="card kpi gold"><small>Band · 50% do líquido</small><b>${kbrl(p.band)}</b><i>${kbrl(p.band*12)} por ano</i></div>
+    <div class="card kpi"><small>VF + ClubBrain · 50%</small><b>${kbrl(p.vf)}</b><i>${kbrl(p.vf*12)} por ano</i></div>
+  </div>
+  <div class="grid g21" style="margin-top:14px">
+    <div class="card"><h3>Business plan · somente o Jogo Aberto <span class="r">simulação mensal editável</span></h3>
+      ${sl('naming','Naming rights (R$/mês)',0,150000,5000,brl(b.naming))}
+      ${sl('ativ','Ativações patrocinadas por mês (R$ '+fmt(b.ativP)+' cada)',0,20,1,b.ativ)}
+      ${sl('perf','Campanhas de performance por mês (R$ '+fmt(b.perfP)+' cada)',0,5,1,b.perf)}
+      ${sl('intel','Licenças de inteligência (R$ '+fmt(b.intelP)+' cada)',0,15,1,b.intel)}
+      ${sl('trib','Tributos (%) · ilustrativo',0,30,1,b.trib+'%')}
+      ${sl('custos','Custos diretos: recompensas Minu, plataforma, operação (%)',0,30,1,b.custos+'%')}
+      <p class="note">Receita potencial após maturação. Supõe inventários distintos, sem dupla contagem. Valores sugeridos, não tabela comercial aprovada pela Band.</p></div>
+    <div class="card"><h3>Composição da receita</h3>
+      ${[['Naming rights',p.naming],['Ativações patrocinadas',p.ativ],['Performance (leads)',p.perf],['Inteligência (licenças)',p.intel]].map(([n,v]) => `<div class="row"><div class="t">${n}</div><div class="bar" style="max-width:110px"><i style="width:${p.bruto ? v/p.bruto*100 : 0}%"></i></div><b style="width:84px;text-align:right">${kbrl(v)}</b></div>`).join('')}
+      <div class="row"><div class="t"><b>Receita bruta</b></div><b>${kbrl(p.bruto)}</b></div>
+      <div class="row"><div class="t">(−) Tributos</div><b style="color:#ff8ea0">${kbrl(p.trib)}</b></div>
+      <div class="row"><div class="t">(−) Custos diretos</div><b style="color:#ff8ea0">${kbrl(p.cust)}</b></div>
+      <div class="row"><div class="t"><b>Líquido distribuível</b></div><b>${kbrl(p.liq)}</b></div>
+      <div class="row"><div class="t">Band (50%)</div><b style="color:#ffd76a">${kbrl(p.band)}</b></div>
+      <div class="row"><div class="t">VF + ClubBrain (50%)</div><b>${kbrl(p.vf)}</b></div></div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><h3>Primeiro contrato · ArenaBand Founding Partner <span class="r">90 dias</span></h3>
+      ${[['Naming rights · 3 meses',240000],['6 desafios patrocinados',90000],['Inteligência de audiência',30000]].map(([n,v]) => `<div class="row"><div class="t">${n}</div><b>${brl(v)}</b></div>`).join('')}
+      <div class="row"><div class="t"><b>Total do piloto</b><small>um patrocinador fundador financia o MVP de 90 dias</small></div><b style="font-size:18px;color:#ffd76a">R$ 360.000</b></div>
+      <div style="display:flex;align-items:flex-end;gap:10px;height:110px;margin-top:12px">${[120,240,360].map((v,i) => `<div style="flex:1;text-align:center"><div style="height:${v/360*80}px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#a86bff,#7c6cff)"></div><small style="color:var(--mut)">Mês ${i+1} · ${kbrl(v*1000)}</small></div>`).join('')}</div></div>
+    <div class="card"><h3>Da audiência ao valor</h3>
+      ${[['📺','Audiência','TV, BandSports e digital'],['📱','Conexão','QR e call to action na tela'],['🎮','ArenaBand','conteúdo, games e comunidade'],['🙋','Interação','vota, joga, participa'],['🪪','Identificação','Band ID com consentimento'],['🧠','Conhecimento','segmentos e insights (ClubBrain)'],['💰','Valor','patrocínios, leads, vendas e receitas']].map(([e,a,b],i) => `<div class="row"><span style="width:26px;text-align:center">${e}</span><div class="t"><b>${i+1}. ${a}</b><small>${b}</small></div></div>`).join('')}
+      <p class="note">A TV gera atenção. O digital transforma atenção em relacionamento, e o relacionamento em receita.</p></div>
+  </div>`; };
+function sl(k,l,min,max,step,show){ return `<div class="sl"><label>${l}</label><b id="v_${k}">${show}</b><input type="range" min="${min}" max="${max}" step="${step}" value="${ST.bp[k]}" data-bp="${k}"></div>`; }
+
+V.marketplace = () => { const p = P.find(x => x.id === sel), inCart = ST.cart.includes(sel);
+  const total = ST.cart.map(id => P.find(x => x.id === id)).filter(x => x && x.unit !== '% por venda' && x.unit !== 'por lead validado').reduce((a,x) => a + x.price, 0);
+  return `<div class="intro"><b>Band Commercial Marketplace.</b> O cardápio que a Band poderá vender: escolha uma propriedade para ver entregáveis, modelo de cobrança e o indicador que o anunciante acompanha. Monte uma proposta e peça à IA para estruturá-la.</div>
+  <div class="grid g21"><div class="mk">${P.map(x => `<button class="prod ${x.id===sel?'on':''}" data-p="${x.id}">${ST.cart.includes(x.id)?'<span class="pill p-g in">na proposta</span>':''}<span class="e">${x.e}</span><b>${esc(x.n)}</b><small>${esc(x.prop)}</small><span class="pr">${x.unit==='% por venda' ? x.price+'%' : brl(x.price)}</span><span class="u">${esc(x.unit)}</span></button>`).join('')}</div>
+  <div class="card det" style="align-self:start"><span class="pill p-p">${esc(p.prop)}</span><h2>${p.e} ${esc(p.n)}</h2><p style="color:#c9d0e6;font-size:13.5px">${esc(p.d)}</p>
+    <div class="row"><div class="t">Preço sugerido</div><b style="color:#ffd76a">${p.unit==='% por venda' ? p.price+'%' : brl(p.price)} <small style="color:var(--mut);font-weight:500">${esc(p.unit)}</small></b></div>
+    <div class="row"><div class="t">Modelo de cobrança</div><b>${esc(p.cob)}</b></div>
+    <div class="row"><div class="t">Indicador para o anunciante</div><b>${esc(p.kpi)}</b></div>
+    <h3 style="margin-top:12px">Entregáveis</h3><ul>${p.ent.map(e => `<li>${esc(e)}</li>`).join('')}</ul>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn ${inCart?'o':''}" data-cart="${p.id}">${inCart ? 'Remover da proposta' : '+ Adicionar à proposta'}</button>${p.id==='leads' ? '<button class="btn o" data-go="com:jornada">Ver jornada Fiat</button>' : ''}${p.id==='naming'||p.id==='enquete' ? `<a class="btn o" href="${ARENA}" target="_blank" rel="noopener">Ver na ArenaBand ↗</a>` : ''}</div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)"><h3>Proposta em montagem <span class="r">${ST.cart.length} item(ns)</span></h3>
+      ${ST.cart.length ? ST.cart.map(id => { const x = P.find(y => y.id === id); return `<div class="row"><div class="t">${x.e} ${esc(x.n)}</div><b>${x.unit==='% por venda' ? x.price+'%' : brl(x.price)}</b></div>`; }).join('') + `<div class="row"><div class="t"><b>Valor fixo estimado</b><small>sem leads e comissões variáveis</small></div><b style="color:#ffd76a">${brl(total)}</b></div><button class="btn g" data-go="com:oportunidades" style="margin-top:8px">✦ Estruturar proposta com IA</button>` : '<p style="color:var(--mut);font-size:13px">Adicione propriedades para montar a proposta.</p>'}</div>
+  </div></div><p class="note">Todos os valores são sugestões ilustrativas, não uma tabela comercial aprovada pela Band.</p>`; };
+
+const J = [
+  ['Contratação','Venda da campanha'],['Na TV','Renata anuncia o desafio'],['ArenaBand','Participação com QR'],['Interesse','Lead com consentimento'],['Conversão','Test-drive e venda'],['Resultado','Receita para a Band']
+];
+let js = 0;
+V.jornada = () => {
+  const body = [
+    `<div class="grid g2"><div class="card"><h3>Venda da campanha</h3>${[['Anunciante','Fiat (exemplo hipotético)'],['Propriedade','Jogo Aberto · Desafio da Rodada'],['Objetivo','Interessados em test-drive'],['Patrocínio fixo','R$ 30.000'],['Lead qualificado','R$ 35 por lead'],['Período','4 semanas']].map(([a,b]) => `<div class="row"><div class="t">${a}</div><b>${b}</b></div>`).join('')}</div>
+     <div class="card"><h3>O que acontece no sistema</h3><div class="row"><div class="t">Proposta registrada no Commercial Studio<small>condições, inventário e período</small></div><span class="pill p-g">OK</span></div><div class="row"><div class="t">Inventário reservado no Jogo Aberto<small>sem conflito com outras cotas</small></div><span class="pill p-g">OK</span></div><div class="row"><div class="t">Pedido e contrato enviados ao ERP<small>conector agnóstico</small></div><span class="pill p-b">Integração</span></div></div></div>`,
+    `<div class="grid g2"><div class="tv"><small style="color:#aab6d6">JOGO ABERTO · AO VIVO</small><h2 style="margin:6px 0 4px">"Desafio da Rodada — Fiat"</h2><p style="color:#c9d0e6;font-size:13px;margin-bottom:60px">Renata Fan convida o público: acerte o placar do Dérbi e concorra a um test-drive exclusivo.</p><div class="lt"><div class="qr"></div><div>Aponte a câmera e participe na ArenaBand<br><small style="font-weight:600">Oferecimento Fiat</small></div></div></div>
+     <div class="card"><h3>Ativação na TV</h3><div class="row"><div class="t">Chamada aprovada pela produção<small>roteiro e tempo de tela</small></div><span class="pill p-g">Aprovado</span></div><div class="row"><div class="t">QR na tela por 90 segundos</div><b>12,4 mil acessos</b></div><div class="row"><div class="t">Controle no Estúdio Band (ArenaBand)</div><a class="btn o" href="${ARENA}#gestao" target="_blank" rel="noopener">Abrir ↗</a></div></div></div>`,
+    `<div class="grid g2"><div class="card funnel"><h3>Participação na ArenaBand</h3>${[['Acessos à campanha',50000],['Participantes cadastrados',25000],['Jogaram o desafio',19800]].map(([a,v]) => `<div class="row"><div class="t">${a}</div><div class="bar" style="max-width:140px"><i style="width:${v/500}%"></i></div><b>${fmt(v)}</b></div>`).join('')}</div>
+     <div class="card"><h3>Experiência do torcedor</h3><p style="color:#c9d0e6;font-size:13.5px">O torcedor entra pela ArenaBand, dá o palpite, sobe no ranking e ganha pontos. A marca aparece no desafio, no ranking e na recompensa.</p><a class="btn o" style="margin-top:10px" href="${ARENA}" target="_blank" rel="noopener">Ver a ArenaBand ↗</a></div></div>`,
+    `<div class="grid g2"><div class="card funnel"><h3>Interesse e consentimento</h3>${[['Interesse declarado na oferta',5000],['Leads qualificados e autorizados',2000]].map(([a,v]) => `<div class="row"><div class="t">${a}</div><div class="bar" style="max-width:140px"><i style="width:${v/50}%"></i></div><b>${fmt(v)}</b></div>`).join('')}<p class="note">Só adultos, com consentimento por finalidade (LGPD). A marca recebe o lead que autorizou; o restante fica em dado agregado.</p></div>
+     <div class="card"><h3>O que a ClubBrain registra</h3><div class="chain"><span>Origem: Jogo Aberto</span><i>→</i><span>Desafio da Rodada</span><i>→</i><span>Interesse: test-drive</span><i>→</i><span>Consentimento v1.3</span><i>→</i><span>Lead no CRM Fiat</span></div></div></div>`,
+    `<div class="grid g4"><div class="card kpi"><small>Leads qualificados</small><b>2.000</b><i>entregues ao CRM</i></div><div class="card kpi"><small>Test-drives agendados</small><b>320</b><i>16% dos leads</i></div><div class="card kpi"><small>Veículos vendidos</small><b>48</b><i>15% dos test-drives</i></div><div class="card kpi gold"><small>Vendas atribuídas</small><b>R$ 7,2 mi</b><i>custo por venda R$ 2.083</i></div></div><p class="note">Os indicadores de venda dependem da integração com o CRM do anunciante.</p>`,
+    (() => { const fixo = 30000, var_ = 2000*35, bruto = fixo+var_, liq = bruto*(1-(ST.bp.trib+ST.bp.custos)/100);
+      return `<div class="grid g2"><div class="card"><h3>Receita da campanha</h3><div class="row"><div class="t">Valor fixo</div><b>${brl(fixo)}</b></div><div class="row"><div class="t">2.000 leads × R$ 35</div><b>${brl(var_)}</b></div><div class="row"><div class="t"><b>Receita bruta</b></div><b class="big" style="font-size:24px;color:#ffd76a">${brl(bruto)}</b></div><div class="row"><div class="t">Líquido distribuível (−${ST.bp.trib+ST.bp.custos}%)</div><b>${brl(liq)}</b></div><div class="row"><div class="t">Band · 50%</div><b style="color:#ffd76a">${brl(liq/2)}</b></div><div class="row"><div class="t">VF + ClubBrain · 50%</div><b>${brl(liq/2)}</b></div></div>
+      <div class="card"><h3>Para o anunciante</h3><div class="row"><div class="t">Investimento total</div><b>${brl(bruto)}</b></div><div class="row"><div class="t">Vendas atribuídas</div><b>R$ 7,2 mi</b></div><div class="row"><div class="t">Custo por venda</div><b>R$ 2.083</b></div><p style="color:#c9d0e6;font-size:13.5px;margin-top:10px">O modelo se repete para bancos, seguradoras, varejo e educação. Cada campanha alimenta a próxima com dados.</p><button class="btn" style="margin-top:10px" data-go="com:anunciante">Abrir Advertiser Cockpit</button></div></div>`; })()
+  ][js];
+  return `<div class="intro"><b>ArenaBand · Jornada comercial 360°.</b> Uma campanha do começo ao fim: da venda ao resultado financeiro. Campanha Fiat no Jogo Aberto, simulada.</div>
+  <div class="steps">${J.map(([a,b],i) => `<button class="${i===js?'on':''} ${i<js?'done':''}" data-js="${i}"><b>${i+1}. ${a}</b>${b}</button>`).join('')}</div>
+  ${body}
+  <div style="display:flex;justify-content:space-between;margin-top:14px"><button class="btn o" data-js="${Math.max(0,js-1)}" ${js===0?'disabled':''}>← Anterior</button><span style="color:var(--mut);font-size:12.5px;align-self:center">Etapa ${js+1} de 6</span><button class="btn" data-js="${Math.min(5,js+1)}" ${js===5?'disabled':''}>Próxima etapa →</button></div>
+  <p class="note">Todos os valores e resultados são simulados. Não representam uma campanha contratada.</p>`; };
+
+const ADV = { fiat:['Fiat · Desafio da Rodada (exemplo)',50000,2000,320,48,7.2e6,'test-drives agendados','veículos vendidos'], banco:['Banco digital · Conta do torcedor (exemplo)',42000,3100,1240,610,0,'contas abertas','cartões ativos'], seguro:['Seguradora · Cotação no intervalo (exemplo)',36000,2400,560,140,0,'cotações','apólices'] };
+let adv = 'fiat';
+V.anunciante = () => { const a = ADV[adv];
+  return `<div class="intro"><b>Band Advertiser Cockpit.</b> O portal que o anunciante recebe: o que a campanha entregou, onde converteu e o que fazer na próxima. Operado pela ClubBrain; dados pessoais não saem da Band, só os leads autorizados.</div>
+  <div class="opt">${Object.entries(ADV).map(([k,v]) => `<button class="${k===adv?'on':''}" data-adv="${k}">${esc(v[0].split(' · ')[0])}</button>`).join('')}</div>
+  <h2 style="margin-bottom:10px">${esc(a[0])}</h2>
+  <div class="grid g4"><div class="card kpi"><small>Público impactado</small><b>${fmt(a[1])}</b></div><div class="card kpi"><small>Leads qualificados</small><b>${fmt(a[2])}</b></div><div class="card kpi"><small>${esc(a[6])}</small><b>${fmt(a[3])}</b></div><div class="card kpi gold"><small>${esc(a[7])}</small><b>${fmt(a[4])}</b>${a[5] ? `<i>R$ 7,2 mi em vendas atribuídas</i>` : '<i>via CRM do anunciante</i>'}</div></div>
+  <div class="grid g2" style="margin-top:14px"><div class="card"><h3>Interessados por região</h3>${[['Sudeste',52],['Sul',21],['Nordeste',15],['Centro-Oeste',8],['Norte',4]].map(([r,v]) => `<div class="row"><div class="t">${r}</div><div class="bar" style="max-width:180px"><i style="width:${v*1.8}%"></i></div><b style="width:40px;text-align:right">${v}%</b></div>`).join('')}</div>
+  <div class="card ai"><h3>✦ ClubBrain AI · recomendação</h3><p style="color:#d5dbef;font-size:13.5px">Concentrar a próxima campanha nas regiões com maior conversão comprovada (Sudeste e Sul) e reativar os interessados que ainda não chegaram à etapa final, com uma oferta no Jogo Aberto de segunda-feira.</p><div class="row" style="margin-top:8px"><div class="t">Licença do cockpit</div><b>R$ 10 mil/mês</b></div><p class="note">Ilustrativo. Indicadores de venda dependem da integração com o CRM do anunciante.</p></div></div>`; };
+
+const SEG = { montadora:'Montadora', banco:'Banco digital', seguradora:'Seguradora', varejo:'Varejo / supermercado', educacao:'Educação', delivery:'Delivery / alimentação', bebida:'Bebidas' };
+const OBJ = { awareness:'Lembrança de marca', leads:'Geração de leads', vendas:'Vendas e conversão', esg:'Impacto social (ESG)' };
+let seg = 'banco', obj = 'leads', budget = 300000, aiOut = null, aiBusy = false;
+V.oportunidades = () => `<div class="intro"><b>✦ Momento WOW · a IA monta a proposta.</b> Escolha o tipo de anunciante, o objetivo e a verba. O agente cruza o cardápio comercial, a grade, a audiência agregada e o histórico de campanhas e devolve uma proposta pronta para o comercial da Band: mix de produtos, programas, público, projeção e a fala do apresentador.</div>
+  <div class="grid g21"><div class="card ai">
+    <h3>Anunciante</h3><div class="opt">${Object.entries(SEG).map(([k,v]) => `<button class="${k===seg?'on':''}" data-seg="${k}">${v}</button>`).join('')}</div>
+    <h3>Objetivo</h3><div class="opt">${Object.entries(OBJ).map(([k,v]) => `<button class="${k===obj?'on':''}" data-obj="${k}">${v}</button>`).join('')}</div>
+    <div class="sl"><label>Verba da campanha</label><b id="v_budget">${brl(budget)}</b><input type="range" min="50000" max="1500000" step="50000" value="${budget}" id="budget"></div>
+    ${ST.cart.length ? `<p style="font-size:12.5px;color:var(--mut)">Partindo da proposta em montagem: ${ST.cart.map(id => P.find(x => x.id===id).n).join(', ')}.</p>` : ''}
+    <button class="btn g" id="aiGo" ${aiBusy?'disabled':''} style="margin-top:6px">${aiBusy ? 'Montando…' : '✦ Gerar proposta com IA'}</button>
+    <div class="out" id="aiOut">${aiBusy ? '<div class="typing"><span></span><span></span><span></span></div>' : aiOut ? renderPlan(aiOut) : ''}</div></div>
+  <div class="card"><h3>Oportunidades detectadas agora</h3>${[
+    ['Banco digital','Superfãs com opt-in no Jogo Aberto (28 mil) têm alta participação em desafios de palpite','alto','com:marketplace'],
+    ['Montadora','Leads de test-drive convertem 2× mais no Sudeste e Sul','alto','com:anunciante'],
+    ['Supermercado','Fãs de "Futebol + culinária" cruzam Jogo Aberto e MasterChef','medio','com:marketplace'],
+    ['Seguradora','Clássicos no fim de semana concentram o maior pico de participação','medio','com:experiencias'],
+    ['Marca de bebidas','Pré-Jogo dos clássicos sem cota master vendida','alto','com:experiencias'],
+    ['ESG / institucional','Gincana das Torcidas ainda sem patrocinador de causa','baixo','com:experiencias']
+  ].map(([a,b,c,k]) => `<div class="row"><div class="t"><b>${a}</b><small>${b}</small></div><span class="pill ${c==='alto'?'p-r':c==='medio'?'p-y':'p-g'}">${c==='alto'?'Alto':c==='medio'?'Médio':'Baixo'}</span><button class="btn o" style="padding:5px 9px;font-size:11.5px" data-go="${k}">Abrir</button></div>`).join('')}
+  <p class="note">Oportunidades calculadas com dados agregados e simulados.</p></div></div>`;
+function renderPlan(j){
+  if (typeof j === 'string') return `<p style="white-space:pre-wrap">${esc(j)}</p>`;
+  return `<h2 style="margin:4px 0 6px">${esc(j.titulo || 'Proposta')}</h2><p>${esc(j.resumo || '')}</p>
+  <h3 style="margin-top:12px">Mix recomendado</h3>${(j.mix||[]).map(m => `<div class="row"><div class="t"><b>${esc(m.produto)}</b><small>${esc(m.programa || '')}${m.porque ? ' · ' + esc(m.porque) : ''}</small></div><b>${esc(m.valor || '')}</b></div>`).join('')}
+  <div class="grid g3" style="margin-top:10px">${(j.projecao||[]).slice(0,3).map(k => `<div class="card kpi" style="padding:12px"><small>${esc(k.nome)}</small><b style="font-size:19px">${esc(k.valor)}</b></div>`).join('')}</div>
+  ${j.publico ? `<p style="margin-top:10px"><b>Público:</b> ${esc(j.publico)}</p>` : ''}
+  ${j.receita_band ? `<p><b>Receita para a Band (50% do líquido):</b> ${esc(j.receita_band)}</p>` : ''}
+  ${j.chamada ? `<div class="tv" style="margin-top:12px;padding-bottom:16px"><small style="color:#aab6d6">FALA SUGERIDA PARA O APRESENTADOR</small><p style="margin-top:6px;font-size:14px">"${esc(j.chamada)}"</p></div>` : ''}
+  <p class="note">Proposta gerada por IA com dados simulados. Revisar com o comercial da Band antes de enviar.</p>`;
+}
+async function gen(){
+  aiBusy = true; aiOut = null; render();
+  const cat = P.map(p => `${p.n} (${p.prop}): ${p.unit==='% por venda' ? p.price+'%' : 'R$ '+fmt(p.price)} ${p.unit}`).join('; ');
+  const prompt = `Você é o agente comercial do Intelligence Hub da Band (Band Playverse: Grupo Bandeirantes × Virtual Fans × ClubBrain). Monte uma proposta comercial para um anunciante do segmento "${SEG[seg]}", objetivo "${OBJ[obj]}", verba de R$ ${fmt(budget)}.
+Use SOMENTE este cardápio (valores ilustrativos): ${cat}.
+Programas: Jogo Aberto (Renata Fan, seg-sex 11h-13h, enquetes e palpites na ArenaBand), Os Donos da Bola (Neto, 13h-14h30, desafios), Show do Esporte (domingo), Pré-Jogo de clássicos, História Viva (acervo), MasterChef (gastronomia), Gincana das Torcidas (causas).
+${ST.cart.length ? 'Partir destes itens já escolhidos: ' + ST.cart.map(id => P.find(x => x.id===id).n).join(', ') + '.' : ''}
+Regras: respeite a verba; resultado da Band = 50% do líquido distribuível depois de 25% de tributos e custos; nunca venda dado pessoal (só segmentos agregados e leads com consentimento de adultos); números são projeções simuladas.
+Responda SOMENTE com JSON válido, sem cercas de código: {"titulo":"...","resumo":"2 frases","mix":[{"produto":"nome do cardápio","programa":"...","valor":"R$ ...","porque":"curto"}],"publico":"segmento agregado","projecao":[{"nome":"...","valor":"..."},{"nome":"...","valor":"..."},{"nome":"...","valor":"..."}],"receita_band":"R$ ... (explique a conta em poucas palavras)","chamada":"fala de até 25 palavras para o apresentador"}`;
+  let out = null;
+  try {
+    const s = await claude.use('sample');
+    if (s) { const r = await s([{ role:'user', content: prompt }]); const t = (r && r.text) || ''; try { out = JSON.parse(t.slice(t.indexOf('{'), t.lastIndexOf('}')+1)); } catch(e) { out = t || null; } }
+  } catch(e) { out = null; }
+  if (!out) { const liq = budget*0.75; out = { titulo:`${SEG[seg]} no Jogo Aberto`, resumo:'Proposta montada com o cardápio da Band (modo offline). Combina presença de marca na ArenaBand com uma ativação ao vivo e mensuração no Advertiser Cockpit.', mix:[{produto:'Enquete ao vivo patrocinada',programa:'Jogo Aberto',valor:'R$ 60.000 (4 edições)',porque:'participação ao vivo'},{produto:'Desafio patrocinado',programa:'Os Donos da Bola',valor:'R$ 20.000',porque:'engajamento entre torcidas'},{produto:'Geração de leads',programa:'Jogo Aberto',valor:'R$ 35 por lead',porque:'resultado mensurável'},{produto:'Advertiser Cockpit',programa:'ClubBrain',valor:'R$ 10.000/mês',porque:'ROI da campanha'}], publico:'Fãs adultos com opt-in de marketing no Sudeste e Sul', projecao:[{nome:'Participantes',valor:'25 mil'},{nome:'Leads autorizados',valor:'2 mil'},{nome:'Custo por lead',valor:'R$ 35'}], receita_band:`${brl(liq/2)} (50% de ${brl(liq)} líquidos)`, chamada:'Vale prêmio! Aponte a câmera para o QR, dê seu palpite na ArenaBand e concorra com a nossa parceira.' }; }
+  aiOut = out; aiBusy = false; render();
+}
+
+V.bandid = () => `<div class="intro"><b>Band ID · cada campanha alimenta a próxima.</b> Uma identidade única para quem interage com as propriedades digitais da Band, com consentimento por finalidade. A Band vende <b>inteligência</b> (segmentos e insights agregados), nunca o dado pessoal. Governança com a <b>Vibra</b>, que faz a gestão de dados da Band.</div>
+  <div class="card tw"><table><tr><th>Dado coletado</th><th>Inteligência ClubBrain</th><th>Oportunidade para a Band</th></tr>
+  ${[['Clube do coração','Mapa das torcidas','Patrocínios segmentados'],['Município','Concentração regional','Publicidade regional'],['Participação em desafios','Engagement Score','Venda de audiência engajada'],['Horário de acesso','Padrões de comportamento','Melhor horário de ativação'],['Interesse em produtos','Intenção de compra','Campanhas de performance'],['Histórico de cupons','Afinidade comercial','Novas ofertas'],['Frequência de participação','Fidelidade ao programa','Retenção de audiência'],['Compras confirmadas','Conversão e valor comercial','Renovação de patrocinadores']].map(r => `<tr>${r.map((c,i) => `<td>${i===2?'<b>'+c+'</b>':c}</td>`).join('')}</tr>`).join('')}</table></div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card"><h3>Consentimento</h3><p style="color:#c9d0e6;font-size:13px">Por finalidade e por canal, versionado. Menores de idade não entram em ofertas comerciais nem em leads.</p></div>
+    <div class="card"><h3>O que a Band vende</h3><p style="color:#c9d0e6;font-size:13px">Segmentos agregados, estudos de audiência, leads autorizados e resultados de campanha. Nunca base de dados bruta.</p></div>
+    <div class="card"><h3>Vibra · parceira de dados</h3><p style="color:#c9d0e6;font-size:13px">A Vibra (dados, IA e Bandplay) define com a ClubBrain a arquitetura do Band ID e as regras de compartilhamento.</p></div></div>`;
+
+V.experiencias = () => `<div class="intro"><b>Propriedades e experiências que geram receita.</b> A gamificação é o meio; o fim é uma nova propriedade comercial digital da Band. A ArenaBand (Virtual Fans) já roda o Jogo Aberto; as demais entram no roadmap.</div>
+  <div class="grid g3">${[
+    ['⚽','Jogo Aberto · A torcida decide','Enquetes ao vivo, palpites, escalação ideal e ranking.','Publicidade interativa, naming rights e leads','No ar na ArenaBand','g',ARENA],
+    ['🎙️','Os Donos da Bola · Desafie o Neto','Duelo de opiniões, desafios entre torcidas e recompensas.','Desafios patrocinados, benefícios e ranking','A acrescentar','y',null],
+    ['📼','Band História Viva','Museu virtual, grandes jogos, ídolos, narrações e quiz de nostalgia. Receita o ano todo, sem direitos de transmissão.','Patrocínio de coleções e experiências premium','Demo no Hub','b','hv'],
+    ['🏟️','Pré-Jogo Band','A Band pode não ter os 90 minutos; tem tudo antes deles: história do clássico, voz do torcedor e cidades.','Cota master por clássico e bolão','A acrescentar','y',null],
+    ['🏆','Gincana das Torcidas','Torcidas pontuam com ações reais: meio ambiente, fome, educação, saúde.','Patrocínio de impacto (ESG)','A acrescentar','y',null],
+    ['👨‍🍳','MasterChef · Desafio do Chef','Caixa misteriosa, receitas com IA, ranking e ofertas de produtos.','Campanhas de marcas, cupons e commerce','A acrescentar','y',null]
+  ].map(([e,n,d,r,s,c,l]) => `<div class="card exp"><span class="e">${e}</span><b style="font-size:15px">${n}</b><p style="color:#c9d0e6;font-size:13px">${d}</p><div class="row" style="border:0;padding:4px 0"><div class="t"><small>Receita</small>${r}</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill p-${c}">${s}</span>${l===ARENA ? `<a class="btn o" style="padding:5px 10px;font-size:12px" href="${ARENA}" target="_blank" rel="noopener">Abrir ArenaBand ↗</a>` : l==='hv' ? `<button class="btn o" style="padding:5px 10px;font-size:12px" data-go="hv:">Abrir demo</button>` : ''}</div></div>`).join('')}</div>`;
+
+V.roadmap = () => `<div class="intro"><b>Integração ArenaBand ↔ ClubBrain.</b> A Virtual Fans opera a experiência (ArenaBand, Estúdio Band); a ClubBrain recebe os eventos e transforma em inteligência e receita. Status da demo, não de produção.</div>
+  <div class="grid g21"><div class="card tw"><table><tr><th>Funcionalidade</th><th>Onde</th><th>Situação</th></tr>
+  ${[['Arena de jogos, palpites e quizzes','ArenaBand','Demonstrada','g'],['Ranking, Vestiário e perfil do fã','ArenaBand','Demonstrada','g'],['Estúdio Band (controle do programa)','ArenaBand','Demonstrada','g'],['Liga de Amigos','ArenaBand','Simulada','b'],['CDP, segmentação e jornadas','ClubBrain','Demonstrada','g'],['Cardápio comercial e business plan','ClubBrain','Demonstrada','g'],['Cadastro de patrocinadores e cotas','Ambos','Validar ou desenvolver','y'],['Eventos ArenaBand → ClubBrain (webhook)','Ambos','Validar','y'],['Band ID e consentimento LGPD','ClubBrain + Vibra','Validar','y'],['Advertiser Cockpit','ClubBrain','Demonstrado','g'],['Atribuição de leads e vendas (CRM do anunciante)','Integração','Integrar','r'],['Revenue share 50/50 e conciliação','ClubBrain + ERP','Validar','y']].map(([a,b,c,d]) => `<tr><td>${a}</td><td>${b}</td><td><span class="pill p-${d}">${c}</span></td></tr>`).join('')}</table></div>
+  <div class="card"><h3>Eventos que a ArenaBand envia</h3>${['vote · enquete do estúdio','prediction · palpite da rodada','quiz · quiz relâmpago','ranking · posição do torcedor','qr_access · acesso via QR na TV','lead · interesse com consentimento'].map(e => `<div class="row"><code style="font:12px ui-monospace,Menlo,monospace;color:#c9b8ff">${e}</code></div>`).join('')}
+  <p class="note">Contrato de eventos proposto para a integração. A ArenaBand de demonstração ainda não envia eventos à ClubBrain.</p><a class="btn o" style="margin-top:10px" href="${ARENA}#gestao" target="_blank" rel="noopener">Abrir Estúdio Band ↗</a></div></div>`;
+
+/* ---------- render e eventos ---------- */
+const page = () => { const h = location.hash.slice(1); return V[h] ? h : 'cockpit'; };
+function render(){ document.getElementById('root').innerHTML = V[page()](); }
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-p],[data-cart],[data-go],[data-js],[data-adv],[data-seg],[data-obj],#aiGo'); if (!t) return;
+  if (t.dataset.p) { sel = t.dataset.p; render(); }
+  else if (t.dataset.cart) { const i = ST.cart.indexOf(t.dataset.cart); if (i >= 0) ST.cart.splice(i,1); else ST.cart.push(t.dataset.cart); save(); render(); }
+  else if (t.dataset.go) go(t.dataset.go);
+  else if (t.dataset.js !== undefined) { js = +t.dataset.js; render(); }
+  else if (t.dataset.adv) { adv = t.dataset.adv; render(); }
+  else if (t.dataset.seg) { seg = t.dataset.seg; render(); }
+  else if (t.dataset.obj) { obj = t.dataset.obj; render(); }
+  else if (t.id === 'aiGo') gen();
+});
+document.addEventListener('input', e => {
+  if (e.target.dataset.bp) { ST.bp[e.target.dataset.bp] = +e.target.value; save(); }
+  if (e.target.id === 'budget') { budget = +e.target.value; const v = document.getElementById('v_budget'); if (v) v.textContent = brl(budget); }
+  if (e.target.dataset.bp) { const k = e.target.dataset.bp, v = document.getElementById('v_' + k); if (v) v.textContent = k === 'naming' ? brl(ST.bp[k]) : (k === 'trib' || k === 'custos') ? ST.bp[k] + '%' : ST.bp[k]; }
+});
+document.addEventListener('change', e => { if (e.target.dataset.bp) render(); });
+addEventListener('hashchange', render);
+render();
+})();
+</script>
+</body>
+</html>

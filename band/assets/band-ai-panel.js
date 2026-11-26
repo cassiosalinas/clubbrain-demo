@@ -22,12 +22,12 @@
   const md = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').split(/\n/).map(l => /^\s*[-•]\s+/.test(l) ? `<li>${l.replace(/^\s*[-•]\s+/, '')}</li>` : (l.trim() ? `<p>${l}</p>` : '')).join('').replace(/(<li>.*?<\/li>)+/g, m => `<ul>${m}</ul>`);
 
   const ROLE_INFO = {
-    ceo: { agent: 'Agente do CEO', focus: 'estratégia, receita incremental, patrocinadores, governança 50/50 e decisões da diretoria',
-      sug: ['Quais 3 decisões destravam mais receita neste trimestre?', 'Onde está o maior risco do MVP de 90 dias?', 'Como está o retorno para os patrocinadores?', 'Resuma esta tela em 3 pontos para o conselho'] },
+    ceo: { agent: 'Agente do CEO', focus: 'estratégia, receita incremental, cardápio comercial, business plan, divisão 50/50 sobre o líquido e decisões da diretoria',
+      sug: ['Quanto a Band ganha por mês só com o Jogo Aberto?', 'Como fechar o Founding Partner de R$ 360 mil?', 'Quais 3 decisões destravam mais receita neste trimestre?', 'Resuma esta tela em 3 pontos para o conselho'] },
     op: { agent: 'Agente de Operações', focus: 'programação no ar, participação ao vivo, moderação, grade e produção',
       sug: ['O que precisa de ação agora no ar?', 'Qual programa puxa mais participação hoje?', 'Como encaixar o QR sem atrapalhar o programa?', 'Resuma esta tela em 3 pontos para a produção'] },
-    mkt: { agent: 'Agente de Marketing', focus: 'audiência, CDP, segmentos, consentimento, jornadas, campanhas e ativação de patrocinadores',
-      sug: ['Qual segmento ativar primeiro, e com qual patrocinador?', 'Como aumentar o opt-in sem perder participação?', 'Que jornada criar para fãs inativos há 14 dias?', 'Resuma esta tela em 3 pontos para o time de CRM'] },
+    mkt: { agent: 'Agente de Marketing', focus: 'audiência, CDP, segmentos, jornadas, campanhas, cardápio comercial, propostas para anunciantes e ROI',
+      sug: ['Monte uma proposta para um banco digital no Jogo Aberto', 'Qual segmento ativar primeiro, e com qual patrocinador?', 'Quais propriedades ainda não têm patrocinador?', 'Resuma esta tela em 3 pontos para o comercial'] },
     it: { agent: 'Agente de TI', focus: 'integrações, conectores, dados, segurança, LGPD e escala nos picos do ao vivo',
       sug: ['Quais integrações bloqueiam o MVP?', 'Quais os riscos de LGPD nesta arquitetura?', 'Como aguentar o pico do Jogo Aberto?', 'Resuma esta tela em 3 pontos para a arquitetura'] },
     band: { agent: 'Agente Band', focus: 'visão completa do Band Playverse: audiência, receita, operação, marketing e tecnologia',
