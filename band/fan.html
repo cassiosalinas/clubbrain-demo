@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#06102a">
-<title>Site do Fã · Band Playverse</title>
+<title>Site do Fã · Band Connect</title>
 <!-- Site do Fã: acesso do torcedor, separado do Intelligence Hub interno da Band.
      No computador aparece dentro de um celular; no celular ocupa a tela toda.
      Login de demonstração: fan / band. As abas carregam as páginas do fã
-     (app Band Playverse, Band Pass, História Viva, Experiências Band) em modo app. -->
+     (app Band Connect, Band Pass, História Viva, Experiências Band) em modo app. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 :root{--ink:#06102a;--ink2:#0b1a40;--card:#0f2150;--line:rgba(255,255,255,.12);--paper:#f2f5fc;--dim:#aab6d6;--gold:#f5b82e;--green:#008c44;--yellow:#ffcb03}
@@ -78,7 +78,7 @@ button,input{font:inherit;color:inherit}
 <body>
 <section class="side">
   <img src="/band/assets/band-logo.svg" alt="Band">
-  <div class="ey">Site do Fã · Band Playverse</div>
+  <div class="ey">Site do Fã · Band Connect</div>
   <h1>A Band no <span>seu celular</span>.</h1>
   <p>Este é o acesso do torcedor, separado do Intelligence Hub da Band. O fã participa dos programas, joga, ganha XP e troca por recompensas, tudo pelo celular.</p>
   <ul>
@@ -93,14 +93,14 @@ button,input{font:inherit;color:inherit}
 <div class="phone">
   <div class="scr" id="scr">
     <div class="island"></div>
-    <div class="sb"><span class="clock" id="clk">9:41</span><span class="sbbrand" style="display:none;align-items:center;gap:8px"><img src="/band/assets/band-logo.svg" alt="" style="width:30px"><b style="font:800 15px 'Barlow Condensed',sans-serif;letter-spacing:.05em">BAND <span style="color:var(--gold)">PLAYVERSE</span></b></span><span style="display:flex;gap:8px;align-items:center"><span class="ic">▂▄▆ 5G 🔋</span><button class="avbtn" id="av" title="Conta" style="display:none">☰</button></span></div>
+    <div class="sb"><span class="clock" id="clk">9:41</span><span class="sbbrand" style="display:none;align-items:center;gap:8px"><img src="/band/assets/band-logo.svg" alt="" style="width:30px"><b style="font:800 15px 'Barlow Condensed',sans-serif;letter-spacing:.05em">BAND <span style="color:var(--gold)">CONNECT</span></b></span><span style="display:flex;gap:8px;align-items:center"><span class="ic">▂▄▆ 5G 🔋</span><button class="avbtn" id="av" title="Conta" style="display:none">☰</button></span></div>
     <div class="view" id="view"></div>
     <nav class="tabbar" id="tabs" style="display:none"></nav>
     <div class="menu" id="menu"><button data-m="arena">Abrir ArenaBand (Virtual Fans) ↗</button><button data-m="reset">Começar de novo (novo Band Pass)</button><button data-m="out">Sair</button></div>
     <div class="toast" id="toast"></div>
 
     <form class="login" id="login" autocomplete="off">
-      <div class="logo"><img src="/band/assets/band-logo.svg" alt="Band"><b>BAND <span>PLAYVERSE</span></b><small>O jogo continua com você</small></div>
+      <div class="logo"><img src="/band/assets/band-logo.svg" alt="Band"><b>BAND <span>CONNECT</span></b><small>O jogo continua com você</small></div>
       <h2>Entrar</h2>
       <p>Assista, participe e ganhe recompensas com a Band.</p>
       <label for="fu">Usuário</label><input id="fu" autocapitalize="none" placeholder="fan">
@@ -174,7 +174,7 @@ $('#login').addEventListener('submit', e => {
   e.preventDefault();
   if ($('#fu').value.trim().toLowerCase() === 'fan' && $('#fp').value.trim().toLowerCase() === 'band') {
     try { sessionStorage.setItem('band-fan-auth', '1'); } catch (er) {}
-    $('#err').style.display = 'none'; enter(); toast('Bem-vindo ao Band Playverse!');
+    $('#err').style.display = 'none'; enter(); toast('Bem-vindo ao Band Connect!');
   } else $('#err').style.display = 'block';
 });
 $('#demoFill').onclick = () => { $('#fu').value = 'Fan'; $('#fp').value = 'Band'; $('#err').style.display = 'none'; };

@@ -5,7 +5,7 @@
  *
  * - Conversa contextual: o agente sabe o papel (CEO, Op, MKT, IT), a tela aberta
  *   e os dados que essa tela tem agora (lê o contexto do iframe da página:
- *   osContext() no BandBrain OS, BO.ctx() no backoffice do Playverse, BP no
+ *   osContext() no BandBrain OS, BO.ctx() no backoffice do Band Connect, BP no
  *   início do papel e no site do fã).
  * - Depois de cada resposta vêm cartões de insight (impacto, número-chave, ação
  *   e atalho para a página certa) e perguntas de continuação.
@@ -30,7 +30,7 @@
       sug: ['Monte uma proposta para um banco digital no Jogo Aberto', 'Qual segmento ativar primeiro, e com qual patrocinador?', 'Quais propriedades ainda não têm patrocinador?', 'Resuma esta tela em 3 pontos para o comercial'] },
     it: { agent: 'Agente de TI', focus: 'integrações, conectores, dados, segurança, LGPD e escala nos picos do ao vivo',
       sug: ['Quais integrações bloqueiam o MVP?', 'Quais os riscos de LGPD nesta arquitetura?', 'Como aguentar o pico do Jogo Aberto?', 'Resuma esta tela em 3 pontos para a arquitetura'] },
-    band: { agent: 'Agente Band', focus: 'visão completa do Band Playverse: audiência, receita, operação, marketing e tecnologia',
+    band: { agent: 'Agente Band', focus: 'visão completa do Band Connect: audiência, receita, operação, marketing e tecnologia',
       sug: ['O que mais importa nesta tela agora?', 'Qual a próxima melhor ação para a Band?', 'Onde está a maior oportunidade de receita?', 'Resuma esta tela em 3 pontos'] }
   };
   const role = () => (window.BAND_ROLE && ROLE_INFO[window.BAND_ROLE]) ? window.BAND_ROLE : 'band';
@@ -204,7 +204,7 @@
     const pages = menuPages();
     const sys = (typeof buildClubAiContext === 'function' ? buildClubAiContext() : '') + `
 
-Você é o ${R.agent} do Intelligence Hub da Band (Band Playverse: Grupo Bandeirantes × Virtual Fans, by ClubBrain.ai). Papel do usuário: ${window.BAND_ROLE ? (BAND_ROLES[window.BAND_ROLE].name + ' — ' + BAND_ROLES[window.BAND_ROLE].role) : 'administrador (visão completa)'}. Foco: ${R.focus}.
+Você é o ${R.agent} do Intelligence Hub da Band (Band Connect: Grupo Bandeirantes × Virtual Fans, by ClubBrain.ai). Papel do usuário: ${window.BAND_ROLE ? (BAND_ROLES[window.BAND_ROLE].name + ' — ' + BAND_ROLES[window.BAND_ROLE].role) : 'administrador (visão completa)'}. Foco: ${R.focus}.
 Responda em português do Brasil, direto e executivo, usando os dados da tela e do contexto. Todos os números são simulados para a proposta: não invente números que não estejam no contexto (pode fazer contas simples com eles). Nunca proponha vender dado pessoal; só segmentos agregados com opt-in. Não colete nem analise opinião política.
 FORMATO OBRIGATÓRIO: responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, sem cercas de código:
 {"resposta":"até 110 palavras; pode usar linhas começando com '- '","insights":[{"titulo":"até 9 palavras","detalhe":"1 ou 2 frases","impacto":"alto|medio|baixo","metrica":"número-chave curto do contexto ou vazio","acao":"próximo passo concreto, começando com verbo","pagina":"uma das chaves abaixo ou vazio"}],"perguntas":["2 ou 3 perguntas de continuação curtas"]}

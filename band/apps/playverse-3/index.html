@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Band Playverse · Virtual Fans + ClubBrain.ai</title>
+<title>Band Connect · Virtual Fans + ClubBrain.ai</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -263,7 +263,7 @@ textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #233
 @keyframes in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @media (max-width:1280px){.body{grid-template-columns:1fr}.side{display:none}.g-live{grid-template-columns:1fr}.tv{grid-row:auto}}
 
-/* ===== Playverse extras ===== */
+/* ===== Band Connect extras ===== */
 .kpis5{display:grid;grid-template-columns:repeat(4,1fr) 230px;gap:12px}
 .qrmini{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
 .qrmini #qr{width:92px;height:92px;padding:6px}
@@ -345,7 +345,7 @@ textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #233
 
 <div id="telao" class="hide">
   <div class="top">
-    <div class="brand"><div class="mark">VF</div><div><b>BAND <span>PLAYVERSE</span></b><small>Virtual Fans + ClubBrain.ai · demo conceitual</small></div></div>
+    <div class="brand"><div class="mark">VF</div><div><b>BAND <span>CONNECT</span></b><small>Virtual Fans + ClubBrain.ai · demo conceitual</small></div></div>
     <div class="tabs" id="tabs">
       <button class="tab on" data-v="live"><span class="dot"></span>Ao vivo</button>
       <button class="tab" data-v="intel">Inteligência</button>
@@ -368,7 +368,7 @@ textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #233
           <div class="kpi"><div class="l">Taxa de engajamento</div><div class="v" id="kEng">0%</div><div class="s">interagiram 2+ vezes</div></div>
           <div class="kpi"><div class="l">Perfis identificados</div><div class="v" id="kId">0</div><div class="s" id="kIdS">com consentimento</div></div>
           <div class="kpi"><div class="l">Receita potencial</div><div class="v" id="kRev">R$ 0</div><div class="s">estimada · ilustrativa</div></div>
-          <div class="qrmini"><div id="qr"></div><p><b>Entre no Playverse</b>Aponte a câmera. Um Band Pass para os 3 programas.</p></div>
+          <div class="qrmini"><div id="qr"></div><p><b>Entre no Band Connect</b>Aponte a câmera. Um Band Pass para os 3 programas.</p></div>
         </div>
         <div class="progs">
           <div class="card pc arena"><div class="ph"><span class="tag live">ao vivo</span><div><b>Band Fan Arena</b><small>Jogo Aberto · Renata Fan</small></div></div>
@@ -392,7 +392,7 @@ textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #233
         </div>
         <div class="three" style="margin-top:16px">
           <div class="card"><h3>Audiência por time <span class="tag">base + sessão</span></h3><div class="bars" id="aud"></div><p class="note">Base histórica fictícia + participantes desta sessão.</p></div>
-          <div class="card"><h3>Ranking Playverse <span class="tag gold">Band Pass</span></h3><div class="rkp" id="rkp"></div></div>
+          <div class="card"><h3>Ranking Band Connect <span class="tag gold">Band Pass</span></h3><div class="rkp" id="rkp"></div></div>
           <div class="card feedcard"><h3>Eventos ClubBrain <span class="tag">stream</span></h3><div class="feed" id="feed"></div></div>
         </div>
       </section>
@@ -466,7 +466,7 @@ textarea.mem{width:100%;min-height:96px;background:#0c1530;border:1px solid #233
     <div class="act"><b>1 · Três celulares</b>Três participantes entram pelo QR. Um joga a Fan Arena da Renata, outro responde ao Neto e outro abre a caixa misteriosa do MasterChef.<i>No celular simulado: troque com "Novo participante".</i></div>
     <div class="act"><b>2 · O telão reage</b>Votos do clássico, VAR da audiência, placar de concordância com o Neto e ingredientes mais escolhidos, tudo em tempo real.<i>Momento WOW: a sala vê os próprios votos.</i></div>
     <div class="act"><b>3 · A IA do Chef</b>Quem abriu a caixa recebe a avaliação e uma receita personalizada criada pela IA, que aparece também no telão.<i>A gamificação vira dado de preferência culinária.</i></div>
-    <div class="act"><b>4 · Band Pass</b>Medalhas e XP valem nos três programas. Quem joga em todos vira "Explorador Playverse" e desbloqueia o prêmio master.<i>Fidelidade entre programas.</i></div>
+    <div class="act"><b>4 · Band Pass</b>Medalhas e XP valem nos três programas. Quem joga em todos vira "Explorador Band Connect" e desbloqueia o prêmio master.<i>Fidelidade entre programas.</i></div>
     <div class="act"><b>5 · Inteligência</b>Aba Inteligência: cruzamento entre programas (quem gosta de futebol e cozinha), Fan 360 e segmentos.<i>Audiência anônima vira comunidade identificada.</i></div>
     <div class="act"><b>6 · A pergunta final</b>Band AI: "Quais são as oportunidades de patrocínio para os perfis que acabaram de interagir nos três programas?". Depois, Campanhas e receita: simular e dividir 50/50.<i>Não é um quiz. É um motor de inteligência comercial.</i></div>
   </div>
@@ -480,7 +480,7 @@ const SPONSORS=[
  {id:"pulso",name:"Pulso Energy",cat:"Bebida energética",fit:"palpiteiros e jovens torcedores",reward:"Combo Pulso do Clássico grátis",code:"PULSO-ARENA"},
  {id:"brasa",name:"Brasa Burger",cat:"Delivery",fit:"debate na hora do almoço",reward:"30% no combo do Desafio do Craque",code:"BRASA-NETO"},
  {id:"vila",name:"Mercado Vila",cat:"Supermercado",fit:"chefs amadores e caixa misteriosa",reward:"R$ 30 em ingredientes da caixa misteriosa",code:"VILA-CHEF"},
- {id:"rota",name:"Rota Bank",cat:"Banco digital",fit:"exploradores multi-programa",reward:"R$ 50 de cashback Explorador Playverse",code:"ROTA-PLAY"},
+ {id:"rota",name:"Rota Bank",cat:"Banco digital",fit:"exploradores multi-programa",reward:"R$ 50 de cashback Explorador Band Connect",code:"ROTA-PLAY"},
  {id:"atl",name:"Atlântica Seguros",cat:"Seguros",fit:"público maduro e nostálgico",reward:"1º mês do seguro residencial",code:"ATL-PASS"}
 ];
 const PROGS={
@@ -504,7 +504,7 @@ const CHEF={star:{q:"Qual ingrediente seria a estrela da sua caixa misteriosa?",
  ings:[["🦐","Camarão"],["🍄","Cogumelos"],["🍫","Chocolate amargo"],["🥭","Manga"],["🌶️","Pimenta dedo-de-moça"],["🧀","Queijo coalho"],["🥔","Mandioca"],["🍋","Limão-siciliano"],["🌰","Castanha-do-pará"]],
  tecs:["Grelhar","Assar","Confitar","Cru / ceviche"]};
 const MINU_CAT=[["📱","Recarga de celular",10],["🚗","Crédito de corrida por app",15],["🍔","Vale-delivery · Brasa Burger",20],["🎬","Ingresso de cinema",25],["🎧","1 mês de streaming de música",22],["🎮","Crédito em games",10]];const XP_PER_REAL=100;
-const MEDALS=[["comentarista","🎙️","Comentarista"],["memoria","📼","Memória do Majestoso"],["polemico","🔥","Polêmico"],["chef","🍳","Chef Amador"],["explorador","🌐","Explorador Playverse"]];
+const MEDALS=[["comentarista","🎙️","Comentarista"],["memoria","📼","Memória do Majestoso"],["polemico","🔥","Polêmico"],["chef","🍳","Chef Amador"],["explorador","🌐","Explorador Band Connect"]];
 const LEVELS=[[0,"Espectador"],[300,"Fã"],[700,"Superfã"],[1200,"Lenda Band"]];
 const REWARD_AT=300;
 const NAMES=["Ana","Bruno","Carla","Diego","Eduarda","Felipe","Gabriela","Henrique","Isabela","João","Karina","Lucas","Mariana","Nicolas","Olívia","Pedro","Rafaela","Samuel","Tainá","Vitor","Yasmin","Thiago","Letícia","Caio","Beatriz","Rodrigo","Juliana","Marcos","Fernanda","Gustavo","Helena","Otávio"];
@@ -585,7 +585,7 @@ function agg(){
  const scale=n?part/n:0;
  const segs=[
   {k:"Futebol + culinária",d:"jogaram Fan Arena e MasterChef",n:mx.ah,prop:.74,brand:"vila"},
-  {k:"Exploradores Playverse",d:"interagiram nos 3 programas",n:mx.all,prop:.81,brand:"rota"},
+  {k:"Exploradores Band Connect",d:"interagiram nos 3 programas",n:mx.all,prop:.81,brand:"rota"},
   {k:"Discordam do Neto",d:"maioria 'discordo' nas provocações",n:fans.filter(f=>f.ops.filter(c=>c===2).length>=2).length,prop:.58,brand:"brasa"},
   {k:"Palpiteiros do clássico",d:"palpite + VAR",n:fans.filter(f=>f.pal!=null&&f.vr!=null).length,prop:.63,brand:"pulso"},
   {k:"Chefs amadores",d:"montaram a caixa misteriosa",n:fans.filter(f=>f.caixa).length,prop:.69,brand:"vila"},
@@ -642,7 +642,7 @@ function renderIntel(a){
  $("#fanCount").textContent=a.n;
  const fans=[...a.fans].sort((x,y)=>(x.sim-y.sim)||(y.last-x.last));
  $("#fanlist").innerHTML=fans.slice(0,40).map(f=>`<button class="fanrow ${S.selected===f.id?"on":""}" data-id="${f.id}"><div class="av" style="background:${teamHex(f.team)}">${esc(ini(f.name))}</div><div><div class="nm">${esc(f.name)} ${!f.sim?"<span class='tag gold'>sala</span>":""}</div><small>${esc(f.team)} · ${Object.keys(f.progs).map(k=>PROGS[k].ic).join(" ")} · ${fmt(f.xp)} XP</small></div></button>`).join("")||`<p class="mut">Ninguém ainda.</p>`;
- const mx=a.mx;$("#matrix").innerHTML=[["Arena + Neto",mx.ac,"futebol e debate"],["Arena + MasterChef",mx.ah,"futebol e culinária"],["Neto + MasterChef",mx.ch,"debate e culinária"],["Nos 3 programas",mx.all,"Exploradores Playverse"]].map((r,i)=>`<div class="mx ${i===1||i===3?"hl":""}"><small>${r[0]}</small><div class="v">${fmt(r[1])}</div><small>${r[2]} · projeção ${fmt(r[1]*a.scale)}</small></div>`).join("");
+ const mx=a.mx;$("#matrix").innerHTML=[["Arena + Neto",mx.ac,"futebol e debate"],["Arena + MasterChef",mx.ah,"futebol e culinária"],["Neto + MasterChef",mx.ch,"debate e culinária"],["Nos 3 programas",mx.all,"Exploradores Band Connect"]].map((r,i)=>`<div class="mx ${i===1||i===3?"hl":""}"><small>${r[0]}</small><div class="v">${fmt(r[1])}</div><small>${r[2]} · projeção ${fmt(r[1]*a.scale)}</small></div>`).join("");
  const f=S.fans.get(S.selected);
  if(!f)$("#f360").innerHTML=`<h3>Fan 360</h3><p class="mut">Selecione um perfil.</p>`;
  else{const it=interests(f),b=nba(f),lv=level(f.xp);
@@ -685,10 +685,10 @@ function renderFin(){const r=+$("#fRec").value,t=+$("#fTax").value,net=Math.max(
 async function genCamp(){
  const a=agg(),s=a.segs[C.seg],sp=spo(C.spo),m=MECS[C.mec];
  const el=$("#aiCamp");el.innerHTML="<span class='mut'>Gerando...</span>";
- const fb=`**${sp.name} · ${s.k}**\n- Mecânica: ${m.k.toLowerCase()} nos programas ${s.k.includes("culinária")?"Jogo Aberto e MasterChef":"do Playverse"}, ativada por ${C.ch.map(i=>CHS[i].k).join(", ")}.\n- Mensagem: "Você joga, a ${sp.name} recompensa: ${sp.reward}."\n- Alvo: ${fmt(s.proj)} perfis projetados, só quem deu opt-in.\n- Medição: resgates por código único no Band Pass.`;
+ const fb=`**${sp.name} · ${s.k}**\n- Mecânica: ${m.k.toLowerCase()} nos programas ${s.k.includes("culinária")?"Jogo Aberto e MasterChef":"do Band Connect"}, ativada por ${C.ch.map(i=>CHS[i].k).join(", ")}.\n- Mensagem: "Você joga, a ${sp.name} recompensa: ${sp.reward}."\n- Alvo: ${fmt(s.proj)} perfis projetados, só quem deu opt-in.\n- Medição: resgates por código único no Band Pass.`;
  let out=null;
  try{const smp=await (window.claude&&claude.use?claude.use("sample"):null);
-  if(smp){const r=await smp(`Você é o Marketing Copilot da ClubBrain.ai no Band Playverse (parceria Band × Virtual Fans). Crie uma proposta curta de campanha patrocinada, em português do Brasil, para apresentar ao vivo a executivos da Band.
+  if(smp){const r=await smp(`Você é o Marketing Copilot da ClubBrain.ai no Band Connect (parceria Band × Virtual Fans). Crie uma proposta curta de campanha patrocinada, em português do Brasil, para apresentar ao vivo a executivos da Band.
 Dados: segmento "${s.k}" (${s.d}), ${fmt(s.proj)} perfis projetados, propensão ${Math.round(s.prop*100)}%. Patrocinador fictício: ${sp.name} (${sp.cat}), recompensa: ${sp.reward}. Mecânica: ${m.k}. Canais: ${C.ch.map(i=>CHS[i].k).join(", ")}. Receita estimada: ${brl(C.lastRev)}.
 Formato: primeira linha com **nome da campanha**, depois 4 tópicos iniciados por "- " (mecânica no ar, mensagem para o fã, como mede, por que a marca compra). No máximo 110 palavras. Só segmentos agregados com opt-in, sem dados pessoais.`,{modelTier:"quick",cache:false,onText:({text})=>{el.innerHTML=md(text)}});out=r&&r.text}}catch(e){}
  el.innerHTML=md(out||fb);
@@ -727,7 +727,7 @@ async function ask(q){if(!q.trim())return;CHAT.push({r:"u",t:q});const msg={r:"a
  if(!s){msg.t=fallbackAnswer();$("#aiState").textContent="offline";renderChat();return}
  $("#aiState").textContent="pensando…";
  const hist=CHAT.slice(0,-1).slice(-5).map(m=>({role:m.r==="u"?"user":"assistant",content:m.t||"-"}));
- const sys=`Você é a Band AI, no papel de ${COPI.n} da ClubBrain.ai, operando o Band Playverse (Virtual Fans + ClubBrain.ai para o Grupo Bandeirantes): três programas gamificados ao mesmo tempo (Band Fan Arena no Jogo Aberto com Renata Fan, Desafio do Craque em Os Donos da Bola com Craque Neto, MasterChef Challenge). Papel: ${COPI.d}.
+ const sys=`Você é a Band AI, no papel de ${COPI.n} da ClubBrain.ai, operando o Band Connect (Virtual Fans + ClubBrain.ai para o Grupo Bandeirantes): três programas gamificados ao mesmo tempo (Band Fan Arena no Jogo Aberto com Renata Fan, Desafio do Craque em Os Donos da Bola com Craque Neto, MasterChef Challenge). Papel: ${COPI.d}.
 Público: executivos da Band numa reunião ao vivo. Responda em português do Brasil, executivo e direto: no máximo 170 palavras, 3 a 5 tópicos iniciados por "- " e uma linha final "Próximo passo: ...". Use **negrito** só em números-chave. Cite pessoas reais da sala pelo nome quando ajudar a provar que os dados são ao vivo. Use só os dados do contexto e diga quando algo é projeção ilustrativa. Respeite as regras.
 CONTEXTO AO VIVO (JSON):
 ${JSON.stringify(ctx())}`;
@@ -743,7 +743,7 @@ function chefLocal(ings,tec){const sweet=ings.includes("Chocolate amargo")||ings
  return{prato,nota:nota.toFixed(1),comentario:br>=2?"Combinação com muita identidade brasileira. Os jurados iam gostar.":sea&&ings.includes("Chocolate amargo")?"Ousado demais: o chocolate briga com o camarão. Equilibre com acidez.":"Boa harmonia. Cuide do ponto e da acidez para chegar ao 9.",passos:[`Prepare o ${main.toLowerCase()} e tempere com sal e um fio de azeite.`,`${tec==="Cru / ceviche"?"Cure em limão por 10 minutos":tec==="Confitar"?"Confite em azeite a fogo baixo por 25 minutos":tec==="Grelhar"?"Grelhe em fogo alto, 2 a 3 minutos por lado":"Asse a 200 °C por cerca de 20 minutos"}.`,`Finalize com ${ings[1].toLowerCase()} e ${ings[2].toLowerCase()}, ajustando o sal.`]}}
 async function chefAI(ings,tec,team,name,onT){
  try{const s=await (window.claude&&claude.use?claude.use("sample"):null);
-  if(s){const r=await s(`Você é a IA do Chef do MasterChef Challenge no Band Playverse. Um participante (${name}, torcedor do ${team}) abriu a caixa misteriosa virtual e escolheu: ${ings.join(", ")}, com a técnica "${tec}".
+  if(s){const r=await s(`Você é a IA do Chef do MasterChef Challenge no Band Connect. Um participante (${name}, torcedor do ${team}) abriu a caixa misteriosa virtual e escolheu: ${ings.join(", ")}, com a técnica "${tec}".
 Avalie a combinação como um jurado exigente porém gentil e proponha uma receita personalizada e viável em casa.
 Responda SOMENTE com JSON válido, sem markdown: {"prato":"nome criativo, até 6 palavras","nota":"número de 0 a 10 com uma casa decimal","comentario":"1 frase de jurado, até 22 palavras","passos":["passo 1","passo 2","passo 3"]}. Português do Brasil.`,{modelTier:"quick",cache:false});
    const t=(r&&r.text)||"";const j=JSON.parse(t.slice(t.indexOf("{"),t.lastIndexOf("}")+1));if(j&&j.prato)return{prato:String(j.prato),nota:String(j.nota),comentario:String(j.comentario||""),passos:(j.passos||[]).slice(0,4).map(String),ia:true}}}catch(e){}
@@ -761,7 +761,7 @@ function PhoneApp(root,key){
  function medal(id){if(fan.medals.includes(id))return;fan.medals.push(id);save();const m=MEDALS.find(x=>x[0]===id);setTimeout(()=>toast(`${m[1]} Medalha: ${m[2]}`),900);emit("medal",null,{label:m[2]});checkExplorer()}
  function checkExplorer(){const p=fan.played||{};if(p.arena&&p.craque&&p.chef&&!fan.medals.includes("explorador")){fan.xp+=150;medal("explorador")}}
  function played(prog){fan.played=fan.played||{};fan.played[prog]=true;save();checkExplorer()}
- function hd(){return`<div class="hd"><div class="mark" style="width:30px;height:30px;font-size:14px;border-radius:8px">VF</div><div class="lg">BAND <span>PLAYVERSE</span></div>${fan?`<div class="xp">${fmt(fan.xp)} XP</div>`:""}</div>`}
+ function hd(){return`<div class="hd"><div class="mark" style="width:30px;height:30px;font-size:14px;border-radius:8px">VF</div><div class="lg">BAND <span>CONNECT</span></div>${fan?`<div class="xp">${fmt(fan.xp)} XP</div>`:""}</div>`}
  function progDone(k){const d=D();if(k==="arena")return[d.pal,d.quiz,d.esc,d.var].filter(Boolean).length+"/4";if(k==="craque")return[d.ops,d.tor].filter(Boolean).length+"/2";return[d.star,d.caixa].filter(Boolean).length+"/2"}
  function mi(go,ic,b,s,done,st){return`<button class="mi ${done?"done":""}" data-go="${go}"><div class="ic">${ic}</div><div><b>${esc(b)}</b><small>${esc(s)}</small></div><div class="st">${done?"✓":esc(st)}</div></button>`}
  function rewardBtn(prog){const sp=spo(PROGS[prog].sponsor),got=fan.rw&&fan.rw[sp.id],can=fan.xp>=REWARD_AT;return`<button class="mi ${got?"done":(can?"":"lock")}" data-rw="${sp.id}"><div class="ic">🎁</div><div><b>${esc(sp.name)}</b><small>${can?esc(sp.reward):`desbloqueia com ${REWARD_AT} XP`}</small></div><div class="st">${got?"resgatada":(can?"abrir":"🔒")}</div></button>`}
@@ -771,23 +771,23 @@ function PhoneApp(root,key){
    <div class="field"><span>Time do coração</span><div class="teams">${Object.keys(TEAMS).map(k=>`<button class="tm ${tmp.team===k?"on":""}" data-team="${k}"><i style="background:${TEAMS[k].hex}"></i>${k}</button>`).join("")}</div></div>
    <label class="chk"><input type="checkbox" id="c1" ${tmp.c1?"checked":""}><span>Aceito os termos e a política de privacidade. Minha participação será usada para pontos, ranking e personalização <b>(obrigatório)</b>.</span></label>
    <label class="chk"><input type="checkbox" id="c2" ${tmp.c2?"checked":""}><span>Quero receber ofertas dos patrocinadores dos programas <b>(opcional, +50 XP)</b>.</span></label>
-   <button class="cta" id="go" ${(tmp.team&&tmp.c1&&(tmp.nm||"").trim())?"":"disabled"}>Entrar no Playverse</button><div class="foot">Demo conceitual · dados de teste · consentimento registrado</div></div>`}
+   <button class="cta" id="go" ${(tmp.team&&tmp.c1&&(tmp.nm||"").trim())?"":"disabled"}>Entrar no Band Connect</button><div class="foot">Demo conceitual · dados de teste · consentimento registrado</div></div>`}
   else if(scr==="hub"){const lv=level(fan.xp);h=`<div class="ct"><div class="pass"><div class="r1"><span>Band Pass</span><span>${esc(fan.team)}</span></div><b>${esc(fan.name)}</b><div class="lvl"><span>${lv.name}</span><span>${lv.next?`${fmt(lv.next-fan.xp)} XP para ${lv.nextName}`:"nível máximo"}</span></div><div class="pb"><i style="width:${lv.pct}%"></i></div>
     <div class="medals">${MEDALS.map(m=>`<span class="medal ${fan.medals.includes(m[0])?"on":""}" title="${m[2]}">${m[1]}</span>`).join("")}</div></div>
    <div class="mut" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 8px">Agora no ar</div>
    <div class="hub">${Object.entries(PROGS).map(([k,p])=>`<button class="pcard ${k}" data-go="${k}"><div class="ic">${p.ic}</div><div><b>${p.name}</b><small>${p.program} · ${p.host}</small><small>${p.tag}</small></div><div class="st">${progDone(k)}</div></button>`).join("")}</div>
-   ${fan.medals.includes("explorador")?`<button class="mi" data-rw="rota" style="margin-top:10px"><div class="ic">🌐</div><div><b>Prêmio Explorador · Rota Bank</b><small>${spo("rota").reward}</small></div><div class="st">${fan.rw&&fan.rw.rota?"resgatado":"abrir"}</div></button>`:`<p class="foot" style="margin-top:10px">Jogue nos 3 programas para virar 🌐 Explorador Playverse (+150 XP e prêmio master).</p>`}
+   ${fan.medals.includes("explorador")?`<button class="mi" data-rw="rota" style="margin-top:10px"><div class="ic">🌐</div><div><b>Prêmio Explorador · Rota Bank</b><small>${spo("rota").reward}</small></div><div class="st">${fan.rw&&fan.rw.rota?"resgatado":"abrir"}</div></button>`:`<p class="foot" style="margin-top:10px">Jogue nos 3 programas para virar 🌐 Explorador Band Connect (+150 XP e prêmio master).</p>`}
    <button class="mi" data-go="minu" style="margin-top:10px;border-color:rgba(245,184,46,.5)"><div class="ic">⇄</div><div><b>Trocar XP na Minu</b><small>Recarga, corrida, delivery, cinema...</small></div><div class="st">${fmt(fan.xp-(fan.spent||0))} XP</div></button>
    <div class="foot">Marcas de patrocinadores fictícias · demo</div></div>`}
-  else if(scr==="minu"){const bal=fan.xp-(fan.spent||0);h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><h2>Trocar <span>XP</span></h2><p class="lead">Seu saldo: <b style="color:var(--gold)">${fmt(bal)} XP</b>. ${XP_PER_REAL} XP = R$ 1. Recompensas instantâneas via <b>Minu</b>.</p>
+  else if(scr==="minu"){const bal=fan.xp-(fan.spent||0);h=`<div class="ct"><button class="back" data-go="hub">‹ Band Connect</button><h2>Trocar <span>XP</span></h2><p class="lead">Seu saldo: <b style="color:var(--gold)">${fmt(bal)} XP</b>. ${XP_PER_REAL} XP = R$ 1. Recompensas instantâneas via <b>Minu</b>.</p>
    ${tmp.voucher?`<div class="coupon" style="margin-bottom:12px"><small>Minu · voucher instantâneo</small><b>${esc(tmp.voucher.n)}</b><div>Enviado por push e WhatsApp</div><div class="code">MINU-${esc(fan.id.slice(0,3).toUpperCase())}${tmp.voucher.k}</div></div>`:""}
    <div class="ms">${MINU_CAT.map((c,i)=>{const cost=c[2]*XP_PER_REAL;return`<button class="mi ${bal<cost?"lock":""}" data-minu="${i}"><div class="ic">${c[0]}</div><div><b>${esc(c[1])}</b><small>R$ ${c[2]} em valor</small></div><div class="st">${fmt(cost)} XP</div></button>`}).join("")}</div>
    <p class="foot" style="margin-top:10px">Integração Minu simulada · catálogo e valores ilustrativos</p></div>`}
-  else if(scr==="arena"){h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><div class="live"><span class="tag">AO VIVO</span><div><b>Jogo Aberto · Band Fan Arena</b><small>com Renata Fan · o torcedor vira comentarista</small></div></div><div class="ms">
+  else if(scr==="arena"){h=`<div class="ct"><button class="back" data-go="hub">‹ Band Connect</button><div class="live"><span class="tag">AO VIVO</span><div><b>Jogo Aberto · Band Fan Arena</b><small>com Renata Fan · o torcedor vira comentarista</small></div></div><div class="ms">
    ${mi("a-pal","🎯","Palpite do clássico",ARENA.pal.q,d.pal,"+100")}${mi("a-quiz","🧠","Quiz do Majestoso","3 perguntas · bônus de velocidade",d.quiz,"até +540")}${mi("a-esc","📋","Escalação dos sonhos","formação + 3 ídolos do acervo",d.esc,"+120")}${mi("a-var","🖥️","VAR interativo","você decide o lance polêmico",d.var,"+80")}${rewardBtn("arena")}</div></div>`}
-  else if(scr==="craque"){h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><div class="live"><span class="tag">AO VIVO</span><div><b>Os Donos da Bola · Desafio do Craque</b><small>com Craque Neto · concorde ou desafie</small></div></div><div class="ms">
+  else if(scr==="craque"){h=`<div class="ct"><button class="back" data-go="hub">‹ Band Connect</button><div class="live"><span class="tag">AO VIVO</span><div><b>Os Donos da Bola · Desafio do Craque</b><small>com Craque Neto · concorde ou desafie</small></div></div><div class="ms">
    ${mi("c-ops","🔥","Duelo de opiniões","3 provocações do Neto",d.ops,"+180")}${mi("c-tor","📣","Provocação entre torcidas",NETO.tor,d.tor,"+60")}${rewardBtn("craque")}</div></div>`}
-  else if(scr==="chef"){h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><div class="live"><span class="tag">AO VIVO</span><div><b>MasterChef Challenge</b><small>caixa misteriosa virtual · IA do Chef</small></div></div><div class="ms">
+  else if(scr==="chef"){h=`<div class="ct"><button class="back" data-go="hub">‹ Band Connect</button><div class="live"><span class="tag">AO VIVO</span><div><b>MasterChef Challenge</b><small>caixa misteriosa virtual · IA do Chef</small></div></div><div class="ms">
    ${mi("h-star","⭐","A estrela da caixa",CHEF.star.q,d.star,"+60")}${mi("h-caixa","📦","Abrir a caixa misteriosa","3 ingredientes + técnica · a IA avalia",d.caixa,"até +300")}${rewardBtn("chef")}</div>
    ${fan.recipe?`<div class="hist" style="margin-top:12px"><div class="who">🍳 Sua criação</div><b>${esc(fan.recipe.prato)}</b> · nota ${esc(fan.recipe.nota)}</div>`:""}</div>`}
   else if(scr==="a-pal"||scr==="h-star"||scr==="c-tor"||scr==="a-var"){const cfg={"a-pal":[ARENA.pal.q,ARENA.pal.o,"pal","arena",100,"palC"],"h-star":[CHEF.star.q,CHEF.star.o,"star","chef",60,"starC"],"c-tor":[NETO.tor,Object.keys(TEAMS),"tor","craque",60,null],"a-var":[ARENA.var.q,ARENA.var.o,"var","arena",80,"varC"]}[scr];
@@ -814,7 +814,7 @@ function PhoneApp(root,key){
    <div class="ingr">${CHEF.ings.map(([e,n])=>`<button class="ing ${tmp.ings.includes(n)?"on":""}" data-ing="${esc(n)}" ${tmp.ings.length>=3&&!tmp.ings.includes(n)?"disabled":""}><span>${e}</span>${esc(n)}</button>`).join("")}</div>
    <div class="pills" style="margin-top:12px">${CHEF.tecs.map(t=>`<button class="pill ${tmp.tec===t?"on":""}" data-tec="${t}">${t}</button>`).join("")}</div>
    <button class="cta" id="cxGo" ${tmp.ings.length===3&&tmp.tec?"":"disabled"}>Cozinhar e avaliar</button></div>`}
-  else if(scr==="reward"){const sp=spo(tmp.rw);h=`<div class="ct"><button class="back" data-go="hub">‹ Playverse</button><h2>Recompensa <span>liberada</span></h2><div class="coupon"><small>${esc(sp.name)} · ${esc(sp.cat)}</small><b>${esc(sp.reward)}</b><div>1 por Band Pass</div><div class="code">${esc(sp.code)}-${esc(fan.id.slice(0,4).toUpperCase())}</div></div><p class="foot" style="margin-top:10px">Marca fictícia para demonstração.</p><button class="cta ghost" data-go="hub">Voltar</button></div>`}
+  else if(scr==="reward"){const sp=spo(tmp.rw);h=`<div class="ct"><button class="back" data-go="hub">‹ Band Connect</button><h2>Recompensa <span>liberada</span></h2><div class="coupon"><small>${esc(sp.name)} · ${esc(sp.cat)}</small><b>${esc(sp.reward)}</b><div>1 por Band Pass</div><div class="code">${esc(sp.code)}-${esc(fan.id.slice(0,4).toUpperCase())}</div></div><p class="foot" style="margin-top:10px">Marca fictícia para demonstração.</p><button class="cta ghost" data-go="hub">Voltar</button></div>`}
   root.innerHTML=`<div class="app">${hd()}${h}<div class="toast"></div></div>`;
   if(scr==="a-quiz"&&qs.ans==null)startT();
  }

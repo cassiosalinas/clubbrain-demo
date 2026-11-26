@@ -249,7 +249,7 @@ function renderPlan(j){
 async function gen(){
   aiBusy = true; aiOut = null; render();
   const cat = P.map(p => `${p.n} (${p.prop}): ${p.unit==='% por venda' ? p.price+'%' : 'R$ '+fmt(p.price)} ${p.unit}`).join('; ');
-  const prompt = `Você é o agente comercial do Intelligence Hub da Band (Band Playverse: Grupo Bandeirantes × Virtual Fans × ClubBrain). Monte uma proposta comercial para um anunciante do segmento "${SEG[seg]}", objetivo "${OBJ[obj]}", verba de R$ ${fmt(budget)}.
+  const prompt = `Você é o agente comercial do Intelligence Hub da Band (Band Connect: Grupo Bandeirantes × Virtual Fans × ClubBrain). Monte uma proposta comercial para um anunciante do segmento "${SEG[seg]}", objetivo "${OBJ[obj]}", verba de R$ ${fmt(budget)}.
 Use SOMENTE este cardápio (valores ilustrativos): ${cat}.
 Programas: Jogo Aberto (Renata Fan, seg-sex 11h-13h, enquetes e palpites na ArenaBand), Os Donos da Bola (Neto, 13h-14h30, desafios), Show do Esporte (domingo), Pré-Jogo de clássicos, História Viva (acervo), MasterChef (gastronomia), Gincana das Torcidas (causas).
 ${ST.cart.length ? 'Partir destes itens já escolhidos: ' + ST.cart.map(id => P.find(x => x.id===id).n).join(', ') + '.' : ''}

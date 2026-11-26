@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Experiências Band · Band Playverse</title>
+<title>Experiências Band · Band Connect</title>
 <link rel="stylesheet" href="/band/assets/band-site.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
   <div class="sec"><div class="eyebrow">Pagar com XP</div><h2>Prefere trocar XP? Recompensas Minu</h2></div>
   <div class="grid g4" id="rewards"></div>
 
-  <div class="sec"><div class="eyebrow">Como funciona por trás</div><h2>Uma compra, seis sistemas</h2><p class="lead">Ao confirmar, o pedido vira evento no Band Playverse: o gateway confirma o pagamento, o ERP lança a receita, a nota fiscal é emitida, o CRM registra o pedido e a jornada de pós-compra dispara. Abra o <a href="/band/os">Painel Band</a> em outra aba para ver acontecer.</p></div>
+  <div class="sec"><div class="eyebrow">Como funciona por trás</div><h2>Uma compra, seis sistemas</h2><p class="lead">Ao confirmar, o pedido vira evento no Band Connect: o gateway confirma o pagamento, o ERP lança a receita, a nota fiscal é emitida, o CRM registra o pedido e a jornada de pós-compra dispara. Abra o <a href="/band/os">Painel Band</a> em outra aba para ver acontecer.</p></div>
   <div class="grid g3">
     <div class="card"><b>💳 Gateway / Pix</b><p style="color:var(--dim);font-size:13px;margin:6px 0 0">Webhook de pagamento confirmado. Nesta demo, simulado.</p></div>
     <div class="card"><b>🧾 ERP + NFS-e</b><p style="color:var(--dim);font-size:13px;margin:6px 0 0">Título recebido e nota fiscal de serviço, com conciliação do 50/50.</p></div>
@@ -36,8 +36,8 @@ B.top('/band/loja');
 const P = [
   { id:'plateia-ja', kind:'Plateia', emoji:'🎙️', bg:'linear-gradient(135deg,#2f6bff,#0b1a40)', name:'Plateia do Jogo Aberto', d:'Assista ao vivo no estúdio, com credencial e foto no cenário. Sujeito a disponibilidade da produção.', price:89, when:'Dias úteis · 10h30', prog:'ja', tag:'Mais procurado' },
   { id:'tour', kind:'Bastidores', emoji:'🎬', bg:'linear-gradient(135deg,#a86bff,#2b145c)', name:'Tour pelos estúdios da Band', d:'Visita guiada ao Morumbi: estúdios de esporte, controle mestre e a história da emissora.', price:120, when:'Sábados · 10h e 14h', prog:'se' },
-  { id:'stock', kind:'Velocidade', emoji:'🏁', bg:'linear-gradient(135deg,#ef4444,#3a0a0a)', name:'Ingresso · etapa da Stock Car', d:'Arquibancada com kit Band Playverse e bolão do pódio valendo 2× XP no dia.', price:180, when:'Etapa a confirmar', prog:'stock', tag:'Exclusivo Band' },
-  { id:'kit', kind:'Produto', emoji:'🧢', bg:'linear-gradient(135deg,#f5b82e,#7a4b00)', name:'Kit Band Playverse', d:'Boné, caneca e adesivos com o selo do Band Pass. Entrega para todo o Brasil.', price:149, when:'Envio em até 7 dias' },
+  { id:'stock', kind:'Velocidade', emoji:'🏁', bg:'linear-gradient(135deg,#ef4444,#3a0a0a)', name:'Ingresso · etapa da Stock Car', d:'Arquibancada com kit Band Connect e bolão do pódio valendo 2× XP no dia.', price:180, when:'Etapa a confirmar', prog:'stock', tag:'Exclusivo Band' },
+  { id:'kit', kind:'Produto', emoji:'🧢', bg:'linear-gradient(135deg,#f5b82e,#7a4b00)', name:'Kit Band Connect', d:'Boné, caneca e adesivos com o selo do Band Pass. Entrega para todo o Brasil.', price:149, when:'Envio em até 7 dias' },
   { id:'premium', kind:'Assinatura', emoji:'⭐', bg:'linear-gradient(135deg,#0ea5e9,#062a3d)', name:'Band Pass Premium · 12 meses', d:'2× XP em todos os programas, acesso antecipado a plateias e sorteios exclusivos.', price:99, when:'Renovação anual', noDiscount:true },
   { id:'papo', kind:'Bastidores', emoji:'🤝', bg:'linear-gradient(135deg,#ff6a1a,#3d1500)', name:'Bate-papo com apresentador', d:'Encontro em grupo pequeno depois do programa. Datas e apresentadores sujeitos a autorização da Band e dos talentos.', price:250, when:'Datas sob consulta', prog:'db', tag:'Edição limitada' }
 ];

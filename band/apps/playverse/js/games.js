@@ -1,4 +1,4 @@
-/* Band Playverse · jogos em Phaser 3 (texturas geradas em código, sem imagens externas) */
+/* Band Connect · jogos em Phaser 3 (texturas geradas em código, sem imagens externas) */
 (function(){
 BP.Games = {
   start(kind, host, onEnd) {
@@ -21,7 +21,7 @@ function penalti(onEnd) {
       g.fillStyle(0x0b1020); g.fillRect(0, 0, W, 110);
       // placas de patrocínio
       g.fillStyle(0xff6a1a); g.fillRect(0, 2, W, 22);
-      this.add.text(W / 2, 13, "PULSO ENERGY  ·  BAND PLAYVERSE  ·  PULSO ENERGY", { fontFamily: "Arial", fontSize: "12px", color: "#1a0d00", fontStyle: "bold" }).setOrigin(.5);
+      this.add.text(W / 2, 13, "PULSO ENERGY  ·  BAND CONNECT  ·  PULSO ENERGY", { fontFamily: "Arial", fontSize: "12px", color: "#1a0d00", fontStyle: "bold" }).setOrigin(.5);
       // área
       g.lineStyle(2, 0xffffff, .7); g.strokeRect(40, 110, 260, 120); g.strokeRect(100, 110, 140, 50); g.fillStyle(0xffffff); g.fillCircle(170, 300, 3);
       // gol
