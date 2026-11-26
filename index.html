@@ -2980,7 +2980,11 @@ function chooseClubFromCover(id){
 function selectClub(id, silent){
   const c = CLUB_PROFILES[id];
   if(!c) return;
-  document.title = id === 'band' ? 'Intelligence Hub' : 'Torcedor 360 · Fan Platform';
+  // Aba: Band = "Intelligence Hub"; clubes = título original. Enquanto o login de /band/os
+  // está aberto, o clube padrão carregado por baixo não troca o título.
+  const loginUp = (document.getElementById('login-screen') || {}).style && document.getElementById('login-screen').style.display !== 'none';
+  const onBandPath = (window.ENTRY_PATH || location.pathname).indexOf('/band') === 0;
+  document.title = (id === 'band' || (onBandPath && loginUp)) ? 'Intelligence Hub' : 'Torcedor 360 · Fan Platform';
   if(window.ROLE_CLUB && id !== window.ROLE_CLUB) return;
   currentClubId = id;
 
